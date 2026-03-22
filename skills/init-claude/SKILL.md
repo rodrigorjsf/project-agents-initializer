@@ -35,27 +35,19 @@ Claude Code's configuration hierarchy enables powerful progressive disclosure:
 
 ### Phase 1: Codebase Analysis
 
-Launch a subagent to analyze the codebase. Use the Task tool with `agent_type: "general-purpose"` and model `claude-sonnet-4-5`:
+Delegate to the `codebase-analyzer` agent with this task:
 
-**Subagent prompt** — read and include the full content of `${CLAUDE_PLUGIN_ROOT}/agents/codebase-analyzer.md` in the subagent prompt. Append to it:
+> Analyze the project at the current working directory. Return ONLY non-standard, non-obvious information that would cause Claude to make mistakes if it didn't know them. Be ruthlessly minimal.
 
-```
-Analyze the project at the current working directory. Return ONLY non-standard, non-obvious information that would cause Claude to make mistakes if it didn't know them. Be ruthlessly minimal.
-```
-
-Wait for the subagent to complete. Parse its structured output.
+The agent runs on Sonnet with read-only tools (Read, Grep, Glob, Bash) in an isolated context. Wait for it to complete and parse its structured output.
 
 ### Phase 2: Scope Detection
 
-Launch a second subagent to detect scopes. Use the Task tool with `agent_type: "general-purpose"` and model `claude-sonnet-4-5`:
+Delegate to the `scope-detector` agent with this task:
 
-**Subagent prompt** — read and include the full content of `${CLAUDE_PLUGIN_ROOT}/agents/scope-detector.md` in the subagent prompt. Append to it:
+> Detect scopes in the project at the current working directory. Only flag scopes with genuinely different tooling or conventions. A simple single-package project should have ZERO additional scopes. Also identify areas that would benefit from path-scoped .claude/rules/ files.
 
-```
-Detect scopes in the project at the current working directory. Only flag scopes with genuinely different tooling or conventions. A simple single-package project should have ZERO additional scopes. Also identify areas that would benefit from path-scoped .claude/rules/ files.
-```
-
-Wait for the subagent to complete. Parse its structured output.
+Wait for it to complete and parse its structured output.
 
 ### Phase 3: Generate Files
 

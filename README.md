@@ -44,7 +44,27 @@ To maintain context integrity during execution, this plugin uses **subagent isol
 | `scope-detector` | Identifies distinct scopes/contexts in the project | init skills |
 | `file-evaluator` | Assesses existing config file quality against research criteria | improve skills |
 
-All subagents run on **Claude Sonnet** for cost efficiency. They return structured summaries — high signal, low noise — keeping the orchestrator's context clean.
+All subagents are defined as native Claude Code subagent files with proper YAML frontmatter (`name`, `description`, `tools`, `model`, `maxTurns`). They run on **Claude Sonnet** with read-only tools (`Read`, `Grep`, `Glob`, `Bash`) for cost efficiency and safety. They return structured summaries — high signal, low noise — keeping the orchestrator's context clean.
+
+#### Subagent Metadata
+
+Each agent file in `agents/` follows the [official Anthropic subagent specification](https://docs.anthropic.com/en/docs/claude-code/sub-agents):
+
+```yaml
+---
+name: codebase-analyzer                    # Unique identifier (kebab-case)
+description: "When to use this agent..."   # Routing signal for Claude's delegation
+tools: Read, Grep, Glob, Bash             # Restricted to read-only + shell
+model: sonnet                              # Cost-efficient for investigation tasks
+maxTurns: 15                               # Prevents runaway execution
+---
+```
+
+Key design decisions:
+- **Tool restriction**: Agents can read and search but cannot write files — all modifications are done by the orchestrating skill
+- **Model selection**: Sonnet provides adequate reasoning for analysis at lower cost than Opus
+- **Turn limits**: `maxTurns: 15-20` prevents infinite loops while allowing thorough analysis
+- **Isolated context**: Each agent receives only its system prompt plus the task — no conversation history
 
 ### Progressive Disclosure
 
@@ -263,7 +283,8 @@ project-agents-initializer/
 │   ├── a-guide-to-claude.md     # Reference: CLAUDE.md best practices
 │   ├── Evaluating-AGENTS-paper.pdf  # ETH Zurich research paper
 │   ├── research-llm-context-optimization.md  # Context optimization research
-│   └── research-claude-code-skills-format.md  # Skills/plugin format research
+│   ├── research-claude-code-skills-format.md  # Skills/plugin format research
+│   └── research-subagent-best-practices.md    # Subagent definition best practices
 ├── README.md
 └── LICENSE
 ```
@@ -273,10 +294,13 @@ project-agents-initializer/
 Contributions welcome. When modifying skills or subagent definitions:
 
 1. Ensure all claims are backed by evidence from the `docs/` directory
-2. Keep skill files focused — one concern per skill
-3. Subagent prompts should request structured output formats
-4. Test with both simple (single-package) and complex (monorepo) projects
-5. Verify generated files pass all quality guardrails (under 200 lines, no bloat, etc.)
+2. Keep generated files under 200 lines (hard limit from Anthropic)
+3. Subagent definitions must include YAML frontmatter (`name`, `description`, `tools`, `model`, `maxTurns`)
+4. Subagent tools should be restricted to read-only unless write access is justified
+5. Subagent prompts should request structured output formats
+6. Keep skill files focused — one concern per skill
+7. Test with both simple (single-package) and complex (monorepo) projects
+8. Verify generated files pass all quality guardrails (under 200 lines, no bloat, etc.)
 
 ## License
 

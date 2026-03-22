@@ -35,42 +35,35 @@ Key metrics from research:
 
 ### Phase 1: Current State Analysis
 
-Launch a subagent to evaluate existing files. Use the Task tool with `agent_type: "general-purpose"` and model `claude-sonnet-4-5`:
+Delegate to the `file-evaluator` agent with this task:
 
-**Subagent prompt** — read and include the full content of `${CLAUDE_PLUGIN_ROOT}/agents/file-evaluator.md` in the subagent prompt. Append to it:
+> Evaluate all CLAUDE.md files and .claude/rules/ files in the project at the current working directory. Check for:
+> 1. Files over 200 lines
+> 2. Bloat indicators (directory listings, obvious conventions, vague instructions)
+> 3. Stale references (file paths that don't exist, commands that aren't in package.json)
+> 4. Contradictions between files (including between CLAUDE.md and .claude/rules/)
+> 5. Progressive disclosure opportunities (content that should be in separate files or path-scoped rules)
+> 6. Missing scope-specific files
+> 7. Rules files without path-scoping that should have it (wasting tokens on every request)
+> 8. Content in root CLAUDE.md that only applies to specific file patterns (should be in .claude/rules/)
+>
+> Return a structured assessment with specific line numbers and content for each issue.
 
-```
-Evaluate all CLAUDE.md files and .claude/rules/ files in the project at the current working directory. Check for:
-1. Files over 200 lines
-2. Bloat indicators (directory listings, obvious conventions, vague instructions)
-3. Stale references (file paths that don't exist, commands that aren't in package.json)
-4. Contradictions between files (including between CLAUDE.md and .claude/rules/)
-5. Progressive disclosure opportunities (content that should be in separate files or path-scoped rules)
-6. Missing scope-specific files
-7. Rules files without path-scoping that should have it (wasting tokens on every request)
-8. Content in root CLAUDE.md that only applies to specific file patterns (should be in .claude/rules/)
-
-Return a structured assessment with specific line numbers and content for each issue.
-```
-
-Wait for the subagent to complete. Parse its structured output.
+The agent runs on Sonnet with read-only tools in an isolated context. Wait for it to complete and parse its structured output.
 
 ### Phase 2: Codebase Comparison
 
-Launch a second subagent to verify current state. Use the Task tool with `agent_type: "general-purpose"` and model `claude-sonnet-4-5`:
+Delegate to the `codebase-analyzer` agent with this task:
 
-**Subagent prompt** — read and include the full content of `${CLAUDE_PLUGIN_ROOT}/agents/codebase-analyzer.md` in the subagent prompt. Append to it:
+> Analyze the project at the current working directory. Focus on:
+> 1. Verifying that tooling commands documented in CLAUDE.md files still work
+> 2. Identifying scopes that have distinct tooling but lack their own CLAUDE.md
+> 3. Detecting file patterns that have specific conventions but lack path-scoped .claude/rules/
+> 4. Detecting new domain areas not covered by existing documentation
+>
+> Return ONLY actionable findings.
 
-```
-Analyze the project at the current working directory. Focus on:
-1. Verifying that tooling commands documented in CLAUDE.md files still work
-2. Identifying scopes that have distinct tooling but lack their own CLAUDE.md
-3. Detecting file patterns that have specific conventions but lack path-scoped .claude/rules/
-4. Detecting new domain areas not covered by existing documentation
-Return ONLY actionable findings.
-```
-
-Wait for the subagent to complete. Parse its structured output.
+Wait for it to complete and parse its structured output.
 
 ### Phase 3: Generate Improvement Plan
 
