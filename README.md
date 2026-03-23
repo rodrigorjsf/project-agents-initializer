@@ -178,7 +178,7 @@ claude plugin install agents-initializer@project-agents-initializer --scope loca
 
 ### npx skills add (Third-Party Skills CLI)
 
-For users of the [skills CLI](https://skills.sh/) — works with Claude Code, VS Code Copilot, Cursor, Windsurf, and other AI coding tools:
+For users of the [skills CLI](https://skills.sh/) — works with VS Code Copilot, Cursor, Windsurf, and other AI coding tools:
 
 ```bash
 # Install all skills globally (available in all projects)
@@ -188,7 +188,7 @@ npx skills add rodrigorjsf/project-agents-initializer -g
 npx skills add rodrigorjsf/project-agents-initializer
 
 # Install for specific AI tools
-npx skills add rodrigorjsf/project-agents-initializer --agent claude-code cursor
+npx skills add rodrigorjsf/project-agents-initializer --agent cursor copilot
 
 # Install only specific skills
 npx skills add rodrigorjsf/project-agents-initializer --skill init-claude improve-claude
@@ -197,16 +197,7 @@ npx skills add rodrigorjsf/project-agents-initializer --skill init-claude improv
 npx skills add rodrigorjsf/project-agents-initializer --list
 ```
 
-**Agents included:** `npx skills add` copies the entire skill folder, which includes the subagent definitions in each skill's `agents/` subdirectory. After installation, each skill will have its subagents available at:
-
-```
-~/.claude/skills/init-claude/agents/codebase-analyzer.md
-~/.claude/skills/init-claude/agents/scope-detector.md
-~/.claude/skills/improve-claude/agents/file-evaluator.md
-...
-```
-
-In **Claude Code**, these agents are registered as named subagents by the plugin install path (see above). In other AI tools (Copilot, Cursor, Windsurf), the agent content is available as inline reference within the skill folder — your AI tool can read and use these files when the skill runs.
+**These are standalone skills** — they perform all analysis inline without delegating to subagents. They work with any AI coding tool without requiring Claude Code's subagent system.
 
 ### Manual Installation
 
@@ -285,26 +276,23 @@ project-agents-initializer/
 ├── .claude-plugin/
 │   └── marketplace.json             # Marketplace catalog (Claude Code plugin system)
 ├── plugins/
-│   └── agents-initializer/
+│   └── agents-initializer/          # Claude Code plugin — agent-delegating skills + proper agents
 │       ├── .claude-plugin/
 │       │   └── plugin.json          # Plugin manifest
 │       ├── skills/
-│       │   ├── init-agents/
-│       │   │   ├── SKILL.md         # Initialize AGENTS.md hierarchy
-│       │   │   └── agents/          # Subagents bundled for npx skills add
-│       │   ├── init-claude/
-│       │   │   ├── SKILL.md         # Initialize CLAUDE.md hierarchy
-│       │   │   └── agents/          # Subagents bundled for npx skills add
-│       │   ├── improve-agents/
-│       │   │   ├── SKILL.md         # Improve existing AGENTS.md files
-│       │   │   └── agents/          # Subagents bundled for npx skills add
-│       │   └── improve-claude/
-│       │       ├── SKILL.md         # Improve existing CLAUDE.md files
-│       │       └── agents/          # Subagents bundled for npx skills add
-│       └── agents/                  # Authoritative agent definitions (Claude Code plugin)
+│       │   ├── init-agents/SKILL.md     # Delegates to codebase-analyzer + scope-detector agents
+│       │   ├── init-claude/SKILL.md     # Delegates to codebase-analyzer + scope-detector agents
+│       │   ├── improve-agents/SKILL.md  # Delegates to file-evaluator + codebase-analyzer agents
+│       │   └── improve-claude/SKILL.md  # Delegates to file-evaluator + codebase-analyzer agents
+│       └── agents/                  # Claude Code subagents (proper YAML spec)
 │           ├── codebase-analyzer.md # Subagent: tech stack and tooling detection
 │           ├── scope-detector.md    # Subagent: project scope/context detection
-│           └── file-evaluator.md   # Subagent: config file quality assessment
+│           └── file-evaluator.md    # Subagent: config file quality assessment
+├── skills/                          # npx skills add — standalone skills (no agent delegation)
+│   ├── init-agents/SKILL.md         # Self-contained: inline analysis, no subagents required
+│   ├── init-claude/SKILL.md         # Self-contained: inline analysis, no subagents required
+│   ├── improve-agents/SKILL.md      # Self-contained: inline analysis, no subagents required
+│   └── improve-claude/SKILL.md      # Self-contained: inline analysis, no subagents required
 ├── docs/
 │   ├── a-guide-to-agents.md         # Reference: AGENTS.md best practices
 │   ├── a-guide-to-claude.md         # Reference: CLAUDE.md best practices
@@ -316,11 +304,13 @@ project-agents-initializer/
 └── LICENSE
 ```
 
-> **Why `plugins/agents-initializer/`?**
-> The Claude Code plugin system requires each plugin to live in its own subdirectory with a `source` path in `marketplace.json`. The `npx skills add` CLI does a recursive SKILL.md search, so it finds skills in `plugins/agents-initializer/skills/` automatically.
+> **Two separate skill sets by design:**
 >
-> **Why are agents duplicated inside skill folders?**
-> `npx skills add` copies each skill's full directory (SKILL.md + all files alongside it). The authoritative agent definitions live in `plugins/agents-initializer/agents/` and are installed by Claude Code's plugin system. The copies inside each `skills/*/agents/` ensure the same agents are available when installed via `npx skills add`.
+> - `plugins/agents-initializer/skills/` — **Claude Code plugin skills** that follow the official spec: analysis is delegated to isolated `codebase-analyzer`, `scope-detector`, and `file-evaluator` subagents, keeping the orchestrating context clean. Requires Claude Code's subagent system.
+>
+> - `skills/` — **Standalone skills** for `npx skills add` users. Perform all analysis inline with direct bash/file commands. No subagent delegation, compatible with any AI coding tool.
+>
+> `npx skills add` does a recursive SKILL.md search. Both paths are discovered, but they have the same skill names — the root `skills/` (standalone versions) are processed last and take precedence, ensuring npx users get the tool-agnostic standalone versions.
 
 ## Contributing
 
