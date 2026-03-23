@@ -197,6 +197,17 @@ npx skills add rodrigorjsf/project-agents-initializer --skill init-claude improv
 npx skills add rodrigorjsf/project-agents-initializer --list
 ```
 
+**Agents included:** `npx skills add` copies the entire skill folder, which includes the subagent definitions in each skill's `agents/` subdirectory. After installation, each skill will have its subagents available at:
+
+```
+~/.claude/skills/init-claude/agents/codebase-analyzer.md
+~/.claude/skills/init-claude/agents/scope-detector.md
+~/.claude/skills/improve-claude/agents/file-evaluator.md
+...
+```
+
+In **Claude Code**, these agents are registered as named subagents by the plugin install path (see above). In other AI tools (Copilot, Cursor, Windsurf), the agent content is available as inline reference within the skill folder — your AI tool can read and use these files when the skill runs.
+
 ### Manual Installation
 
 ```bash
@@ -279,14 +290,18 @@ project-agents-initializer/
 │       │   └── plugin.json          # Plugin manifest
 │       ├── skills/
 │       │   ├── init-agents/
-│       │   │   └── SKILL.md         # Initialize AGENTS.md hierarchy
+│       │   │   ├── SKILL.md         # Initialize AGENTS.md hierarchy
+│       │   │   └── agents/          # Subagents bundled for npx skills add
 │       │   ├── init-claude/
-│       │   │   └── SKILL.md         # Initialize CLAUDE.md hierarchy
+│       │   │   ├── SKILL.md         # Initialize CLAUDE.md hierarchy
+│       │   │   └── agents/          # Subagents bundled for npx skills add
 │       │   ├── improve-agents/
-│       │   │   └── SKILL.md         # Improve existing AGENTS.md files
+│       │   │   ├── SKILL.md         # Improve existing AGENTS.md files
+│       │   │   └── agents/          # Subagents bundled for npx skills add
 │       │   └── improve-claude/
-│       │       └── SKILL.md         # Improve existing CLAUDE.md files
-│       └── agents/
+│       │       ├── SKILL.md         # Improve existing CLAUDE.md files
+│       │       └── agents/          # Subagents bundled for npx skills add
+│       └── agents/                  # Authoritative agent definitions (Claude Code plugin)
 │           ├── codebase-analyzer.md # Subagent: tech stack and tooling detection
 │           ├── scope-detector.md    # Subagent: project scope/context detection
 │           └── file-evaluator.md   # Subagent: config file quality assessment
@@ -303,6 +318,9 @@ project-agents-initializer/
 
 > **Why `plugins/agents-initializer/`?**
 > The Claude Code plugin system requires each plugin to live in its own subdirectory with a `source` path in `marketplace.json`. The `npx skills add` CLI does a recursive SKILL.md search, so it finds skills in `plugins/agents-initializer/skills/` automatically.
+>
+> **Why are agents duplicated inside skill folders?**
+> `npx skills add` copies each skill's full directory (SKILL.md + all files alongside it). The authoritative agent definitions live in `plugins/agents-initializer/agents/` and are installed by Claude Code's plugin system. The copies inside each `skills/*/agents/` ensure the same agents are available when installed via `npx skills add`.
 
 ## Contributing
 
