@@ -1,35 +1,21 @@
 {
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "project-agents-initializer",
+  "version": "1.0.0",
+  "description": "Evidence-based AGENTS.md and CLAUDE.md initializer and optimizer plugin for AI coding agents",
   "owner": {
-    "name": "Project Agents Initializer Contributors"
-  },
-  "metadata": {
-    "description": "Evidence-based AGENTS.md and CLAUDE.md initializer and optimizer plugin for AI coding agents",
-    "version": "1.0.0"
+    "name": "rodrigorjsf"
   },
   "plugins": [
     {
       "name": "agents-initializer",
       "description": "Generate and optimize minimal, scoped AGENTS.md and CLAUDE.md configuration files based on academic research and Anthropic best practices. Uses subagent-driven analysis for context-efficient file generation.",
       "version": "1.0.0",
-      "source": ".",
-      "category": "developer-tools",
-      "tags": [
-        "agents-md",
-        "claude-md",
-        "context-engineering",
-        "progressive-disclosure",
-        "initialization",
-        "optimization"
-      ],
-      "keywords": [
-        "AGENTS.md",
-        "CLAUDE.md",
-        "init",
-        "improve",
-        "context optimization",
-        "progressive disclosure"
-      ]
+      "author": {
+        "name": "rodrigorjsf"
+      },
+      "source": "./plugins/agents-initializer",
+      "category": "developer-tools"
     }
   ]
 }

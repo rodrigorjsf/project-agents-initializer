@@ -49,7 +49,7 @@ All subagents are defined as native Claude Code subagent files with proper YAML 
 
 #### Subagent Metadata
 
-Each agent file in `agents/` follows the [official Anthropic subagent specification](https://docs.anthropic.com/en/docs/claude-code/sub-agents):
+Each agent file in `plugins/agents-initializer/agents/` follows the [official Anthropic subagent specification](https://docs.anthropic.com/en/docs/claude-code/sub-agents):
 
 ```yaml
 ---
@@ -205,14 +205,14 @@ git clone https://github.com/rodrigorjsf/project-agents-initializer.git /tmp/pro
 
 # For Claude Code (project-level)
 mkdir -p .claude/skills
-cp -r /tmp/project-agents-initializer/skills/* .claude/skills/
+cp -r /tmp/project-agents-initializer/plugins/agents-initializer/skills/* .claude/skills/
 
 # For Claude Code (user-level, all projects)
-cp -r /tmp/project-agents-initializer/skills/* ~/.claude/skills/
+cp -r /tmp/project-agents-initializer/plugins/agents-initializer/skills/* ~/.claude/skills/
 
 # For VS Code / GitHub Copilot
 mkdir -p .agents/skills
-cp -r /tmp/project-agents-initializer/skills/* .agents/skills/
+cp -r /tmp/project-agents-initializer/plugins/agents-initializer/skills/* .agents/skills/
 
 # Clean up
 rm -rf /tmp/project-agents-initializer
@@ -272,24 +272,27 @@ All research documents are saved in the `docs/` directory for reference.
 ```
 project-agents-initializer/
 ├── .claude-plugin/
-│   ├── plugin.json              # Plugin manifest
-│   └── marketplace.json         # Marketplace catalog
-├── skills/
-│   ├── init-agents/
-│   │   └── SKILL.md             # Initialize AGENTS.md hierarchy
-│   ├── init-claude/
-│   │   └── SKILL.md             # Initialize CLAUDE.md hierarchy
-│   ├── improve-agents/
-│   │   └── SKILL.md             # Improve existing AGENTS.md files
-│   └── improve-claude/
-│       └── SKILL.md             # Improve existing CLAUDE.md files
-├── agents/
-│   ├── codebase-analyzer.md     # Subagent: tech stack and tooling detection
-│   ├── scope-detector.md        # Subagent: project scope/context detection
-│   └── file-evaluator.md        # Subagent: config file quality assessment
+│   └── marketplace.json             # Marketplace catalog (Claude Code plugin system)
+├── plugins/
+│   └── agents-initializer/
+│       ├── .claude-plugin/
+│       │   └── plugin.json          # Plugin manifest
+│       ├── skills/
+│       │   ├── init-agents/
+│       │   │   └── SKILL.md         # Initialize AGENTS.md hierarchy
+│       │   ├── init-claude/
+│       │   │   └── SKILL.md         # Initialize CLAUDE.md hierarchy
+│       │   ├── improve-agents/
+│       │   │   └── SKILL.md         # Improve existing AGENTS.md files
+│       │   └── improve-claude/
+│       │       └── SKILL.md         # Improve existing CLAUDE.md files
+│       └── agents/
+│           ├── codebase-analyzer.md # Subagent: tech stack and tooling detection
+│           ├── scope-detector.md    # Subagent: project scope/context detection
+│           └── file-evaluator.md   # Subagent: config file quality assessment
 ├── docs/
-│   ├── a-guide-to-agents.md     # Reference: AGENTS.md best practices
-│   ├── a-guide-to-claude.md     # Reference: CLAUDE.md best practices
+│   ├── a-guide-to-agents.md         # Reference: AGENTS.md best practices
+│   ├── a-guide-to-claude.md         # Reference: CLAUDE.md best practices
 │   ├── Evaluating-AGENTS-paper.pdf  # ETH Zurich research paper
 │   ├── research-llm-context-optimization.md  # Context optimization research
 │   ├── research-claude-code-skills-format.md  # Skills/plugin format research
@@ -297,6 +300,9 @@ project-agents-initializer/
 ├── README.md
 └── LICENSE
 ```
+
+> **Why `plugins/agents-initializer/`?**
+> The Claude Code plugin system requires each plugin to live in its own subdirectory with a `source` path in `marketplace.json`. The `npx skills add` CLI does a recursive SKILL.md search, so it finds skills in `plugins/agents-initializer/skills/` automatically.
 
 ## Contributing
 
