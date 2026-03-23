@@ -15,6 +15,7 @@ The ETH Zurich study ["Evaluating AGENTS.md: Are Repository-Level Context Files 
 | Developer-written minimal file | **+4% success rate** | +19% cost |
 
 **Key findings:**
+
 - Auto-generated files are **redundant with existing documentation** and add unnecessary instructions
 - Unnecessary requirements **make tasks harder** — agents follow them, spending more steps on irrelevant work
 - Context files don't provide effective codebase overviews — directory listings don't help agents navigate
@@ -61,6 +62,7 @@ maxTurns: 15                               # Prevents runaway execution
 ```
 
 Key design decisions:
+
 - **Tool restriction**: Agents can read and search but cannot write files — all modifications are done by the orchestrating skill
 - **Model selection**: Sonnet provides adequate reasoning for analysis at lower cost than Opus
 - **Turn limits**: `maxTurns: 15-20` prevents infinite loops while allowing thorough analysis
@@ -87,12 +89,14 @@ Root AGENTS.md / CLAUDE.md        ← Always loaded (15-40 lines)
 Initialize an optimized AGENTS.md file hierarchy for your project.
 
 **What it does:**
+
 1. Launches a `codebase-analyzer` subagent to detect your tech stack and tooling
 2. Launches a `scope-detector` subagent to identify distinct project contexts
 3. Generates minimal per-scope AGENTS.md files with progressive disclosure pointers
 4. Presents all files for review before writing
 
 **What it generates:**
+
 - Root `AGENTS.md` — project essentials only
 - Subdirectory `AGENTS.md` files — one per detected scope
 - Domain files (`docs/TESTING.md`, `docs/BUILD.md`, etc.) — only when non-standard patterns exist
@@ -102,6 +106,7 @@ Initialize an optimized AGENTS.md file hierarchy for your project.
 Initialize an optimized CLAUDE.md hierarchy with `.claude/rules/` for your project.
 
 **Same as `init-agents` but also:**
+
 - Generates `.claude/rules/*.md` path-scoped rules for file-pattern-specific conventions
 - Leverages Claude Code's on-demand loading for subdirectory CLAUDE.md files
 - Maximizes on-demand loading, minimizes always-loaded content
@@ -111,12 +116,14 @@ Initialize an optimized CLAUDE.md hierarchy with `.claude/rules/` for your proje
 Evaluate and improve existing AGENTS.md files.
 
 **What it does:**
+
 1. Launches a `file-evaluator` subagent to assess current file quality
 2. Launches a `codebase-analyzer` subagent to verify references and detect gaps
 3. Generates an improvement plan (removals → refactoring → additions)
 4. Presents changes with token savings metrics before applying
 
 **What it checks:**
+
 - Files over 200 lines
 - Bloat indicators (directory listings, obvious conventions, vague instructions)
 - Stale references (paths that don't exist, commands that aren't in package.json)
@@ -129,6 +136,7 @@ Evaluate and improve existing AGENTS.md files.
 Evaluate and improve existing CLAUDE.md files and `.claude/rules/`.
 
 **Same as `improve-agents` but also:**
+
 - Evaluates `.claude/rules/` files for missing path-scoping
 - Converts pattern-specific rules from CLAUDE.md to path-scoped `.claude/rules/`
 - Reports always-loaded vs on-demand token distribution
@@ -142,7 +150,7 @@ The recommended way to install for Claude Code users:
 
 ```bash
 # Step 1: Add the marketplace (one-time setup)
-/plugin marketplace add <github-owner>/project-agents-initializer
+/plugin marketplace add rodrigorjsf/project-agents-initializer
 
 # Step 2: Install the plugin
 /plugin install agents-initializer@project-agents-initializer
@@ -155,6 +163,7 @@ claude plugin install agents-initializer@project-agents-initializer
 ```
 
 **Scopes:**
+
 - Default (user scope): Available in all your projects
 - Project scope: Shared with your team via `.claude/settings.json`
 - Local scope: Only for you in this project (gitignored)
@@ -173,40 +182,40 @@ For users of the [skills CLI](https://skills.sh/) — works with Claude Code, VS
 
 ```bash
 # Install all skills globally (available in all projects)
-npx skills add <github-owner>/project-agents-initializer -g
+npx skills add rodrigorjsf/project-agents-initializer -g
 
 # Install all skills for the current project only
-npx skills add <github-owner>/project-agents-initializer
+npx skills add rodrigorjsf/project-agents-initializer
 
 # Install for specific AI tools
-npx skills add <github-owner>/project-agents-initializer --agent claude-code cursor
+npx skills add rodrigorjsf/project-agents-initializer --agent claude-code cursor
 
 # Install only specific skills
-npx skills add <github-owner>/project-agents-initializer --skill init-claude improve-claude
+npx skills add rodrigorjsf/project-agents-initializer --skill init-claude improve-claude
 
 # List available skills before installing
-npx skills add <github-owner>/project-agents-initializer --list
+npx skills add rodrigorjsf/project-agents-initializer --list
 ```
 
 ### Manual Installation
 
 ```bash
 # Clone the repository
-git clone https://github.com/<owner>/project-agents-initializer.git /tmp/pai
+git clone https://github.com/rodrigorjsf/project-agents-initializer.git /tmp/project-agents-initializer
 
 # For Claude Code (project-level)
 mkdir -p .claude/skills
-cp -r /tmp/pai/skills/* .claude/skills/
+cp -r /tmp/project-agents-initializer/skills/* .claude/skills/
 
 # For Claude Code (user-level, all projects)
-cp -r /tmp/pai/skills/* ~/.claude/skills/
+cp -r /tmp/project-agents-initializer/skills/* ~/.claude/skills/
 
 # For VS Code / GitHub Copilot
 mkdir -p .agents/skills
-cp -r /tmp/pai/skills/* .agents/skills/
+cp -r /tmp/project-agents-initializer/skills/* .agents/skills/
 
 # Clean up
-rm -rf /tmp/pai
+rm -rf /tmp/project-agents-initializer
 ```
 
 ## Usage
@@ -231,7 +240,7 @@ This plugin's design is based on three categories of evidence:
 
 ### Academic Research
 
-- **[Evaluating AGENTS.md](docs/Evaluating-AGENTS-paper.pdf)** (ETH Zurich, Feb 2026) — The first rigorous study of context file effectiveness across multiple coding agents. Found that LLM-generated files reduce performance while developer-written minimal files slightly improve it.
+- **[Evaluating AGENTS study](docs/Evaluating-AGENTS-paper.pdf)** (ETH Zurich, Feb 2026) — The first rigorous study of context file effectiveness across multiple coding agents. Found that LLM-generated files reduce performance while developer-written minimal files slightly improve it.
 
 ### Anthropic Official Documentation
 
