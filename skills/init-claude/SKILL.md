@@ -45,7 +45,7 @@ The agent runs on Sonnet with read-only tools (Read, Grep, Glob, Bash) in an iso
 
 Delegate to the `scope-detector` agent with this task:
 
-> Detect scopes in the project at the current working directory. Only flag scopes with genuinely different tooling or conventions. A simple single-package project should have ZERO additional scopes. Also identify areas that would benefit from path-scoped .claude/rules/ files.
+> Detect scopes in the project at the current working directory. Only flag scopes with genuinely different tooling or conventions. A simple single-package project should have ZERO additional scopes. Also identify areas that would benefit from path-scoped .claude/rules/ files. Check shared/library packages in monorepos — even utility packages may need their own scope if they have unique constraints (e.g., zero-dependency rules, dual exports, conditional imports).
 
 Wait for it to complete and parse its structured output.
 
@@ -115,8 +115,18 @@ paths:
 - [Specific, verifiable instruction]
 ```
 
+**Create rules files for TWO categories:**
+
+1. **Convention rules** — file-pattern-specific coding conventions:
+   - Style rules for specific file types (e.g., `**/*.ts`, `**/*.test.ts`)
+   - Framework-specific patterns (e.g., route handlers, migration scripts)
+
+2. **Domain-critical rules** — security, privacy, or compliance rules triggered by sensitive file patterns:
+   - Data privacy rules triggered by files handling sensitive data
+   - Security rules triggered by client-facing code patterns
+   - Compliance rules triggered by regulated data handling
+
 **Only create rules files when:**
-- There are conventions specific to a file pattern (e.g., API routes, test files, migration scripts)
 - The convention is non-obvious and would cause mistakes if not followed
 - The scope is narrow enough that loading it on every request would be wasteful
 

@@ -29,6 +29,7 @@ Key metrics from research:
 - **VERIFY** that file path references in content still point to existing files
 - **CONVERT** behavioral rules to path-scoped `.claude/rules/` when they only apply to specific file patterns
 - **MAXIMIZE** on-demand loading — minimize always-loaded content
+- **ROOT TARGET: 15-40 lines** — root CLAUDE.md should contain ONLY: one-sentence description, non-standard tooling commands, import boundaries (if any), and pointers to scope files. Move everything else to on-demand locations.
 </RULES>
 
 ## Process
@@ -57,8 +58,8 @@ Delegate to the `codebase-analyzer` agent with this task:
 
 > Analyze the project at the current working directory. Focus on:
 > 1. Verifying that tooling commands documented in CLAUDE.md files still work
-> 2. Identifying scopes that have distinct tooling but lack their own CLAUDE.md
-> 3. Detecting file patterns that have specific conventions but lack path-scoped .claude/rules/
+> 2. Identifying scopes that have distinct tooling but lack their own CLAUDE.md — including library/shared packages in monorepos that have unique constraints (zero-dependency rules, dual exports, conditional imports, server-only markers)
+> 3. Detecting file patterns that have specific conventions but lack path-scoped .claude/rules/ — check for BOTH convention rules (code style, test patterns) AND domain-critical rules (privacy, security, compliance) that should be path-scoped to sensitive file patterns
 > 4. Detecting new domain areas not covered by existing documentation
 >
 > Return ONLY actionable findings.
@@ -84,9 +85,9 @@ Based on both subagent reports, create an improvement plan. Categorize actions b
 6. **Consolidate fragmented files** that cover the same scope
 
 #### Addition Actions (lowest priority — only if genuinely missing)
-1. **Add missing scope files** for detected scopes without configuration
+1. **Add missing scope files** for detected scopes without configuration — including library/shared packages
 2. **Add missing tooling commands** that the codebase-analyzer identified as non-standard
-3. **Create missing `.claude/rules/`** for file patterns with non-obvious conventions
+3. **Create missing `.claude/rules/`** for file patterns with non-obvious conventions — include both convention rules (style, tests) and domain-critical rules (privacy, security, compliance) path-scoped to sensitive file patterns
 
 ### Phase 4: Present and Apply
 

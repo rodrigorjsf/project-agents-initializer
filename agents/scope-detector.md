@@ -29,11 +29,14 @@ A directory is a distinct scope if ANY of these are true:
 | Different deployment target | Lambda functions vs Docker containers |
 | Independent package with own dependencies | Monorepo package with own `package.json` |
 | Distinct domain with specialized conventions | Database migration scripts with specific ordering rules |
+| Unique constraints on a shared package | Zero-dependency rule, dual exports, conditional imports, `server-only` marker |
+| Security-sensitive data handling | Package that handles encryption, PII, or cross-schema access control |
 
 A directory is NOT a distinct scope if:
 - It merely organizes code within the same tech stack
 - Its conventions are identical to the root
 - It has no independent tooling or commands
+- It is a simple utility directory with no unique constraints
 
 ## Process
 
