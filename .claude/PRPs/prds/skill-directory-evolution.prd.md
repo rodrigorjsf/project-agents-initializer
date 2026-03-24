@@ -359,7 +359,7 @@ The `.claude/rules/` files enforce that when a shared reference is updated, all 
 |---|-------|-------------|--------|----------|---------|----------|
 | 1 | Reference content creation | Create all `references/` files derived from `docs/` research documents | in-progress | - | - | `.claude/PRPs/plans/reference-content-creation.plan.md` |
 | 2 | Asset templates creation | Create all `assets/templates/` files for consistent output generation | complete | with 1 | - | `.claude/PRPs/plans/asset-templates-creation.plan.md` |
-| 3 | Agent-to-reference conversion | Convert 3 agent files to universal reference docs for standalone skills | pending | with 1 | - | - |
+| 3 | Agent-to-reference conversion | Convert 3 agent files to universal reference docs for standalone skills | complete | with 1 | - | `.claude/PRPs/plans/agent-to-reference-conversion.plan.md` |
 | 4 | Plugin skills evolution | Rewrite 4 plugin SKILL.md files to use `references/` and `assets/`, add self-validation loop | pending | - | 1, 2 | - |
 | 5 | Standalone skills evolution | Rewrite 4 standalone SKILL.md files to use `references/` (including converted agents) and `assets/`, add self-validation loop | pending | - | 1, 2, 3 | - |
 | 6 | Rules and conventions update | Update `.claude/rules/`, `CLAUDE.md` files, and `plugin.json` to enforce new directory conventions | pending | - | 4, 5 | - |
