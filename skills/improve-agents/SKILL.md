@@ -1,6 +1,6 @@
 ---
 name: improve-agents
-description: "Evaluate and improve existing AGENTS.md files in your project. Identifies bloat, contradictions, stale references, and missing scopes — then applies progressive disclosure refactoring based on the ETH Zurich study and context engineering research."
+description: "Evaluates and improves existing AGENTS.md files in projects. Identifies bloat, contradictions, stale references, and missing scopes — then applies progressive disclosure refactoring based on the ETH Zurich study and context engineering research."
 ---
 
 # Improve AGENTS.md
@@ -10,6 +10,7 @@ Evaluate existing AGENTS.md files against evidence-based quality criteria and ap
 ## Why This Matters
 
 The ETH Zurich study found that **unnecessary requirements in context files make tasks harder**. Every token in AGENTS.md is loaded on every request. Bloated files cause agents to:
+
 - Spend more steps exploring (cost +20%)
 - Follow irrelevant instructions that distract from the actual task
 - Lose important instructions in the noise ("lost in the middle" effect)
@@ -44,6 +45,7 @@ find . -name "AGENTS.md" -not -path "*/node_modules/*" | xargs cat
 ```
 
 For each file, evaluate:
+
 1. **Files over 200 lines** — must be split
 2. **Bloat indicators** — directory listings, obvious conventions, vague instructions ("write clean code")
 3. **Stale references** — file paths that don't exist, commands not in package.json
@@ -73,6 +75,7 @@ ls docs/ 2>/dev/null
 ```
 
 Collect ONLY actionable findings:
+
 - Commands in AGENTS.md that no longer exist in package.json
 - New scopes without documentation (especially library/shared packages with unique constraints)
 - Domain patterns (testing, deployment) not covered
@@ -82,18 +85,21 @@ Collect ONLY actionable findings:
 Based on both analyses, create an improvement plan prioritized by impact:
 
 #### Removal Actions (highest priority — reduce token waste)
+
 1. **Remove bloat**: Delete directory listings, obvious conventions, vague instructions
 2. **Remove stale content**: Delete references to files/commands that no longer exist
 3. **Remove duplicates**: Eliminate content duplicated across multiple files
 4. **Resolve contradictions**: Pick the correct version and remove the conflicting one
 
 #### Refactoring Actions (split bloated files)
+
 1. **Extract scope-specific content** into subdirectory AGENTS.md files
 2. **Extract domain content** into docs/TESTING.md, docs/BUILD.md, etc.
 3. **Add progressive disclosure pointers** in root file to new split files
 4. **Consolidate fragmented files** that cover the same scope
 
 #### Addition Actions (lowest priority — only if genuinely missing)
+
 1. **Add missing scope files** for detected scopes without configuration
 2. **Add missing tooling commands** that are non-standard and actually needed
 3. **Add progressive disclosure pointers** to existing documentation

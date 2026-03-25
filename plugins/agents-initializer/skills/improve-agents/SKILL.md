@@ -1,6 +1,6 @@
 ---
 name: improve-agents
-description: "Evaluate and improve existing AGENTS.md files in your project. Identifies bloat, contradictions, stale references, and missing scopes — then applies progressive disclosure refactoring based on the ETH Zurich study and context engineering research."
+description: "Evaluates and improves existing AGENTS.md files in projects. Identifies bloat, contradictions, stale references, and missing scopes — then applies progressive disclosure refactoring based on the ETH Zurich study and context engineering research."
 ---
 
 # Improve AGENTS.md

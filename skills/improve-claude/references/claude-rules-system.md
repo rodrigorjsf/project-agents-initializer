@@ -6,6 +6,19 @@ Sources: research-claude-code-skills-format.md, research-llm-context-optimizatio
 
 ---
 
+## Contents
+
+- Loading behavior table (when each location loads, token impact)
+- Path-scoping syntax (YAML frontmatter for conditional loading)
+- When to create rules files (conventions and domain-critical)
+- When NOT to create rules files (content belongs elsewhere)
+- Rules directory structure (organization and discovery)
+- Rules vs CLAUDE.md decision table
+- CLAUDE.md hierarchy (5 scopes with resolution order)
+- Maximize on-demand loading (priority order for placement)
+
+---
+
 ## Loading Behavior Table
 
 Use this to decide where to place content (priority: minimize always-consumed tokens):

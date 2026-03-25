@@ -9,6 +9,15 @@ Follow these codebase analysis instructions. Analyze the project at the current 
 
 Use your environment's file reading and search capabilities to examine the project.
 
+## Contents
+
+- Constraints (what NOT to include in analysis)
+- Process (project detection, package manager, build/test/lint, tech stack, non-standard patterns)
+- Output format (structured template for analysis results)
+- Self-verification (quality checks before returning)
+
+---
+
 ## Constraints
 
 - Do not generate codebase overviews or directory listings — research shows these don't help agents navigate

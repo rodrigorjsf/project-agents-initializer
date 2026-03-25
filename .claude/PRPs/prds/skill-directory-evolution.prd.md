@@ -7,12 +7,14 @@ Developers using AI coding agents suffer from poisoned context windows caused by
 ## Evidence
 
 - All 8 skills contain only a single SKILL.md file — no `references/`, `scripts/`, or `assets/` directories exist (codebase exploration, 2026-03-23)
-- 5 research documents totaling ~1,800+ lines of evidence-based guidance exist in `docs/` but are not bundled into or referenced by any skill
+- 8 research documents totaling ~6,000+ lines of evidence-based guidance exist in `docs/` but are not bundled into or referenced by any skill
 - Standalone skills use simple inline bash commands that produce less thorough analysis than plugin skills' subagent delegation (codebase analysis comparison)
 - No self-validation loop exists — skills generate output and present it without quality checks
 - No competing tool performs project analysis + progressive disclosure restructuring (market research, 2026-03-23)
 - ETH Zurich study ("Evaluating AGENTS.md", 2026) provides quantitative evidence that auto-generated files hurt performance by -3% while costing +20% more tokens
 - Frontier LLMs follow ~150-200 instructions consistently; beyond that, compliance degrades (HumanLayer, Anthropic docs, multiple sources)
+- Anthropic's official Skill Authoring Best Practices guide defines concrete SKILL.md constraints (name ≤64 chars, description ≤1024 chars, body <500 lines, references one level deep) that skills must comply with (docs/skill-authoring-best-practices.md, 2026-03-24)
+- Anthropic's Prompting Best Practices guide validates the self-correction pattern (generate → review → refine) as a proven prompting technique, directly supporting the self-validation loop design (docs/claude-prompting-best-practices.md, 2026-03-24)
 
 ## Proposed Solution
 
@@ -39,7 +41,7 @@ We believe that skills bundled with evidence-based reference documents, validati
 | Generated root file size | 15-40 lines (CLAUDE.md), similar for AGENTS.md | Line count of generated root files |
 | Progressive disclosure compliance | All language/domain rules in separate files | No language-specific rules in root file; all in referenced docs |
 | Cross-tool compatibility | Works on Claude Code, Copilot, Codex, Gemini CLI | Manual testing on each platform |
-| Research coverage | 100% of `docs/` findings incorporated | Each research doc mapped to at least one `references/` file |
+| Research coverage | 100% of `docs/` findings incorporated | Each research doc (8 docs) mapped to at least one `references/` file |
 | No critical information loss | Zero cases of important project info deleted during improve | Validation loop checks for information preservation |
 
 ## Open Questions (Resolved)
@@ -265,6 +267,8 @@ The 3 agent files (`codebase-analyzer.md`, `scope-detector.md`, `file-evaluator.
 
 The original agent files in `plugins/agents-initializer/agents/` remain unchanged. The converted copies are independent files that can evolve separately.
 
+**Important distinction**: All converted reference docs must be clearly framed as "read as instructions" content, not executable scripts. Per Anthropic's Skill Authoring Best Practices, SKILL.md must make intent unambiguous — e.g., "Read `references/codebase-analyzer.md` and follow its analysis instructions" rather than "Run `codebase-analyzer.md`".
+
 ### Self-Validation Loop Design
 
 Each skill's SKILL.md includes a final phase structured as:
@@ -294,6 +298,10 @@ The `validation-criteria.md` contains checks derived from the research:
 - Zero language-specific rules in root file
 - Zero stale file path references
 - Zero contradictions between files
+- SKILL.md `name` field: ≤64 chars, lowercase letters/numbers/hyphens only, no XML tags, no reserved words ("anthropic", "claude")
+- SKILL.md `description` field: non-empty, ≤1024 chars, no XML tags, written in third person
+- SKILL.md body: under 500 lines (Anthropic's official recommendation for optimal performance)
+- All reference files linked one level deep from SKILL.md (no nested references — Claude may partially read deeply nested files)
 
 **Quality checks:**
 
@@ -303,6 +311,9 @@ The `validation-criteria.md` contains checks derived from the research:
 - Progressive disclosure: domain docs referenced, not inlined
 - No information that tools can enforce (linting rules, formatting)
 - No duplication across files in the hierarchy
+- SKILL.md `description` includes both what the skill does AND when to use it (triggers skill discovery)
+- Reference files >100 lines include a table of contents at the top (ensures Claude can see full scope even with partial reads)
+- Reference files explicitly framed as "read as instructions" (not "execute as scripts") — clear intent distinction per Anthropic guidance
 
 **Information preservation (improve skills only):**
 
@@ -312,17 +323,17 @@ The `validation-criteria.md` contains checks derived from the research:
 
 ### Reference Content Derivation Map
 
-| Reference File | Primary Source (`docs/`) | Content Focus |
-|---------------|--------------------------|---------------|
-| `progressive-disclosure-guide.md` | `a-guide-to-agents.md` + `a-guide-to-claude.md` | File hierarchy design, nesting strategy, what goes where |
-| `context-optimization.md` | `research-llm-context-optimization.md` | Token budgets, attention patterns, JIT loading, context poisoning |
-| `what-not-to-include.md` | `research-llm-context-optimization.md` + `a-guide-to-*.md` | Evidence table of content to exclude with research citations |
-| `validation-criteria.md` | All docs + `Evaluating-AGENTS-paper.pdf` findings | Complete quality checklist for self-validation loop |
-| `evaluation-criteria.md` | `research-llm-context-optimization.md` + paper | Scoring rubric for existing file quality (improve skills) |
-| `claude-rules-system.md` | `research-claude-code-skills-format.md` + `research-llm-context-optimization.md` | `.claude/rules/` conventions, path scoping, when to use rules vs docs |
-| `codebase-analyzer.md` (ref) | `agents/codebase-analyzer.md` | Converted: project detection, tech stack analysis, non-standard pattern detection |
-| `scope-detector.md` (ref) | `agents/scope-detector.md` | Converted: monorepo detection, boundary identification, scope criteria |
-| `file-evaluator.md` (ref) | `agents/file-evaluator.md` | Converted: quality scoring, bloat/staleness detection, per-file analysis |
+| Reference File | Primary Source (`docs/`) | Secondary Sources | Content Focus |
+|---------------|--------------------------|-------------------|---------------|
+| `progressive-disclosure-guide.md` | `a-guide-to-agents.md` + `a-guide-to-claude.md` | `skill-authoring-best-practices.md` (progressive disclosure patterns, one-level-deep rule) | File hierarchy design, nesting strategy, what goes where |
+| `context-optimization.md` | `research-llm-context-optimization.md` | `claude-prompting-best-practices.md` (long context: data at top/query at bottom, context awareness) | Token budgets, attention patterns, JIT loading, context poisoning |
+| `what-not-to-include.md` | `research-llm-context-optimization.md` + `a-guide-to-*.md` | `skill-authoring-best-practices.md` (anti-patterns: vague names, time-sensitive info, inconsistent terminology) | Evidence table of content to exclude with research citations |
+| `validation-criteria.md` | All docs + `Evaluating-AGENTS-paper.pdf` findings | `skill-authoring-best-practices.md` (frontmatter constraints, TOC requirement, checklist for effective skills), `claude-prompting-best-practices.md` (self-correction pattern validation) | Complete quality checklist for self-validation loop |
+| `evaluation-criteria.md` | `research-llm-context-optimization.md` + paper | - | Scoring rubric for existing file quality (improve skills) |
+| `claude-rules-system.md` | `research-claude-code-skills-format.md` + `research-llm-context-optimization.md` | - | `.claude/rules/` conventions, path scoping, when to use rules vs docs |
+| `codebase-analyzer.md` (ref) | `agents/codebase-analyzer.md` | - | Converted: project detection, tech stack analysis, non-standard pattern detection |
+| `scope-detector.md` (ref) | `agents/scope-detector.md` | - | Converted: monorepo detection, boundary identification, scope criteria |
+| `file-evaluator.md` (ref) | `agents/file-evaluator.md` | - | Converted: quality scoring, bloat/staleness detection, per-file analysis |
 
 ### Shared vs Skill-Specific References
 
@@ -361,9 +372,10 @@ The `.claude/rules/` files enforce that when a shared reference is updated, all 
 | 2 | Asset templates creation | Create all `assets/templates/` files for consistent output generation | complete | with 1 | - | `.claude/PRPs/plans/asset-templates-creation.plan.md` |
 | 3 | Agent-to-reference conversion | Convert 3 agent files to universal reference docs for standalone skills | complete | with 1 | - | `.claude/PRPs/plans/agent-to-reference-conversion.plan.md` |
 | 4 | Plugin skills evolution | Rewrite 4 plugin SKILL.md files to use `references/` and `assets/`, add self-validation loop | complete | - | 1, 2 | `.claude/PRPs/plans/plugin-skills-evolution.plan.md` |
-| 5 | Standalone skills evolution | Rewrite 4 standalone SKILL.md files to use `references/` (including converted agents) and `assets/`, add self-validation loop | pending | - | 1, 2, 3 | - |
-| 6 | Rules and conventions update | Update `.claude/rules/`, `CLAUDE.md` files, and `plugin.json` to enforce new directory conventions | pending | - | 4, 5 | - |
-| 7 | Cross-distribution validation | Test all 8 skills with `test-prompt` RED-GREEN-REFACTOR cycle, verify feature parity | pending | - | 4, 5, 6 | - |
+| 5 | Compliance audit & remediation | Verify and fix completed phases (1-4) against new Anthropic Skill Authoring constraints discovered post-completion | complete | - | 4 | `.claude/PRPs/plans/completed/compliance-audit-remediation.plan.md` |
+| 6 | Standalone skills evolution | Rewrite 4 standalone SKILL.md files to use `references/` (including converted agents) and `assets/`, add self-validation loop | pending | - | 1, 2, 3, 5 | - |
+| 7 | Rules and conventions update | Update `.claude/rules/`, `CLAUDE.md` files, and `plugin.json` to enforce new directory conventions | pending | - | 5, 6 | - |
+| 8 | Cross-distribution validation | Test all 8 skills with `test-prompt` RED-GREEN-REFACTOR cycle, verify feature parity | pending | - | 5, 6, 7 | - |
 
 ### Phase Details
 
@@ -377,7 +389,7 @@ The `.claude/rules/` files enforce that when a shared reference is updated, all 
   - `validation-criteria.md` (quality checklist for self-validation loop)
   - `evaluation-criteria.md` (scoring rubric for improve skills)
   - `claude-rules-system.md` (`.claude/rules/` conventions, for claude skills only)
-- **Success signal**: Each reference file is under 200 lines, traceable to source docs, and contains actionable instructions (not just theory)
+- **Success signal**: Each reference file is under 200 lines, traceable to source docs, contains actionable instructions (not just theory), and includes a table of contents if >100 lines
 
 **Phase 2: Asset Templates Creation**
 
@@ -408,7 +420,17 @@ The `.claude/rules/` files enforce that when a shared reference is updated, all 
   - Agent delegation mechanism unchanged (still uses Claude Code Task tool)
 - **Success signal**: Plugin skills produce validated output that passes all criteria in `validation-criteria.md`
 
-**Phase 5: Standalone Skills Evolution**
+**Phase 5: Compliance Audit & Remediation**
+
+- **Goal**: Verify and fix all Phase 1-4 artifacts against Anthropic Skill Authoring Best Practices constraints discovered after those phases completed
+- **Scope**:
+  - Fix 4 plugin SKILL.md `description` fields from second person ("your project") to third person ("Initializes... for projects") — per Anthropic guidance that descriptions are injected into system prompts and inconsistent POV causes discovery problems
+  - Add table of contents to all reference files >100 lines (7 unique files across both distributions): `context-optimization.md` (120 lines), `progressive-disclosure-guide.md` (133 lines), `evaluation-criteria.md` (134 lines), `claude-rules-system.md` (139 lines), `codebase-analyzer.md` (131 lines), `scope-detector.md` (135 lines), `file-evaluator.md` (165 lines)
+  - Sync all shared reference file copies across plugin and standalone directories after TOC additions
+  - Verify no other Phase 1-4 artifacts violate the new constraints (body <500 lines, name format, one-level-deep refs — all currently passing)
+- **Success signal**: All SKILL.md descriptions pass third-person check. All reference files >100 lines have TOC. All shared copies remain in sync. Zero regressions in existing functionality.
+
+**Phase 6: Standalone Skills Evolution**
 
 - **Goal**: Rewrite 4 standalone SKILL.md files with full feature parity to plugin versions
 - **Scope**:
@@ -417,20 +439,22 @@ The `.claude/rules/` files enforce that when a shared reference is updated, all 
   - File generation uses `assets/templates/`
   - Self-validation loop identical to plugin version
   - Analysis quality matches plugin version by following same detection patterns from reference docs
+  - SKILL.md `description` fields written in third person from the start (compliance from Phase 5)
 - **Success signal**: Standalone skills produce output equivalent in quality to plugin skills when tested on the same project
 
-**Phase 6: Rules and Conventions Update**
+**Phase 7: Rules and Conventions Update**
 
 - **Goal**: Update all project governance files to enforce and document the new directory conventions
 - **Scope**:
   - Update `.claude/rules/plugin-skills.md` — add rules for `references/` and `assets/` usage
   - Update `.claude/rules/standalone-skills.md` — add rules for converted agent references
-  - Add new `.claude/rules/reference-files.md` — conventions for reference document authoring
+  - Add new `.claude/rules/reference-files.md` — conventions for reference document authoring, including TOC requirement for files >100 lines
   - Update root `CLAUDE.md` and `plugins/agents-initializer/CLAUDE.md` — document new structure
   - Update `plugin.json` version
+  - Add rule enforcing Anthropic SKILL.md frontmatter constraints (name format, description third person, body <500 lines)
 - **Success signal**: A developer editing any skill file gets the correct rules loaded automatically
 
-**Phase 7: Cross-Distribution Validation**
+**Phase 8: Cross-Distribution Validation**
 
 - **Goal**: Verify all 8 skills work correctly using the `test-prompt` RED-GREEN-REFACTOR methodology
 - **Scope**:
@@ -440,6 +464,7 @@ The `.claude/rules/` files enforce that when a shared reference is updated, all 
   - REFACTOR: Optimize prompts, close loopholes, verify robustness
   - Test feature parity: same scenario on plugin vs standalone, compare output quality
   - Test self-validation loop: introduce deliberate quality issues, verify loop catches them
+  - Verify compliance: all output SKILL.md files meet Anthropic frontmatter constraints
 - **Success signal**: All 8 skills pass all test scenarios. Plugin and standalone produce equivalent quality. Self-validation loop catches all deliberate issues.
 
 ### Parallelism Notes
@@ -450,11 +475,15 @@ Phases 1, 2, and 3 can all run in parallel as they produce independent output fi
 - Phase 2 creates template files (structural, not content-dependent)
 - Phase 3 converts agent files (source is `plugins/agents-initializer/agents/`, not `docs/`)
 
-Phases 4 and 5 depend on all three preceding phases but could theoretically run in parallel with each other since they modify different directory trees (`plugins/.../skills/` vs `skills/`). However, running them sequentially allows Phase 5 to learn from any issues discovered in Phase 4.
+Phase 4 depends on 1 and 2 (plugin skills need reference files and templates).
 
-Phase 6 depends on 4 and 5 because rules must reflect the final state of skills.
+Phase 5 (compliance) depends on 4 and remediates Phase 1-4 artifacts against constraints discovered post-completion. Must run before Phase 6 so standalone skills start from compliant inputs.
 
-Phase 7 must run last as it validates the complete system.
+Phase 6 (standalone skills) depends on 1, 2, 3, and 5. It cannot start until compliance remediation completes because it copies reference files (which need TOCs) and follows SKILL.md patterns (which need third-person descriptions).
+
+Phase 7 depends on 5 and 6 because rules must reflect the final, compliant state of all skills.
+
+Phase 8 must run last as it validates the complete system including compliance.
 
 ---
 
@@ -472,6 +501,7 @@ Phase 7 must run last as it validates the complete system.
 | Reference bundling per skill | Only the agent refs each skill uses | All 3 agent refs in every skill | Minimizes token cost; each skill only loads what it needs (e.g., improve skills don't need scope-detector) |
 | Standalone analysis pattern | Reference docs as "follow these instructions" | Embedded full agent logic in SKILL.md, shell scripts | Reference docs keep SKILL.md under 500 lines; shell scripts add dependency; instructions are universal |
 | Progressive disclosure in generated output | Mandatory separate files for language/domain rules | Optional, user-configurable | Core value proposition — the whole point is progressive disclosure; making it optional defeats the purpose |
+| New docs evaluation (2026-03-24) | Incorporate `skill-authoring-best-practices.md` findings; add `claude-prompting-best-practices.md` as secondary source; exclude `claude-memory-tool-docs.md` | Incorporate all 3 docs equally, ignore all 3 | `skill-authoring-best-practices.md` provides official Anthropic SKILL.md constraints (frontmatter rules, TOC requirement, one-level-deep rule) directly impacting validation criteria. `claude-prompting-best-practices.md` validates self-correction pattern but is mostly implementation-level. `claude-memory-tool-docs.md` covers runtime memory APIs — explicitly out of scope per "What We're NOT Building" |
 
 ---
 
@@ -495,8 +525,13 @@ Phase 7 must run last as it validates the complete system.
 - Three-stage progressive disclosure (metadata → body → references) is the spec's native model
 - Plugin skills delegate to registered agents via Task tool; standalone skills must replicate this via reference docs
 - Self-validation is feasible as an in-SKILL.md loop with criteria loaded from `references/`
+- Anthropic's Skill Authoring Best Practices (2026-03-24) codifies concrete SKILL.md constraints: `name` ≤64 chars lowercase/hyphens, `description` ≤1024 chars in third person, body <500 lines, references one level deep, TOC required for files >100 lines
+- Anthropic's Prompting Best Practices (2026-03-24) validates self-correction (generate → review → refine) as a top-tier prompting pattern; also confirms "long data at top, query at bottom" principle for reference loading order
+- Anthropic's Prompting Best Practices confirms Claude Opus 4.6 may overuse subagents — relevant for plugin skills that delegate; skills should use direct execution where simpler
+- Memory tool docs (2026-03-24) evaluated and excluded — covers runtime persistence APIs, not static configuration file optimization
 
 ---
 
 *Generated: 2026-03-23*
+*Updated: 2026-03-24 — Evolved with findings from skill-authoring-best-practices.md and claude-prompting-best-practices.md*
 *Status: DRAFT - needs validation*

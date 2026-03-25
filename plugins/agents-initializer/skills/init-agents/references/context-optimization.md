@@ -5,6 +5,18 @@ Source: research-llm-context-optimization.md
 
 ---
 
+## Contents
+
+- Hard limits (lines per file, instruction count, contradictions)
+- The attention budget (finite resource, n-squared constraint)
+- Lost in the middle (placement strategy for critical instructions)
+- Quality over quantity checklist (include/exclude decision table)
+- Context poisoning vectors (detection and removal)
+- JIT documentation patterns (on-demand loading strategies)
+- Key citations
+
+---
+
 ## Hard Limits
 
 | Limit | Value | Source |

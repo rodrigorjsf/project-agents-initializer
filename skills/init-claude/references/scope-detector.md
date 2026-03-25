@@ -9,6 +9,16 @@ Follow these scope detection instructions. Identify distinct contexts within the
 
 Use your environment's file reading and search capabilities to examine the project.
 
+## Contents
+
+- Constraints (minimum scopes, meaningful differences only)
+- When a directory deserves its own scope (criterion table)
+- Process (monorepo check, package boundaries, domain boundaries, scope content)
+- Output format (structured template for scope results)
+- Self-verification (quality checks before returning)
+
+---
+
 ## Constraints
 
 - Do not create a scope for every directory — only for truly distinct contexts
