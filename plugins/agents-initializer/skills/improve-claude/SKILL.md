@@ -11,12 +11,6 @@ Evaluate existing CLAUDE.md files and `.claude/rules/` against evidence-based qu
 
 The ETH Zurich study found that **unnecessary requirements in context files make tasks harder**. Every token in CLAUDE.md is loaded on every request. Anthropic explicitly warns: "Bloated CLAUDE.md files cause Claude to ignore your actual instructions."
 
-Key metrics from research:
-- Auto-generated files: **-3% success rate, +20% cost**
-- Developer-written minimal files: **+4% success rate**
-- Target: **under 200 lines** per file (Anthropic recommendation)
-- Instruction budget: **~150-200 instructions** max before adherence drops
-
 ## Hard Rules
 
 <RULES>
@@ -36,9 +30,12 @@ Key metrics from research:
 
 ### Phase 1: Current State Analysis
 
+Read `${CLAUDE_SKILL_DIR}/references/evaluation-criteria.md` for the scoring rubric and bloat/staleness indicators.
+
 Delegate to the `file-evaluator` agent with this task:
 
 > Evaluate all CLAUDE.md files and .claude/rules/ files in the project at the current working directory. Check for:
+>
 > 1. Files over 200 lines
 > 2. Bloat indicators (directory listings, obvious conventions, vague instructions)
 > 3. Stale references (file paths that don't exist, commands that aren't in package.json)
@@ -57,6 +54,7 @@ The agent runs on Sonnet with read-only tools in an isolated context. Wait for i
 Delegate to the `codebase-analyzer` agent with this task:
 
 > Analyze the project at the current working directory. Focus on:
+>
 > 1. Verifying that tooling commands documented in CLAUDE.md files still work
 > 2. Identifying scopes that have distinct tooling but lack their own CLAUDE.md — including library/shared packages in monorepos that have unique constraints (zero-dependency rules, dual exports, conditional imports, server-only markers)
 > 3. Detecting file patterns that have specific conventions but lack path-scoped .claude/rules/ — check for BOTH convention rules (code style, test patterns) AND domain-critical rules (privacy, security, compliance) that should be path-scoped to sensitive file patterns
@@ -68,15 +66,24 @@ Wait for it to complete and parse its structured output.
 
 ### Phase 3: Generate Improvement Plan
 
-Based on both subagent reports, create an improvement plan. Categorize actions by impact:
+Read these reference documents:
+
+- `${CLAUDE_SKILL_DIR}/references/progressive-disclosure-guide.md` — hierarchy decisions and loading tiers
+- `${CLAUDE_SKILL_DIR}/references/what-not-to-include.md` — content exclusion criteria
+- `${CLAUDE_SKILL_DIR}/references/context-optimization.md` — token budget guidelines
+- `${CLAUDE_SKILL_DIR}/references/claude-rules-system.md` — .claude/rules/ conventions and path-scoping
+
+Based on both subagent reports, create improvement plan:
 
 #### Removal Actions (highest priority — reduce token waste)
+
 1. **Remove bloat**: Delete directory listings, obvious conventions, vague instructions
 2. **Remove stale content**: Delete references to files/commands that no longer exist
 3. **Remove duplicates**: Eliminate content duplicated across multiple files
 4. **Resolve contradictions**: Pick the correct version and remove the conflicting one
 
 #### Refactoring Actions (optimize loading behavior)
+
 1. **Extract scope-specific content** into subdirectory CLAUDE.md files (on-demand loading)
 2. **Convert pattern-specific rules** to `.claude/rules/` with path frontmatter (on-demand loading)
 3. **Extract domain content** into docs/TESTING.md, docs/BUILD.md, etc. (progressive disclosure)
@@ -85,11 +92,25 @@ Based on both subagent reports, create an improvement plan. Categorize actions b
 6. **Consolidate fragmented files** that cover the same scope
 
 #### Addition Actions (lowest priority — only if genuinely missing)
+
 1. **Add missing scope files** for detected scopes without configuration — including library/shared packages
 2. **Add missing tooling commands** that the codebase-analyzer identified as non-standard
 3. **Create missing `.claude/rules/`** for file patterns with non-obvious conventions — include both convention rules (style, tests) and domain-critical rules (privacy, security, compliance) path-scoped to sensitive file patterns
 
-### Phase 4: Present and Apply
+When generating new or restructured files, use these templates:
+
+- Root CLAUDE.md: Read `${CLAUDE_SKILL_DIR}/assets/templates/root-claude-md.md`
+- Scoped CLAUDE.md: Read `${CLAUDE_SKILL_DIR}/assets/templates/scoped-claude-md.md`
+- .claude/rules/ files: Read `${CLAUDE_SKILL_DIR}/assets/templates/claude-rule.md`
+- Domain docs: Read `${CLAUDE_SKILL_DIR}/assets/templates/domain-doc.md`
+
+### Phase 4: Self-Validation
+
+Read `${CLAUDE_SKILL_DIR}/references/validation-criteria.md` and execute its **Validation Loop Instructions** against every improved or newly created file.
+
+For improve operations, also evaluate the **"If This Is an IMPROVE Operation"** section. For CLAUDE.md files, also check **CLAUDE.md-specific** structural checks (path-scoping, minimal always-loaded content). Maximum 3 iterations.
+
+### Phase 5: Present and Apply
 
 1. Show the user a summary of issues found with counts:
    - Files over limit: X
@@ -124,36 +145,3 @@ Based on both subagent reports, create an improvement plan. Categorize actions b
    - Always-loaded lines before → after
    - Files before → after
    - Estimated token savings per session
-
-## Loading Behavior Reference
-
-Understanding token impact of each configuration location:
-
-| Location | Loading | Token Impact |
-|----------|---------|-------------|
-| Root `CLAUDE.md` | Session start | **Always consumed** |
-| `.claude/CLAUDE.md` | Session start | **Always consumed** |
-| `.claude/rules/*.md` (no paths) | Session start | **Always consumed** |
-| `.claude/rules/*.md` (with paths) | When matching files are read | On-demand |
-| Subdirectory `CLAUDE.md` | When files in that dir are read | On-demand |
-| `docs/*.md` domain files | When agent navigates to them | On-demand |
-
-**Priority: Move content from "always consumed" to "on-demand" locations.**
-
-## Improvement Checklist
-
-After improvements, every CLAUDE.md and .claude/rules/ file should pass:
-
-- [ ] Under 200 lines
-- [ ] No directory/file structure listings
-- [ ] No standard language conventions
-- [ ] No vague, unactionable instructions
-- [ ] No stale file path references
-- [ ] No contradictions with other files
-- [ ] No duplicated content across files
-- [ ] Progressive disclosure pointers where appropriate
-- [ ] One scope per file
-- [ ] Every instruction is specific and verifiable
-- [ ] `.claude/rules/` files have path-scoping when they apply to specific patterns
-- [ ] Minimal content in always-loaded locations
-- [ ] Maximum content in on-demand locations

@@ -44,72 +44,35 @@ Wait for it to complete and parse its structured output.
 
 ### Phase 3: Generate Files
 
-Using ONLY the information from Phase 1 and Phase 2, generate the file hierarchy.
+Before generating, read these reference documents:
 
-#### Root AGENTS.md Template
+- `${CLAUDE_SKILL_DIR}/references/progressive-disclosure-guide.md` — file hierarchy decisions
+- `${CLAUDE_SKILL_DIR}/references/what-not-to-include.md` — content exclusion criteria
+- `${CLAUDE_SKILL_DIR}/references/context-optimization.md` — token budget guidelines
 
-```markdown
-# [One-sentence project description from codebase analysis]
+Using ONLY the information from Phase 1 and Phase 2, generate the file hierarchy:
 
-## Tooling
+#### Root AGENTS.md
 
-[Only include non-standard items. Omit sections with nothing non-standard.]
-- Package manager: [only if not the language default]
-- Build: `[command]`
-- Test: `[command]`
-- Lint: `[command]`
-- Typecheck: `[command]`
+Read `${CLAUDE_SKILL_DIR}/assets/templates/root-agents-md.md`. Fill its placeholders using ONLY the analysis output from Phase 1 and Phase 2. Follow the HTML comment instructions in the template to determine which sections to include or remove. Remove any section that would be empty. Target: 15-40 lines.
 
-## Context
+#### Scope AGENTS.md (per detected scope)
 
-[Only include if scopes were detected]
-See scope-specific AGENTS.md files:
-- `[path/]` — [one-line purpose]
-
-## References
-
-[Only include if domain files were generated]
-- For testing conventions, see `[path]`
-- For build details, see `[path]`
-```
-
-**Remove any section that would be empty.** The file should be as short as possible.
-
-#### Scope AGENTS.md Template (per detected scope)
-
-```markdown
-# [One-sentence scope description]
-
-## Tooling
-
-[Only scope-specific commands that differ from root]
-- Build: `[command]`
-- Test: `[command]`
-
-## Conventions
-
-[Only non-obvious, scope-specific conventions]
-- [Specific, verifiable instruction]
-```
+If scopes were detected, read `${CLAUDE_SKILL_DIR}/assets/templates/scoped-agents-md.md` for each scope. Only include scope-specific content that differs from root.
 
 #### Domain Files (only if non-standard patterns detected)
 
-Generate `docs/TESTING.md`, `docs/BUILD.md`, `docs/API.md`, etc. **only** when the codebase-analyzer identified non-standard patterns in that domain. Each file should contain specific, actionable instructions.
+If the codebase-analyzer identified non-standard domain patterns, read `${CLAUDE_SKILL_DIR}/assets/templates/domain-doc.md` and generate a file per domain.
 
-### Phase 4: Present and Write
+### Phase 4: Self-Validation
+
+Read `${CLAUDE_SKILL_DIR}/references/validation-criteria.md` and execute its **Validation Loop Instructions** against every generated file.
+
+The loop evaluates all hard limits and quality checks, fixes any failures, and re-evaluates — maximum 3 iterations. Do not proceed to Phase 5 until ALL criteria pass for ALL files.
+
+### Phase 5: Present and Write
 
 1. Show the user ALL generated files with their content before writing
 2. Explain briefly why each file exists and what evidence supports its content
 3. Ask for confirmation before writing files
 4. Write all files to the project
-
-## What NOT to Include (Evidence-Based)
-
-| Content | Why to Exclude | Source |
-|---------|----------------|--------|
-| Directory structure | "Not effective at providing repository overview" | ETH Zurich paper |
-| Standard conventions | Agent already knows from training data | Anthropic Best Practices |
-| Codebase overviews | Increases steps without improving navigation | ETH Zurich paper |
-| Vague guidance | Not actionable, wastes attention budget | a-guide-to-agents.md |
-| File path references | "File paths change constantly... actively poisons context" | a-guide-to-claude.md |
-| Everything in one file | "Ball of mud" problem, exceeds attention budget | Both guides |
