@@ -1,7 +1,3 @@
-> ## Documentation Index
-> Fetch the complete documentation index at: https://code.claude.com/docs/llms.txt
-> Use this file to discover all available pages before exploring further.
-
 # How Claude remembers your project
 
 > Give Claude persistent instructions with CLAUDE.md files, and let Claude accumulate learnings automatically with auto memory.
