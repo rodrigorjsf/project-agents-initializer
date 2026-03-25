@@ -1,6 +1,6 @@
 ---
 name: improve-claude
-description: "Evaluate and improve existing CLAUDE.md files and .claude/rules/ in your project. Identifies bloat, contradictions, stale references, and missing scopes — then applies progressive disclosure refactoring using Claude Code's full configuration system."
+description: "Evaluates and improves existing CLAUDE.md files and .claude/rules/ in projects. Identifies bloat, contradictions, stale references, and missing scopes — then applies progressive disclosure refactoring using Claude Code's full configuration system."
 ---
 
 # Improve CLAUDE.md
@@ -12,6 +12,7 @@ Evaluate existing CLAUDE.md files and `.claude/rules/` against evidence-based qu
 The ETH Zurich study found that **unnecessary requirements in context files make tasks harder**. Every token in CLAUDE.md is loaded on every request. Anthropic explicitly warns: "Bloated CLAUDE.md files cause Claude to ignore your actual instructions."
 
 Key metrics from research:
+
 - Auto-generated files: **-3% success rate, +20% cost**
 - Developer-written minimal files: **+4% success rate**
 - Target: **under 200 lines** per file (Anthropic recommendation)
@@ -53,6 +54,7 @@ cat .claude/rules/*.md 2>/dev/null
 ```
 
 For each file, evaluate:
+
 1. **Files over 200 lines** — must be split
 2. **Bloat indicators** — directory listings, obvious conventions, vague instructions
 3. **Stale references** — file paths that don't exist, commands not in package.json
@@ -84,6 +86,7 @@ find . -name "*auth*" -o -name "*payment*" -o -name "*secret*" 2>/dev/null | gre
 ```
 
 Collect ONLY actionable findings:
+
 - Commands documented that no longer exist
 - New scopes without documentation (including library/shared packages with unique constraints)
 - File patterns with non-obvious conventions that lack path-scoped rules
@@ -94,12 +97,14 @@ Collect ONLY actionable findings:
 Based on both analyses, create an improvement plan. Categorize by impact:
 
 #### Removal Actions (highest priority — reduce token waste)
+
 1. **Remove bloat**: Delete directory listings, obvious conventions, vague instructions
 2. **Remove stale content**: Delete references to files/commands that no longer exist
 3. **Remove duplicates**: Eliminate content duplicated across multiple files
 4. **Resolve contradictions**: Pick the correct version and remove the conflicting one
 
 #### Refactoring Actions (optimize loading behavior)
+
 1. **Extract scope-specific content** into subdirectory CLAUDE.md files (on-demand loading)
 2. **Convert pattern-specific rules** to `.claude/rules/` with path frontmatter (on-demand loading)
 3. **Extract domain content** into docs/TESTING.md, docs/BUILD.md, etc. (progressive disclosure)
@@ -108,6 +113,7 @@ Based on both analyses, create an improvement plan. Categorize by impact:
 6. **Consolidate fragmented files** that cover the same scope
 
 #### Addition Actions (lowest priority — only if genuinely missing)
+
 1. **Add missing scope files** for detected scopes without configuration — including library/shared packages
 2. **Add missing tooling commands** that are non-standard and actually needed
 3. **Create missing `.claude/rules/`** for file patterns with non-obvious conventions — include both convention rules (style, tests) and domain-critical rules (privacy, security, compliance)

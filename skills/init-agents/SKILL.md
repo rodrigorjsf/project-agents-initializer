@@ -1,6 +1,6 @@
 ---
 name: init-agents
-description: "Initialize optimized AGENTS.md hierarchy for your project. Generates minimal, scoped files following progressive disclosure — based on the ETH Zurich 'Evaluating AGENTS.md' study showing that minimal developer-style files outperform comprehensive auto-generated ones."
+description: "Initializes optimized AGENTS.md hierarchy for projects. Generates minimal, scoped files following progressive disclosure — based on the ETH Zurich 'Evaluating AGENTS.md' study showing that minimal developer-style files outperform comprehensive auto-generated ones."
 ---
 
 # Initialize AGENTS.md
@@ -47,6 +47,7 @@ cat package.json 2>/dev/null | grep '"workspaces"'
 ```
 
 From this analysis, extract ONLY:
+
 - Package manager (only if non-default for the detected language)
 - Non-standard build/test/lint commands
 - Non-obvious tooling constraints (e.g., custom scripts, unusual flags)

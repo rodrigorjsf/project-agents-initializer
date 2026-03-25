@@ -1,6 +1,6 @@
 ---
 name: init-claude
-description: "Initialize optimized CLAUDE.md hierarchy and .claude/rules/ for your project. Generates minimal, scoped files following progressive disclosure — based on the ETH Zurich 'Evaluating AGENTS.md' study and Anthropic's context engineering best practices."
+description: "Initializes optimized CLAUDE.md hierarchy and .claude/rules/ for projects. Generates minimal, scoped files following progressive disclosure — based on the ETH Zurich 'Evaluating AGENTS.md' study and Anthropic's context engineering best practices."
 ---
 
 # Initialize CLAUDE.md
@@ -12,6 +12,7 @@ Generate an evidence-based CLAUDE.md file hierarchy for this project, leveraging
 Research shows that auto-generated comprehensive configuration files **reduce** agent task success by ~3% while **increasing cost by 20%+** (Evaluating AGENTS.md, ETH Zurich, 2026). Developer-written **minimal** files improve success by ~4%. This skill generates files that mimic what an experienced developer would write: only non-obvious tooling and conventions.
 
 Claude Code's configuration hierarchy enables powerful progressive disclosure:
+
 - **Root CLAUDE.md** — always loaded, project-wide essentials
 - **Subdirectory CLAUDE.md** — loaded on-demand when working in that area
 - **`.claude/rules/`** — path-scoped rules triggered only when matching files are read
@@ -54,6 +55,7 @@ cat package.json 2>/dev/null | grep '"workspaces"'
 ```
 
 From this analysis, extract ONLY:
+
 - Package manager (only if non-default for the detected language)
 - Non-standard build/test/lint commands
 - Non-obvious tooling constraints
@@ -78,6 +80,7 @@ find . -name "*.env*" -o -name "*auth*" -o -name "*payment*" -o -name "*secret*"
 A simple single-package project should produce ZERO additional scopes. Only create scope files when you confirm genuinely different tooling.
 
 Flag paths for `.claude/rules/` when:
+
 - Specific file patterns have non-obvious coding conventions (e.g., test files, migration scripts)
 - Security/privacy rules apply to specific file patterns (auth files, payment handling, data access)
 
@@ -158,6 +161,7 @@ paths:
    - Security rules triggered by client-facing code patterns
 
 **Only create rules files when:**
+
 - The convention is non-obvious and would cause mistakes if not followed
 - The scope is narrow enough that loading it on every request would be wasteful
 

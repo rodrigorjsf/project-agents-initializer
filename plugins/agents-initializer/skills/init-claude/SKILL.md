@@ -1,6 +1,6 @@
 ---
 name: init-claude
-description: "Initialize optimized CLAUDE.md hierarchy and .claude/rules/ for your project. Uses subagent-driven codebase analysis to generate minimal, scoped files following progressive disclosure — based on the ETH Zurich 'Evaluating AGENTS.md' study and Anthropic's context engineering best practices."
+description: "Initializes optimized CLAUDE.md hierarchy and .claude/rules/ for projects. Uses subagent-driven codebase analysis to generate minimal, scoped files following progressive disclosure — based on the ETH Zurich 'Evaluating AGENTS.md' study and Anthropic's context engineering best practices."
 ---
 
 # Initialize CLAUDE.md
