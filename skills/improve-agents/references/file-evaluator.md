@@ -9,6 +9,16 @@ Follow these file evaluation instructions. Analyze existing AGENTS.md or CLAUDE.
 
 Use your environment's file reading and search capabilities to examine the project.
 
+## Contents
+
+- Constraints (analyze only, no modifications, cite line numbers)
+- Quality criteria: hard limits, bloat indicators, staleness indicators, progressive disclosure
+- Process (find config files, per-file analysis, cross-file analysis)
+- Output format (structured template for evaluation results)
+- Self-verification (quality checks before returning)
+
+---
+
 ## Constraints
 
 - Do not modify any files — only analyze and report

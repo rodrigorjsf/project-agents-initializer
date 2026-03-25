@@ -5,6 +5,19 @@ Sources: a-guide-to-agents.md, a-guide-to-claude.md, research-llm-context-optimi
 
 ---
 
+## Contents
+
+- File hierarchy decision table (where to place content)
+- Root file requirements (minimal elements only)
+- Monorepo: what goes where (root vs package level)
+- Progressive disclosure patterns (domain files, nested docs, skills)
+- CLAUDE.md-specific hierarchy (5 scopes with priority)
+- AGENTS.md-specific notes (open standard, symlinks, merging)
+- Anti-patterns to detect and remove
+- Validation checklist
+
+---
+
 ## File Hierarchy Decision Table
 
 When deciding where to place content, use this table:

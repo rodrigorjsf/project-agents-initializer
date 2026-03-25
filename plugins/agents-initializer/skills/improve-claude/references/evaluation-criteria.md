@@ -5,6 +5,18 @@ Used by IMPROVE skills only. Source: file-evaluator.md, research-llm-context-opt
 
 ---
 
+## Contents
+
+- Hard limits table (file length, instruction count, contradictions)
+- Bloat indicators table (directory listings, vague instructions, duplicates)
+- Staleness indicators table (stale paths, failing commands, outdated refs)
+- Progressive disclosure assessment (root focus, domain separation, pointers)
+- Instruction specificity assessment (goldilocks zone examples)
+- Quality score rubric (5-dimension scoring 1-10)
+- Evaluation output template
+
+---
+
 ## Hard Limits Table
 
 | Criterion | Threshold | Source |
