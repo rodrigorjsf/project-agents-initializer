@@ -2,13 +2,13 @@
 
 Instructions for generating and improving `.claude/rules/` and CLAUDE.md hierarchy.
 Claude Code-specific — not applicable to AGENTS.md skills.
-Sources: research-claude-code-skills-format.md, research-llm-context-optimization.md, init-claude/SKILL.md
+Sources: research-claude-code-skills-format.md, research-llm-context-optimization.md, init-claude/SKILL.md, memory/how-claude-remembers-a-project.md
 
 ---
 
 ## Contents
 
-- Loading behavior table (when each location loads, token impact)
+- Loading behavior table (when each location loads, token impact, claudeMdExcludes)
 - Path-scoping syntax (YAML frontmatter for conditional loading)
 - When to create rules files (conventions and domain-critical)
 - When NOT to create rules files (content belongs elsewhere)
@@ -34,6 +34,16 @@ Use this to decide where to place content (priority: minimize always-consumed to
 | Skills | When invoked | On-demand |
 
 **Rule**: Move content from always-consumed to on-demand locations wherever possible.
+
+**`claudeMdExcludes`**: Skip irrelevant CLAUDE.md files by path/glob in `.claude/settings.local.json`:
+
+```json
+{ "claudeMdExcludes": ["**/other-team/CLAUDE.md"] }
+```
+
+Patterns match absolute paths. Arrays merge across settings layers. Managed policy files cannot be excluded.
+
+*Source: memory/how-claude-remembers-a-project.md lines 243-260*
 
 *Source: improve-claude/SKILL.md:130-141; research-llm-context-optimization.md:181-208*
 
@@ -105,8 +115,8 @@ Create `.claude/rules/` files for exactly two categories:
 
 - Each file covers **one topic** with a descriptive filename
 - Files discovered **recursively** in `.claude/rules/`
-- Supports **symlinks** for sharing across projects
-- User-level rules (`~/.claude/rules/`) apply to all projects
+- Supports **symlinks** for sharing across projects; circular symlinks are detected and handled gracefully
+- User-level rules (`~/.claude/rules/`) apply to all projects; loaded **before** project rules (project rules take higher priority)
 
 *Source: research-llm-context-optimization.md lines 284-305*
 

@@ -1,7 +1,7 @@
 # Progressive Disclosure Guide
 
 Evidence-based instructions for structuring AGENTS.md and CLAUDE.md hierarchies.
-Sources: a-guide-to-agents.md, a-guide-to-claude.md, research-llm-context-optimization.md
+Sources: a-guide-to-agents.md, a-guide-to-claude.md, research-llm-context-optimization.md, memory/how-claude-remembers-a-project.md
 
 ---
 
@@ -9,9 +9,9 @@ Sources: a-guide-to-agents.md, a-guide-to-claude.md, research-llm-context-optimi
 
 - File hierarchy decision table (where to place content)
 - Root file requirements (minimal elements only)
-- Monorepo: what goes where (root vs package level)
+- Monorepo: what goes where (root vs package level, claudeMdExcludes)
 - Progressive disclosure patterns (domain files, nested docs, skills)
-- CLAUDE.md-specific hierarchy (5 scopes with priority)
+- CLAUDE.md-specific hierarchy (5 scopes, @import, load order)
 - AGENTS.md-specific notes (open standard, symlinks, merging)
 - Anti-patterns to detect and remove
 - Validation checklist
@@ -66,6 +66,16 @@ See each package's AGENTS.md for specific guidelines.
 > "Don't overload any level. The agent sees all merged files in its context."
 > — a-guide-to-agents.md lines 164-193
 
+**`claudeMdExcludes`**: In large monorepos, skip irrelevant ancestor CLAUDE.md files via `.claude/settings.local.json`:
+
+```json
+{ "claudeMdExcludes": ["**/other-team/CLAUDE.md", "**/other-team/.claude/rules/**"] }
+```
+
+Patterns match absolute paths with glob syntax. Arrays merge across settings layers. Managed policy CLAUDE.md files cannot be excluded.
+
+*Source: memory/how-claude-remembers-a-project.md lines 243-260*
+
 ---
 
 ## Progressive Disclosure Patterns
@@ -108,6 +118,10 @@ docs/
 | Path-scoped rules | `.claude/rules/*.md` with `paths:` | When matching files are read |
 
 **Priority rule**: Minimize content in always-loaded locations. Move to on-demand locations wherever possible.
+
+**@import syntax**: CLAUDE.md files can import additional files with `@path/to/file`. Imports expand at launch alongside the importing CLAUDE.md. Relative paths resolve relative to the importing file, not CWD. Max recursion depth: 5 hops. Requires one-time user approval per project.
+
+**Load order**: Claude Code walks up the directory tree from CWD, loading every ancestor CLAUDE.md at session start. Subdirectory CLAUDE.md files load on-demand only when Claude reads files in that directory — not at launch.
 
 *Source: research-llm-context-optimization.md lines 181-208, 257-305*
 

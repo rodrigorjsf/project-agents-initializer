@@ -1,7 +1,7 @@
 # What NOT to Include
 
 Evidence-based exclusion table for AGENTS.md and CLAUDE.md content.
-Sources: ETH Zurich paper (Evaluating AGENTS.md), Anthropic Best Practices, a-guide-to-agents.md
+Sources: ETH Zurich paper (Evaluating AGENTS.md), Anthropic Best Practices, a-guide-to-agents.md, hooks/automate-workflow-with-hooks.md
 
 ---
 
@@ -21,6 +21,7 @@ Sources: ETH Zurich paper (Evaluating AGENTS.md), Anthropic Best Practices, a-gu
 | Long explanations and tutorials | Context is for instructions, not education | Listed in explicit ❌ Exclude column | Anthropic Best Practices |
 | Detailed API documentation | Link to external docs instead of inlining | Listed in explicit ❌ Exclude column | Anthropic Best Practices |
 | Anything the agent can infer from code | Agent reads code directly; redundant instructions waste tokens | "Anything Claude can figure out by reading code" | Anthropic Best Practices |
+| Hook-enforced behaviors (formatting, file blocking, notifications) | Hooks handle these deterministically; config file instructions are redundant and may conflict with hook execution | "Hooks provide deterministic control over Claude Code's behavior, ensuring certain actions always happen rather than relying on the LLM" | Anthropic Hooks Guide |
 
 *Source: init-agents/SKILL.md:106-116 expanded; research-llm-context-optimization.md:113-121; Evaluating-AGENTS-paper.md abstract*
 

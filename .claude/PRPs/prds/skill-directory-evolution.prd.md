@@ -376,7 +376,7 @@ The `.claude/rules/` files enforce that when a shared reference is updated, all 
 | 3 | Agent-to-reference conversion | Convert 3 agent files to universal reference docs for standalone skills | complete | with 1 | - | `.claude/PRPs/plans/agent-to-reference-conversion.plan.md` |
 | 4 | Plugin skills evolution | Rewrite 4 plugin SKILL.md files to use `references/` and `assets/`, add self-validation loop | complete | - | 1, 2 | `.claude/PRPs/plans/plugin-skills-evolution.plan.md` |
 | 5 | Compliance audit & remediation | Verify and fix completed phases (1-4) against new Anthropic Skill Authoring constraints discovered post-completion | complete | - | 4 | `.claude/PRPs/plans/completed/compliance-audit-remediation.plan.md` |
-| 5b | New documentation integration | Enrich completed Phase 1 reference files with findings from newly added `docs/` subdirectory documents (2026-03-24 reorganization) | pending | - | 5 | - |
+| 5b | New documentation integration | Enrich completed Phase 1 reference files with findings from newly added `docs/` subdirectory documents (2026-03-24 reorganization) | complete | - | 5 | `.claude/PRPs/plans/completed/new-documentation-integration.plan.md` |
 | 6 | Standalone skills evolution | Rewrite 4 standalone SKILL.md files to use `references/` (including converted agents) and `assets/`, add self-validation loop | pending | - | 1, 2, 3, 5b | - |
 | 7 | Rules and conventions update | Update `.claude/rules/`, `CLAUDE.md` files, and `plugin.json` to enforce new directory conventions | pending | - | 5b, 6 | - |
 | 8 | Cross-distribution validation | Test all 8 skills with `test-prompt` RED-GREEN-REFACTOR cycle, verify feature parity | pending | - | 5b, 6, 7 | - |
