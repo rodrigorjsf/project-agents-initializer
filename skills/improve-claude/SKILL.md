@@ -37,64 +37,44 @@ Key metrics from research:
 
 ### Phase 1: Current State Analysis
 
-Read and evaluate all CLAUDE.md files and `.claude/rules/` in the project directly:
+Read `${CLAUDE_SKILL_DIR}/references/evaluation-criteria.md` for the scoring rubric and bloat/staleness indicators.
 
-```bash
-# Find all config files
-find . -name "CLAUDE.md" -not -path "*/node_modules/*"
-find . -path "./.claude/rules/*.md" 2>/dev/null
+Read `${CLAUDE_SKILL_DIR}/references/file-evaluator.md` and follow its evaluation instructions to evaluate all CLAUDE.md files and .claude/rules/ files in the project at the current working directory.
 
-# Count lines in each
-find . -name "CLAUDE.md" -not -path "*/node_modules/*" | xargs wc -l
-find . -path "./.claude/rules/*.md" 2>/dev/null | xargs wc -l
+Check for:
 
-# Read each file
-find . -name "CLAUDE.md" -not -path "*/node_modules/*" | xargs cat
-cat .claude/rules/*.md 2>/dev/null
-```
+1. Files over 200 lines
+2. Bloat indicators (directory listings, obvious conventions, vague instructions)
+3. Stale references (file paths that don't exist, commands that aren't in package.json)
+4. Contradictions between files (including between CLAUDE.md and .claude/rules/)
+5. Progressive disclosure opportunities (content that should be in separate files or path-scoped rules)
+6. Missing scope-specific files
+7. Rules files without path-scoping that should have it (wasting tokens on every request)
+8. Content in root CLAUDE.md that only applies to specific file patterns (should be in .claude/rules/)
 
-For each file, evaluate:
-
-1. **Files over 200 lines** — must be split
-2. **Bloat indicators** — directory listings, obvious conventions, vague instructions
-3. **Stale references** — file paths that don't exist, commands not in package.json
-4. **Contradictions** — conflicting instructions across CLAUDE.md files and .claude/rules/
-5. **Progressive disclosure opportunities** — content that should be in separate files
-6. **Rules files without path-scoping** — loading content on every request that should be on-demand
-7. **Content in root that only applies to specific patterns** — should be in .claude/rules/
-
-Build a structured assessment with specific line numbers for each issue.
+Build a structured assessment with specific line numbers and content for each issue.
 
 ### Phase 2: Codebase Comparison
 
-Verify documentation against the actual codebase and identify gaps:
+Read `${CLAUDE_SKILL_DIR}/references/codebase-analyzer.md` and follow its codebase analysis instructions. Focus on:
 
-```bash
-# Verify tooling commands
-cat package.json 2>/dev/null | grep -A 30 '"scripts"'
-cat Makefile 2>/dev/null | head -20
+1. Verifying that tooling commands documented in CLAUDE.md files still work
+2. Identifying scopes that have distinct tooling but lack their own CLAUDE.md — including library/shared packages in monorepos that have unique constraints (zero-dependency rules, dual exports, conditional imports, server-only markers)
+3. Detecting file patterns that have specific conventions but lack path-scoped .claude/rules/ — check for BOTH convention rules (code style, test patterns) AND domain-critical rules (privacy, security, compliance) that should be path-scoped to sensitive file patterns
+4. Detecting new domain areas not covered by existing documentation
 
-# Check for scopes without CLAUDE.md
-find . -name "package.json" -not -path "*/node_modules/*" -not -path "./.*/package.json" | \
-  xargs dirname | grep -v "^.$" | while read d; do
-    [ -f "$d/CLAUDE.md" ] || echo "Missing: $d/CLAUDE.md"
-  done
-
-# Check for file patterns that should have .claude/rules/
-find . -name "*.test.*" -o -name "*.spec.*" | head -3 | xargs head -3 2>/dev/null
-find . -name "*auth*" -o -name "*payment*" -o -name "*secret*" 2>/dev/null | grep -v node_modules | head -5
-```
-
-Collect ONLY actionable findings:
-
-- Commands documented that no longer exist
-- New scopes without documentation (including library/shared packages with unique constraints)
-- File patterns with non-obvious conventions that lack path-scoped rules
-- Security/privacy patterns that should have domain-critical path-scoped rules
+Return ONLY actionable findings.
 
 ### Phase 3: Generate Improvement Plan
 
-Based on both analyses, create an improvement plan. Categorize by impact:
+Read these reference documents:
+
+- `${CLAUDE_SKILL_DIR}/references/progressive-disclosure-guide.md` — hierarchy decisions and loading tiers
+- `${CLAUDE_SKILL_DIR}/references/what-not-to-include.md` — content exclusion criteria
+- `${CLAUDE_SKILL_DIR}/references/context-optimization.md` — token budget guidelines
+- `${CLAUDE_SKILL_DIR}/references/claude-rules-system.md` — .claude/rules/ conventions and path-scoping
+
+Based on both analyses, create improvement plan:
 
 #### Removal Actions (highest priority — reduce token waste)
 
@@ -115,12 +95,25 @@ Based on both analyses, create an improvement plan. Categorize by impact:
 #### Addition Actions (lowest priority — only if genuinely missing)
 
 1. **Add missing scope files** for detected scopes without configuration — including library/shared packages
-2. **Add missing tooling commands** that are non-standard and actually needed
-3. **Create missing `.claude/rules/`** for file patterns with non-obvious conventions — include both convention rules (style, tests) and domain-critical rules (privacy, security, compliance)
+2. **Add missing tooling commands** that the codebase-analyzer identified as non-standard
+3. **Create missing `.claude/rules/`** for file patterns with non-obvious conventions — include both convention rules (style, tests) and domain-critical rules (privacy, security, compliance) path-scoped to sensitive file patterns
 
-### Phase 4: Present and Apply
+When generating new or restructured files, use these templates:
 
-1. Show the user a summary of issues found:
+- Root CLAUDE.md: Read `${CLAUDE_SKILL_DIR}/assets/templates/root-claude-md.md`
+- Scoped CLAUDE.md: Read `${CLAUDE_SKILL_DIR}/assets/templates/scoped-claude-md.md`
+- .claude/rules/ files: Read `${CLAUDE_SKILL_DIR}/assets/templates/claude-rule.md`
+- Domain docs: Read `${CLAUDE_SKILL_DIR}/assets/templates/domain-doc.md`
+
+### Phase 4: Self-Validation
+
+Read `${CLAUDE_SKILL_DIR}/references/validation-criteria.md` and execute its **Validation Loop Instructions** against every improved or newly created file.
+
+For improve operations, also evaluate the **"If This Is an IMPROVE Operation"** section. For CLAUDE.md files, also check **CLAUDE.md-specific** structural checks (path-scoping, minimal always-loaded content). Maximum 3 iterations.
+
+### Phase 5: Present and Apply
+
+1. Show the user a summary of issues found with counts:
    - Files over limit: X
    - Bloat lines to remove: X
    - Stale references: X
@@ -129,52 +122,27 @@ Based on both analyses, create an improvement plan. Categorize by impact:
    - Rules to add path-scoping: X files
    - Scopes to add: X
 
-2. Show specific changes per file with token impact analysis:
+2. Show the specific changes for each file:
+   - Lines to remove (with content)
+   - Content to move to subdirectory CLAUDE.md or .claude/rules/
+   - New files to create
+   - Path-scoping to add to existing rules
+
+3. Show token impact analysis:
    - **Always-loaded tokens**: before → after
    - **On-demand tokens**: before → after
    - **Removed tokens**: total waste eliminated
 
-3. Ask for confirmation before applying
+4. Ask for confirmation before applying
 
-4. Apply changes and verify:
+5. Apply changes and verify:
    - All files under 200 lines
    - No orphaned references
    - Progressive disclosure tree is consistent
    - Path-scoped rules have valid glob patterns
 
-5. Report final metrics:
+6. Report final metrics:
    - Total lines before → after
    - Always-loaded lines before → after
    - Files before → after
    - Estimated token savings per session
-
-## Loading Behavior Reference
-
-| Location | Loading | Token Impact |
-|----------|---------|-------------|
-| Root `CLAUDE.md` | Session start | **Always consumed** |
-| `.claude/CLAUDE.md` | Session start | **Always consumed** |
-| `.claude/rules/*.md` (no paths) | Session start | **Always consumed** |
-| `.claude/rules/*.md` (with paths) | When matching files are read | On-demand |
-| Subdirectory `CLAUDE.md` | When files in that dir are read | On-demand |
-| `docs/*.md` domain files | When agent navigates to them | On-demand |
-
-**Priority: Move content from "always consumed" to "on-demand" locations.**
-
-## Improvement Checklist
-
-After improvements, every CLAUDE.md and .claude/rules/ file should pass:
-
-- [ ] Under 200 lines
-- [ ] No directory/file structure listings
-- [ ] No standard language conventions
-- [ ] No vague, unactionable instructions
-- [ ] No stale file path references
-- [ ] No contradictions with other files
-- [ ] No duplicated content across files
-- [ ] Progressive disclosure pointers where appropriate
-- [ ] One scope per file
-- [ ] Every instruction is specific and verifiable
-- [ ] `.claude/rules/` files have path-scoping when they apply to specific patterns
-- [ ] Minimal content in always-loaded locations
-- [ ] Maximum content in on-demand locations
