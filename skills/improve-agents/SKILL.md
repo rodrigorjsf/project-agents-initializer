@@ -31,58 +31,40 @@ The ETH Zurich study found that **unnecessary requirements in context files make
 
 ### Phase 1: Current State Analysis
 
-Read and evaluate all AGENTS.md files in the project directly. Check each file for:
+Read `${CLAUDE_SKILL_DIR}/references/evaluation-criteria.md` for the complete scoring rubric, bloat indicators table, and staleness detection patterns. Use this to inform the evaluation and to understand the expected output format.
 
-```bash
-# Find all AGENTS.md files
-find . -name "AGENTS.md" -not -path "*/node_modules/*"
+Read `${CLAUDE_SKILL_DIR}/references/file-evaluator.md` and follow its evaluation instructions to evaluate all AGENTS.md files in the project at the current working directory.
 
-# Count lines in each
-find . -name "AGENTS.md" -not -path "*/node_modules/*" | xargs wc -l
+Check for:
 
-# Read each file
-find . -name "AGENTS.md" -not -path "*/node_modules/*" | xargs cat
-```
+1. Files over 200 lines
+2. Bloat indicators (directory listings, obvious conventions, vague instructions)
+3. Stale references (file paths that don't exist, commands that aren't in package.json)
+4. Contradictions between files
+5. Progressive disclosure opportunities (content that should be in separate files)
+6. Missing scope-specific files
 
-For each file, evaluate:
-
-1. **Files over 200 lines** — must be split
-2. **Bloat indicators** — directory listings, obvious conventions, vague instructions ("write clean code")
-3. **Stale references** — file paths that don't exist, commands not in package.json
-4. **Contradictions** — conflicting instructions across files
-5. **Progressive disclosure opportunities** — content that should be in separate scope files
-6. **Missing scope files** — detect scopes from directory structure that lack AGENTS.md
-
-Build a structured assessment with specific line numbers for each issue.
+Build a structured assessment with specific line numbers and content for each issue.
 
 ### Phase 2: Codebase Comparison
 
-Verify the existing documentation against the actual codebase:
+Read `${CLAUDE_SKILL_DIR}/references/codebase-analyzer.md` and follow its codebase analysis instructions. Focus on:
 
-```bash
-# Verify tooling commands still work
-cat package.json 2>/dev/null | grep -A 30 '"scripts"'
-cat Makefile 2>/dev/null | head -20
+1. Verifying that tooling commands documented in AGENTS.md files still work
+2. Identifying scopes that have distinct tooling but lack their own AGENTS.md
+3. Detecting new domain areas not covered by existing documentation
 
-# Check for scopes without AGENTS.md
-find . -name "package.json" -not -path "*/node_modules/*" -not -path "./.*/package.json" | \
-  xargs dirname | grep -v "^.$" | while read d; do
-    [ -f "$d/AGENTS.md" ] || echo "Missing: $d/AGENTS.md"
-  done
-
-# Check for new domain areas
-ls docs/ 2>/dev/null
-```
-
-Collect ONLY actionable findings:
-
-- Commands in AGENTS.md that no longer exist in package.json
-- New scopes without documentation (especially library/shared packages with unique constraints)
-- Domain patterns (testing, deployment) not covered
+Return ONLY actionable findings.
 
 ### Phase 3: Generate Improvement Plan
 
-Based on both analyses, create an improvement plan prioritized by impact:
+Read these reference documents for improvement guidance:
+
+- `${CLAUDE_SKILL_DIR}/references/progressive-disclosure-guide.md` — hierarchy decisions
+- `${CLAUDE_SKILL_DIR}/references/what-not-to-include.md` — content exclusion criteria
+- `${CLAUDE_SKILL_DIR}/references/context-optimization.md` — token budget guidelines
+
+Based on both analyses, create an improvement plan. Categorize actions:
 
 #### Removal Actions (highest priority — reduce token waste)
 
@@ -101,12 +83,26 @@ Based on both analyses, create an improvement plan prioritized by impact:
 #### Addition Actions (lowest priority — only if genuinely missing)
 
 1. **Add missing scope files** for detected scopes without configuration
-2. **Add missing tooling commands** that are non-standard and actually needed
+2. **Add missing tooling commands** that the codebase-analyzer identified as non-standard
 3. **Add progressive disclosure pointers** to existing documentation
 
-### Phase 4: Present and Apply
+When generating new or restructured files, use these templates for consistent structure:
 
-1. Show the user a summary of issues found:
+- Root AGENTS.md: Read `${CLAUDE_SKILL_DIR}/assets/templates/root-agents-md.md`
+- Scoped AGENTS.md: Read `${CLAUDE_SKILL_DIR}/assets/templates/scoped-agents-md.md`
+- Domain docs: Read `${CLAUDE_SKILL_DIR}/assets/templates/domain-doc.md`
+
+### Phase 4: Self-Validation
+
+Read `${CLAUDE_SKILL_DIR}/references/validation-criteria.md` and execute its **Validation Loop Instructions** against every improved or newly created file.
+
+For improve operations, also evaluate the **"If This Is an IMPROVE Operation"** section in validation-criteria.md — checking information preservation, custom command retention, and progressive disclosure structure preservation.
+
+Maximum 3 iterations. Do not proceed to Phase 5 until ALL criteria pass.
+
+### Phase 5: Present and Apply
+
+1. Show the user a summary of issues found with counts:
    - Files over limit: X
    - Bloat lines to remove: X
    - Stale references: X
@@ -114,31 +110,18 @@ Based on both analyses, create an improvement plan prioritized by impact:
    - Files to split: X
    - Scopes to add: X
 
-2. Show specific changes per file (lines to remove with content, content to move, new files)
+2. Show the specific changes for each file:
+   - Lines to remove (with content)
+   - Content to move to new files
+   - New files to create
 
 3. Ask for confirmation before applying
 
 4. Apply changes and verify:
    - All files under 200 lines
    - No orphaned references
-   - Progressive disclosure tree is consistent
 
 5. Report final metrics:
    - Total lines before → after
    - Files before → after
    - Estimated token savings
-
-## Improvement Checklist
-
-After improvements, every AGENTS.md file should pass:
-
-- [ ] Under 200 lines
-- [ ] No directory/file structure listings
-- [ ] No standard language conventions
-- [ ] No vague, unactionable instructions
-- [ ] No stale file path references
-- [ ] No contradictions with other files
-- [ ] No duplicated content across files
-- [ ] Progressive disclosure pointers to domain files where appropriate
-- [ ] One scope per file
-- [ ] Every instruction is specific and verifiable
