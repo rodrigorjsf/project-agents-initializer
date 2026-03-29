@@ -258,6 +258,8 @@ This plugin's design is based on three categories of evidence:
 
 All research documents are saved in the `docs/` directory for reference.
 
+For a comprehensive mapping of every design decision to its evidence source, see **[DESIGN-GUIDELINES.md](DESIGN-GUIDELINES.md)**.
+
 ## Anti-Patterns This Plugin Avoids
 
 | Anti-Pattern | Evidence | What We Do Instead |
