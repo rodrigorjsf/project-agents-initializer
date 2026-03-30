@@ -251,6 +251,28 @@ Rejected suggestions preserve the original content in its current location. No i
 
 ---
 
+## Guideline 13: Automation Migration Decision Framework
+
+**Source**: [Anthropic — Hooks](https://docs.anthropic.com/en/docs/claude-code/hooks) | [Anthropic — Skills](https://docs.anthropic.com/en/docs/claude-code/skills) | [ETH Zurich Study](docs/Evaluating-AGENTS-paper.pdf) | [docs/analysis/analysis-automate-workflow-with-hooks.md](docs/analysis/analysis-automate-workflow-with-hooks.md)
+
+Instructions in CLAUDE.md/AGENTS.md that are infrequently relevant to the current task should migrate to on-demand mechanisms. The decision criteria map each content type to the most appropriate mechanism based on context cost, enforcement guarantee, and platform compatibility.
+
+| Content Type | Best Mechanism | Context Cost | Evidence |
+|---|---|---|---|
+| Always-applicable universal rules (<5 lines) | CLAUDE.md root | Per-session | research-llm-context-optimization.md |
+| Path-specific conventions (5-50 lines) | `.claude/rules/` with `paths:` | On-demand | analysis-how-claude-remembers-a-project.md |
+| Infrequent workflows/domain knowledge (50-500 lines) | Skill (`user-invocable: false`) | ~100 tokens at startup | extend-claude-with-skills.md |
+| Heavy/rare workflows with side effects | Skill (`disable-model-invocation: true`) | Zero | extend-claude-with-skills.md |
+| Must-enforce behavioral rules | Hook (`PreToolUse`/`PostToolUse`/`Stop`) | Zero | analysis-automate-workflow-with-hooks.md |
+| Enforcement needing LLM judgment | Hook (`type: "prompt"` or `type: "agent"`) | Zero | automate-workflow-with-hooks.md |
+| Information agents can infer from code | DELETE — do not document | Negative (saves) | analysis-evaluating-agents-paper.md |
+
+Distribution awareness: Plugin suggests all mechanisms; standalone suggests skills + rules only (hooks and subagents are Claude Code-specific).
+
+**Implemented in**: `references/automation-migration-guide.md` (all 4 improve skills), improve Phase 3 (Phase 4 of this PRD)
+
+---
+
 ## Research Foundation
 
 All design decisions trace to these sources:
@@ -288,5 +310,5 @@ Sixteen analysis documents in `docs/analysis/` provide deep extraction of key fi
 
 ---
 
-*Last updated: 2026-03-29*
+*Last updated: 2026-03-30*
 *Maintained in sync with project implementations via documentation sync mechanism*
