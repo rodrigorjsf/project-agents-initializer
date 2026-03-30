@@ -190,8 +190,8 @@ Preflight: CLAUDE.md exists?
 
 | # | Phase | Description | Status | Parallel | Depends | PRP Plan |
 |---|-------|-------------|--------|----------|---------|----------|
-| 1 | Research & Documentation Foundation | Research official docs on hooks, agent inference, context poisoning; create `automation-migration-guide.md`; create `DESIGN-GUIDELINES.md` and sync mechanism | in-progress | - | - | `.claude/PRPs/plans/phase-1-research-documentation-foundation.plan.md` |
-| 2 | Init Preflight Redirect | Add preflight check to all 4 init skills; redirect to improve when files exist | pending | with 3 | 1 | - |
+| 1 | Research & Documentation Foundation | Research official docs on hooks, agent inference, context poisoning; create `automation-migration-guide.md`; create `DESIGN-GUIDELINES.md` and sync mechanism | complete | - | - | `.claude/PRPs/plans/phase-1-research-documentation-foundation.plan.md` |
+| 2 | Init Preflight Redirect | Add preflight check to all 4 init skills; redirect to improve when files exist | complete | with 3 | 1 | `.claude/PRPs/plans/completed/phase-2-init-preflight-redirect.plan.md` |
 | 3 | Reference Files Evolution | Modify `file-evaluator.md`, `what-not-to-include.md`, `evaluation-criteria.md` across all distributions to add migration detection | pending | with 2 | 1 | - |
 | 4 | Improve Phase 3 Enhancement | Add automation migration subcategory and redundancy analysis to improve skills | pending | - | 2, 3 | - |
 | 5 | User Presentation & Approval Flow | Implement 3-option presentation, evidence-based justification, approval gates in Phase 5 | pending | - | 4 | - |
