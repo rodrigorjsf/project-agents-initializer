@@ -95,6 +95,8 @@ Initialize an optimized AGENTS.md file hierarchy for your project.
 3. Generates minimal per-scope AGENTS.md files with progressive disclosure pointers
 4. Presents all files for review before writing
 
+**Preflight check:** If `AGENTS.md` already exists, the skill redirects to `improve-agents` to optimize your existing configuration instead of generating a new one.
+
 **What it generates:**
 
 - Root `AGENTS.md` — project essentials only
@@ -110,6 +112,8 @@ Initialize an optimized CLAUDE.md hierarchy with `.claude/rules/` for your proje
 - Generates `.claude/rules/*.md` path-scoped rules for file-pattern-specific conventions
 - Leverages Claude Code's on-demand loading for subdirectory CLAUDE.md files
 - Maximizes on-demand loading, minimizes always-loaded content
+
+**Preflight check:** If `CLAUDE.md` already exists, the skill redirects to `improve-claude` to optimize your existing configuration instead of generating a new one.
 
 ### `improve-agents`
 

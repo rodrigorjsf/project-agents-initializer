@@ -273,6 +273,25 @@ Distribution awareness: Plugin suggests all mechanisms; standalone suggests skil
 
 ---
 
+## Guideline 14: Init Preflight Redirect
+
+**Source**: [ETH Zurich Study](docs/Evaluating-AGENTS-paper.pdf) | Project design decision | PRD Phase 2
+
+Init skills must check for existing target files before proceeding with generation. Running init on a project that already has configuration files wastes subagent runs and risks overwriting user customizations.
+
+**Decision criteria**:
+
+| Condition | Action | Rationale |
+|---|---|---|
+| Target file (CLAUDE.md/AGENTS.md) exists | Redirect to corresponding improve skill | Preserves existing customizations; improve workflow optimizes rather than replaces |
+| Target file does not exist | Proceed with normal init flow | Clean project needs full generation |
+
+**Implementation pattern**: A `### Preflight Check` section sits between `## Process` and `### Phase 1` in all init SKILL.md files. The check uses plain English conditional logic ("If it already exists") consistent with the conditional patterns already in Phase 3 of init skills.
+
+**Implemented in**: All 4 init skills (plugin and standalone distributions)
+
+---
+
 ## Research Foundation
 
 All design decisions trace to these sources:
