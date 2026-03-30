@@ -21,9 +21,7 @@ Perform a complete quality gate of the agents-initializer project. This meta-ski
 
 ## Phase 1: Static Artifact Inspection
 
-Read `${CLAUDE_SKILL_DIR}/agents/artifact-inspector.md` to load the complete inspection instructions.
-
-Spawn a general-purpose agent using the Task tool, providing the artifact-inspector content as the agent's task. The agent has access to all bash/glob/grep tools to inspect the project files.
+Read `.claude/skills/quality-gate/agents/artifact-inspector.md`. Skip the YAML frontmatter block (the content between the first and second `---` delimiters) — it is documentation metadata only. Pass the remaining content as the task to a general-purpose agent via the Task tool.
 
 **Wait for completion.** Collect structured output as `artifact_report`, which contains:
 - Compliance matrix per category (Plugin SKILL.md, Standalone SKILL.md, Reference Files, Agent Files, Templates)
@@ -33,9 +31,7 @@ Spawn a general-purpose agent using the Task tool, providing the artifact-inspec
 
 ## Phase 2: Cross-Distribution Parity Check
 
-Read `${CLAUDE_SKILL_DIR}/agents/parity-checker.md` to load the parity check instructions.
-
-Spawn a general-purpose agent using the Task tool, providing the parity-checker content as the agent's task.
+Read `.claude/skills/quality-gate/agents/parity-checker.md`. Skip the YAML frontmatter block. Pass the remaining content as the task to a general-purpose agent via the Task tool.
 
 **Wait for completion.** Collect structured output as `parity_report`, which contains:
 - Parity matrix: each shared file group with MATCH/MISMATCH status and copy count
@@ -45,9 +41,9 @@ Spawn a general-purpose agent using the Task tool, providing the parity-checker 
 
 ## Phase 3: Red-Green Test Evaluation
 
-Read `${CLAUDE_SKILL_DIR}/agents/scenario-evaluator.md` to load the base evaluator instructions.
+Read `.claude/skills/quality-gate/agents/scenario-evaluator.md`. Skip the YAML frontmatter block. Use the remaining content as the base evaluator instructions.
 
-Spawn 4 agents in parallel using the Task tool — one per scenario below. For each agent, pass the scenario-evaluator instructions plus this instruction appended:
+**Spawn all 4 agents simultaneously in a single response** using the Task tool (one call per scenario — do not wait between them). For each agent, combine the scenario-evaluator instructions with this appended instruction:
 
 > **Your scenario to evaluate:** Read the scenario file at `[SCENARIO_PATH]` and evaluate both the plugin and standalone versions of the target skill.
 
@@ -70,7 +66,7 @@ Spawn 4 agents in parallel using the Task tool — one per scenario below. For e
 
 Aggregate all outputs from Phases 1, 2, and 3.
 
-Read `${CLAUDE_SKILL_DIR}/references/quality-gate-criteria.md` to verify complete checklist coverage.
+Read `.claude/skills/quality-gate/references/quality-gate-criteria.md` Section `## Expected Results Checklist`. Cross-reference the category headings in the checklist against the Phase 1–3 results to confirm every category was covered. Note any categories with no corresponding results.
 
 Compute and display the **Quality Gate Dashboard**:
 
@@ -90,7 +86,7 @@ OVERALL                       [N]     [N]     [N]   [PASS/FAIL]
 **If all checks pass:**
 > ✅ Quality Gate PASSED — All [N] checks passed. All artifacts comply with documented conventions and all test scenarios evaluate as GREEN.
 
-Stop here.
+**Stop here. Do NOT write any report file to `.specs/reports/`.**
 
 **If any checks fail:** Proceed to Phase 5.
 
@@ -100,7 +96,7 @@ Stop here.
 
 Generate `.specs/reports/quality-gate-[YYYY-MM-DD]-findings.md`.
 
-Read `${CLAUDE_SKILL_DIR}/references/quality-gate-criteria.md` Section "## Report Template" for the exact document structure to follow.
+Read `.claude/skills/quality-gate/references/quality-gate-criteria.md` Section "## Report Template" for the exact document structure to follow.
 
 For each finding, assign a Finding ID (F001, F002, ...) and document:
 1. **Artifact**: file path affected
