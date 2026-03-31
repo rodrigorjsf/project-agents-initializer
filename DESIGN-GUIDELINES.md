@@ -110,7 +110,7 @@ Stale information in config files is worse than no information. When a documente
 | Ball-of-mud accumulation | Redundancy analysis with mandatory user approval |
 | Frequently-changing info | Exclude from config files entirely |
 
-**Implemented in**: `references/file-evaluator.md` (staleness detection), improve skills Phase 1-2 (verification), `references/what-not-to-include.md`
+**Implemented in**: `references/file-evaluator.md` (staleness + automation opportunity detection), improve skills Phase 1-2 (verification), `references/what-not-to-include.md` (exclusion actions with migration paths)
 
 ---
 
@@ -269,7 +269,7 @@ Instructions in CLAUDE.md/AGENTS.md that are infrequently relevant to the curren
 
 Distribution awareness: Plugin suggests all mechanisms; standalone suggests skills + rules only (hooks and subagents are Claude Code-specific).
 
-**Implemented in**: `references/automation-migration-guide.md` (all 4 improve skills), improve Phase 3 (Phase 4 of this PRD)
+**Implemented in**: `references/automation-migration-guide.md` (all 4 improve skills), `references/file-evaluator.md` (Automation Opportunity Indicators — detection), `references/evaluation-criteria.md` (Automation Opportunity scoring dimension), `references/what-not-to-include.md` (Exclusion Actions migration table)
 
 ---
 
