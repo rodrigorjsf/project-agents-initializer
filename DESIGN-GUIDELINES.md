@@ -344,7 +344,7 @@ Instructions in CLAUDE.md/AGENTS.md that are infrequently relevant to the curren
 
 Distribution awareness: Plugin suggests all mechanisms; standalone suggests skills + rules only (hooks and subagents are Claude Code-specific).
 
-**Implemented in**: `references/automation-migration-guide.md` (all 4 improve skills), `references/file-evaluator.md` (Automation Opportunity Indicators — detection), `references/evaluation-criteria.md` (Automation Opportunity scoring dimension), `references/what-not-to-include.md` (Exclusion Actions migration table)
+**Implemented in**: Improve skills Phase 3 (Automation Migration classification + Redundancy Elimination), `references/automation-migration-guide.md` (decision criteria — loaded in Phase 3), `references/file-evaluator.md` (Automation Opportunity Indicators — Phase 1 detection), `references/evaluation-criteria.md` (Automation Opportunity scoring dimension), `references/what-not-to-include.md` (Exclusion Actions + instruction test)
 
 ---
 
