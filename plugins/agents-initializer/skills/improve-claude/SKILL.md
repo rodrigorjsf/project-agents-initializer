@@ -72,6 +72,7 @@ Read these reference documents:
 - `${CLAUDE_SKILL_DIR}/references/what-not-to-include.md` — content exclusion criteria
 - `${CLAUDE_SKILL_DIR}/references/context-optimization.md` — token budget guidelines
 - `${CLAUDE_SKILL_DIR}/references/claude-rules-system.md` — .claude/rules/ conventions and path-scoping
+- `${CLAUDE_SKILL_DIR}/references/automation-migration-guide.md` — automation migration decision criteria (skill vs. hook vs. rule vs. subagent)
 
 Based on both subagent reports, create improvement plan:
 
@@ -90,6 +91,23 @@ Based on both subagent reports, create improvement plan:
 4. **Add progressive disclosure pointers** in root file to new split files
 5. **Add path-scoping** to `.claude/rules/` files that lack it (reduce always-loaded content)
 6. **Consolidate fragmented files** that cover the same scope
+7. **Migrate automation candidates** — for each instruction flagged in Phase 1 as `HOOK_CANDIDATE`, `RULE_CANDIDATE`, or `SKILL_CANDIDATE`:
+   - Classify using the decision flowchart in automation-migration-guide.md
+   - Select target mechanism: hook (deterministic enforcement), path-scoped `.claude/rules/` (file-pattern convention), skill (domain knowledge/infrequent workflow), or subagent (isolated analysis)
+   - Estimate token savings using the token impact estimation table in automation-migration-guide.md
+   - Distribution-aware: automation-migration-guide.md filters mechanisms to those supported in the current distribution
+
+#### Redundancy Elimination (delete what agents already know)
+
+Apply the instruction test from what-not-to-include.md to each instruction in the evaluated files:
+
+> "Would removing this cause the agent to make mistakes? If not, cut it."
+
+1. **Delete agent-inferable content**: Standard conventions, obvious tooling, information discoverable from code — flagged as `DELETE_CANDIDATE` in Phase 1
+2. **Delete vague/generic advice**: Instructions that cannot be verified or acted on
+3. **Delete auto-enforced rules**: Formatting or linting rules already enforced by project tooling
+
+For each deletion, document: the specific content being removed, WHY the agent doesn't need it (inference capability or tool enforcement), and the evidence source from what-not-to-include.md.
 
 #### Addition Actions (lowest priority — only if genuinely missing)
 
@@ -120,12 +138,16 @@ For improve operations, also evaluate the **"If This Is an IMPROVE Operation"** 
    - Content to move to on-demand files: X lines
    - Rules to add path-scoping: X files
    - Scopes to add: X
+   - Automation migration candidates: X (by mechanism type)
+   - Redundant instructions to delete: X
 
 2. Show the specific changes for each file:
    - Lines to remove (with content)
    - Content to move to subdirectory CLAUDE.md or .claude/rules/
    - New files to create
    - Path-scoping to add to existing rules
+   - Automation migration recommendations (target mechanism, token savings)
+   - Redundant instructions to remove (with evidence justification)
 
 3. Show token impact analysis:
    - **Always-loaded tokens**: before → after
