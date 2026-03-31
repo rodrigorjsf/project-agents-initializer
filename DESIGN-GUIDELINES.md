@@ -209,7 +209,7 @@ Behaviors that don't apply to every task should load into context only when need
 
 Converting a behavioral instruction from CLAUDE.md to a hook removes it from the context budget entirely while guaranteeing enforcement. Each converted rule saves ~20-50 tokens from always-loaded context.
 
-**Implemented in**: Improve skills (Phase 3 refactoring actions), `references/context-optimization.md`, `references/claude-rules-system.md`
+**Implemented in**: Improve skills (Phase 3 refactoring actions — including automation migration item), `references/context-optimization.md`, `references/claude-rules-system.md`, `references/automation-migration-guide.md`
 
 ---
 
@@ -269,7 +269,7 @@ Instructions in CLAUDE.md/AGENTS.md that are infrequently relevant to the curren
 
 Distribution awareness: Plugin suggests all mechanisms; standalone suggests skills + rules only (hooks and subagents are Claude Code-specific).
 
-**Implemented in**: `references/automation-migration-guide.md` (all 4 improve skills), `references/file-evaluator.md` (Automation Opportunity Indicators — detection), `references/evaluation-criteria.md` (Automation Opportunity scoring dimension), `references/what-not-to-include.md` (Exclusion Actions migration table)
+**Implemented in**: Improve skills Phase 3 (Automation Migration classification + Redundancy Elimination), `references/automation-migration-guide.md` (decision criteria — loaded in Phase 3), `references/file-evaluator.md` (Automation Opportunity Indicators — Phase 1 detection), `references/evaluation-criteria.md` (Automation Opportunity scoring dimension), `references/what-not-to-include.md` (Exclusion Actions + instruction test)
 
 ---
 
