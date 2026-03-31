@@ -37,6 +37,18 @@ Not all excluded content should be deleted — some should migrate to on-demand 
 | Agent-inferable content | **Delete** | No migration — agents discover via tools |
 | Stale, vague, or duplicate content | **Delete** | No migration value |
 
+### Exclusion Actions
+
+Not all excluded content should be deleted — some should migrate to on-demand mechanisms:
+
+| Exclusion Category | Action | Mechanism |
+|-------------------|--------|-----------|
+| Hook-enforced behaviors | **Migrate** | Hook (zero context cost, deterministic enforcement) |
+| Path-specific conventions | **Migrate** | `.claude/rules/` with `paths:` (loads on file match only) |
+| Domain knowledge blocks >50 lines | **Migrate** | Skill `user-invocable: false` (~100 token startup cost) |
+| Agent-inferable content | **Delete** | No migration — agents discover via tools |
+| Stale, vague, or duplicate content | **Delete** | No migration value |
+
 ---
 
 ## The Instruction Test
