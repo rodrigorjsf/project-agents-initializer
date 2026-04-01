@@ -332,15 +332,15 @@ When a user approves an automation migration in Phase 5, the improve skill must 
 
 Instructions in CLAUDE.md/AGENTS.md that are infrequently relevant to the current task should migrate to on-demand mechanisms. The decision criteria map each content type to the most appropriate mechanism based on context cost, enforcement guarantee, and platform compatibility.
 
-| Content Type | Best Mechanism | Context Cost | Evidence |
-|---|---|---|---|
-| Always-applicable universal rules (<5 lines) | CLAUDE.md root | Per-session | research-llm-context-optimization.md |
-| Path-specific conventions (5-50 lines) | `.claude/rules/` with `paths:` | On-demand | analysis-how-claude-remembers-a-project.md |
-| Infrequent workflows/domain knowledge (50-500 lines) | Skill (`user-invocable: false`) | ~100 tokens at startup | extend-claude-with-skills.md |
-| Heavy/rare workflows with side effects | Skill (`disable-model-invocation: true`) | Zero | extend-claude-with-skills.md |
-| Must-enforce behavioral rules | Hook (`PreToolUse`/`PostToolUse`/`Stop`) | Zero | analysis-automate-workflow-with-hooks.md |
-| Enforcement needing LLM judgment | Hook (`type: "prompt"` or `type: "agent"`) | Zero | automate-workflow-with-hooks.md |
-| Information agents can infer from code | DELETE — do not document | Negative (saves) | analysis-evaluating-agents-paper.md |
+| Content Type                                         | Best Mechanism                             | Context Cost           | Evidence                                   |
+| ---------------------------------------------------- | ------------------------------------------ | ---------------------- | ------------------------------------------ |
+| Always-applicable universal rules (<5 lines)         | CLAUDE.md root                             | Per-session            | research-llm-context-optimization.md       |
+| Path-specific conventions (5-50 lines)               | `.claude/rules/` with `paths:`             | On-demand              | analysis-how-claude-remembers-a-project.md |
+| Infrequent workflows/domain knowledge (50-500 lines) | Skill (`user-invocable: false`)            | ~100 tokens at startup | extend-claude-with-skills.md               |
+| Heavy/rare workflows with side effects               | Skill (`disable-model-invocation: true`)   | Zero                   | extend-claude-with-skills.md               |
+| Must-enforce behavioral rules                        | Hook (`PreToolUse`/`PostToolUse`/`Stop`)   | Zero                   | analysis-automate-workflow-with-hooks.md   |
+| Enforcement needing LLM judgment                     | Hook (`type: "prompt"` or `type: "agent"`) | Zero                   | automate-workflow-with-hooks.md            |
+| Information agents can infer from code               | DELETE — do not document                   | Negative (saves)       | analysis-evaluating-agents-paper.md        |
 
 Distribution awareness: Plugin suggests all mechanisms; standalone suggests skills + rules only (hooks and subagents are Claude Code-specific).
 
@@ -356,10 +356,10 @@ Init skills must check for existing target files before proceeding with generati
 
 **Decision criteria**:
 
-| Condition | Action | Rationale |
-|---|---|---|
+| Condition                                | Action                                  | Rationale                                                                          |
+| ---------------------------------------- | --------------------------------------- | ---------------------------------------------------------------------------------- |
 | Target file (CLAUDE.md/AGENTS.md) exists | Redirect to corresponding improve skill | Preserves existing customizations; improve workflow optimizes rather than replaces |
-| Target file does not exist | Proceed with normal init flow | Clean project needs full generation |
+| Target file does not exist               | Proceed with normal init flow           | Clean project needs full generation                                                |
 
 **Implementation pattern**: A `### Preflight Check` section sits between `## Process` and `### Phase 1` in all init SKILL.md files. The check uses plain English conditional logic ("If it already exists") consistent with the conditional patterns already in Phase 3 of init skills.
 
