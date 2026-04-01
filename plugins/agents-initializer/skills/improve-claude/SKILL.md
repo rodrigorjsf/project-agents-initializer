@@ -130,40 +130,44 @@ For improve operations, also evaluate the **"If This Is an IMPROVE Operation"** 
 
 ### Phase 5: Present and Apply
 
-1. Show the user a summary of issues found with counts:
-   - Files over limit: X
-   - Bloat lines to remove: X
-   - Stale references: X
-   - Contradictions: X
-   - Content to move to on-demand files: X lines
-   - Rules to add path-scoping: X files
-   - Scopes to add: X
-   - Automation migration candidates: X (by mechanism type)
-   - Redundant instructions to delete: X
+1. Show a summary overview of all improvements found, grouped by category:
+   - **Removals**: X items (bloat: X, stale: X, duplicates: X, contradictions: X)
+   - **Refactoring**: X items (scope extraction: X, rule conversion: X, domain extraction: X, consolidation: X)
+   - **Automation Migrations**: X items (hooks: X, rules: X, skills: X, subagents: X)
+   - **Redundancy Eliminations**: X items
+   - **Additions**: X items
 
-2. Show the specific changes for each file:
-   - Lines to remove (with content)
-   - Content to move to subdirectory CLAUDE.md or .claude/rules/
-   - New files to create
-   - Path-scoping to add to existing rules
-   - Automation migration recommendations (target mechanism, token savings)
-   - Redundant instructions to remove (with evidence justification)
+2. For each suggestion, present a structured card in priority order (Removals → Refactoring → Automation Migrations → Redundancy Eliminations → Additions):
 
-3. Show token impact analysis:
+   **WHAT**: The specific content and its current location (file:lines)
+   **WHY**: Evidence-based justification with source reference (e.g., "Agents can infer directory structure from tools — source: analysis-evaluating-agents-paper.md lines 36-41")
+   **TOKEN IMPACT**: Estimated tokens saved from always-loaded context (from automation-migration-guide.md token impact table)
+   **OPTIONS**:
+   - **Option A** (recommended): Primary action — e.g., "Remove this content" / "Migrate to `.claude/rules/commit-conventions.md` with `paths: ['*.md']`" / "Convert to skill with `user-invocable: false`"
+   - **Option B**: Alternative action — e.g., "Move to scoped CLAUDE.md instead" / "Convert to path-scoped rule instead of hook"
+   - **Option C**: Keep as-is — "Preserve in current location. Trade-off: continues consuming ~X tokens per session"
+   - *(Additional options when applicable — e.g., for automation migrations, show each viable mechanism as a separate option)*
+
+   Wait for the user to select an option for each suggestion before proceeding to the next.
+   If the user selects "Keep as-is", preserve the content in its exact current location — no modification.
+
+3. After all suggestions are reviewed, show aggregate token impact analysis:
    - **Always-loaded tokens**: before → after
    - **On-demand tokens**: before → after
    - **Removed tokens**: total waste eliminated
+   - **Deferred suggestions**: X items kept as-is (user chose to preserve)
 
-4. Ask for confirmation before applying
+4. Apply ONLY the approved changes (options A or B selections):
+   - Execute each approved change in dependency order
+   - Verify after each change:
+     - All files under 200 lines
+     - No orphaned references
+     - Progressive disclosure tree is consistent
+     - Path-scoped rules have valid glob patterns
 
-5. Apply changes and verify:
-   - All files under 200 lines
-   - No orphaned references
-   - Progressive disclosure tree is consistent
-   - Path-scoped rules have valid glob patterns
-
-6. Report final metrics:
+5. Report final metrics:
    - Total lines before → after
    - Always-loaded lines before → after
    - Files before → after
    - Estimated token savings per session
+   - Suggestions applied: X of Y (Z deferred)

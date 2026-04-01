@@ -6,11 +6,11 @@ Every design decision in this plugin traces to published research or official do
 
 The ETH Zurich study ["Evaluating AGENTS.md"](docs/Evaluating-AGENTS-paper.pdf) (February 2026) tested 138 benchmark instances across multiple coding agents and found:
 
-| Configuration | Success Impact | Cost Impact |
-|---|---|---|
-| No config file | Baseline | Baseline |
-| LLM-generated comprehensive file | **-3%** | **+20%** |
-| Developer-written minimal file | **+4%** | +19% |
+| Configuration                    | Success Impact | Cost Impact |
+| -------------------------------- | -------------- | ----------- |
+| No config file                   | Baseline       | Baseline    |
+| LLM-generated comprehensive file | **-3%**        | **+20%**    |
+| Developer-written minimal file   | **+4%**        | +19%        |
 
 Auto-generated files hurt performance because agents follow every instruction — compliance is guaranteed, usefulness is not. Each unnecessary instruction competes for the agent's attention budget.
 
@@ -26,13 +26,13 @@ Auto-generated files hurt performance because agents follow every instruction �
 
 Organize configuration files in a hierarchy that loads content only when relevant:
 
-| Tier | Loading Behavior | Target Size | Example |
-|---|---|---|---|
-| Root file | Always loaded | 15-40 lines | `CLAUDE.md`, `AGENTS.md` |
-| Subdirectory file | On-demand (when working in that directory) | 10-30 lines | `packages/api/CLAUDE.md` |
-| Path-scoped rule | On-demand (when reading matching files) | Focused | `.claude/rules/testing.md` |
-| Domain doc | On-demand (agent navigates there) | Under 200 lines | `docs/TESTING.md` |
-| Skill | On-demand (invoked by name) | Under 500 lines | `/improve-claude` |
+| Tier              | Loading Behavior                           | Target Size     | Example                    |
+| ----------------- | ------------------------------------------ | --------------- | -------------------------- |
+| Root file         | Always loaded                              | 15-40 lines     | `CLAUDE.md`, `AGENTS.md`   |
+| Subdirectory file | On-demand (when working in that directory) | 10-30 lines     | `packages/api/CLAUDE.md`   |
+| Path-scoped rule  | On-demand (when reading matching files)    | Focused         | `.claude/rules/testing.md` |
+| Domain doc        | On-demand (agent navigates there)          | Under 200 lines | `docs/TESTING.md`          |
+| Skill             | On-demand (invoked by name)                | Under 500 lines | `/improve-claude`          |
 
 The root file carries a per-session token cost regardless of task relevance. Every line moved from root to an on-demand tier saves attention budget for every task.
 
@@ -102,13 +102,13 @@ Stale information in config files is worse than no information. When a documente
 
 **Prevention strategies this plugin applies**:
 
-| Poisoning Vector | Mitigation |
-|---|---|
-| Stale file paths | Describe capabilities, not structures |
-| Stale commands | Verify commands exist in package.json/Makefile during improve |
-| Contradictions across files | Cross-file contradiction detection in improve Phase 1 |
-| Ball-of-mud accumulation | Redundancy analysis with mandatory user approval |
-| Frequently-changing info | Exclude from config files entirely |
+| Poisoning Vector            | Mitigation                                                    |
+| --------------------------- | ------------------------------------------------------------- |
+| Stale file paths            | Describe capabilities, not structures                         |
+| Stale commands              | Verify commands exist in package.json/Makefile during improve |
+| Contradictions across files | Cross-file contradiction detection in improve Phase 1         |
+| Ball-of-mud accumulation    | Redundancy analysis with mandatory user approval              |
+| Frequently-changing info    | Exclude from config files entirely                            |
 
 **Implemented in**: `references/file-evaluator.md` (staleness + automation opportunity detection), improve skills Phase 1-2 (verification), `references/what-not-to-include.md` (exclusion actions with migration paths)
 
@@ -122,13 +122,13 @@ Subagents run in isolated context windows. Each receives only its system prompt 
 
 **Plugin subagent design rules**:
 
-| Rule | Rationale | Source |
-|---|---|---|
-| Read-only tools only (`Read`, `Grep`, `Glob`, `Bash`) | Prevents unintended modifications | [Sub-agent docs](https://docs.anthropic.com/en/docs/claude-code/sub-agents) |
-| Sonnet model | Cost-efficient for analysis tasks | [docs/subagents/research-subagent-best-practices.md](docs/subagents/research-subagent-best-practices.md) |
-| maxTurns: 15-20 | Prevents runaway execution | [docs/subagents/creating-custom-subagents.md](docs/subagents/creating-custom-subagents.md) |
-| Structured output format | High signal, low noise for orchestrator | [docs/analysis/analysis-research-subagent-best-practices.md](docs/analysis/analysis-research-subagent-best-practices.md) |
-| Confidence-based filtering (>80%) | Reduces noise in evaluation output | [docs/analysis/analysis-research-subagent-best-practices.md](docs/analysis/analysis-research-subagent-best-practices.md) |
+| Rule                                                  | Rationale                               | Source                                                                                                                   |
+| ----------------------------------------------------- | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Read-only tools only (`Read`, `Grep`, `Glob`, `Bash`) | Prevents unintended modifications       | [Sub-agent docs](https://docs.anthropic.com/en/docs/claude-code/sub-agents)                                              |
+| Sonnet model                                          | Cost-efficient for analysis tasks       | [docs/subagents/research-subagent-best-practices.md](docs/subagents/research-subagent-best-practices.md)                 |
+| maxTurns: 15-20                                       | Prevents runaway execution              | [docs/subagents/creating-custom-subagents.md](docs/subagents/creating-custom-subagents.md)                               |
+| Structured output format                              | High signal, low noise for orchestrator | [docs/analysis/analysis-research-subagent-best-practices.md](docs/analysis/analysis-research-subagent-best-practices.md) |
+| Confidence-based filtering (>80%)                     | Reduces noise in evaluation output      | [docs/analysis/analysis-research-subagent-best-practices.md](docs/analysis/analysis-research-subagent-best-practices.md) |
 
 **Implemented in**: `plugins/agents-initializer/agents/` (3 agent definitions), `.claude/rules/agent-files.md`
 
@@ -142,13 +142,13 @@ Skills are the primary progressive disclosure mechanism. Descriptions consume ~1
 
 **Standards this plugin follows**:
 
-| Constraint | Limit | Source |
-|---|---|---|
-| Skill name | ≤64 characters | [Skill Authoring Best Practices](docs/skills/skill-authoring-best-practices.md) |
-| Description | ≤1024 characters | [Skill Authoring Best Practices](docs/skills/skill-authoring-best-practices.md) |
-| SKILL.md body | <500 lines | [Skill Authoring Best Practices](docs/skills/skill-authoring-best-practices.md) |
-| Reference depth | Max 1 level from SKILL.md | [Skill Authoring Best Practices](docs/skills/skill-authoring-best-practices.md) |
-| Reference file size | ≤200 lines | [Anthropic — Memory](https://docs.anthropic.com/en/docs/claude-code/memory) |
+| Constraint          | Limit                     | Source                                                                          |
+| ------------------- | ------------------------- | ------------------------------------------------------------------------------- |
+| Skill name          | ≤64 characters            | [Skill Authoring Best Practices](docs/skills/skill-authoring-best-practices.md) |
+| Description         | ≤1024 characters          | [Skill Authoring Best Practices](docs/skills/skill-authoring-best-practices.md) |
+| SKILL.md body       | <500 lines                | [Skill Authoring Best Practices](docs/skills/skill-authoring-best-practices.md) |
+| Reference depth     | Max 1 level from SKILL.md | [Skill Authoring Best Practices](docs/skills/skill-authoring-best-practices.md) |
+| Reference file size | ≤200 lines                | [Anthropic — Memory](https://docs.anthropic.com/en/docs/claude-code/memory)     |
 
 **Degrees of freedom** match task fragility: high freedom for judgment-based tasks (code review), low freedom for destructive operations (file deletion, database migrations).
 
@@ -181,14 +181,14 @@ The generate-review-refine pattern catches errors before they reach the user. Ev
 
 Different artifact types require different prompting strategies. Advanced reasoning models (Opus 4.6) perform worse with explicit chain-of-thought and few-shot examples — their internal reasoning already handles these steps.
 
-| Artifact | Strategy | Rationale |
-|---|---|---|
-| Skill (analysis phase) | Implicit CoT ("think thoroughly") | Opus performs better without explicit step-by-step |
-| Skill (output phase) | Direct instructions, templates | Precision matters; minimize variation |
-| Subagent system prompt | Role → Process → Checklist → Output Format | Matches lost-in-the-middle constraint |
-| Rule | Direct assertion, no CoT | Rules are commands, not reasoning prompts |
-| Hook | Fast, deterministic, no LLM reasoning | Hooks execute programmatically |
-| Reference file | Structured guidance with tables | Compact, scannable, high information density |
+| Artifact               | Strategy                                   | Rationale                                          |
+| ---------------------- | ------------------------------------------ | -------------------------------------------------- |
+| Skill (analysis phase) | Implicit CoT ("think thoroughly")          | Opus performs better without explicit step-by-step |
+| Skill (output phase)   | Direct instructions, templates             | Precision matters; minimize variation              |
+| Subagent system prompt | Role → Process → Checklist → Output Format | Matches lost-in-the-middle constraint              |
+| Rule                   | Direct assertion, no CoT                   | Rules are commands, not reasoning prompts          |
+| Hook                   | Fast, deterministic, no LLM reasoning      | Hooks execute programmatically                     |
+| Reference file         | Structured guidance with tables            | Compact, scannable, high information density       |
 
 **Implemented in**: All SKILL.md files (phase structure), agent definitions (system prompt structure), `.claude/rules/` (direct assertions)
 
@@ -200,12 +200,12 @@ Different artifact types require different prompting strategies. Advanced reason
 
 Behaviors that don't apply to every task should load into context only when needed. Three mechanisms achieve this:
 
-| Mechanism | Context Cost | Enforcement | Best For |
-|---|---|---|---|
-| Skill (`user-invocable: false`) | ~100 tokens description at startup; body on invocation | Advisory (LLM decides) | Infrequent workflows, domain knowledge |
-| Skill (`disable-model-invocation: true`) | Zero passive cost | Manual invocation only | Heavy workflows, rare operations |
-| Hook (`PreToolUse`, `PostToolUse`, `Stop`) | Zero context cost | Deterministic (100%) | Rules that must always hold |
-| Path-scoped rule (`.claude/rules/` with `paths:`) | Zero until matching file accessed | Advisory, scoped | File-pattern-specific conventions |
+| Mechanism                                         | Context Cost                                           | Enforcement            | Best For                               |
+| ------------------------------------------------- | ------------------------------------------------------ | ---------------------- | -------------------------------------- |
+| Skill (`user-invocable: false`)                   | ~100 tokens description at startup; body on invocation | Advisory (LLM decides) | Infrequent workflows, domain knowledge |
+| Skill (`disable-model-invocation: true`)          | Zero passive cost                                      | Manual invocation only | Heavy workflows, rare operations       |
+| Hook (`PreToolUse`, `PostToolUse`, `Stop`)        | Zero context cost                                      | Deterministic (100%)   | Rules that must always hold            |
+| Path-scoped rule (`.claude/rules/` with `paths:`) | Zero until matching file accessed                      | Advisory, scoped       | File-pattern-specific conventions      |
 
 Converting a behavioral instruction from CLAUDE.md to a hook removes it from the context budget entirely while guaranteeing enforcement. Each converted rule saves ~20-50 tokens from always-loaded context.
 
@@ -219,14 +219,14 @@ Converting a behavioral instruction from CLAUDE.md to a hook removes it from the
 
 The plugin ships two distributions with identical skill names but different analysis mechanisms:
 
-| Aspect | Plugin (Claude Code) | Standalone (npx skills add) |
-|---|---|---|
-| Analysis | Delegates to named subagents | Reads reference docs, runs inline |
-| Hooks support | Full (suggest hooks in improve) | None (standalone tools lack hooks) |
-| Subagent support | Full (suggest subagents) | None |
-| Rules support | Full (`.claude/rules/` with path-scoping) | Partial (suggest rules as separate files) |
-| Skills support | Full | Full |
-| Output quality | Identical | Identical |
+| Aspect           | Plugin (Claude Code)                      | Standalone (npx skills add)               |
+| ---------------- | ----------------------------------------- | ----------------------------------------- |
+| Analysis         | Delegates to named subagents              | Reads reference docs, runs inline         |
+| Hooks support    | Full (suggest hooks in improve)           | None (standalone tools lack hooks)        |
+| Subagent support | Full (suggest subagents)                  | None                                      |
+| Rules support    | Full (`.claude/rules/` with path-scoping) | Partial (suggest rules as separate files) |
+| Skills support   | Full                                      | Full                                      |
+| Output quality   | Identical                                 | Identical                                 |
 
 Shared references are copied (not symlinked) into each skill directory. When updating a shared reference, all copies across both distributions must stay in sync.
 
@@ -247,7 +247,7 @@ The plugin never removes, migrates, or restructures information without explicit
 
 Rejected suggestions preserve the original content in its current location. No information is lost under any circumstance.
 
-**Implemented in**: Phase 5 of all 4 improve skills, validation criteria (information preservation check)
+**Implemented in**: Phase 5 of all 4 improve skills (per-suggestion approval with 3+ options), validation criteria (information preservation check)
 
 ---
 
@@ -257,15 +257,15 @@ Rejected suggestions preserve the original content in its current location. No i
 
 Instructions in CLAUDE.md/AGENTS.md that are infrequently relevant to the current task should migrate to on-demand mechanisms. The decision criteria map each content type to the most appropriate mechanism based on context cost, enforcement guarantee, and platform compatibility.
 
-| Content Type | Best Mechanism | Context Cost | Evidence |
-|---|---|---|---|
-| Always-applicable universal rules (<5 lines) | CLAUDE.md root | Per-session | research-llm-context-optimization.md |
-| Path-specific conventions (5-50 lines) | `.claude/rules/` with `paths:` | On-demand | analysis-how-claude-remembers-a-project.md |
-| Infrequent workflows/domain knowledge (50-500 lines) | Skill (`user-invocable: false`) | ~100 tokens at startup | extend-claude-with-skills.md |
-| Heavy/rare workflows with side effects | Skill (`disable-model-invocation: true`) | Zero | extend-claude-with-skills.md |
-| Must-enforce behavioral rules | Hook (`PreToolUse`/`PostToolUse`/`Stop`) | Zero | analysis-automate-workflow-with-hooks.md |
-| Enforcement needing LLM judgment | Hook (`type: "prompt"` or `type: "agent"`) | Zero | automate-workflow-with-hooks.md |
-| Information agents can infer from code | DELETE — do not document | Negative (saves) | analysis-evaluating-agents-paper.md |
+| Content Type                                         | Best Mechanism                             | Context Cost           | Evidence                                   |
+| ---------------------------------------------------- | ------------------------------------------ | ---------------------- | ------------------------------------------ |
+| Always-applicable universal rules (<5 lines)         | CLAUDE.md root                             | Per-session            | research-llm-context-optimization.md       |
+| Path-specific conventions (5-50 lines)               | `.claude/rules/` with `paths:`             | On-demand              | analysis-how-claude-remembers-a-project.md |
+| Infrequent workflows/domain knowledge (50-500 lines) | Skill (`user-invocable: false`)            | ~100 tokens at startup | extend-claude-with-skills.md               |
+| Heavy/rare workflows with side effects               | Skill (`disable-model-invocation: true`)   | Zero                   | extend-claude-with-skills.md               |
+| Must-enforce behavioral rules                        | Hook (`PreToolUse`/`PostToolUse`/`Stop`)   | Zero                   | analysis-automate-workflow-with-hooks.md   |
+| Enforcement needing LLM judgment                     | Hook (`type: "prompt"` or `type: "agent"`) | Zero                   | automate-workflow-with-hooks.md            |
+| Information agents can infer from code               | DELETE — do not document                   | Negative (saves)       | analysis-evaluating-agents-paper.md        |
 
 Distribution awareness: Plugin suggests all mechanisms; standalone suggests skills + rules only (hooks and subagents are Claude Code-specific).
 
@@ -281,10 +281,10 @@ Init skills must check for existing target files before proceeding with generati
 
 **Decision criteria**:
 
-| Condition | Action | Rationale |
-|---|---|---|
+| Condition                                | Action                                  | Rationale                                                                          |
+| ---------------------------------------- | --------------------------------------- | ---------------------------------------------------------------------------------- |
 | Target file (CLAUDE.md/AGENTS.md) exists | Redirect to corresponding improve skill | Preserves existing customizations; improve workflow optimizes rather than replaces |
-| Target file does not exist | Proceed with normal init flow | Clean project needs full generation |
+| Target file does not exist               | Proceed with normal init flow           | Clean project needs full generation                                                |
 
 **Implementation pattern**: A `### Preflight Check` section sits between `## Process` and `### Phase 1` in all init SKILL.md files. The check uses plain English conditional logic ("If it already exists") consistent with the conditional patterns already in Phase 3 of init skills.
 
@@ -298,30 +298,30 @@ All design decisions trace to these sources:
 
 ### Academic Research
 
-| Document | Key Finding | Location |
-|---|---|---|
-| [Evaluating AGENTS.md](docs/Evaluating-AGENTS-paper.pdf) (ETH Zurich, 2026) | Auto-generated files reduce success by 3%, increase cost by 20% | `docs/Evaluating-AGENTS-paper.md` |
-| [Lost in the Middle](https://arxiv.org/abs/2307.03172) (TACL 2023) | Models perform worst on mid-context information | Referenced in `docs/research-llm-context-optimization.md` |
+| Document                                                                    | Key Finding                                                     | Location                                                  |
+| --------------------------------------------------------------------------- | --------------------------------------------------------------- | --------------------------------------------------------- |
+| [Evaluating AGENTS.md](docs/Evaluating-AGENTS-paper.pdf) (ETH Zurich, 2026) | Auto-generated files reduce success by 3%, increase cost by 20% | `docs/Evaluating-AGENTS-paper.md`                         |
+| [Lost in the Middle](https://arxiv.org/abs/2307.03172) (TACL 2023)          | Models perform worst on mid-context information                 | Referenced in `docs/research-llm-context-optimization.md` |
 
 ### Anthropic Official Documentation
 
-| Document | Key Principle | URL |
-|---|---|---|
-| Context Engineering | "Find the smallest possible set of high-signal tokens" | [anthropic.com](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents) |
-| CLAUDE.md Memory | Under 200 lines per file; hierarchical loading | [docs.anthropic.com](https://docs.anthropic.com/en/docs/claude-code/memory) |
-| Best Practices | "If Claude already does it correctly, delete it" | [docs.anthropic.com](https://docs.anthropic.com/en/docs/claude-code/best-practices) |
-| Skills | Progressive disclosure; description budget at 2% of context | [docs.anthropic.com](https://docs.anthropic.com/en/docs/claude-code/skills) |
-| Sub-agents | Isolated context; read-only tools; structured output | [docs.anthropic.com](https://docs.anthropic.com/en/docs/claude-code/sub-agents) |
-| Hooks | Deterministic enforcement; zero context cost | [docs.anthropic.com](https://docs.anthropic.com/en/docs/claude-code/hooks) |
+| Document            | Key Principle                                               | URL                                                                                                |
+| ------------------- | ----------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| Context Engineering | "Find the smallest possible set of high-signal tokens"      | [anthropic.com](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents) |
+| CLAUDE.md Memory    | Under 200 lines per file; hierarchical loading              | [docs.anthropic.com](https://docs.anthropic.com/en/docs/claude-code/memory)                        |
+| Best Practices      | "If Claude already does it correctly, delete it"            | [docs.anthropic.com](https://docs.anthropic.com/en/docs/claude-code/best-practices)                |
+| Skills              | Progressive disclosure; description budget at 2% of context | [docs.anthropic.com](https://docs.anthropic.com/en/docs/claude-code/skills)                        |
+| Sub-agents          | Isolated context; read-only tools; structured output        | [docs.anthropic.com](https://docs.anthropic.com/en/docs/claude-code/sub-agents)                    |
+| Hooks               | Deterministic enforcement; zero context cost                | [docs.anthropic.com](https://docs.anthropic.com/en/docs/claude-code/hooks)                         |
 
 ### Practitioner Guides
 
-| Document | Key Contribution | Location |
-|---|---|---|
-| [A Guide to AGENTS.md](docs/a-guide-to-agents.md) | Progressive disclosure patterns, domain files | `docs/` |
-| [A Guide to CLAUDE.md](docs/a-guide-to-claude.md) | CLAUDE.md hierarchy, instruction budget | `docs/` |
-| [Prompt Engineering Guide](docs/prompt-engineering-guide.md) | Context engineering strategies by artifact type | `docs/` |
-| [Skill Authoring Best Practices](docs/skills/skill-authoring-best-practices.md) | Skill size limits, degrees of freedom | `docs/skills/` |
+| Document                                                                        | Key Contribution                                | Location       |
+| ------------------------------------------------------------------------------- | ----------------------------------------------- | -------------- |
+| [A Guide to AGENTS.md](docs/a-guide-to-agents.md)                               | Progressive disclosure patterns, domain files   | `docs/`        |
+| [A Guide to CLAUDE.md](docs/a-guide-to-claude.md)                               | CLAUDE.md hierarchy, instruction budget         | `docs/`        |
+| [Prompt Engineering Guide](docs/prompt-engineering-guide.md)                    | Context engineering strategies by artifact type | `docs/`        |
+| [Skill Authoring Best Practices](docs/skills/skill-authoring-best-practices.md) | Skill size limits, degrees of freedom           | `docs/skills/` |
 
 ### Analysis Corpus
 
