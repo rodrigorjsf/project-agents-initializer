@@ -126,30 +126,35 @@ Maximum 3 iterations. Do not proceed to Phase 5 until ALL criteria pass.
 
 ### Phase 5: Present and Apply
 
-1. Show the user a summary of issues found with counts:
-   - Files over limit: X
-   - Bloat lines to remove: X
-   - Stale references: X
-   - Contradictions: X
-   - Files to split: X
-   - Scopes to add: X
-   - Automation migration candidates: X (by mechanism type)
-   - Redundant instructions to delete: X
+1. Show a summary overview of all improvements found, grouped by category:
+   - **Removals**: X items (bloat: X, stale: X, duplicates: X, contradictions: X)
+   - **Refactoring**: X items (scope extraction: X, domain extraction: X, consolidation: X)
+   - **Automation Migrations**: X items (hooks: X, rules: X, skills: X, subagents: X)
+   - **Redundancy Eliminations**: X items
+   - **Additions**: X items
 
-2. Show the specific changes for each file:
-   - Lines to remove (with content)
-   - Content to move to new files
-   - New files to create
-   - Automation migration recommendations (target mechanism, token savings)
-   - Redundant instructions to remove (with evidence justification)
+2. For each suggestion, present a structured card in priority order (Removals → Refactoring → Automation Migrations → Redundancy Eliminations → Additions):
 
-3. Ask for confirmation before applying
+   **WHAT**: The specific content and its current location (file:lines)
+   **WHY**: Evidence-based justification with source reference
+   **TOKEN IMPACT**: Estimated tokens saved from always-loaded context
+   **OPTIONS**:
+   - **Option A** (recommended): Primary action
+   - **Option B**: Alternative action
+   - **Option C**: Keep as-is — "Preserve in current location. Trade-off: continues consuming ~X tokens per session"
+   - *(Additional options when applicable)*
 
-4. Apply changes and verify:
-   - All files under 200 lines
-   - No orphaned references
+   Wait for the user to select an option for each suggestion before proceeding to the next.
+   If the user selects "Keep as-is", preserve the content in its exact current location — no modification.
 
-5. Report final metrics:
+3. Apply ONLY the approved changes (options A or B selections):
+   - Execute each approved change in dependency order
+   - Verify after each change:
+     - All files under 200 lines
+     - No orphaned references
+
+4. Report final metrics:
    - Total lines before → after
    - Files before → after
    - Estimated token savings
+   - Suggestions applied: X of Y (Z deferred)
