@@ -292,6 +292,40 @@ Init skills must check for existing target files before proceeding with generati
 
 ---
 
+## Guideline 15: Migration Artifact Templates
+
+**Source**: Project design decision | [Anthropic — Skills](https://docs.anthropic.com/en/docs/claude-code/skills) | [Anthropic — Hooks](https://docs.anthropic.com/en/docs/claude-code/hooks) | PRD Phase 6
+
+When a user approves an automation migration in Phase 5, the improve skill must generate a complete target artifact — not just remove the source content. Three template files provide the structure for these generated artifacts.
+
+**Template types and distribution scope**:
+
+| Template | Location | Distributions | Generates |
+| -------- | -------- | ------------- | --------- |
+| `skill.md` | `assets/templates/skill.md` | All 4 improve skills | `.claude/skills/[name]/SKILL.md` |
+| `hook-config.md` | `assets/templates/hook-config.md` | Plugin improve skills only | JSON snippet for `.claude/settings.json` |
+| `claude-rule.md` (extended) | `assets/templates/claude-rule.md` | All 4 improve skills | `.claude/rules/[topic].md` |
+
+**Template conventions**:
+
+- HTML comment metadata block (`<!-- TEMPLATE: ... -->`) — placement, naming, line targets, and embedded rules
+- Bracket placeholder syntax (`[placeholder-name]`) — consistent across all templates
+- `<!-- CONDITIONAL: ... -->` blocks — optional frontmatter fields or sections included only when applicable
+- Source attribution comment (`<!-- Migrated from [source-file]:lines [N-M] -->`) — every migrated artifact traces to its origin
+- Migration guidance block (`<!-- MIGRATION: ... -->`) in `claude-rule.md` — separate from init-time guidance; applies only in improve context
+
+**Distribution awareness**:
+
+- `hook-config.md` exists only in plugin improve skill directories — hooks require Claude Code and are not available in standalone distributions
+- Standalone improve SKILL.md files reference `skill.md` and `claude-rule.md` only; never `hook-config.md`
+- Init skill template directories do NOT include migration-specific templates or the extended `claude-rule.md`
+
+**Quality constraint**: Generated artifacts must meet the same quality standards as hand-authored files. The improve skill's self-validation phase (Phase 4) applies to migration-generated artifacts.
+
+**Implemented in**: `assets/templates/skill.md` (all 4 improve skills), `assets/templates/hook-config.md` (plugin improve skills), `assets/templates/claude-rule.md` extended with `<!-- MIGRATION: -->` block (all 4 improve skills), Phase 3 template loading lists in all 4 improve SKILL.md files
+
+---
+
 ## Research Foundation
 
 All design decisions trace to these sources:

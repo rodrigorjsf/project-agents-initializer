@@ -109,6 +109,8 @@ When generating new or restructured files, use these templates for consistent st
 - Root AGENTS.md: Read `${CLAUDE_SKILL_DIR}/assets/templates/root-agents-md.md`
 - Scoped AGENTS.md: Read `${CLAUDE_SKILL_DIR}/assets/templates/scoped-agents-md.md`
 - Domain docs: Read `${CLAUDE_SKILL_DIR}/assets/templates/domain-doc.md`
+- .claude/rules/ files (from automation migration): Read `${CLAUDE_SKILL_DIR}/assets/templates/claude-rule.md`
+- Skills (from automation migration): Read `${CLAUDE_SKILL_DIR}/assets/templates/skill.md`
 
 ### Phase 4: Self-Validation
 
