@@ -85,6 +85,8 @@ Flag instructions that are candidates for migration to on-demand mechanisms:
 
 *Source: automation-migration-guide.md lines 58-72*
 
+**Standalone Distribution Note**: This evaluation runs in the standalone distribution where hooks and subagents are not available. Continue flagging `HOOK_CANDIDATE` items — the signal identifies enforcement-like instructions that should migrate. The improve skill's Phase 3 will reclassify these to `RULE_CANDIDATE` (path-specific enforcement under 50 lines) or `SKILL_CANDIDATE` (workflow-based enforcement) before presenting suggestions.
+
 ---
 
 ## Process

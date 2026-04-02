@@ -12,6 +12,7 @@ paths:
 - Self-validation phase MUST read `references/validation-criteria.md` and loop until all checks pass
 - Reference files must be one level deep from SKILL.md — no nested `references/references/` paths
 - Conditional reference loading pattern: "read X only if project uses Y"
+- Plugin improve skills suggest all 4 migration mechanisms: hooks, path-scoped rules, skills, and subagents
 - SKILL.md `name` field: ≤64 chars, lowercase letters/numbers/hyphens only, no XML tags
 - SKILL.md `description` field: non-empty, ≤1024 chars, third person, no XML tags
 - SKILL.md body: under 500 lines

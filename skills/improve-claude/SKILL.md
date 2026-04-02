@@ -94,9 +94,10 @@ Based on both analyses, create improvement plan:
 6. **Consolidate fragmented files** that cover the same scope
 7. **Migrate automation candidates** — for each instruction flagged in Phase 1 as `HOOK_CANDIDATE`, `RULE_CANDIDATE`, or `SKILL_CANDIDATE`:
    - Classify using the decision flowchart in automation-migration-guide.md
-   - Select target mechanism: hook (deterministic enforcement), path-scoped `.claude/rules/` (file-pattern convention), skill (domain knowledge/infrequent workflow), or subagent (isolated analysis)
+   - Select target mechanism: path-scoped `.claude/rules/` (file-pattern convention) or skill (domain knowledge/infrequent workflow)
+   - Reclassify `HOOK_CANDIDATE` items: if the behavior is path-specific and under 50 lines → `RULE_CANDIDATE`; if it is a workflow or domain block → `SKILL_CANDIDATE`
    - Estimate token savings using the token impact estimation table in automation-migration-guide.md
-   - Distribution-aware: automation-migration-guide.md filters mechanisms to those supported in the current distribution
+   - This is the standalone distribution — suggest only skills and path-scoped rules. Do not suggest hooks or subagents (these require Claude Code). When automation-migration-guide.md references hooks or subagents, substitute with the closest available mechanism.
 
 #### Redundancy Elimination (delete what agents already know)
 
@@ -135,7 +136,7 @@ For improve operations, also evaluate the **"If This Is an IMPROVE Operation"** 
 1. Show a summary overview of all improvements found, grouped by category:
    - **Removals**: X items (bloat: X, stale: X, duplicates: X, contradictions: X)
    - **Refactoring**: X items (scope extraction: X, rule conversion: X, domain extraction: X, consolidation: X)
-   - **Automation Migrations**: X items (hooks: X, rules: X, skills: X, subagents: X)
+   - **Automation Migrations**: X items (rules: X, skills: X)
    - **Redundancy Eliminations**: X items
    - **Additions**: X items
 
@@ -146,9 +147,9 @@ For improve operations, also evaluate the **"If This Is an IMPROVE Operation"** 
    **TOKEN IMPACT**: Estimated tokens saved from always-loaded context (from automation-migration-guide.md token impact table)
    **OPTIONS**:
    - **Option A** (recommended): Primary action — e.g., "Remove this content" / "Migrate to `.claude/rules/commit-conventions.md` with `paths: ['*.md']`" / "Convert to skill with `user-invocable: false`"
-   - **Option B**: Alternative action — e.g., "Move to scoped CLAUDE.md instead" / "Convert to path-scoped rule instead of hook"
+   - **Option B**: Alternative action — e.g., "Move to scoped CLAUDE.md instead" / "Convert to path-scoped rule instead"
    - **Option C**: Keep as-is — "Preserve in current location. Trade-off: continues consuming ~X tokens per session"
-   - *(Additional options when applicable — e.g., for automation migrations, show each viable mechanism as a separate option)*
+   - *(Additional options when applicable — e.g., for automation migrations, show each viable mechanism as a separate option. Note: hooks and subagents are not available in the standalone distribution; additional mechanisms available with the Claude Code plugin)*
 
    Wait for the user to select an option for each suggestion before proceeding to the next.
    If the user selects "Keep as-is", preserve the content in its exact current location — no modification.

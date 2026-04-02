@@ -95,7 +95,7 @@ Based on both subagent reports, create improvement plan:
    - Classify using the decision flowchart in automation-migration-guide.md
    - Select target mechanism: hook (deterministic enforcement), path-scoped `.claude/rules/` (file-pattern convention), skill (domain knowledge/infrequent workflow), or subagent (isolated analysis)
    - Estimate token savings using the token impact estimation table in automation-migration-guide.md
-   - Distribution-aware: automation-migration-guide.md filters mechanisms to those supported in the current distribution
+   - This is the plugin distribution — suggest all mechanisms: hooks (deterministic enforcement), path-scoped `.claude/rules/` (file-pattern convention), skills (domain knowledge/infrequent workflow), and subagents (isolated analysis). Use the decision flowchart in automation-migration-guide.md to select the best mechanism for each candidate.
 
 #### Redundancy Elimination (delete what agents already know)
 
