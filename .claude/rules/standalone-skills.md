@@ -16,6 +16,8 @@ paths:
 - Reference files must be one level deep from SKILL.md — no nested `references/references/` paths
 - Each skill bundles its own copies of shared references — no symlinks, no cross-directory references
 - When a shared reference is updated, update ALL copies across both distributions in sync
+- Standalone improve skills MUST suggest only skills and path-scoped rules as migration targets — NEVER hooks or subagents (these require Claude Code plugin architecture)
+- When shared references mention hooks or subagents, standalone SKILL.md MUST instruct to substitute with the closest available mechanism (rule or skill)
 - SKILL.md `name` field: ≤64 chars, lowercase letters/numbers/hyphens only, no XML tags
 - SKILL.md `description` field: non-empty, ≤1024 chars, third person, no XML tags
 - SKILL.md body: under 500 lines
