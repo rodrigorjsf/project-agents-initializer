@@ -82,9 +82,10 @@ Based on both analyses, create an improvement plan. Categorize actions:
 4. **Consolidate fragmented files** that cover the same scope
 5. **Migrate automation candidates** — for each instruction flagged in Phase 1 as `HOOK_CANDIDATE`, `RULE_CANDIDATE`, or `SKILL_CANDIDATE`:
    - Classify using the decision flowchart in automation-migration-guide.md
-   - Select target mechanism: hook (deterministic enforcement), path-scoped rule (file-pattern convention), skill (domain knowledge/infrequent workflow), or subagent (isolated analysis)
+   - Select target mechanism: path-scoped rule (file-pattern convention) or skill (domain knowledge/infrequent workflow)
+   - Reclassify `HOOK_CANDIDATE` items: if the behavior is path-specific and under 50 lines → `RULE_CANDIDATE`; if it is a workflow or domain block → `SKILL_CANDIDATE`
    - Estimate token savings using the token impact estimation table in automation-migration-guide.md
-   - Distribution-aware: automation-migration-guide.md filters mechanisms to those supported in the current distribution
+   - This is the standalone distribution — suggest only skills and path-scoped rules. Do not suggest hooks or subagents (these require Claude Code). When automation-migration-guide.md references hooks or subagents, substitute with the closest available mechanism.
 
 #### Redundancy Elimination (delete what agents already know)
 
@@ -125,7 +126,7 @@ Maximum 3 iterations. Do not proceed to Phase 5 until ALL criteria pass.
 1. Show a summary overview of all improvements found, grouped by category:
    - **Removals**: X items (bloat: X, stale: X, duplicates: X, contradictions: X)
    - **Refactoring**: X items (scope extraction: X, domain extraction: X, consolidation: X)
-   - **Automation Migrations**: X items (hooks: X, rules: X, skills: X, subagents: X)
+   - **Automation Migrations**: X items (rules: X, skills: X)
    - **Redundancy Eliminations**: X items
    - **Additions**: X items
 
