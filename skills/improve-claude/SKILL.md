@@ -122,6 +122,7 @@ When generating new or restructured files, use these templates:
 - Scoped CLAUDE.md: Read `${CLAUDE_SKILL_DIR}/assets/templates/scoped-claude-md.md`
 - .claude/rules/ files: Read `${CLAUDE_SKILL_DIR}/assets/templates/claude-rule.md`
 - Domain docs: Read `${CLAUDE_SKILL_DIR}/assets/templates/domain-doc.md`
+- Skills (from automation migration): Read `${CLAUDE_SKILL_DIR}/assets/templates/skill.md`
 
 ### Phase 4: Self-Validation
 

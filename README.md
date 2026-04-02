@@ -135,6 +135,12 @@ Evaluate and improve existing AGENTS.md files.
 - Missing scope-specific files
 - Progressive disclosure opportunities
 
+**What it generates when migrations are approved:**
+
+- `.claude/skills/[name]/SKILL.md` — migrated workflow or domain knowledge blocks
+- `.claude/rules/[topic].md` — migrated path-scoped conventions (from any tool's config)
+- Hook config snippets for `.claude/settings.json` (plugin distribution only)
+
 ### `improve-claude`
 
 Evaluate and improve existing CLAUDE.md files and `.claude/rules/`.
@@ -145,6 +151,12 @@ Evaluate and improve existing CLAUDE.md files and `.claude/rules/`.
 - Converts pattern-specific rules from CLAUDE.md to path-scoped `.claude/rules/`
 - Reports always-loaded vs on-demand token distribution
 - Optimizes loading behavior across Claude Code's configuration hierarchy
+
+**What it generates when migrations are approved:**
+
+- `.claude/skills/[name]/SKILL.md` — migrated workflow or domain knowledge blocks
+- `.claude/rules/[topic].md` — migrated path-scoped conventions
+- Hook config snippets for `.claude/settings.json` (plugin distribution only)
 
 ## Installation
 
