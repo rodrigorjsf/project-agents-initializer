@@ -109,6 +109,29 @@ Evaluate on 1–10 scale:
 
 ---
 
+### Automation Migration Criteria (Phase 3-7 features)
+
+| Criterion | Plugin Threshold | Standalone Threshold | How to Check |
+|-----------|-----------------|---------------------|--------------|
+| Migration candidates detected | ≥3 items classified | ≥3 items classified | Verify HOOK/RULE/SKILL/DELETE_CANDIDATE tags in evaluation output |
+| 3-option presentation format | Each candidate has Options A/B/C+ | Each candidate has Options A/B/C+ | Manual review of Phase 5 output |
+| Evidence-based justification | Each option references docs | Each option references docs | Check WHY field in each card |
+| Token impact estimation | Present for each suggestion | Present for each suggestion | Check TOKEN IMPACT field |
+| Distribution-aware mechanisms | hooks+rules+skills+subagents | rules+skills only | Check suggested mechanisms |
+| HOOK_CANDIDATE reclassification | N/A | Reclassified to RULE or SKILL | Standalone must not suggest hooks |
+| Approval gate | Per-item sequential approval | Per-item sequential approval | Verify wait-for-user behavior |
+| Template-generated artifacts | Valid skill.md/hook-config.md/claude-rule.md | Valid skill.md/claude-rule.md | Check generated file structure |
+
+### Distribution-Specific Pass Criteria
+
+| Check | Plugin | Standalone |
+|-------|--------|------------|
+| Summary line mechanisms | "hooks: X, rules: X, skills: X, subagents: X" | "rules: X, skills: X" |
+| Hook template referenced | YES | NO |
+| HOOK_CANDIDATE items in output | Present as hooks | Reclassified to rules/skills |
+
+---
+
 ## Self-Validation Loop Evidence
 
 This scenario is a primary trigger for self-validation loop iterations:
