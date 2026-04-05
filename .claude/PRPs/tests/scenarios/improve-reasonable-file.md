@@ -94,6 +94,24 @@ The skill should make targeted improvements without restructuring the whole file
 
 ---
 
+### Automation Migration Criteria (reasonable file)
+
+| Criterion | Threshold | How to Check |
+|-----------|-----------|--------------|
+| Migration candidates detected | 0-2 items (restraint) | Verify only genuine candidates flagged |
+| No false-positive migrations | 0 instructions incorrectly flagged | Manual review |
+| Database section extraction | Suggested as SKILL_CANDIDATE or domain doc | Check Phase 3 classification |
+| Default command (`npm test`) | Flagged as DELETE_CANDIDATE or removed | Verify `npm test` not retained |
+| Over-specification (tsconfig types) | Flagged as DELETE_CANDIDATE | Verify redundancy identified |
+
+### Restraint Validation
+
+- Skill MUST NOT suggest migrating well-structured, universally-relevant instructions
+- Total migration suggestions ≤ 3 (proportional to file quality)
+- "Keep as-is" option present for every suggestion
+
+---
+
 ## Hardest Aspect of This Test
 
 The improve skill must demonstrate **restraint** — recognizing that a mostly-good file needs surgical fixes, not wholesale restructuring. A skill that rewrites the entire file has failed this scenario even if the output is technically valid.

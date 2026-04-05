@@ -51,7 +51,7 @@ projectx/
 
 ## Development Setup
 
-To set up the project for the first time, you need to install all the required dependencies. Start by installing Python 3.11 or higher. Then install Go 1.21. Then install the required Python packages by running:
+To set up the project for the first time, you need to install all the required dependencies. Start by installing Python 3.11 or higher. <!-- MIGRATION_TEST: DELETE_CANDIDATE — version inferable from pyproject.toml requires-python field --> Then install Go 1.21. Then install the required Python packages by running:
 
 ```bash
 pip install -e ".[dev]"
@@ -74,6 +74,8 @@ All Python code must follow PEP 8. Line length should be maximum 80 characters. 
 Imports should be sorted using isort conventions: standard library first, then third-party packages, then local imports. Each group separated by a blank line.
 
 Type hints are required for all public functions. Use `Optional[X]` instead of `X | None` for compatibility with Python 3.9. Always annotate return types.
+
+In the `services/auth/` directory, always use absolute imports (e.g., `from src.auth.models import User`, not relative imports). <!-- MIGRATION_TEST: RULE_CANDIDATE — path-scoped, belongs in services/auth/AGENTS.md -->
 
 ### Testing with pytest
 
@@ -110,6 +112,7 @@ Always use specific exception types. Never use bare `except:` clauses. Log excep
 Use the standard Python `logging` module. The root logger is configured in `services/auth/src/main.py`. [STALE: the logging config moved to infra/logging.py]. Use `__name__` as the logger name. Log at DEBUG level during development, INFO in production.
 
 ## Go Development Conventions
+<!-- MIGRATION_TEST: SKILL_CANDIDATE — 35+ line domain block, irrelevant to Python/UI work sessions -->
 
 ### Code Style and Naming
 
@@ -193,6 +196,8 @@ make ci
 ```
 
 This runs ruff, mypy, and pytest for Python services, and golangci-lint and go test for Go services.
+
+ALWAYS run `make lint` before committing any changes to ensure CI linting passes. <!-- MIGRATION_TEST: HOOK_CANDIDATE — deterministic, pre-commit enforceable -->
 
 ## Indentation Policy
 

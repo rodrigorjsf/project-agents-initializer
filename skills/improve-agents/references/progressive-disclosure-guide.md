@@ -82,6 +82,8 @@ Patterns match absolute paths with glob syntax. Arrays merge across settings lay
 
 Apply these patterns when content exceeds root-file scope:
 
+**Extraction trigger**: Extract a section to a separate domain file when it has 3+ distinct rules AND spans 10+ lines, OR when the topic is irrelevant to most work sessions (e.g., database migration conventions in a project where most work is UI changes).
+
 **Move domain rules to separate files:**
 
 ```markdown
