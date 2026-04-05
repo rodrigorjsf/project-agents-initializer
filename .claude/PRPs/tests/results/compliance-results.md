@@ -59,6 +59,40 @@ These are expected — standalone skills perform analysis inline using these ref
 
 ---
 
+## Phase 8 Re-Run — Quality Gate Results (2026-04-05)
+
+**Date**: 2026-04-05
+**Changes validated**: F001 fix (evaluation-criteria.md × 4 copies), F002 fix (progressive-disclosure-guide.md × 8 copies), `Sources:` → `Source:` fix (validation-criteria.md × 8 copies)
+
+### New Checks (Phase 8)
+
+| # | Check | Result | Details |
+|---|-------|--------|---------|
+| 23 | F001 fix: `evaluation-criteria.md` `npm test` example annotated | PASS | All 4 copies contain annotation: "*(format example only; standard commands should still be excluded per what-not-to-include.md)*" |
+| 24 | F002 fix: `progressive-disclosure-guide.md` has measurable extraction threshold | PASS | All 8 copies contain "3+ distinct rules AND spans 10+ lines" heuristic |
+| 25 | Source attribution: `validation-criteria.md` uses `Source:` (not `Sources:`) | PASS | All 8 copies corrected — now matches `grep -i "source:"` pattern used by artifact-inspector |
+
+**Phase 8 new checks: 3 checks, 3 PASS, 0 FAIL**
+
+### Updated Totals
+
+| Run | Date | Checks | PASS | FAIL |
+|-----|------|--------|------|------|
+| Original quality gate | 2026-03-26 | 22 | 22 | 0 |
+| Phase 8 re-run | 2026-04-05 | 25 | 25 | 0 |
+
+**Phase 8 Quality Gate: PASS — All 25 checks pass, 0 findings**
+
+### Notes — Phase 8 Fixes
+
+**F001 (evaluation-criteria.md)**: The `npm test` specificity example was annotated rather than replaced. The annotation clarifies it is a format-only example and standard commands should still be excluded per `what-not-to-include.md`. All 4 copies byte-identical (md5: `72a46fb5b438fdcdf8ad145371efda82`).
+
+**F002 (progressive-disclosure-guide.md)**: Added 3-line extraction trigger block with AND/OR logic: "Extract when 3+ distinct rules AND spans 10+ lines, OR when topic is irrelevant to most work sessions." All 8 copies byte-identical (md5: `4da7bc1b53732597cb1ed57520a5e848`).
+
+**Source: fix (validation-criteria.md)**: Pre-existing issue caught during Phase 8 quality gate execution. The original 2026-03-26 gate verified parity (all 8 copies identical) but did not separately verify the attribution format. The artifact-inspector uses `grep -i "source:"` which requires the colon to immediately follow "source" — `Sources:` (with 's') did not match this pattern. After fix, all 8 copies byte-identical (md5: `bd7b16fcdda4c0ec7f9cd7b8060659bd`).
+
+---
+
 ## Raw Check Evidence
 
 ### SKILL.md Names Verified

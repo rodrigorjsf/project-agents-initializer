@@ -359,3 +359,69 @@ See `init-skills-results.md` RED Phase section for full documentation. Summary:
 **Lowest 5-dimension average**: 8.8/10 (bloated improve-agents runs — structural complexity)
 **All critical info preserved**: 8/8
 **All planted violations resolved**: 8/8
+
+---
+
+## Phase 8 Re-Run — Automation Migration Validation (2026-04-05)
+
+**Date**: 2026-04-05
+**Method**: `/customaize-agent:test-prompt` executed on all 4 improve SKILL.md files with S3/S4 scenarios
+**Fixtures**: Updated `bloated-agents-md.md` (226 lines, 4 MIGRATION_TEST markers) and `bloated-claude-md.md` (229 lines, 4 MIGRATION_TEST markers)
+
+MIGRATION_TEST markers in `bloated-agents-md.md`:
+
+- `HOOK_CANDIDATE`: `make lint` (deterministic enforcement candidate)
+- `RULE_CANDIDATE`: absolute imports rule in `services/auth/` (path-scoped)
+- `SKILL_CANDIDATE`: Go conventions section (domain knowledge block >50 lines)
+- `DELETE_CANDIDATE`: "This project uses Python 3.11" (agents can infer from pyproject.toml)
+
+MIGRATION_TEST markers in `bloated-claude-md.md`:
+
+- `HOOK_CANDIDATE`: `make ci` (deterministic pre-commit enforcement)
+- `RULE_CANDIDATE`: security rules block (path-rule applicable)
+- `SKILL_CANDIDATE`: Development Rules section (workflow domain knowledge)
+- `DELETE_CANDIDATE`: "Aim for 80% coverage" (inferable from pytest config)
+
+### Automation Migration Check Results — M1–M8
+
+| Run | Skill | Distribution | Candidates Detected | Classification | 3-Option Format | Mechanisms | HOOK Reclassified | Verdict |
+|-----|-------|-------------|--------------------|--------------|-----------------|-----------|--------------------|---------|
+| M1 | improve-agents | plugin | 4/4 PASS | PASS | PASS | 4 types PASS | N/A | PASS |
+| M2 | improve-agents | standalone | 4/4 PASS | PASS | PASS | 2 types PASS | YES PASS | PASS |
+| M3 | improve-claude | plugin | 4/4 PASS | PASS | PASS | 4 types PASS | N/A | PASS |
+| M4 | improve-claude | standalone | 4/4 PASS | PASS | PASS | 2 types PASS | YES PASS | PASS |
+| M5 | improve-agents | plugin | 0-1 PASS (restraint) | PASS | N/A | N/A | N/A | PASS |
+| M6 | improve-agents | standalone | 0-1 PASS (restraint) | PASS | N/A | N/A | N/A | PASS |
+| M7 | improve-claude | plugin | 0-1 PASS (restraint) | PASS | N/A | N/A | N/A | PASS |
+| M8 | improve-claude | standalone | 0-1 PASS (restraint) | PASS | N/A | N/A | N/A | PASS |
+
+### Distribution-Specific Mechanism Validation
+
+**Plugin improve runs (M1, M3) — 4 mechanism types:**
+
+- `HOOK_CANDIDATE` (`make lint` / `make ci`) → suggested as hook with hook-config.md template
+- `RULE_CANDIDATE` (path-scoped import rule / security rules) → suggested as `.claude/rules/` file
+- `SKILL_CANDIDATE` (Go conventions / Development Rules) → suggested as standalone skill
+- `DELETE_CANDIDATE` (Python 3.11 ref / 80% coverage target) → suggested for deletion with justification
+
+**Standalone improve runs (M2, M4) — 2 mechanism types with reclassification:**
+
+- `HOOK_CANDIDATE` reclassified to `SKILL_CANDIDATE`: `make lint` / `make ci` → project-wide workflow instruction becomes skill (hooks not available in standalone)
+- `RULE_CANDIDATE` → `.claude/rules/` file (same as plugin)
+- `SKILL_CANDIDATE` → standalone skill (same as plugin)
+- `DELETE_CANDIDATE` → deletion (same as plugin)
+
+**Reclassification note**: Standalone correctly emits "Note: Hooks are not available outside the plugin distribution. This HOOK_CANDIDATE has been reclassified as SKILL_CANDIDATE." in the migration card.
+
+### S4 Restraint Validation (M5-M8)
+
+| Check | M5 | M6 | M7 | M8 |
+|-------|----|----|----|----|
+| Migration candidates detected (0-2) | PASS | PASS | PASS | PASS |
+| No false-positive migrations | PASS | PASS | PASS | PASS |
+| "Keep as-is" option present | PASS | PASS | PASS | PASS |
+| Total suggestions ≤ 3 | PASS | PASS | PASS | PASS |
+
+All S4 runs correctly applied restraint — no well-structured universally-relevant instructions were incorrectly flagged for migration.
+
+**All 8 automation migration re-runs: PASS**
