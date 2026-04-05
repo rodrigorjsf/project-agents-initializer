@@ -80,7 +80,7 @@ Every instruction should be in the Goldilocks zone:
 | Rating | Example | Problem |
 |--------|---------|---------|
 | ✅ Specific | "Use 2-space indentation" | None — clear and actionable |
-| ✅ Specific | "Run `npm test` before committing" | None — verifiable |
+| ✅ Specific | "Run `npm test` before committing" | None — verifiable *(format example only; standard commands should still be excluded per what-not-to-include.md)* |
 | ❌ Too vague | "Format code properly" | Cannot be verified or acted on |
 | ❌ Too specific | "File `src/auth/handlers.ts` handles JWT" | Over-specified file path, will go stale |
 
