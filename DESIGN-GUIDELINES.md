@@ -363,5 +363,16 @@ Sixteen analysis documents in `docs/analysis/` provide deep extraction of key fi
 
 ---
 
-*Last updated: 2026-03-30*
+## Self-Application Record
+
+This plugin applies its own guidelines to its configuration. Phase 9 (Self-Application) audited root CLAUDE.md, plugin CLAUDE.md, `.claude/rules/`, and settings files against the criteria in this document. Changes applied:
+
+- Removed 6 duplicated constraints from plugin CLAUDE.md (covered by path-scoped rules in `.claude/rules/plugin-skills.md` and `.claude/rules/agent-files.md`)
+- Deleted `git-commits.md` rule (`paths: **/*` defeated path-scoping; content absorbed into root CLAUDE.md)
+- Deleted `documentation-sync.md` rule (PostToolUse hook provides deterministic enforcement per Guideline 10)
+- Cleaned stale permission entries from `settings.local.json`
+
+---
+
+*Last updated: 2026-04-06*
 *Maintained in sync with project implementations via documentation sync mechanism*
