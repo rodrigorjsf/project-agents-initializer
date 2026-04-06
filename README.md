@@ -332,16 +332,14 @@ project-agents-initializer/
 
 ## Contributing
 
-Contributions welcome. When modifying skills or subagent definitions:
+Development conventions are enforced by `.claude/rules/` — path-scoped rules load automatically when editing matching files. Key rules:
 
-1. Ensure all claims are backed by evidence from the `docs/` directory
-2. Keep generated files under 200 lines (hard limit from Anthropic)
-3. Subagent definitions must include YAML frontmatter (`name`, `description`, `tools`, `model`, `maxTurns`)
-4. Subagent tools should be restricted to read-only unless write access is justified
-5. Subagent prompts should request structured output formats
-6. Keep skill files focused — one concern per skill
-7. Test with both simple (single-package) and complex (monorepo) projects
-8. Verify generated files pass all quality guardrails (under 200 lines, no bloat, etc.)
+- `plugin-skills.md` — plugin skill authoring constraints (delegation, validation, limits)
+- `standalone-skills.md` — standalone skill constraints (inline analysis, distribution awareness)
+- `agent-files.md` — subagent file requirements (frontmatter, model, tools)
+- `reference-files.md` — reference file format and size constraints
+
+See `DESIGN-GUIDELINES.md` for the evidence base behind each convention.
 
 ## License
 
