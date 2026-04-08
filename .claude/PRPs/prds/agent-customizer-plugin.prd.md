@@ -182,6 +182,39 @@ User approves each change → Apply
   PRP: link to generated plan file once created
 -->
 
+### GitHub Workflow Requirements
+
+Every phase follows this mandatory GitHub workflow:
+
+**When generating a plan (`/prp-plan`):**
+
+1. Create a GitHub sub-issue under rodrigorjsf/agent-engineering-toolkit referencing the parent issue #29:
+
+   ```bash
+   gh issue create \
+     --repo rodrigorjsf/agent-engineering-toolkit \
+     --title "Phase {N}: {Phase Name}" \
+     --body "Sub-issue of #29 — {phase description}\n\nPlan: \`.claude/PRPs/plans/{plan-file}.plan.md\`" \
+     --label "phase"
+   ```
+
+2. Record the created issue number in the plan file's Metadata table (`GitHub Issue: #{N}`)
+
+**When executing a plan (`/prp-implement`):**
+
+1. Branch naming must follow: `feature/phase-{N}-{kebab-slug}` (e.g., `feature/phase-2-docs-corpus-distillation`)
+2. After implementation is complete, create a PR from the feature branch to `development`:
+
+   ```bash
+   gh pr create \
+     --repo rodrigorjsf/agent-engineering-toolkit \
+     --base development \
+     --title "Phase {N}: {Phase Name}" \
+     --body "Closes #{sub-issue-number}\n\nPart of #29 — agent-customizer plugin\n\n## Summary\n{summary}"
+   ```
+
+3. The PR body must reference both the sub-issue (`Closes #N`) and the parent (`Part of #29`)
+
 | # | Phase | Description | Status | Parallel | Depends | PRP Plan |
 |---|-------|-------------|--------|----------|---------|----------|
 | 1 | Marketplace Rename & Restructure | Rename project to `agent-engineering-toolkit`, update marketplace.json, repo, origin | complete | - | - | `.claude/PRPs/plans/completed/marketplace-rename-restructure.plan.md` |
