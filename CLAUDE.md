@@ -1,12 +1,13 @@
-# project-agents-initializer
+# agent-engineering-toolkit
 
-Claude Code plugin providing evidence-based AGENTS.md and CLAUDE.md initialization skills.
+Multi-plugin Claude Code marketplace for evidence-based agent artifact engineering.
 
 ## Structure
 
-Two separate skill sets — same names, different conventions:
+Two plugins, each with two separate skill sets — same names, different conventions:
 
 - `plugins/agents-initializer/skills/` — Claude Code plugin; delegates analysis to subagents
+- `plugins/agent-customizer/skills/` — Claude Code plugin; artifact creation/improvement (planned)
 - `skills/` — npx skills add; standalone inline analysis, no agent delegation
 
 Each skill directory contains:
