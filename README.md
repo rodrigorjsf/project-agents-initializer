@@ -1,6 +1,6 @@
-# Project Agents Initializer
+# Agent Engineering Toolkit
 
-An evidence-based plugin for generating and optimizing AGENTS.md and CLAUDE.md configuration files for AI coding agents. Instead of auto-generating one bloated file, this plugin creates **minimal, scoped files** following progressive disclosure principles — proven by research to outperform comprehensive auto-generated configurations.
+A multi-plugin marketplace providing evidence-based Claude Code artifact engineering. The `agents-initializer` plugin generates and optimizes AGENTS.md and CLAUDE.md configuration files. Instead of auto-generating one bloated file, this toolkit creates **minimal, scoped files** following progressive disclosure principles — proven by research to outperform comprehensive auto-generated configurations.
 
 ## Why This Plugin Exists
 
@@ -166,16 +166,16 @@ The recommended way to install for Claude Code users:
 
 ```bash
 # Step 1: Add the marketplace (one-time setup)
-/plugin marketplace add rodrigorjsf/project-agents-initializer
+/plugin marketplace add rodrigorjsf/agent-engineering-toolkit
 
 # Step 2: Install the plugin
-/plugin install agents-initializer@project-agents-initializer
+/plugin install agents-initializer@agent-engineering-toolkit
 ```
 
 Or via the Claude Code CLI:
 
 ```bash
-claude plugin install agents-initializer@project-agents-initializer
+claude plugin install agents-initializer@agent-engineering-toolkit
 ```
 
 **Scopes:**
@@ -186,10 +186,10 @@ claude plugin install agents-initializer@project-agents-initializer
 
 ```bash
 # Install for the whole team
-claude plugin install agents-initializer@project-agents-initializer --scope project
+claude plugin install agents-initializer@agent-engineering-toolkit --scope project
 
 # Install only for yourself in this project
-claude plugin install agents-initializer@project-agents-initializer --scope local
+claude plugin install agents-initializer@agent-engineering-toolkit --scope local
 ```
 
 ### npx skills add (Third-Party Skills CLI)
@@ -198,19 +198,19 @@ For users of the [skills CLI](https://skills.sh/) — works with VS Code Copilot
 
 ```bash
 # Install all skills globally (available in all projects)
-npx skills add rodrigorjsf/project-agents-initializer -g
+npx skills add rodrigorjsf/agent-engineering-toolkit -g
 
 # Install all skills for the current project only
-npx skills add rodrigorjsf/project-agents-initializer
+npx skills add rodrigorjsf/agent-engineering-toolkit
 
 # Install for specific AI tools
-npx skills add rodrigorjsf/project-agents-initializer --agent cursor copilot
+npx skills add rodrigorjsf/agent-engineering-toolkit --agent cursor copilot
 
 # Install only specific skills
-npx skills add rodrigorjsf/project-agents-initializer --skill init-claude improve-claude
+npx skills add rodrigorjsf/agent-engineering-toolkit --skill init-claude improve-claude
 
 # List available skills before installing
-npx skills add rodrigorjsf/project-agents-initializer --list
+npx skills add rodrigorjsf/agent-engineering-toolkit --list
 ```
 
 **These are standalone skills** — they perform all analysis inline without delegating to subagents. They work with any AI coding tool without requiring Claude Code's subagent system.
@@ -219,21 +219,21 @@ npx skills add rodrigorjsf/project-agents-initializer --list
 
 ```bash
 # Clone the repository
-git clone https://github.com/rodrigorjsf/project-agents-initializer.git /tmp/project-agents-initializer
+git clone https://github.com/rodrigorjsf/agent-engineering-toolkit.git /tmp/agent-engineering-toolkit
 
 # For Claude Code (project-level)
 mkdir -p .claude/skills
-cp -r /tmp/project-agents-initializer/plugins/agents-initializer/skills/* .claude/skills/
+cp -r /tmp/agent-engineering-toolkit/plugins/agents-initializer/skills/* .claude/skills/
 
 # For Claude Code (user-level, all projects)
-cp -r /tmp/project-agents-initializer/plugins/agents-initializer/skills/* ~/.claude/skills/
+cp -r /tmp/agent-engineering-toolkit/plugins/agents-initializer/skills/* ~/.claude/skills/
 
 # For VS Code / GitHub Copilot
 mkdir -p .agents/skills
-cp -r /tmp/project-agents-initializer/plugins/agents-initializer/skills/* .agents/skills/
+cp -r /tmp/agent-engineering-toolkit/plugins/agents-initializer/skills/* .agents/skills/
 
 # Clean up
-rm -rf /tmp/project-agents-initializer
+rm -rf /tmp/agent-engineering-toolkit
 ```
 
 ## Usage
@@ -290,7 +290,7 @@ For a comprehensive mapping of every design decision to its evidence source, see
 ## Repository Structure
 
 ```
-project-agents-initializer/
+agent-engineering-toolkit/
 ├── .claude-plugin/
 │   └── marketplace.json             # Marketplace catalog (Claude Code plugin system)
 ├── plugins/

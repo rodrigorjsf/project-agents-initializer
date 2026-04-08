@@ -12,7 +12,7 @@ O `prompt-engineering-guide.md` é o documento mais extenso e denso do projeto, 
 
 A descoberta mais relevante para o projeto é a **inversão de paradigma**: modelos de raciocínio avançados (o1, R1, Claude com extended thinking) performam pior com técnicas clássicas como few-shot e CoT explícito. Isso impacta diretamente a escrita de skills e prompts de subagentes — técnicas que funcionam em prompts conversacionais podem ser contraproducentes em contextos agentic. O guia também documenta a transição de "prompt engineering" para "context engineering", alinhando-se perfeitamente com o `research-llm-context-optimization.md` e validando a abordagem de progressive disclosure defendida em `a-guide-to-agents.md`.
 
-Para o `project-agents-initializer`, este documento serve como a **base técnica de referência** para todas as decisões de prompting nos dois conjuntos de skills (plugin e standalone). Cada técnica catalogada aqui tem aplicação direta em pelo menos um dos artefatos que as skills geram: AGENTS.md, CLAUDE.md, SKILL.md, rules, hooks ou prompts de subagentes.
+Para o `agent-engineering-toolkit`, este documento serve como a **base técnica de referência** para todas as decisões de prompting nos dois conjuntos de skills (plugin e standalone). Cada técnica catalogada aqui tem aplicação direta em pelo menos um dos artefatos que as skills geram: AGENTS.md, CLAUDE.md, SKILL.md, rules, hooks ou prompts de subagentes.
 
 ---
 
