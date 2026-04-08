@@ -184,7 +184,7 @@ User approves each change → Apply
 
 | # | Phase | Description | Status | Parallel | Depends | PRP Plan |
 |---|-------|-------------|--------|----------|---------|----------|
-| 1 | Marketplace Rename & Restructure | Rename project to `agent-engineering-toolkit`, update marketplace.json, repo, origin | in-progress | - | - | `.claude/PRPs/plans/marketplace-rename-restructure.plan.md` |
+| 1 | Marketplace Rename & Restructure | Rename project to `agent-engineering-toolkit`, update marketplace.json, repo, origin | complete | - | - | `.claude/PRPs/plans/completed/marketplace-rename-restructure.plan.md` |
 | 2 | Docs Corpus Distillation | Distill 39 docs into artifact-type reference files with source citations | pending | - | 1 | - |
 | 3 | Plugin Scaffold & Infrastructure | Create `plugins/agent-customizer/` structure, subagents, rules, templates, CLAUDE.md | pending | with 2 | 1 | - |
 | 4 | Create Skills (4 artifact types) | Implement `create-skill`, `create-hook`, `create-rule`, `create-subagent` | pending | - | 2, 3 | - |
