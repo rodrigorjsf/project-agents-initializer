@@ -42,8 +42,8 @@ The plugin uses **subagent-driven development**: subagents (running on Claude So
 
 This project supports **three distribution channels**:
 
-1. **Claude Code Plugin** (native): `.claude-plugin/marketplace.json` + `.claude-plugin/plugin.json` — install via `/plugin marketplace add owner/repo` then `/plugin install agents-initializer@project-agents-initializer`
-2. **`npx skills add`** (third-party skills CLI): SKILL.md files discoverable by the `skills` CLI — install via `npx skills add owner/project-agents-initializer`
+1. **Claude Code Plugin** (native): `.claude-plugin/marketplace.json` + `.claude-plugin/plugin.json` — install via `/plugin marketplace add owner/repo` then `/plugin install agents-initializer@agent-engineering-toolkit`
+2. **`npx skills add`** (third-party skills CLI): SKILL.md files discoverable by the `skills` CLI — install via `npx skills add owner/agent-engineering-toolkit`
 3. **Cross-agent** (VS Code Copilot, Codex, etc.): Same SKILL.md format works in `.agents/skills/` for VS Code and other tools
 
 ### Skills
@@ -212,36 +212,36 @@ Phase 3: Improvement Application (main skill context)
 
 ```bash
 # Add the marketplace (one-time)
-/plugin marketplace add <github-owner>/project-agents-initializer
+/plugin marketplace add <github-owner>/agent-engineering-toolkit
 
 # Install the plugin
-/plugin install agents-initializer@project-agents-initializer
+/plugin install agents-initializer@agent-engineering-toolkit
 
 # Or via CLI
-claude plugin install agents-initializer@project-agents-initializer
+claude plugin install agents-initializer@agent-engineering-toolkit
 ```
 
 ### npx skills add (third-party skills CLI)
 
 ```bash
 # Install all skills globally
-npx skills add <github-owner>/project-agents-initializer -g
+npx skills add <github-owner>/agent-engineering-toolkit -g
 
 # Install for a specific project
-npx skills add <github-owner>/project-agents-initializer
+npx skills add <github-owner>/agent-engineering-toolkit
 
 # Install with agent targeting
-npx skills add <github-owner>/project-agents-initializer --agent claude-code cursor
+npx skills add <github-owner>/agent-engineering-toolkit --agent claude-code cursor
 
 # Install specific skills only
-npx skills add <github-owner>/project-agents-initializer --skill init-claude improve-claude
+npx skills add <github-owner>/agent-engineering-toolkit --skill init-claude improve-claude
 ```
 
 ### Manual Installation
 
 ```bash
 # Clone into project's .claude/skills/
-git clone https://github.com/<owner>/project-agents-initializer.git /tmp/pai
+git clone https://github.com/<owner>/agent-engineering-toolkit.git /tmp/pai
 cp -r /tmp/pai/skills/* .claude/skills/
 
 # Or for VS Code Copilot
@@ -251,7 +251,7 @@ cp -r /tmp/pai/skills/* .agents/skills/
 ## Repository Structure
 
 ```
-project-agents-initializer/
+agent-engineering-toolkit/
 ├── .claude-plugin/
 │   ├── plugin.json              # Plugin manifest
 │   └── marketplace.json         # Marketplace catalog
