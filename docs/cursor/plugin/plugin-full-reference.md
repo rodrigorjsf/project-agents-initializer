@@ -90,7 +90,6 @@ When the manifest does not specify explicit paths for a component type, the pars
 | Hooks       | `hooks/hooks.json`        | Parsed for hook event names                                                                |
 | MCP Servers | `mcp.json`                | Parsed for server entries                                                                  |
 | Root Skill  | `SKILL.md` at plugin root | Treated as a single-skill plugin (only if no `skills/` dir and no manifest `skills` field) |
-
 If a manifest field **is** specified (e.g., `"skills": "./my-skills/"`), it **replaces** folder discovery for that component. The default folder is not also scanned.
 
 ## Rules format
@@ -118,7 +117,6 @@ Only use `let` when the variable needs to be reassigned. Never use `var`.
 | `description` | string          | Brief description of what the rule does                                         |
 | `alwaysApply` | boolean         | If `true`, rule applies to all files. If `false`, rule is available on request. |
 | `globs`       | string or array | File patterns the rule applies to (e.g., `"**/*.ts"`)                           |
-
 For full documentation, see [Rules](/docs/rules).
 
 ## Skills format
@@ -160,7 +158,6 @@ description: Design RESTful APIs following OpenAPI 3.0 specification.
 | ------------- | ------ | ----------------------------------------------------- |
 | `name`        | string | Skill identifier (lowercase, kebab-case)              |
 | `description` | string | Description of what the skill does and when to use it |
-
 For full documentation, see [Skills](/docs/skills).
 
 ## Agents format
