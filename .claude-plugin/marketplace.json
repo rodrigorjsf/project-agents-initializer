@@ -20,7 +20,7 @@
     {
       "name": "agent-customizer",
       "description": "Create and improve Claude Code artifacts (skills, hooks, rules, subagents) with documentation-grounded guidance and evidence traceability.",
-      "version": "1.0.0",
+      "version": "0.0.0",
       "author": {
         "name": "rodrigorjsf"
       },
