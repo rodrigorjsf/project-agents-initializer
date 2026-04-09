@@ -6,7 +6,7 @@ A multi-plugin marketplace providing evidence-based Claude Code artifact enginee
 
 ### The Problem with Auto-Generated Config Files
 
-The ETH Zurich study ["Evaluating AGENTS.md: Are Repository-Level Context Files Helpful for Coding Agents?"](docs/Evaluating-AGENTS-paper.pdf) (February 2026) evaluated multiple coding agents across hundreds of real-world tasks and found:
+The ETH Zurich study ["Evaluating AGENTS.md: Are Repository-Level Context Files Helpful for Coding Agents?"](docs/general-llm/Evaluating-AGENTS-paper.pdf) (February 2026) evaluated multiple coding agents across hundreds of real-world tasks and found:
 
 | Setting | Task Success Impact | Cost Impact |
 |---------|-------------------|-------------|
@@ -258,7 +258,7 @@ This plugin's design is based on three categories of evidence:
 
 ### Academic Research
 
-- **[Evaluating AGENTS study](docs/Evaluating-AGENTS-paper.pdf)** (ETH Zurich, Feb 2026) — The first rigorous study of context file effectiveness across multiple coding agents. Found that LLM-generated files reduce performance while developer-written minimal files slightly improve it.
+- **[Evaluating AGENTS study](docs/general-llm/Evaluating-AGENTS-paper.pdf)** (ETH Zurich, Feb 2026) — The first rigorous study of context file effectiveness across multiple coding agents. Found that LLM-generated files reduce performance while developer-written minimal files slightly improve it.
 
 ### Anthropic Official Documentation
 
@@ -269,8 +269,8 @@ This plugin's design is based on three categories of evidence:
 
 ### Practitioner Guides
 
-- **[A Complete Guide to AGENTS.md](docs/a-guide-to-agents.md)** — Progressive disclosure patterns, monorepo support, domain files (BUILD.md, TESTING.md).
-- **[A Complete Guide to CLAUDE.md](docs/a-guide-to-claude.md)** — Same principles applied to Claude Code's configuration system.
+- **[A Complete Guide to AGENTS.md](docs/general-llm/a-guide-to-agents.md)** — Progressive disclosure patterns, monorepo support, domain files (BUILD.md, TESTING.md).
+- **[A Complete Guide to CLAUDE.md](docs/claude-code/a-guide-to-claude.md)** — Same principles applied to Claude Code's configuration system.
 
 All research documents are saved in the `docs/` directory for reference.
 
@@ -312,12 +312,12 @@ agent-engineering-toolkit/
 │   ├── improve-agents/SKILL.md      # Self-contained: inline analysis, no subagents required
 │   └── improve-claude/SKILL.md      # Self-contained: inline analysis, no subagents required
 ├── docs/
-│   ├── a-guide-to-agents.md         # Reference: AGENTS.md best practices
-│   ├── a-guide-to-claude.md         # Reference: CLAUDE.md best practices
-│   ├── Evaluating-AGENTS-paper.pdf  # ETH Zurich research paper
-│   ├── research-llm-context-optimization.md  # Context optimization research
-│   ├── research-claude-code-skills-format.md  # Skills/plugin format research
-│   └── research-subagent-best-practices.md    # Subagent definition best practices
+│   ├── claude-code/                     # Claude Code specific docs
+│   ├── cursor/                          # Cursor IDE specific docs
+│   ├── general-llm/                     # General LLM/agent research & guides
+│   ├── shared/                          # Cross-tool standards (Agent Skills)
+│   ├── analysis/                        # Deep extraction analysis (Portuguese)
+│   └── plans/                           # Project design documents
 ├── README.md
 └── LICENSE
 ```

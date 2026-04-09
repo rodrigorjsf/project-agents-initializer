@@ -72,7 +72,7 @@ Rules provide system-level instructions to Agent. Covers the four rule types (Al
 
 **Source:** [cursor.com/docs/skills](https://cursor.com/docs/skills)
 
-Agent Skills is an open standard for extending AI agents with specialized, portable capabilities. Covers the `SKILL.md` entry point, frontmatter fields, skill directories, how Cursor discovers and invokes skills, and the relationship to the [Agent Skills standard](../skills/standard/README.md).
+Agent Skills is an open standard for extending AI agents with specialized, portable capabilities. Covers the `SKILL.md` entry point, frontmatter fields, skill directories, how Cursor discovers and invokes skills, and the relationship to the [Agent Skills standard](../shared/skills-standard/README.md).
 
 → [`skills/agent-skills-guide.md`](./skills/agent-skills-guide.md)
 

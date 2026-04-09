@@ -155,13 +155,13 @@ You can import skills from GitHub repositories:
 
 The skill format used by Cursor follows the **Agent Skills open standard** defined at [agentskills.io](https://agentskills.io). This standard is also adopted by Claude Code, Codex, and other GenAI agents, making skills portable across compatible implementations.
 
-The local reference copy of the full standard specification is available in [`docs/skills/standard/`](../../skills/standard/README.md) and covers:
+The local reference copy of the full standard specification is available in [`docs/shared/skills-standard/`](../../shared/skills-standard/README.md) and covers:
 
-- [What are skills?](../../skills/standard/agentskills-what-are-skills.md) — core concepts
-- [Specification](../../skills/standard/agentskills-specification.md) — complete file format and frontmatter reference
-- [Best practices](../../skills/standard/agentskills-best-practices.md) — authoring and naming guidelines
-- [Using scripts](../../skills/standard/agentskills-using-scripts.md) — bundling executable code in skills
-- [Optimizing descriptions](../../skills/standard/agentskills-optimizing-descriptions.md) — writing descriptions that trigger reliable invocation
-- [Evaluating skill quality](../../skills/standard/agentskills-evaluating-skills.md) — measuring and improving skill behaviour
+- [What are skills?](../../shared/skills-standard/agentskills-what-are-skills.md) — core concepts
+- [Specification](../../shared/skills-standard/agentskills-specification.md) — complete file format and frontmatter reference
+- [Best practices](../../shared/skills-standard/agentskills-best-practices.md) — authoring and naming guidelines
+- [Using scripts](../../shared/skills-standard/agentskills-using-scripts.md) — bundling executable code in skills
+- [Optimizing descriptions](../../shared/skills-standard/agentskills-optimizing-descriptions.md) — writing descriptions that trigger reliable invocation
+- [Evaluating skill quality](../../shared/skills-standard/agentskills-evaluating-skills.md) — measuring and improving skill behaviour
 
 When creating or modifying skills in this project, the standard defined there takes precedence over any gaps in this document.

@@ -13,8 +13,10 @@ applyTo: "docs/**/*.md"
 ## Structure and Organization
 
 - `docs/analysis/` contains deep analysis extractions — file names must follow `analysis-{source-name}.md` pattern
-- `docs/skills/` contains skill-related research and standards
-- `docs/subagents/` contains subagent design research
+- `docs/claude-code/` contains Claude Code specific documentation (hooks, memory, plugins, skills, subagents)
+- `docs/cursor/` contains Cursor IDE specific documentation
+- `docs/general-llm/` contains general LLM/agent research and guides
+- `docs/shared/` contains cross-tool standards (Agent Skills open standard)
 - `docs/plans/` contains design documents — file names must follow `YYYY-MM-DD-{topic}-design.md` pattern
 
 ## Content Quality

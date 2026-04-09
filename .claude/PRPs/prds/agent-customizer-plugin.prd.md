@@ -9,7 +9,7 @@ Developers using Claude Code who need to create or improve agent artifacts (skil
 - **Gap analysis**: All 10 `customaize-agent:*` skills were read and cross-referenced against `docs/`. Zero skills fully ground their guidance in the docs corpus. Only `apply-anthropic-skill-best-practices` partially mirrors one doc (`skill-authoring-best-practices.md`), without citations.
 - **Missing artifact coverage**: No `create-subagent` skill exists despite 86KB of subagent documentation (`creating-custom-subagents.md` + `research-subagent-best-practices.md`). No `create-rule` skill despite path-scoping docs in `how-claude-remembers-a-project.md`.
 - **No "improve" counterparts**: Only "create" skills exist — no update/optimize workflow for existing artifacts, unlike `agents-initializer` which has both init and improve flows.
-- **ETH Zurich study evidence**: Auto-generated comprehensive files reduce agent success by ~3% and increase cost by 20%. Minimal, evidence-based artifacts improve success by ~4%. (Source: `docs/Evaluating-AGENTS-paper.md`)
+- **ETH Zurich study evidence**: Auto-generated comprehensive files reduce agent success by ~3% and increase cost by 20%. Minimal, evidence-based artifacts improve success by ~4%. (Source: `docs/general-llm/Evaluating-AGENTS-paper.md`)
 - **Market gap**: 2,300+ pre-built skills exist across marketplaces, but no documentation-driven quality-assured generator exists — all are collections, not authoring tools.
 
 ## Proposed Solution
@@ -74,10 +74,10 @@ When I need to create or improve a Claude Code artifact (skill, rule, subagent, 
 
 | Priority | Capability | Rationale |
 |----------|------------|-----------|
-| Must | `create-skill` — Generate SKILL.md with references, templates, frontmatter grounded in `docs/skills/` | Core artifact type; replaces ungrounded `customaize-agent:create-skill` |
-| Must | `create-hook` — Generate hook configurations grounded in `docs/hooks/` (14 event types, JSON schema) | Core artifact type; replaces partial `customaize-agent:create-hook` |
-| Must | `create-rule` — Generate path-scoped `.claude/rules/` files grounded in `docs/memory/` | Missing entirely from existing skills |
-| Must | `create-subagent` — Generate agent definitions with YAML frontmatter grounded in `docs/subagents/` | Missing entirely from existing skills; 86KB of unused docs |
+| Must | `create-skill` — Generate SKILL.md with references, templates, frontmatter grounded in `docs/shared/` & `docs/claude-code/skills/` | Core artifact type; replaces ungrounded `customaize-agent:create-skill` |
+| Must | `create-hook` — Generate hook configurations grounded in `docs/claude-code/hooks/` (14 event types, JSON schema) | Core artifact type; replaces partial `customaize-agent:create-hook` |
+| Must | `create-rule` — Generate path-scoped `.claude/rules/` files grounded in `docs/claude-code/memory/` | Missing entirely from existing skills |
+| Must | `create-subagent` — Generate agent definitions with YAML frontmatter grounded in `docs/claude-code/subagents/` & `docs/general-llm/subagents/` | Missing entirely from existing skills; 86KB of unused docs |
 | Must | `improve-skill` — Evaluate and optimize existing skills against docs best practices | No improve counterpart exists |
 | Must | `improve-hook` — Evaluate and optimize existing hooks against docs best practices | No improve counterpart exists |
 | Must | `improve-rule` — Evaluate and optimize existing rules against docs best practices | No improve counterpart exists |
@@ -246,13 +246,13 @@ Every phase follows this mandatory GitHub workflow:
 
 - **Goal**: Transform the 39-doc corpus into artifact-type-specific reference files (≤200 lines each) with source citations
 - **Scope**:
-  - Analyze `docs/skills/` (3 files, ~95KB) → distill into skill-specific references
-  - Analyze `docs/hooks/` (2 files, ~148KB) → distill into hook-specific references
-  - Analyze `docs/subagents/` (3 files, ~109KB) → distill into subagent-specific references
-  - Analyze `docs/memory/` (1 file, ~22KB) + rules system → distill into rule-specific references
+  - Analyze `docs/shared/` & `docs/claude-code/skills/` (3 files, ~95KB) → distill into skill-specific references
+  - Analyze `docs/claude-code/hooks/` (2 files, ~148KB) → distill into hook-specific references
+  - Analyze `docs/claude-code/subagents/` & `docs/general-llm/subagents/` (3 files, ~109KB) → distill into subagent-specific references
+  - Analyze `docs/claude-code/memory/` (1 file, ~22KB) + rules system → distill into rule-specific references
   - Cross-reference with `docs/analysis/` (16 files) for pre-synthesized insights
-  - Extract prompt engineering strategies per artifact type from `docs/prompt-engineering-guide.md`
-  - Extract context optimization guidelines from `docs/research-llm-context-optimization.md`
+  - Extract prompt engineering strategies per artifact type from `docs/general-llm/prompt-engineering-guide.md`
+  - Extract context optimization guidelines from `docs/general-llm/research-llm-context-optimization.md`
   - Every reference file includes `Source: docs/{file}` attribution with line ranges
 - **Success signal**: Complete set of reference files (≤200 lines each), 100% of relevant docs cited, reference-files rule passes
 
@@ -279,10 +279,10 @@ Every phase follows this mandatory GitHub workflow:
 
 - **Goal**: Implement the 4 "create" skills, each grounded in the distilled docs references
 - **Scope**:
-  - `create-skill/SKILL.md` — 5-phase orchestration: preflight → codebase analysis (via artifact-analyzer) → generation (references from docs/skills/) → self-validation → user presentation
-  - `create-hook/SKILL.md` — Same pattern, references from docs/hooks/, covers all 14 hook events, JSON schema
-  - `create-rule/SKILL.md` — Same pattern, references from docs/memory/ + rules system, path-scoping globs
-  - `create-subagent/SKILL.md` — Same pattern, references from docs/subagents/, YAML frontmatter, model selection heuristics
+  - `create-skill/SKILL.md` — 5-phase orchestration: preflight → codebase analysis (via artifact-analyzer) → generation (references from docs/claude-code/skills/) → self-validation → user presentation
+  - `create-hook/SKILL.md` — Same pattern, references from docs/claude-code/hooks/, covers all 14 hook events, JSON schema
+  - `create-rule/SKILL.md` — Same pattern, references from docs/claude-code/memory/ + rules system, path-scoping globs
+  - `create-subagent/SKILL.md` — Same pattern, references from docs/claude-code/subagents/, YAML frontmatter, model selection heuristics
   - Each skill loads references progressively (only when needed per phase)
   - Each skill uses artifact-type-specific evaluator subagent for analysis
   - Each skill includes self-validation loop (max 3 iterations)
@@ -395,14 +395,14 @@ Every phase follows this mandatory GitHub workflow:
 
 **Sources**
 
-- ETH Zurich "Evaluating AGENTS.md" study (`docs/Evaluating-AGENTS-paper.md`) — auto-generated files reduce success by 3%, increase cost by 20%
-- Anthropic context engineering research (`docs/research-llm-context-optimization.md`) — context is finite resource with diminishing returns
-- Anthropic skill authoring best practices (`docs/skills/skill-authoring-best-practices.md`) — conciseness, progressive disclosure, testing with all models
-- Anthropic prompting best practices (`docs/claude-prompting-best-practices.md`) — clarity, XML structuring, agentic systems
-- Prompt engineering guide (`docs/prompt-engineering-guide.md`) — 58+ techniques, context-specific strategy selection
-- Hook reference (`docs/hooks/claude-hook-reference-doc.md`) — 14 event types, JSON schema, exit codes
-- Subagent guides (`docs/subagents/creating-custom-subagents.md`, `docs/subagents/research-subagent-best-practices.md`) — YAML frontmatter, model selection, tool restriction
-- Plugin creation guide (`docs/plugins/claude-create-plugin-doc.md`) — manifest structure, marketplace distribution
+- ETH Zurich "Evaluating AGENTS.md" study (`docs/general-llm/Evaluating-AGENTS-paper.md`) — auto-generated files reduce success by 3%, increase cost by 20%
+- Anthropic context engineering research (`docs/general-llm/research-llm-context-optimization.md`) — context is finite resource with diminishing returns
+- Anthropic skill authoring best practices (`docs/shared/skill-authoring-best-practices.md`) — conciseness, progressive disclosure, testing with all models
+- Anthropic prompting best practices (`docs/claude-code/claude-prompting-best-practices.md`) — clarity, XML structuring, agentic systems
+- Prompt engineering guide (`docs/general-llm/prompt-engineering-guide.md`) — 58+ techniques, context-specific strategy selection
+- Hook reference (`docs/claude-code/hooks/claude-hook-reference-doc.md`) — 14 event types, JSON schema, exit codes
+- Subagent guides (`docs/claude-code/subagents/creating-custom-subagents.md`, `docs/general-llm/subagents/research-subagent-best-practices.md`) — YAML frontmatter, model selection, tool restriction
+- Plugin creation guide (`docs/claude-code/plugins/claude-create-plugin-doc.md`) — manifest structure, marketplace distribution
 
 ---
 
