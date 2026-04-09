@@ -6,14 +6,17 @@ AI agents should treat these documents as authoritative references when generati
 
 ## Table of Contents
 
-- [Directory Overview](#directory-overview)
-- [hooks/](#hooks)
-- [mcp/](#mcp)
-- [plugin/](#plugin)
-- [rules/](#rules)
-- [skills/](#skills)
-- [subagents/](#subagents)
-- [tools/](#tools)
+- [Cursor IDE — Official Documentation](#cursor-ide--official-documentation)
+  - [Table of Contents](#table-of-contents)
+  - [Directory Overview](#directory-overview)
+    - [tools/ sub-directories](#tools-sub-directories)
+  - [hooks/](#hooks)
+  - [mcp/](#mcp)
+  - [plugin/](#plugin)
+  - [rules/](#rules)
+  - [skills/](#skills)
+  - [subagents/](#subagents)
+  - [tools/](#tools)
 
 ## Directory Overview
 
