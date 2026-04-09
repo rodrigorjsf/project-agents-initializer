@@ -218,7 +218,7 @@ Every phase follows this mandatory GitHub workflow:
 | # | Phase | Description | Status | Parallel | Depends | PRP Plan |
 |---|-------|-------------|--------|----------|---------|----------|
 | 1 | Marketplace Rename & Restructure | Rename project to `agent-engineering-toolkit`, update marketplace.json, repo, origin | complete | - | - | `.claude/PRPs/plans/completed/marketplace-rename-restructure.plan.md` |
-| 2 | Docs Corpus Distillation | Distill 39 docs into artifact-type reference files with source citations | in-progress | - | 1 | `.claude/PRPs/plans/docs-corpus-distillation.plan.md` |
+| 2 | Docs Corpus Distillation | Distill 39 docs into artifact-type reference files with source citations | complete | - | 1 | `.claude/PRPs/plans/completed/docs-corpus-distillation.plan.md` |
 | 3 | Plugin Scaffold & Infrastructure | Create `plugins/agent-customizer/` structure, subagents, rules, templates, CLAUDE.md | pending | with 2 | 1 | - |
 | 4 | Create Skills (4 artifact types) | Implement `create-skill`, `create-hook`, `create-rule`, `create-subagent` | pending | - | 2, 3 | - |
 | 5 | Improve Skills (4 artifact types) | Implement `improve-skill`, `improve-hook`, `improve-rule`, `improve-subagent` | pending | - | 4 | - |
