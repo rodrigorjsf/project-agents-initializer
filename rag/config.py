@@ -57,12 +57,6 @@ class DatabaseConfig:
 
 
 @dataclass
-class ServerConfig:
-    name: str = "rag-docs"
-    transport: str = "stdio"
-
-
-@dataclass
 class SharedConfig:
     cache_dir: str = ".rag/models"
 
@@ -74,7 +68,6 @@ class RagConfig:
     shared: SharedConfig = field(default_factory=SharedConfig)
     database: DatabaseConfig = field(default_factory=DatabaseConfig)
     search: SearchConfig = field(default_factory=SearchConfig)
-    server: ServerConfig = field(default_factory=ServerConfig)
     _config_dir: str = field(default="", repr=False)
 
     def resolve_path(self, rel_path: str) -> str:
@@ -172,13 +165,6 @@ def load_config(path: str | None = None) -> RagConfig:
         fts_candidates=search_data.get("fts_candidates", 20),
     )
 
-    # Build server config
-    server_data = raw.get("server", {})
-    server = ServerConfig(
-        name=server_data.get("name", "rag-docs"),
-        transport=server_data.get("transport", "stdio"),
-    )
-
     project_data = raw.get("project", {})
 
     return RagConfig(
@@ -187,6 +173,5 @@ def load_config(path: str | None = None) -> RagConfig:
         shared=shared,
         database=database,
         search=search,
-        server=server,
         _config_dir=config_dir,
     )

@@ -54,7 +54,7 @@ async def search_docs(query: str, top_k: int = 5) -> str:
     from rag.search import format_results
 
     engine = _get_engine()
-    results = engine.search_collection(query, "docs", min(top_k, 10))
+    results = engine.search_collection(query, "docs", top_k)
     return format_results(results, collection="docs")
 
 
@@ -71,7 +71,7 @@ async def search_code(query: str, top_k: int = 5) -> str:
     from rag.search import format_results
 
     engine = _get_engine()
-    results = engine.search_collection(query, "code", min(top_k, 10))
+    results = engine.search_collection(query, "code", top_k)
     return format_results(results, collection="code")
 
 
@@ -89,7 +89,7 @@ async def search_all(query: str, top_k: int = 5) -> str:
     from rag.search import format_results
 
     engine = _get_engine()
-    results = engine.search_all(query, min(top_k, 10))
+    results = engine.search_all(query, top_k)
     return format_results(results, collection="all")
 
 

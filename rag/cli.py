@@ -84,10 +84,6 @@ search:
   rrf_k: 60
   vector_candidates: 20
   fts_candidates: 20
-
-server:
-  name: "rag-docs"
-  transport: "stdio"
 '''
     project_name = os.path.basename(os.getcwd())
     with open(config_path, "w") as f:
