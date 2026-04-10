@@ -26,7 +26,7 @@ Modern LLMs use **Byte-Pair Encoding (BPE)** tokenizers. BPE handles whitespace 
 | `" hello"` (space + word) | 1 | Space merges with word |
 | `"    hello"` (indent + word) | 2 | 4-space indent = only 1 extra token |
 
-**Sources**: OpenAI tiktoken; Karpathy's tokenization lecture (2024); o200k_base experimental verification
+**Sources**: [OpenAI tiktoken](https://github.com/openai/tiktoken); [Karpathy — "Let's build the GPT Tokenizer" lecture (2024)](https://www.youtube.com/watch?v=zduSFxRajkE); o200k_base tokenizer experimental verification
 
 **Critical insight**: Spaces merge with following words. `"The cat sat"` → 3 tokens: `['The', ' cat', ' sat']`. Whitespace is nearly free.
 
