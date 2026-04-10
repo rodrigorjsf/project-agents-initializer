@@ -271,10 +271,16 @@ agent-engineering-toolkit/
 ├── README.md                    # Full documentation
 ├── LICENSE
 └── docs/
-    ├── a-guide-to-agents.md     # Reference: AGENTS.md + CLAUDE.md guide (merged)
-    ├── Evaluating-AGENTS-paper.pdf  # Research paper
-    ├── research-context-engineering-comprehensive.md  # Context optimization research
-    ├── research-claude-code-skills-format.md  # Skills/plugin format research
+    ├── general-llm/
+    │   ├── a-guide-to-agents.md                        # Reference: AGENTS.md + CLAUDE.md guide (merged)
+    │   ├── Evaluating-AGENTS-paper.pdf                 # Research paper
+    │   └── research-context-engineering-comprehensive.md  # Context optimization research (hub)
+    ├── claude-code/
+    │   └── skills/
+    │       └── research-claude-code-skills-format.md   # Skills/plugin format research
+    ├── analysis/                                        # Deep-dive analysis extractions
+    ├── cursor/                                          # Cursor IDE docs
+    ├── shared/                                          # Cross-tool standards
     └── plans/
         └── 2026-03-22-agents-initializer-plugin-design.md  # This document
 ```
