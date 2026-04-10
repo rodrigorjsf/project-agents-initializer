@@ -1,4 +1,12 @@
 {
+  "permissions": {
+    "deny": [
+      "Read(/next-steps.md)",
+      "Read(/docs/plans/**)",
+      "Read(/.claude/PRPs/plans/**)",
+      "Read(/.claude/PRPs/prds/completed/**)"
+    ]
+  },
   "hooks": {
     "PostToolUse": [
       {
