@@ -269,8 +269,7 @@ This plugin's design is based on three categories of evidence:
 
 ### Practitioner Guides
 
-- **[A Complete Guide to AGENTS.md](docs/general-llm/a-guide-to-agents.md)** — Progressive disclosure patterns, monorepo support, domain files (BUILD.md, TESTING.md).
-- **[A Complete Guide to CLAUDE.md](docs/claude-code/a-guide-to-claude.md)** — Same principles applied to Claude Code's configuration system.
+- **[A Complete Guide to AGENTS.md](docs/general-llm/a-guide-to-agents.md)** — Progressive disclosure patterns, monorepo support, domain files (covers both AGENTS.md and CLAUDE.md).
 
 All research documents are saved in the `docs/` directory for reference.
 

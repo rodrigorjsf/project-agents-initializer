@@ -252,7 +252,7 @@ Every phase follows this mandatory GitHub workflow:
   - Analyze `docs/claude-code/memory/` (1 file, ~22KB) + rules system → distill into rule-specific references
   - Cross-reference with `docs/analysis/` (16 files) for pre-synthesized insights
   - Extract prompt engineering strategies per artifact type from `docs/general-llm/prompt-engineering-guide.md`
-  - Extract context optimization guidelines from `docs/general-llm/research-llm-context-optimization.md`
+  - Extract context optimization guidelines from `docs/general-llm/research-context-engineering-comprehensive.md`
   - Every reference file includes `Source: docs/{file}` attribution with line ranges
 - **Success signal**: Complete set of reference files (≤200 lines each), 100% of relevant docs cited, reference-files rule passes
 
@@ -396,7 +396,7 @@ Every phase follows this mandatory GitHub workflow:
 **Sources**
 
 - ETH Zurich "Evaluating AGENTS.md" study (`docs/general-llm/Evaluating-AGENTS-paper.md`) — auto-generated files reduce success by 3%, increase cost by 20%
-- Anthropic context engineering research (`docs/general-llm/research-llm-context-optimization.md`) — context is finite resource with diminishing returns
+- Anthropic context engineering research (`docs/general-llm/research-context-engineering-comprehensive.md`) — context is finite resource with diminishing returns
 - Anthropic skill authoring best practices (`docs/shared/skill-authoring-best-practices.md`) — conciseness, progressive disclosure, testing with all models
 - Anthropic prompting best practices (`docs/claude-code/claude-prompting-best-practices.md`) — clarity, XML structuring, agentic systems
 - Prompt engineering guide (`docs/general-llm/prompt-engineering-guide.md`) — 58+ techniques, context-specific strategy selection

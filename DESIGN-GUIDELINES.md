@@ -22,7 +22,7 @@ Auto-generated files hurt performance because agents follow every instruction �
 
 ## Guideline 1: Progressive Disclosure
 
-**Source**: [Anthropic — Memory & CLAUDE.md](https://docs.anthropic.com/en/docs/claude-code/memory) | [A Guide to CLAUDE.md](docs/claude-code/a-guide-to-claude.md) | [A Guide to AGENTS.md](docs/general-llm/a-guide-to-agents.md)
+**Source**: [Anthropic — Memory & CLAUDE.md](https://docs.anthropic.com/en/docs/claude-code/memory) | [A Guide to AGENTS.md](docs/general-llm/a-guide-to-agents.md)
 
 Organize configuration files in a hierarchy that loads content only when relevant:
 
@@ -42,7 +42,7 @@ The root file carries a per-session token cost regardless of task relevance. Eve
 
 ## Guideline 2: The 200-Line Budget
 
-**Source**: [Anthropic — Best Practices](https://docs.anthropic.com/en/docs/claude-code/best-practices) | [Context Engineering](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents) | [docs/research-llm-context-optimization.md](docs/general-llm/research-llm-context-optimization.md)
+**Source**: [Anthropic — Best Practices](https://docs.anthropic.com/en/docs/claude-code/best-practices) | [Context Engineering](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents) | [docs/research-context-engineering-comprehensive.md](docs/general-llm/research-context-engineering-comprehensive.md)
 
 Frontier LLMs follow ~150-200 instructions with reasonable consistency. Beyond that, adherence drops as instructions compete for attention. This budget is shared across all always-loaded sources: root CLAUDE.md, unconditional rules, and skill descriptions.
 
@@ -58,7 +58,7 @@ Frontier LLMs follow ~150-200 instructions with reasonable consistency. Beyond t
 
 ## Guideline 3: Lost-in-the-Middle Effect
 
-**Source**: [Liu et al., "Lost in the Middle" (TACL 2023)](https://arxiv.org/abs/2307.03172) | [docs/research-llm-context-optimization.md](docs/general-llm/research-llm-context-optimization.md)
+**Source**: [Liu et al., "Lost in the Middle" (TACL 2023)](https://arxiv.org/abs/2307.03172) | [docs/research-context-engineering-comprehensive.md](docs/general-llm/research-context-engineering-comprehensive.md)
 
 Models retrieve information best from the beginning and end of context, worst from the middle. Critical instructions must appear at the top of configuration files; secondary information at the bottom. Never bury key rules in the middle of a long file.
 
@@ -96,7 +96,7 @@ Agents discover codebase structure through tools (`glob`, `grep`, `read`) as eff
 
 ## Guideline 5: Context Poisoning Prevention
 
-**Source**: [docs/research-llm-context-optimization.md](docs/general-llm/research-llm-context-optimization.md) | [A Guide to CLAUDE.md](docs/claude-code/a-guide-to-claude.md) | [docs/analysis/analysis-research-llm-context-optimization.md](docs/analysis/analysis-research-llm-context-optimization.md)
+**Source**: [docs/general-llm/research-context-engineering-comprehensive.md](docs/general-llm/research-context-engineering-comprehensive.md) | [A Guide to AGENTS.md](docs/general-llm/a-guide-to-agents.md) | [docs/analysis/analysis-research-llm-context-optimization.md](docs/analysis/analysis-research-llm-context-optimization.md)
 
 Stale information in config files is worse than no information. When a documented file path changes, agents look in the wrong place with high confidence. When contradictory instructions exist across files, agents pick one arbitrarily without warning.
 
@@ -236,7 +236,7 @@ Shared references are copied (not symlinked) into each skill directory. When upd
 
 ## Guideline 12: Mandatory User Approval for Destructive Changes
 
-**Source**: Project design decision backed by [ETH Zurich study](docs/general-llm/Evaluating-AGENTS-paper.pdf) | [A Guide to CLAUDE.md](docs/claude-code/a-guide-to-claude.md)
+**Source**: Project design decision backed by [ETH Zurich study](docs/general-llm/Evaluating-AGENTS-paper.pdf) | [A Guide to AGENTS.md](docs/general-llm/a-guide-to-agents.md)
 
 The plugin never removes, migrates, or restructures information without explicit user consent. Every improvement is presented with:
 
@@ -259,7 +259,7 @@ Instructions in CLAUDE.md/AGENTS.md that are infrequently relevant to the curren
 
 | Content Type                                         | Best Mechanism                             | Context Cost           | Evidence                                   |
 | ---------------------------------------------------- | ------------------------------------------ | ---------------------- | ------------------------------------------ |
-| Always-applicable universal rules (<5 lines)         | CLAUDE.md root                             | Per-session            | research-llm-context-optimization.md       |
+| Always-applicable universal rules (<5 lines)         | CLAUDE.md root                             | Per-session            | research-context-engineering-comprehensive.md |
 | Path-specific conventions (5-50 lines)               | `.claude/rules/` with `paths:`             | On-demand              | analysis-how-claude-remembers-a-project.md |
 | Infrequent workflows/domain knowledge (50-500 lines) | Skill (`user-invocable: false`)            | ~100 tokens at startup | extend-claude-with-skills.md               |
 | Heavy/rare workflows with side effects               | Skill (`disable-model-invocation: true`)   | Zero                   | extend-claude-with-skills.md               |
@@ -335,7 +335,7 @@ All design decisions trace to these sources:
 | Document                                                                    | Key Finding                                                     | Location                                                  |
 | --------------------------------------------------------------------------- | --------------------------------------------------------------- | --------------------------------------------------------- |
 | [Evaluating AGENTS.md](docs/general-llm/Evaluating-AGENTS-paper.pdf) (ETH Zurich, 2026) | Auto-generated files reduce success by 3%, increase cost by 20% | `docs/general-llm/Evaluating-AGENTS-paper.md`                         |
-| [Lost in the Middle](https://arxiv.org/abs/2307.03172) (TACL 2023)          | Models perform worst on mid-context information                 | Referenced in `docs/general-llm/research-llm-context-optimization.md` |
+| [Lost in the Middle](https://arxiv.org/abs/2307.03172) (TACL 2023)          | Models perform worst on mid-context information                 | Referenced in `docs/general-llm/research-context-engineering-comprehensive.md` |
 
 ### Anthropic Official Documentation
 
@@ -353,7 +353,7 @@ All design decisions trace to these sources:
 | Document                                                                        | Key Contribution                                | Location       |
 | ------------------------------------------------------------------------------- | ----------------------------------------------- | -------------- |
 | [A Guide to AGENTS.md](docs/general-llm/a-guide-to-agents.md)                               | Progressive disclosure patterns, domain files   | `docs/`        |
-| [A Guide to CLAUDE.md](docs/claude-code/a-guide-to-claude.md)                               | CLAUDE.md hierarchy, instruction budget         | `docs/`        |
+| [A Guide to AGENTS.md](docs/general-llm/a-guide-to-agents.md)                               | CLAUDE.md hierarchy, instruction budget (merged) | `docs/general-llm/` |
 | [Prompt Engineering Guide](docs/general-llm/prompt-engineering-guide.md)                    | Context engineering strategies by artifact type | `docs/`        |
 | [Skill Authoring Best Practices](docs/shared/skill-authoring-best-practices.md) | Skill size limits, degrees of freedom           | `docs/shared/` & `docs/claude-code/skills/` |
 

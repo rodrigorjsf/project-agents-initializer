@@ -1,7 +1,7 @@
 # Context Optimization
 
 Evidence-based instructions for managing token budgets and attention in agent configuration files.
-Source: research-llm-context-optimization.md
+Source: research-context-engineering-comprehensive.md
 
 ---
 
@@ -79,7 +79,7 @@ For each instruction line, ask: **"Would removing this cause the agent to make m
 - ✅ "Run `npm test` before committing" vs. ❌ "Test your changes"
 - ✅ "API handlers live in `src/api/handlers/`" vs. ❌ "Keep files organized"
 
-*Source: research-llm-context-optimization.md lines 113-134*
+*Source: research-context-engineering-comprehensive.md lines 113-134*
 
 ---
 
@@ -97,7 +97,7 @@ Detect and remove these before generating or improving configuration files:
 
 > "Treat CLAUDE.md like code: review it when things go wrong, prune it regularly." — Anthropic Best Practices
 
-*Source: research-llm-context-optimization.md lines 213-253*
+*Source: research-context-engineering-comprehensive.md lines 213-253*
 
 ---
 
@@ -116,7 +116,7 @@ Use these patterns to move content from always-consumed to on-demand locations:
 > "Rather than pre-processing all relevant data up front, agents maintain lightweight identifiers and use these references to dynamically load data into context at runtime."
 > — Anthropic Engineering: Effective Context Engineering
 
-*Source: research-llm-context-optimization.md lines 138-208, 451-461*
+*Source: research-context-engineering-comprehensive.md lines 138-208, 451-461*
 
 ---
 
