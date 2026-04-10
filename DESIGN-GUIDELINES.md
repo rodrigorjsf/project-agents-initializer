@@ -334,7 +334,7 @@ Instructions in CLAUDE.md/AGENTS.md that are infrequently relevant to the curren
 
 | Content Type                                         | Best Mechanism                             | Context Cost           | Evidence                                   |
 | ---------------------------------------------------- | ------------------------------------------ | ---------------------- | ------------------------------------------ |
-| Always-applicable universal rules (<5 lines)         | CLAUDE.md root                             | Per-session            | research-llm-context-optimization.md       |
+| Always-applicable universal rules (<5 lines)         | CLAUDE.md root                             | Per-session            | research-context-engineering-comprehensive.md |
 | Path-specific conventions (5-50 lines)               | `.claude/rules/` with `paths:`             | On-demand              | analysis-how-claude-remembers-a-project.md |
 | Infrequent workflows/domain knowledge (50-500 lines) | Skill (`user-invocable: false`)            | ~100 tokens at startup | extend-claude-with-skills.md               |
 | Heavy/rare workflows with side effects               | Skill (`disable-model-invocation: true`)   | Zero                   | extend-claude-with-skills.md               |
@@ -350,7 +350,7 @@ Distribution awareness: Plugin suggests all mechanisms; standalone suggests skil
 
 ## Guideline 14: Init Preflight Redirect
 
-**Source**: [ETH Zurich Study](docs/Evaluating-AGENTS-paper.pdf) | Project design decision | PRD Phase 2
+**Source**: [ETH Zurich Study](docs/general-llm/Evaluating-AGENTS-paper.pdf) | Project design decision | PRD Phase 2
 
 Init skills must check for existing target files before proceeding with generation. Running init on a project that already has configuration files wastes subagent runs and risks overwriting user customizations.
 
