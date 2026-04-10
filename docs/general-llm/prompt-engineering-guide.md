@@ -1,282 +1,282 @@
-# Engenharia de prompts: guia técnico completo das técnicas de 2022 a 2026
+# Prompt Engineering: Complete Technical Guide to Techniques from 2022 to 2026
 
-A engenharia de prompts evoluiu de uma arte informal para uma disciplina técnica rigorosa com **mais de 58 técnicas documentadas** e impacto direto na qualidade, custo e confiabilidade de sistemas de IA. Este relatório cobre as principais técnicas — desde as fundacionais (zero-shot, few-shot) até as de fronteira (agentic patterns, DSPy, Graph of Thoughts) — com análise comparativa de performance, custo de tokens e aplicabilidade em arquiteturas multi-agentes. A descoberta mais importante dos últimos dois anos é a inversão de paradigma: **modelos de raciocínio avançados (o1, R1, GPT-5) frequentemente performam pior com técnicas clássicas como few-shot e CoT explícito**, exigindo que engenheiros reavaliem premissas consolidadas. O campo está em transição acelerada de "prompt engineering" para "context engineering" — o gerenciamento holístico de todo o contexto que alimenta o modelo a cada passo.
+Prompt engineering has evolved from an informal art into a rigorous technical discipline with **over 58 documented techniques** and direct impact on AI system quality, cost, and reliability. This report covers the major techniques — from foundational (zero-shot, few-shot) to frontier (agentic patterns, DSPy, Graph of Thoughts) — with comparative analysis of performance, token cost, and applicability in multi-agent architectures. The most important finding of the last two years is a paradigm inversion: **advanced reasoning models (o1, R1, GPT-5) frequently perform worse with classic techniques like few-shot and explicit CoT**, requiring engineers to reassess established assumptions. The field is rapidly transitioning from "prompt engineering" to "context engineering" — the holistic management of all context fed to the model at each step.
 
 ---
 
-## Técnicas fundamentais: a base de toda engenharia de prompts
+## Fundamental techniques: the foundation of all prompt engineering
 
-### Role Prompting (atribuição de papéis)
+### Role Prompting
 
-**Definição e funcionamento.** Role prompting instrui o modelo a adotar uma persona, identidade profissional ou padrão comportamental antes de executar uma tarefa. Ao atribuir um papel, o modelo ajusta sua distribuição de probabilidades para gerar texto no estilo, vocabulário e profundidade típicos daquela persona. A implementação é simples: `"Você é um cardiologista experiente"` antes da pergunta muda drasticamente o registro, a terminologia e o foco da resposta.
+**Definition and mechanism.** Role prompting instructs the model to adopt a persona, professional identity, or behavioral pattern before executing a task. By assigning a role, the model adjusts its probability distribution to generate text in the style, vocabulary, and depth typical of that persona. Implementation is straightforward: `"You are an experienced cardiologist"` before the question drastically changes the register, terminology, and focus of the response.
 
-**Melhores casos de uso.** Controle de tom e estilo (formal, técnico, casual); especialização de domínio (jurídico, médico, financeiro); criação de agentes conversacionais com identidade definida; escrita criativa com voz específica.
+**Best use cases.** Tone and style control (formal, technical, casual); domain specialization (legal, medical, financial); conversational agent creation with defined identity; creative writing with a specific voice.
 
-**Quando NÃO usar.** Pesquisa de Schulhoff et al. (2024, "The Prompt Report") testou 12 role prompts em 2.000 questões MMLU com GPT-4-turbo e demonstrou que **2-shot CoT supera role prompts consistentemente em tarefas de raciocínio**. Role prompting não melhora acurácia factual em modelos de ponta — seu valor está no estilo, não na precisão.
+**When NOT to use.** Research by Schulhoff et al. (2024, "The Prompt Report") tested 12 role prompts on 2,000 MMLU questions with GPT-4-turbo and demonstrated that **2-shot CoT consistently outperforms role prompts on reasoning tasks**. Role prompting does not improve factual accuracy in frontier models — its value lies in style, not precision.
 
-**Custo de tokens.** Mínimo: 10-30 tokens adicionais. Melhor relação custo-benefício entre todas as técnicas para controle de estilo.
+**Token cost.** Minimal: 10–30 additional tokens. Best cost-benefit ratio among all techniques for style control.
 
-**Impacto em multi-agentes.** Role prompting é o mecanismo fundamental de especialização em arquiteturas multi-agentes. No sistema de pesquisa da Anthropic, cada subagente recebe um papel especializado via system prompt. LangChain e CrewAI usam role prompting como base para definir comportamentos de agentes.
+**Impact on multi-agent systems.** Role prompting is the fundamental specialization mechanism in multi-agent architectures. In Anthropic's research system, each subagent receives a specialized role via system prompt. LangChain and CrewAI use role prompting as the basis for defining agent behaviors.
 
-### Zero-Shot Prompting (sem exemplos)
+### Zero-Shot Prompting
 
-**Definição e funcionamento.** O modelo recebe apenas a instrução da tarefa, sem exemplos demonstrativos. Depende inteiramente do conhecimento adquirido durante o treinamento. Para tarefas comuns (classificação, tradução, sumarização), modelos modernos como GPT-4o e Claude Sonnet 4.5 têm capacidades zero-shot robustas.
+**Definition and mechanism.** The model receives only the task instruction, with no demonstrative examples. It relies entirely on knowledge acquired during training. For common tasks (classification, translation, summarization), modern models like GPT-4o and Claude Sonnet 4.5 have robust zero-shot capabilities.
 
-**Melhores casos de uso.** Chatbots de propósito geral; classificação e tradução simples; brainstorming rápido; quando eficiência de tokens é prioridade.
+**Best use cases.** General-purpose chatbots; simple classification and translation; quick brainstorming; when token efficiency is a priority.
 
-**Quando NÃO usar.** Raciocínio multi-passo complexo; tarefas exigindo formato de saída específico; classificações ambíguas com sarcasmo ou negação; tarefas fora dos padrões comuns de treinamento.
+**When NOT to use.** Complex multi-step reasoning; tasks requiring a specific output format; ambiguous classifications involving sarcasm or negation; tasks outside common training patterns.
 
-**Custo e performance.** **Menor custo de tokens** entre todas as técnicas. Modelos modernos alcançam **~85% de acurácia** em tarefas simples em zero-shot. A variante **zero-shot CoT** ("Vamos pensar passo a passo") frequentemente supera few-shot em tarefas de raciocínio com modelos de ponta (Kojima et al., 2022).
+**Cost and performance.** **Lowest token cost** among all techniques. Modern models achieve **~85% accuracy** on simple tasks in zero-shot. The **zero-shot CoT** variant ("Let's think step by step") frequently outperforms few-shot on reasoning tasks with frontier models (Kojima et al., 2022).
 
-### Few-Shot Prompting (poucos exemplos)
+### Few-Shot Prompting
 
-**Definição e funcionamento.** Fornece 2-5+ exemplos de pares entrada-saída no prompt, funcionando como um "mini conjunto de treinamento" para aprendizado em contexto (in-context learning). Demonstrado extensivamente por Brown et al. (2020) com GPT-3. O modelo identifica o mapeamento entre entradas e saídas e generaliza para novas entradas.
+**Definition and mechanism.** Provides 2–5+ input-output pair examples in the prompt, functioning as a "mini training set" for in-context learning. Extensively demonstrated by Brown et al. (2020) with GPT-3. The model identifies the mapping between inputs and outputs and generalizes to new inputs.
 
-**Práticas recomendadas.** A Anthropic recomenda **3-5 exemplos diversos e relevantes**, encapsulados em tags XML (`<example>`, `</example>`). Pesquisa de Min et al. (2022) revelou que **o espaço de labels e a distribuição dos inputs importam mais que a correção dos labels** — até labels aleatórios superam zero-shot. A **ordem dos exemplos importa significativamente** (Lu et al., 2021), recomendando-se testar múltiplas ordenações.
+**Best practices.** Anthropic recommends **3–5 diverse and relevant examples**, encapsulated in XML tags (`<example>`, `</example>`). Research by Min et al. (2022) revealed that **the label space and input distribution matter more than label correctness** — even random labels outperform zero-shot. **Example order matters significantly** (Lu et al., 2021); testing multiple orderings is recommended.
 
-**Quando NÃO usar.** Com **modelos de raciocínio avançados** (o1, R1, GPT-5): exemplos podem **prejudicar a performance** ao restringir o processo de raciocínio. Após ~5-10 exemplos, retornos são decrescentes. Few-shot padrão não ajuda em raciocínio multi-passo complexo — para isso, use CoT.
+**When NOT to use.** With **advanced reasoning models** (o1, R1, GPT-5): examples can **hurt performance** by constraining the reasoning process. After ~5–10 examples, returns are diminishing. Standard few-shot does not help with complex multi-step reasoning — use CoT instead.
 
-**Custo de tokens.** Moderado a alto: cada exemplo adiciona 50-200+ tokens. Em sistemas multi-agentes, exemplos competem com o orçamento limitado da janela de contexto de subagentes.
+**Token cost.** Moderate to high: each example adds 50–200+ tokens. In multi-agent systems, examples compete with the limited context window budget of subagents.
 
-**Combinações eficazes.** Few-shot + CoT (a combinação mais poderosa — base do paper de Wei et al., 2022); few-shot + XML tags (recomendação da Anthropic); few-shot + role prompting para estilo + formato.
+**Effective combinations.** Few-shot + CoT (the most powerful combination — basis of the Wei et al., 2022 paper); few-shot + XML tags (Anthropic recommendation); few-shot + role prompting for style + format.
 
 ### System Prompts versus User Prompts
 
-O **system prompt** define o framework comportamental persistente do modelo — identidade, restrições, regras de formato, guardrails de segurança. O **user prompt** carrega a tarefa dinâmica específica — dados, perguntas, exemplos contextuais.
+The **system prompt** defines the model's persistent behavioral framework — identity, constraints, formatting rules, safety guardrails. The **user prompt** carries the specific dynamic task — data, questions, contextual examples.
 
-**Melhores práticas em produção.** Colocar role e restrições no system prompt (persistência entre turnos), exemplos few-shot no user prompt (flexibilidade por tarefa), e queries ao **final** do prompt após documentos/contexto — testes da Anthropic mostram **melhoria de até 30% na qualidade** quando a pergunta está no final. **Prompt caching** (disponível na Anthropic e OpenAI) reduz dramaticamente o custo de system prompts repetidos.
+**Production best practices.** Place role and constraints in the system prompt (persistence across turns), few-shot examples in the user prompt (per-task flexibility), and queries at the **end** of the prompt after documents/context — Anthropic's tests show **up to 30% quality improvement** when the question is at the end. **Prompt caching** (available from Anthropic and OpenAI) dramatically reduces the cost of repeated system prompts.
 
-**Em arquiteturas multi-agentes**, system prompts são **críticos**: definem completamente o comportamento de cada subagente (stateless por natureza). Conforme o blog de engenharia da Anthropic: *"Como cada agente é dirigido por um prompt, prompt engineering foi nossa principal alavanca para melhorar comportamentos... prompts precisam ser mais explícitos, detalhados e intencionais."*
-
----
-
-## Técnicas de raciocínio: quando o modelo precisa "pensar"
-
-### Chain-of-Thought (CoT): o raciocínio passo a passo
-
-**Definição e funcionamento.** Introduzido por Wei et al. (2022), CoT encoraja o modelo a gerar passos intermediários de raciocínio antes da resposta final. Três variantes: **Few-Shot CoT** (exemplos manuais com raciocínio explícito), **Zero-Shot CoT** (adicionar "Vamos pensar passo a passo"), e **Auto-CoT** (Zhang et al., 2022 — geração automática de cadeias diversas).
-
-**Benchmarks quantitativos.** No GSM8K, PaLM 540B saltou de **17,9% para 58,1%** com CoT (>3x de melhoria). Com Self-Consistency: **74%**. Flan-PaLM com CoT+SC: **83,9%**. Modelos modernos com 8-shot CoT: Llama 3.1 405B alcança **96,8%**, GPT-4o **96,1%**, Claude 3.5 Sonnet **96,4%**.
-
-**Quando NÃO usar.** Modelos pequenos (<100B parâmetros) produzem cadeias "fluentes mas ilógicas" que **prejudicam** a acurácia. Em **modelos de raciocínio** (o1, R1), um estudo da Wharton (2025) encontrou apenas **2-3% de melhoria marginal** com aumento de **20-80% no tempo de resposta**. Um estudo do NeurIPS 2024 ("Chain of Thoughtlessness") demonstrou que CoT só ajuda quando exemplos anotados correspondem de perto à query — conforme problemas se generalizam, a acurácia cai para níveis de prompting padrão. **Tarefas simples de um passo** ganham pouco ou nada.
-
-**Custo de tokens.** Requisições CoT levam **35-600% mais tempo** que requisições diretas. A alternativa **Chain of Draft (CoD)** iguala a acurácia usando apenas **~7,6% dos tokens**. A Anthropic recomenda usar tags XML (`<thinking>`, `<answer>`) para separação estruturada e sempre permitir que o modelo externalize seu raciocínio.
-
-### Tree of Thoughts (ToT): exploração e backtracking
-
-**Definição.** Introduzido por Yao et al. (2023, NeurIPS), ToT generaliza CoT ao permitir exploração de múltiplos caminhos de raciocínio organizados em árvore, com autoavaliação e backtracking. Quatro módulos: decomposição de pensamentos, geração de candidatos, avaliação de estados (o LLM classifica como "certo/talvez/impossível"), e algoritmo de busca (BFS/DFS).
-
-**Benchmarks surpreendentes.** No Game of 24: GPT-4 com CoT alcançou **4%** de sucesso; com ToT, **74%** — melhoria de **18,5x**. Descrito como **~10x mais preciso que CoT** em benchmarks de planejamento e busca.
-
-**Quando NÃO usar.** Problemas simples e lineares (overkill massivo); aplicações sensíveis a latência; ambientes com restrição de tokens — ToT requer **5-20x mais chamadas de API** que CoT. Cada avaliação requer múltiplas amostras do LLM.
-
-**Combinações.** CoT é um caso especial de ToT (árvore de profundidade 1, largura 1). **Graph of Thoughts (GoT)** estende ToT permitindo múltiplos nós-pai e operações de agregação — obteve **62% de melhoria** sobre ToT em tarefas de ordenação com **>31% de redução de custo**.
-
-### ReAct: raciocínio + ação com ferramentas
-
-**Definição.** Introduzido por Yao et al. (2022, ICLR 2023), ReAct sincroniza raciocínio verbal e ações no ambiente externo em um loop iterativo **Pensamento → Ação → Observação**. O modelo raciocina sobre o estado atual, executa uma ferramenta (busca, calculadora, API), recebe o resultado, e repete.
-
-**Performance.** No ALFWorld (tomada de decisão interativa), ReAct superou métodos de imitação e RL por **34% absolutos** de taxa de sucesso com apenas 1-2 exemplos. No Fever (verificação de fatos), **supera CoT** ao reduzir alucinações via recuperação de informação fundamentada. Os melhores resultados gerais vêm de **ReAct + CoT-SC combinados**.
-
-**Quando NÃO usar.** Tarefas de raciocínio puro sem necessidade de dados externos (CoT basta); quando nenhuma ferramenta está disponível (ReAct perde metade do valor); tarefas de perguntas factuais simples; quando resultados de busca são provavelmente ruins. À medida que o número de ferramentas cresce, modelos cometem mais erros.
-
-**Importância em multi-agentes.** **ReAct é O padrão fundamental para agentes de IA modernos.** LangChain (`create_react_agent`), CrewAI, LangGraph e AutoGen implementam ReAct como seu loop central de agente. Google Cloud recomenda começar com ReAct antes de escalar para multi-agentes.
-
-### Self-Consistency: votação majoritária sobre múltiplos caminhos
-
-**Definição.** Proposto por Wang et al. (2022, ICLR 2023), substitui a decodificação greedy no CoT: amostra **N caminhos de raciocínio diversos** (temperatura >0) para o mesmo problema e seleciona a resposta mais frequente por votação majoritária.
-
-**Resultados.** Sobre CoT no GSM8K: **+17,9%**; SVAMP: **+11%**; AQuA: **+12,2%**. Tão poucas quanto **3 amostras** já melhoram sobre CoT greedy. Completamente não-supervisionado — sem treinamento, anotação ou fine-tuning adicional.
-
-**Quando NÃO usar.** Geração aberta/criativa (sem resposta "correta" para votar); aplicações sensíveis a latência; custo restrito — **multiplica o custo de tokens pelo número de amostras** (5-30x). Retornos decrescentes após 20-30 caminhos. **Universal Self-Consistency (USC)** é uma variante onde o próprio LLM escolhe a melhor resposta, eliminando a necessidade de votação externa.
+**In multi-agent architectures**, system prompts are **critical**: they completely define each subagent's behavior (stateless by nature). Per Anthropic's engineering blog: *"Because each agent is directed by a prompt, prompt engineering was our main lever for improving behaviors... prompts need to be more explicit, detailed, and intentional."*
 
 ---
 
-## Técnicas avançadas e estruturais para sistemas de produção
+## Reasoning techniques: when the model needs to "think"
 
-### Prompt Chaining: decomposição em pipeline
+### Chain-of-Thought (CoT): step-by-step reasoning
 
-Prompt chaining quebra tarefas complexas em subtarefas sequenciais, onde a saída de uma alimenta a entrada da próxima. Tipos: **sequencial** (linear), **condicional** (ramificação if/else baseada na saída do LLM), **iterativo** (loops gerar → criticar → refinar), e **paralelo** (subtarefas independentes simultâneas).
+**Definition and mechanism.** Introduced by Wei et al. (2022), CoT encourages the model to generate intermediate reasoning steps before the final answer. Three variants: **Few-Shot CoT** (manual examples with explicit reasoning), **Zero-Shot CoT** (appending "Let's think step by step"), and **Auto-CoT** (Zhang et al., 2022 — automatic generation of diverse chains).
 
-**Caso prático típico.** Análise de documentos: extrair citações relevantes → sintetizar resposta → auto-revisão de acurácia. Cada passo usa um prompt focado com objetivo único. Frameworks como LangChain (operador pipe `|` do LCEL), LangGraph (grafos com ciclos e edges condicionais), e Vellum (construtor visual) implementam chaining nativamente.
+**Quantitative benchmarks.** On GSM8K, PaLM 540B jumped from **17.9% to 58.1%** with CoT (>3x improvement). With Self-Consistency: **74%**. Flan-PaLM with CoT+SC: **83.9%**. Modern models with 8-shot CoT: Llama 3.1 405B reaches **96.8%**, GPT-4o **96.1%**, Claude 3.5 Sonnet **96.4%**.
 
-**Trade-offs.** Custo tipicamente **2-5x** maior que prompt único. Latência aditiva — cada elo adiciona uma ida-e-volta completa à API. Compensa com maior qualidade, controlabilidade e debuggabilidade. Conforme a documentação mais recente da Anthropic: *"Com pensamento adaptativo e orquestração de subagentes, Claude lida internamente com a maioria do raciocínio multi-passo. Prompt chaining explícito ainda é útil quando você precisa inspecionar saídas intermediárias ou impor uma estrutura de pipeline específica."*
+**When NOT to use.** Small models (<100B parameters) produce "fluent but illogical" chains that **hurt** accuracy. With **reasoning models** (o1, R1), a Wharton study (2025) found only **2–3% marginal improvement** with a **20–80% increase in response time**. A NeurIPS 2024 study ("Chain of Thoughtlessness") demonstrated that CoT only helps when annotated examples closely match the query — as problems generalize, accuracy drops to standard prompting levels. **Simple single-step tasks** gain little to nothing.
 
-### Meta-Prompting: prompts que geram prompts
+**Token cost.** CoT requests take **35–600% longer** than direct requests. The **Chain of Draft (CoD)** alternative matches accuracy using only **~7.6% of the tokens**. Anthropic recommends using XML tags (`<thinking>`, `<answer>`) for structured separation and always allowing the model to externalize its reasoning.
 
-Meta-prompting tem três acepções na literatura. **Scaffolding (Suzgun & Kalai, 2024):** transforma um LM em "condutor" que orquestra múltiplas instâncias "especialistas" com contexto fresco ("Fresh Eyes"). **Otimização prática (OpenAI Cookbook):** usar um modelo forte (o1-preview) para gerar/otimizar prompts para um modelo mais barato (GPT-4o). **Estrutural (Zhang et al., 2023):** formaliza a estrutura de tarefas usando teoria de categorias.
+### Tree of Thoughts (ToT): exploration and backtracking
 
-**Resultados.** Suzgun & Kalai: meta-prompting com GPT-4 superou prompting padrão em **17,1%**, expert prompting em **17,3%**, e multipersona em **15,2%** (média em Game of 24, Checkmate-in-One, Python Programming Puzzles). Zhang et al.: Qwen-72B com meta-prompt zero-shot alcançou **46,3% no MATH** e **83,5% no GSM8K**.
+**Definition.** Introduced by Yao et al. (2023, NeurIPS), ToT generalizes CoT by enabling exploration of multiple reasoning paths organized as a tree, with self-evaluation and backtracking. Four modules: thought decomposition, candidate generation, state evaluation (the LLM classifies as "sure/maybe/impossible"), and search algorithm (BFS/DFS).
 
-**Ferramentas.** O gerador de prompts da Anthropic, DSPy (Stanford NLP, 30k+ stars no GitHub — otimiza pipelines de prompts com Signatures, Modules e Optimizers), e TEXTGRAD (feedback em linguagem natural como "gradientes textuais").
+**Surprising benchmarks.** On Game of 24: GPT-4 with CoT achieved **4%** success; with ToT, **74%** — an **18.5x improvement**. Described as **~10x more accurate than CoT** on planning and search benchmarks.
 
-### Structured Output: saídas em JSON, XML e schemas
+**When NOT to use.** Simple linear problems (massive overkill); latency-sensitive applications; token-constrained environments — ToT requires **5–20x more API calls** than CoT. Each evaluation requires multiple LLM samples.
 
-Técnicas para forçar saídas de LLMs em formatos legíveis por máquina. Três níveis de rigor: **prompt engineering** (instruir em texto — ~35% de conformidade), **JSON mode da API** (garante JSON válido mas não schema), e **structured outputs com constrained decoding** (100% de conformidade de schema via máquinas de estados finitos que mascaram tokens inválidos durante a geração).
+**Combinations.** CoT is a special case of ToT (tree of depth 1, width 1). **Graph of Thoughts (GoT)** extends ToT by allowing multiple parent nodes and aggregation operations — achieved **62% improvement** over ToT on sorting tasks with **>31% cost reduction**.
 
-**Descoberta crítica sobre raciocínio.** Forçar JSON durante raciocínio **degrada a acurácia em 10-15%** (estudo "Let Me Speak Freely?", EMNLP 2024). A prática recomendada é usar **duas etapas**: raciocínio livre primeiro, formatação estruturada depois — acurácia salta de **48% para 61%** em tarefas de agregação. Colocar campos de raciocínio **antes** dos campos de resposta no schema permite que o modelo "pense" dentro do formato estruturado.
+### ReAct: reasoning + action with tools
 
-**Comparação de formatos.** JSON minificado é mais eficiente em tokens e tem **78,5% de acurácia** de compreensão pelo LLM. XML é **14% menos eficiente** mas a Anthropic treinou Claude especificamente para reconhecer XML, gerando **15-20% de boost de performance**. YAML é bom para configuração humana. TOON (formato tabular) usa **40% menos tokens** para dados tabulares.
+**Definition.** Introduced by Yao et al. (2022, ICLR 2023), ReAct synchronizes verbal reasoning and external environment actions in an iterative **Thought → Action → Observation** loop. The model reasons about the current state, executes a tool (search, calculator, API), receives the result, and repeats.
 
-**Ferramentas modernas.** OpenAI Structured Outputs (API nativa com `strict: true`); Anthropic Structured Outputs (beta desde novembro 2025, constrained decoding); Outlines (open-source); XGrammar (overhead próximo de zero — ~50μs por token); Instructor (biblioteca de alto nível para Pydantic).
+**Performance.** On ALFWorld (interactive decision-making), ReAct outperformed imitation and RL methods by **34% absolute** success rate with only 1–2 examples. On Fever (fact verification), it **outperforms CoT** by reducing hallucinations via grounded information retrieval. The best overall results come from **ReAct + CoT-SC combined**.
 
-### RAG Prompting Patterns: contexto externo fundamentado
+**When NOT to use.** Pure reasoning tasks without need for external data (CoT suffices); when no tools are available (ReAct loses half its value); simple factual Q&A tasks; when search results are likely poor. As the number of tools grows, models make more errors.
 
-RAG (Retrieval-Augmented Generation) combina recuperação de documentos externos com geração do LLM. Os padrões de prompt para RAG são o que determina a qualidade das respostas.
+**Importance in multi-agent systems.** **ReAct is THE fundamental pattern for modern AI agents.** LangChain (`create_react_agent`), CrewAI, LangGraph, and AutoGen implement ReAct as their core agent loop. Google Cloud recommends starting with ReAct before scaling to multi-agent systems.
 
-**Padrões essenciais.** **(1) Context Injection básico:** system prompt com regras de grounding + contexto recuperado no user prompt. **(2) Dual Prompt Structure:** separar camadas — system prompt persistente com papel e regras, user prompt dinâmico com contexto e pergunta. Regra-chave: *"Nunca misture estas camadas — a maioria da instabilidade em RAG vem de mesclá-las"* (StackAI, 2026). **(3) N-Shot RAG:** incluir exemplos demonstrando como respostas devem ser derivadas do contexto. **(4) CoT RAG:** guiar raciocínio sobre conteúdo recuperado passo a passo. **(5) Agentic RAG:** o LLM decide quando recuperar usando tool calls.
+### Self-Consistency: majority voting over multiple paths
 
-**Evolução.** Naive RAG (simples index → retrieve → generate) → Advanced RAG (reranking, filtragem, otimização de pré-recuperação) → **Modular RAG** (componentes plugáveis, reescrita de query, recuperação multi-hop, orquestração por agentes) — o padrão de produção em 2025-2026.
+**Definition.** Proposed by Wang et al. (2022, ICLR 2023), it replaces greedy decoding in CoT: samples **N diverse reasoning paths** (temperature >0) for the same problem and selects the most frequent answer via majority voting.
 
-**Custo.** Busca vetorial adiciona **50-200ms** de latência. Chunks recuperados consomem **1-4K tokens** por query. Prompt caching e estratégias "just in time" de contexto mitigam custos.
+**Results.** Over CoT on GSM8K: **+17.9%**; SVAMP: **+11%**; AQuA: **+12.2%**. As few as **3 samples** already improve over greedy CoT. Completely unsupervised — no training, annotation, or additional fine-tuning required.
+
+**When NOT to use.** Open-ended/creative generation (no "correct" answer to vote on); latency-sensitive applications; cost-constrained settings — **multiplies token cost by the number of samples** (5–30x). Diminishing returns after 20–30 paths. **Universal Self-Consistency (USC)** is a variant where the LLM itself selects the best answer, eliminating the need for external voting.
 
 ---
 
-## Técnicas de fronteira: inovações de 2022 a 2026
+## Advanced and structural techniques for production systems
 
-### Constitutional AI e Self-Critique
+### Prompt Chaining: pipeline decomposition
 
-Metodologia de alinhamento da Anthropic (Bai et al., 2022) que treina modelos usando princípios escritos (uma "constituição") ao invés de feedback humano extensivo. Duas fases: **supervisionada** (modelo critica e revisa suas próprias respostas contra princípios constitucionais) e **RL** (RLAIF — RL from AI Feedback). Como **técnica de prompting**, implementa loops critique → revision explícitos no prompt.
+Prompt chaining breaks complex tasks into sequential subtasks, where the output of one feeds the input of the next. Types: **sequential** (linear), **conditional** (if/else branching based on LLM output), **iterative** (generate → critique → refine loops), and **parallel** (simultaneous independent subtasks).
 
-**Aplicabilidade.** Produção-ready — core dos modelos Claude. Elimina necessidade de labels humanos de harmfulness. Modelos CAI igualam ou superam RLHF em harmlessness mantendo helpfulness. Custo: **2-3x** por resposta devido aos ciclos de crítica-revisão. Modelos pequenos (7-9B) mostram capacidade limitada de auto-crítica.
+**Typical practical case.** Document analysis: extract relevant citations → synthesize answer → self-review for accuracy. Each step uses a focused prompt with a single objective. Frameworks such as LangChain (LCEL pipe operator `|`), LangGraph (graphs with cycles and conditional edges), and Vellum (visual builder) implement chaining natively.
+
+**Trade-offs.** Cost typically **2–5x** higher than a single prompt. Additive latency — each link adds a full API round trip. Compensated by higher quality, controllability, and debuggability. Per Anthropic's latest documentation: *"With adaptive thinking and subagent orchestration, Claude handles most multi-step reasoning internally. Explicit prompt chaining is still useful when you need to inspect intermediate outputs or enforce a specific pipeline structure."*
+
+### Meta-Prompting: prompts that generate prompts
+
+Meta-prompting has three meanings in the literature. **Scaffolding (Suzgun & Kalai, 2024):** transforms an LM into a "conductor" orchestrating multiple "expert" instances with fresh context ("Fresh Eyes"). **Practical optimization (OpenAI Cookbook):** using a strong model (o1-preview) to generate/optimize prompts for a cheaper model (GPT-4o). **Structural (Zhang et al., 2023):** formalizes task structure using category theory.
+
+**Results.** Suzgun & Kalai: meta-prompting with GPT-4 outperformed standard prompting by **17.1%**, expert prompting by **17.3%**, and multipersona by **15.2%** (average across Game of 24, Checkmate-in-One, Python Programming Puzzles). Zhang et al.: Qwen-72B with zero-shot meta-prompt achieved **46.3% on MATH** and **83.5% on GSM8K**.
+
+**Tools.** Anthropic's prompt generator, DSPy (Stanford NLP, 30k+ GitHub stars — optimizes prompt pipelines with Signatures, Modules, and Optimizers), and TEXTGRAD (natural language feedback as "textual gradients").
+
+### Structured Output: JSON, XML, and schema outputs
+
+Techniques for forcing LLM outputs into machine-readable formats. Three levels of rigor: **prompt engineering** (text-based instructions — ~35% conformance), **API JSON mode** (guarantees valid JSON but not schema), and **structured outputs with constrained decoding** (100% schema conformance via finite state machines that mask invalid tokens during generation).
+
+**Critical finding on reasoning.** Forcing JSON during reasoning **degrades accuracy by 10–15%** ("Let Me Speak Freely?" study, EMNLP 2024). The recommended practice is a **two-stage approach**: free reasoning first, structured formatting second — accuracy jumps from **48% to 61%** on aggregation tasks. Placing reasoning fields **before** answer fields in the schema allows the model to "think" within the structured format.
+
+**Format comparison.** Minified JSON is more token-efficient and achieves **78.5% LLM comprehension accuracy**. XML is **14% less efficient** but Anthropic specifically trained Claude to recognize XML, yielding a **15–20% performance boost**. YAML is suitable for human configuration. TOON (tabular format) uses **40% fewer tokens** for tabular data.
+
+**Modern tools.** OpenAI Structured Outputs (native API with `strict: true`); Anthropic Structured Outputs (beta since November 2025, constrained decoding); Outlines (open-source); XGrammar (near-zero overhead — ~50μs per token); Instructor (high-level Pydantic library).
+
+### RAG Prompting Patterns: grounded external context
+
+RAG (Retrieval-Augmented Generation) combines external document retrieval with LLM generation. The prompt patterns for RAG determine response quality.
+
+**Essential patterns.** **(1) Basic Context Injection:** system prompt with grounding rules + retrieved context in the user prompt. **(2) Dual Prompt Structure:** separate layers — persistent system prompt with role and rules, dynamic user prompt with context and question. Key rule: *"Never mix these layers — most RAG instability comes from merging them"* (StackAI, 2026). **(3) N-Shot RAG:** include examples demonstrating how answers should be derived from context. **(4) CoT RAG:** guide step-by-step reasoning over retrieved content. **(5) Agentic RAG:** the LLM decides when to retrieve using tool calls.
+
+**Evolution.** Naive RAG (simple index → retrieve → generate) → Advanced RAG (reranking, filtering, pre-retrieval optimization) → **Modular RAG** (pluggable components, query rewriting, multi-hop retrieval, agent orchestration) — the production standard in 2025–2026.
+
+**Cost.** Vector search adds **50–200ms** of latency. Retrieved chunks consume **1–4K tokens** per query. Prompt caching and "just in time" context strategies mitigate costs.
+
+---
+
+## Frontier techniques: innovations from 2022 to 2026
+
+### Constitutional AI and Self-Critique
+
+Anthropic's alignment methodology (Bai et al., 2022) that trains models using written principles (a "constitution") instead of extensive human feedback. Two phases: **supervised** (model critiques and revises its own responses against constitutional principles) and **RL** (RLAIF — RL from AI Feedback). As a **prompting technique**, it implements explicit critique → revision loops in the prompt.
+
+**Applicability.** Production-ready — core of Claude models. Eliminates the need for human harmfulness labels. CAI models match or outperform RLHF on harmlessness while maintaining helpfulness. Cost: **2–3x** per response due to critique-revision cycles. Small models (7–9B) show limited self-critique capability.
 
 ### Automatic Prompt Engineering (APE)
 
-APE (Zhou et al., 2022) enquadra geração de instruções como otimização black-box: LLMs geram candidatos de prompt, executam cada um, e selecionam o melhor por score de avaliação. Alcançou performance de nível humano em **24/24** tarefas de Instruction Induction. Descobriu prompts melhores que os humanos, como *"Let's work this out in a step by step way to be sure we have the right answer"* — que melhorou MultiArith de 78,7 para 82,0.
+APE (Zhou et al., 2022) frames instruction generation as black-box optimization: LLMs generate prompt candidates, execute each one, and select the best by evaluation score. Achieved human-level performance on **24/24** Instruction Induction tasks. Discovered prompts better than human ones, such as *"Let's work this out in a step by step way to be sure we have the right answer"* — which improved MultiArith from 78.7 to 82.0.
 
-**OPRO (Google DeepMind):** usa LLMs como otimizadores via meta-prompt com pares instrução-score anteriores. Superou prompts humanos em **até 8%** no GSM8K e **até 50%** em Big-Bench Hard. Descobriu: *"Take a deep breath and work on this problem step-by-step."*
+**OPRO (Google DeepMind):** uses LLMs as optimizers via a meta-prompt with previous instruction-score pairs. Outperformed human prompts by **up to 8%** on GSM8K and **up to 50%** on Big-Bench Hard. Discovered: *"Take a deep breath and work on this problem step-by-step."*
 
-**DSPy (Stanford NLP):** framework que substitui prompt engineering manual por pipelines otimizáveis com Signatures, Modules e Optimizers (MIPROv2, COPRO, SIMBA, GEPA). Acurácia de avaliação de prompts: **46,2% → 64,0%** com otimização. 30k+ stars no GitHub, amplamente adotado em produção.
+**DSPy (Stanford NLP):** framework that replaces manual prompt engineering with optimizable pipelines using Signatures, Modules, and Optimizers (MIPROv2, COPRO, SIMBA, GEPA). Prompt evaluation accuracy: **46.2% → 64.0%** with optimization. 30k+ GitHub stars, widely adopted in production.
 
 ### Directional Stimulus Prompting (DSP)
 
-Li et al. (2023, NeurIPS) usa um pequeno modelo de política treinável (T5) para gerar estímulos direcionais — dicas, keywords, cues — específicos por instância que guiam um LLM frozen black-box. **41,4% de melhoria** no ChatGPT para diálogo (MultiWOZ com apenas 80 exemplos). Custo mínimo por query (apenas tokens do estímulo), mas requer treinar o modelo de política.
+Li et al. (2023, NeurIPS) uses a small trainable policy model (T5) to generate directional stimuli — hints, keywords, cues — specific per instance that guide a frozen black-box LLM. **41.4% improvement** on ChatGPT for dialogue (MultiWOZ with only 80 examples). Minimal per-query cost (only stimulus tokens), but requires training the policy model.
 
 ### Skeleton-of-Thought (SoT)
 
-Ning et al. (Microsoft Research, ICLR 2024) reduz latência de geração: primeiro gera um esqueleto (outline com 3-5 palavras por ponto), depois expande cada ponto em **paralelo**. **≥2x de speedup** em 8/12 modelos testados. Qualidade comparável ou melhor em **60%** dos casos. Até **3,72x de speedup** no LLaMA-2. Não usar para: matemática, código, raciocínio sequencial.
+Ning et al. (Microsoft Research, ICLR 2024) reduces generation latency: first generates a skeleton (outline with 3–5 words per point), then expands each point in **parallel**. **≥2x speedup** on 8/12 tested models. Comparable or better quality in **60%** of cases. Up to **3.72x speedup** on LLaMA-2. Do not use for: math, code, sequential reasoning.
 
 ### Emotion Prompting
 
-Li et al. (2023, Microsoft Research) demonstra que adicionar estímulos emocionais (*"Isto é muito importante para minha carreira"*, *"Estou contando com você!"*) melhora performance em **>10%** em 45 tarefas. Custo zero de implementação. Mais eficaz para tarefas criativas e abertas.
+Li et al. (2023, Microsoft Research) demonstrates that adding emotional stimuli (*"This is very important to my career"*, *"I'm counting on you!"*) improves performance by **>10%** across 45 tasks. Zero implementation cost. Most effective for creative and open-ended tasks.
 
 ### Step-Back Prompting (Google DeepMind)
 
-Zheng et al. (2023) instrui o LLM a primeiro responder uma questão de abstração mais alta antes de enfrentar a query específica. Melhoria de **7-27%** sobre CoT dependendo da tarefa. Exemplo: em vez de resolver diretamente a questão sobre gases ideais, primeiro perguntar "Qual é a lei dos gases ideais?" → PV = nRT → aplicar ao problema.
+Zheng et al. (2023) instructs the LLM to first answer a higher-abstraction question before tackling the specific query. **7–27% improvement** over CoT depending on the task. Example: instead of directly solving the ideal gas question, first ask "What is the ideal gas law?" → PV = nRT → apply to the problem.
 
 ### Rephrase and Respond (RaR)
 
-Deng et al. (2024) instrui o LLM a reformular a pergunta antes de responder. Pode ser one-step (*"Reformule e expanda a pergunta, e responda"*) ou two-step (reformulação separada da resposta). Eficaz em QA e raciocínio simbólico. Combina bem com CoT. Zero overhead de implementação.
+Deng et al. (2024) instructs the LLM to rephrase the question before answering. Can be one-step (*"Rephrase and expand the question, and respond"*) or two-step (separate rephrasing from answering). Effective on QA and symbolic reasoning. Combines well with CoT. Zero implementation overhead.
 
 ### Thread of Thought (ThoT)
 
-Substitui "Vamos pensar passo a passo" por: *"Caminhe por este contexto em partes gerenciáveis passo a passo, resumindo e analisando conforme avançamos."* Superior para tarefas de compreensão de contexto longo e análise documental. Drop-in replacement para zero-shot CoT.
+Replaces "Let's think step by step" with: *"Walk through this context in manageable parts step by step, summarizing and analyzing as we go."* Superior for long-context comprehension and document analysis tasks. Drop-in replacement for zero-shot CoT.
 
-### Multimodal CoT e prompts visuais
+### Multimodal CoT and visual prompts
 
-**Multimodal CoT** (Meta/AWS, ICLR 2024): framework de dois estágios separando geração de justificativa (texto+imagens) de inferência de resposta. Modelo sub-1B parâmetros alcançou SOTA no ScienceQA. **Compositional CoT (CCoT)** (CVPR 2024): gera grafos de cena como passos intermediários para raciocínio visual. **Interleaved-Modal CoT (ICoT)** (CVPR 2025): intercala justificativas visuais e textuais.
-
----
-
-## Análise comparativa e matriz de decisão
-
-### Performance por técnica e benchmark
-
-| Técnica | GSM8K (impacto) | Custo tokens | Latência | Melhores cenários |
-|---------|-----------------|-------------|----------|-------------------|
-| Zero-shot | Baseline (~85% tarefas simples) | Mínimo | Mínima | Classificação, tradução, QA simples |
-| Few-shot (3-5) | +25-40% vs zero-shot | Moderado | Baixa | Formato, padrão, extração |
-| Chain-of-Thought | +30-50% raciocínio | 2-3x | Média | Matemática, lógica, análise |
-| Self-Consistency | +12-18% sobre CoT | 5-30x | Alta (paralelizável) | Aritmética, raciocínio crítico |
-| Tree of Thoughts | 18,5x sobre CoT (Game of 24) | 5-20x chamadas | Muito alta | Puzzles, planejamento, exploração |
-| ReAct | +34% abs. em ALFWorld | 2-5x por loop | Média-alta | Tool use, QA fundamentado |
-| Prompt Chaining | N/A (qualitativo) | 2-5x | Aditiva por elo | Pipelines, documentos, workflows |
-| Structured Output | N/A | +10-20% (JSON) | Similar | APIs, extração, inter-agentes |
-| Meta-Prompting | +17,1% vs padrão | Alto (otimização) | Alta | Multi-domínio, otimização |
-| Step-Back | +7-27% vs CoT | ~2x | Dupla | Raciocínio abstrato, física |
-| SoT | Qualidade ≈ | Maior | **≥2x mais rápido** | QA, conselhos, paralelizável |
-
-### Matriz de decisão por tipo de tarefa
-
-Para **classificação e extração simples**, começar com zero-shot — se insuficiente, adicionar 2-3 exemplos few-shot com tags XML. Para **raciocínio multi-passo**, usar CoT (few-shot para modelos padrão, zero-shot para modelos de raciocínio). Para **tarefas de alta confiabilidade**, adicionar Self-Consistency (aceitar custo 5-10x). Para **problemas de exploração e planejamento**, ToT. Para **tarefas com ferramentas e dados em tempo real**, ReAct. Para **workflows complexos multi-etapa**, prompt chaining. Para **saídas consumidas por sistemas**, structured outputs com constrained decoding.
-
-### Matriz por tier de modelo
-
-A descoberta mais contra-intuitiva de 2025-2026: **a técnica ótima depende do modelo**. Kusano et al. (2025) testaram 23 tipos de prompt em 12 LLMs com resultados radicalmente diferentes.
-
-- **Modelos de raciocínio** (o1, o3, R1, GPT-5): zero-shot, sem exemplos, sem "pense passo a passo" — essas instruções **prejudicam** a performance.
-- **Modelos frontier padrão** (GPT-4o, Claude Sonnet 4.5, Gemini 1.5 Pro): few-shot CoT, XML tags para Claude, templates estruturados para GPT.
-- **Modelos mid-tier** (GPT-4o-mini, Claude Haiku, Llama 3 8B): prompting complexo com mais exemplos e CoT explícito — **beneficiam-se mais** de engenharia de prompts.
-- **Modelos pequenos** (<10B params): few-shot extensivo, instruções detalhadas. CoT só funciona com modelos de **100B+** parâmetros.
-
-### Restrições de custo e otimização
-
-Pesquisa de Levy, Jacoby & Goldberg (2024) encontrou que **performance de raciocínio começa a degradar em torno de 3.000 tokens**. O sweet spot prático para a maioria das tarefas: **150-300 palavras** de prompt. **TALE-EP** (ACL 2025) reduz tokens de CoT em **67%** com **59% de redução de custo** mantendo performance competitiva. Prompt otimizado versus naive pode significar **$706/dia versus $3.000/dia** em 100K chamadas — **70% de redução de tokens** com qualidade idêntica ou superior.
+**Multimodal CoT** (Meta/AWS, ICLR 2024): two-stage framework separating rationale generation (text+images) from answer inference. A sub-1B parameter model achieved SOTA on ScienceQA. **Compositional CoT (CCoT)** (CVPR 2024): generates scene graphs as intermediate steps for visual reasoning. **Interleaved-Modal CoT (ICoT)** (CVPR 2025): interleaves visual and textual rationales.
 
 ---
 
-## Impacto em arquiteturas multi-agentes e subagentes
+## Comparative analysis and decision matrix
 
-### De prompts para context engineering
+### Performance by technique and benchmark
 
-O campo evoluiu de otimizar prompts individuais para gerenciar **todo o contexto** que alimenta o modelo. Na formulação de Andrej Karpathy (junho 2025): *"O LLM é uma CPU, a janela de contexto é RAM, e você é o sistema operacional."* Context engineering inclui instruções, definições de ferramentas, memória, resultados de ferramentas anteriores e saídas estruturadas.
+| Technique | GSM8K (impact) | Token cost | Latency | Best scenarios |
+|-----------|----------------|------------|---------|----------------|
+| Zero-shot | Baseline (~85% simple tasks) | Minimal | Minimal | Classification, translation, simple QA |
+| Few-shot (3-5) | +25-40% vs zero-shot | Moderate | Low | Format, pattern, extraction |
+| Chain-of-Thought | +30-50% reasoning | 2-3x | Medium | Math, logic, analysis |
+| Self-Consistency | +12-18% over CoT | 5-30x | High (parallelizable) | Arithmetic, critical reasoning |
+| Tree of Thoughts | 18.5x over CoT (Game of 24) | 5-20x calls | Very high | Puzzles, planning, exploration |
+| ReAct | +34% abs. on ALFWorld | 2-5x per loop | Medium-high | Tool use, grounded QA |
+| Prompt Chaining | N/A (qualitative) | 2-5x | Additive per link | Pipelines, documents, workflows |
+| Structured Output | N/A | +10-20% (JSON) | Similar | APIs, extraction, inter-agent |
+| Meta-Prompting | +17.1% vs standard | High (optimization) | High | Multi-domain, optimization |
+| Step-Back | +7-27% vs CoT | ~2x | Double | Abstract reasoning, physics |
+| SoT | Quality ≈ | Higher | **≥2x faster** | QA, advice, parallelizable |
 
-### Os cinco padrões de workflow da Anthropic
+### Decision matrix by task type
 
-O guia "Building Effective Agents" da Anthropic (dezembro 2024) define cinco padrões composíveis que representam o estado da arte:
+For **simple classification and extraction**, start with zero-shot — if insufficient, add 2–3 few-shot examples with XML tags. For **multi-step reasoning**, use CoT (few-shot for standard models, zero-shot for reasoning models). For **high-reliability tasks**, add Self-Consistency (accept 5–10x cost). For **exploration and planning problems**, ToT. For **tasks with tools and real-time data**, ReAct. For **complex multi-step workflows**, prompt chaining. For **outputs consumed by systems**, structured outputs with constrained decoding.
 
-- **Prompt Chaining:** saída de uma chamada LLM alimenta a próxima; cada passo pode incluir verificações programáticas
-- **Routing:** classificar input e direcionar para prompts/agentes especializados
-- **Paralelização:** múltiplas chamadas LLM simultâneas
-- **Orchestrator-Worker:** LLM central decompõe tarefas dinamicamente e delega a workers
-- **Evaluator-Optimizer:** um LLM gera, outro avalia; refinamento iterativo
+### Decision matrix by model tier
 
-O princípio dominante é **"encontrar a solução mais simples possível, só aumentando complexidade quando necessário"**. Começar com prompts simples → otimizar com avaliação → adicionar sistemas agentic apenas quando soluções mais simples falham.
+The most counter-intuitive finding of 2025–2026: **the optimal technique depends on the model**. Kusano et al. (2025) tested 23 prompt types across 12 LLMs with radically different results.
 
-### Como técnicas de prompting se aplicam em multi-agentes
+- **Reasoning models** (o1, o3, R1, GPT-5): zero-shot, no examples, no "think step by step" — these instructions **hurt** performance.
+- **Standard frontier models** (GPT-4o, Claude Sonnet 4.5, Gemini 1.5 Pro): few-shot CoT, XML tags for Claude, structured templates for GPT.
+- **Mid-tier models** (GPT-4o-mini, Claude Haiku, Llama 3 8B): complex prompting with more examples and explicit CoT — **benefit the most** from prompt engineering.
+- **Small models** (<10B params): extensive few-shot, detailed instructions. CoT only works with models of **100B+** parameters.
 
-**Role prompting** é o mecanismo de especialização — cada agente recebe persona com metas, heurísticas de decisão e políticas de interação. No sistema EvoMAC (ICLR 2025), prompts de agentes são **iterativamente evoluídos** durante teste, superando sistemas estáticos humanos em **26,48%** em Website Basic e **34,78%** em Game Basic.
+### Cost constraints and optimization
 
-**Prompt chaining** é a espinha dorsal de workflows — a saída de um agente alimenta o próximo. **ReAct** é o loop central de cada agente individual (Pensamento → Ação → Observação). **Structured outputs** garantem comunicação confiável entre agentes via JSON/schemas. **RAG** integra-se como estratégia de contexto "just in time" — recuperar apenas quando necessário, em vez de pré-carregar todo o contexto.
-
-As **quatro estratégias de contexto do LangChain** para multi-agentes são fundamentais: **Write** (persistir contexto externamente), **Select** (recuperar via RAG), **Compress** (sumarizar e compactar), **Isolate** (separar contextos de diferentes agentes para evitar contaminação cruzada).
-
-### Frameworks de multi-agentes em produção
-
-**CrewAI** adota uma metáfora de equipe com roles, backstory e metas por agente — ideal para prototipagem rápida e pipelines de conteúdo. **LangGraph** oferece grafos de estado com checkpointing e execução durável — ideal para produção com requisitos de auditabilidade e compliance. **AutoGen** (Microsoft, 54,7k+ stars) usa conversação multi-agente com execução de código — ideal para debate, refinamento iterativo e geração de código. **OpenAI Agents SDK** implementa dois padrões: agents-as-tools (hub-and-spoke) e handoffs (peer-to-peer com transferência de controle). O Gartner projeta que **40% das aplicações enterprise** terão agentes de IA integrados até o final de 2026.
-
----
-
-## Combinações sinérgicas e conflitos entre técnicas
-
-### Combinações que amplificam resultados
-
-**CoT + Self-Consistency** produz os maiores ganhos quantitativos em raciocínio: +12-18% de acurácia sobre CoT sozinho. **ReAct + CoT-SC** é a combinação com melhor performance geral segundo o paper original — combina raciocínio interno com ações externas e votação por consistência. **Few-shot + Structured Output** é o padrão de produção para extração de dados: exemplos ensinam o formato, constrained decoding garante conformidade. **Role + CoT + Restrições de formato** cria "layered prompting" que reduz ambiguidade e melhora acurácia e consistência simultaneamente. **RAG + Prompt Chaining** fundamenta cada etapa em conhecimento recuperado — o padrão dominante em sistemas de pesquisa.
-
-### Combinações que prejudicam ou são redundantes
-
-**Few-shot + modelos de raciocínio** (o1, R1): exemplos restringem o processo de raciocínio e **reduzem** performance. **CoT explícito + modelos de raciocínio**: redundante — esses modelos já raciocinam internamente; instruções de CoT são contraproducentes. **Self-Consistency + tarefas simples**: custo massivo (5-30x) com benefício mínimo. **ToT + raciocínio simples**: over-engineering onde CoT basta. **Formatação agressiva (ALL-CAPS, "NUNCA", "JAMAIS") + modelos Claude recentes**: produz resultados piores. **Contexto longo + raciocínio complexo**: performance degrada após ~3.000 tokens.
-
-### A estratégia de stacking em 6 camadas
-
-Baseado na síntese de 1.500 papers por Gupta (2025): **(1)** Definir objetivos de negócio claros. **(2)** Escolher técnicas específicas por tarefa (CoT para raciocínio, Chain-of-Table para dados, instruções diretas para a maioria). **(3)** Otimizar para o modelo específico (XML para Claude, templates para GPT, zero-shot para modelos de raciocínio). **(4)** Implementar testes automatizados — **otimização automática de prompts supera otimização manual por margem significativa**. **(5)** Monitorar e iterar (modelos mudam, distribuições de dados mudam). **(6)** Balancear custo total e qualidade.
+Research by Levy, Jacoby & Goldberg (2024) found that **reasoning performance begins to degrade around 3,000 tokens**. The practical sweet spot for most tasks: **150–300 words** of prompt. **TALE-EP** (ACL 2025) reduces CoT tokens by **67%** with **59% cost reduction** while maintaining competitive performance. Optimized versus naive prompts can mean **$706/day versus $3,000/day** at 100K calls — **70% token reduction** with identical or superior quality.
 
 ---
 
-## Conclusão: o que muda agora e para onde caminha o campo
+## Impact on multi-agent and subagent architectures
 
-A engenharia de prompts em 2026 não é mais sobre encontrar as "palavras mágicas" — é sobre **arquitetar o contexto certo para o modelo certo no momento certo**. Três insights transformam a prática atual. Primeiro, a descoberta de que modelos de raciocínio avançados **performam pior** com técnicas clássicas como few-shot e CoT explícito inverte a sabedoria convencional e exige que engenheiros testem antes de assumir. Segundo, a automação de prompt engineering (APE, OPRO, DSPy) está tornando a otimização manual progressivamente obsoleta — sistemas automatizados criam prompts melhores em 10 minutos do que especialistas humanos em 20 horas. Terceiro, a transição para context engineering em arquiteturas multi-agentes significa que o prompt individual é apenas uma peça de um sistema complexo onde memória, ferramentas, recuperação de contexto e orquestração de subagentes devem funcionar em harmonia.
+### From prompts to context engineering
 
-A recomendação mais consistente de Anthropic e OpenAI permanece deceptivamente simples: **comece com a solução mais simples possível e só aumente a complexidade quando demonstravelmente necessário**. Em um campo onde novas técnicas surgem semanalmente, a disciplina de medir, testar e simplificar é o diferencial entre engenharia eficaz e complexidade desnecessária.
+The field has evolved from optimizing individual prompts to managing **all context** fed to the model. In Andrej Karpathy's formulation (June 2025): *"The LLM is a CPU, the context window is RAM, and you are the operating system."* Context engineering includes instructions, tool definitions, memory, previous tool results, and structured outputs.
 
-# Fontes de Referência — Engenharia de Prompts (2022–2026)
+### Anthropic's five workflow patterns
 
-> Curadoria de links oficiais, papers acadêmicos e documentações técnicas consultados para o relatório de técnicas de prompt engineering.
-> Última atualização: Março/2026
+Anthropic's "Building Effective Agents" guide (December 2024) defines five composable patterns representing the state of the art:
+
+- **Prompt Chaining:** output of one LLM call feeds the next; each step can include programmatic checks
+- **Routing:** classify input and direct to specialized prompts/agents
+- **Parallelization:** multiple simultaneous LLM calls
+- **Orchestrator-Worker:** central LLM dynamically decomposes tasks and delegates to workers
+- **Evaluator-Optimizer:** one LLM generates, another evaluates; iterative refinement
+
+The dominant principle is **"find the simplest possible solution, only increasing complexity when necessary"**. Start with simple prompts → optimize with evaluation → add agentic systems only when simpler solutions fail.
+
+### How prompting techniques apply in multi-agent systems
+
+**Role prompting** is the specialization mechanism — each agent receives a persona with goals, decision heuristics, and interaction policies. In the EvoMAC system (ICLR 2025), agent prompts are **iteratively evolved** during testing, outperforming static human systems by **26.48%** on Website Basic and **34.78%** on Game Basic.
+
+**Prompt chaining** is the backbone of workflows — one agent's output feeds the next. **ReAct** is the core loop of each individual agent (Thought → Action → Observation). **Structured outputs** ensure reliable inter-agent communication via JSON/schemas. **RAG** integrates as a "just in time" context strategy — retrieve only when needed, rather than preloading all context.
+
+LangChain's **four context strategies** for multi-agent systems are fundamental: **Write** (persist context externally), **Select** (retrieve via RAG), **Compress** (summarize and compact), **Isolate** (separate contexts of different agents to prevent cross-contamination).
+
+### Multi-agent frameworks in production
+
+**CrewAI** adopts a team metaphor with roles, backstory, and goals per agent — ideal for rapid prototyping and content pipelines. **LangGraph** offers state graphs with checkpointing and durable execution — ideal for production with auditability and compliance requirements. **AutoGen** (Microsoft, 54.7k+ stars) uses multi-agent conversation with code execution — ideal for debate, iterative refinement, and code generation. **OpenAI Agents SDK** implements two patterns: agents-as-tools (hub-and-spoke) and handoffs (peer-to-peer with control transfer). Gartner projects that **40% of enterprise applications** will have integrated AI agents by the end of 2026.
 
 ---
 
-## 1. Documentação Oficial dos Providers
+## Synergistic combinations and conflicts between techniques
+
+### Combinations that amplify results
+
+**CoT + Self-Consistency** produces the largest quantitative gains in reasoning: +12–18% accuracy over CoT alone. **ReAct + CoT-SC** is the combination with the best overall performance according to the original paper — combines internal reasoning with external actions and consistency voting. **Few-shot + Structured Output** is the production standard for data extraction: examples teach the format, constrained decoding ensures conformance. **Role + CoT + Format constraints** creates "layered prompting" that reduces ambiguity and improves both accuracy and consistency. **RAG + Prompt Chaining** grounds each stage in retrieved knowledge — the dominant pattern in research systems.
+
+### Combinations that hurt or are redundant
+
+**Few-shot + reasoning models** (o1, R1): examples constrain the reasoning process and **reduce** performance. **Explicit CoT + reasoning models**: redundant — these models already reason internally; CoT instructions are counterproductive. **Self-Consistency + simple tasks**: massive cost (5–30x) with minimal benefit. **ToT + simple reasoning**: over-engineering where CoT suffices. **Aggressive formatting (ALL-CAPS, "NEVER", "ABSOLUTELY NOT") + recent Claude models**: produces worse results. **Long context + complex reasoning**: performance degrades after ~3,000 tokens.
+
+### The 6-layer stacking strategy
+
+Based on the synthesis of 1,500 papers by Gupta (2025): **(1)** Define clear business objectives. **(2)** Choose task-specific techniques (CoT for reasoning, Chain-of-Table for data, direct instructions for most tasks). **(3)** Optimize for the specific model (XML for Claude, templates for GPT, zero-shot for reasoning models). **(4)** Implement automated testing — **automatic prompt optimization outperforms manual optimization by a significant margin**. **(5)** Monitor and iterate (models change, data distributions change). **(6)** Balance total cost and quality.
+
+---
+
+## Conclusion: what changes now and where the field is heading
+
+Prompt engineering in 2026 is no longer about finding the "magic words" — it is about **architecting the right context for the right model at the right time**. Three insights transform current practice. First, the finding that advanced reasoning models **perform worse** with classic techniques like few-shot and explicit CoT inverts conventional wisdom and requires engineers to test before assuming. Second, the automation of prompt engineering (APE, OPRO, DSPy) is making manual optimization progressively obsolete — automated systems create better prompts in 10 minutes than human specialists in 20 hours. Third, the transition to context engineering in multi-agent architectures means the individual prompt is just one piece of a complex system where memory, tools, context retrieval, and subagent orchestration must work in harmony.
+
+The most consistent recommendation from Anthropic and OpenAI remains deceptively simple: **start with the simplest possible solution and only increase complexity when demonstrably necessary**. In a field where new techniques emerge weekly, the discipline of measuring, testing, and simplifying is the differentiator between effective engineering and unnecessary complexity.
+
+# Reference Sources — Prompt Engineering (2022–2026)
+
+> Curated collection of official links, academic papers, and technical documentation consulted for this prompt engineering techniques report.
+> Last updated: March 2026
+
+---
+
+## 1. Official Provider Documentation
 
 ### Anthropic (Claude)
 
@@ -312,15 +312,15 @@ A recomendação mais consistente de Anthropic e OpenAI permanece deceptivamente
 
 ---
 
-## 2. Papers Acadêmicos (arXiv e Conferências)
+## 2. Academic Papers (arXiv and Conferences)
 
-### Surveys e Meta-Análises
+### Surveys and Meta-Analyses
 
 - [The Prompt Report: A Systematic Survey of Prompt Engineering Techniques (Schulhoff et al., 2024)](https://arxiv.org/abs/2406.06608)
 - [Unleashing the Potential of Prompt Engineering for LLMs — ScienceDirect (2025)](https://www.sciencedirect.com/science/article/pii/S2666389925001084)
 - [Smarter AI Through Prompt Engineering: Insights and Case Studies (2025)](https://arxiv.org/pdf/2602.00337)
 
-### Chain-of-Thought e Variantes
+### Chain-of-Thought and Variants
 
 - [Chain-of-Thought Prompting Elicits Reasoning in LLMs (Wei et al., 2022) — JMLR](https://jmlr.org/papers/volume25/23-0870/23-0870.pdf)
 - [Chain of Thoughtlessness? An Analysis of CoT in Planning — NeurIPS 2024](https://proceedings.neurips.cc/paper_files/paper/2024/file/3365d974ce309623bd8151082d78206c-Paper-Conference.pdf)
@@ -343,7 +343,7 @@ A recomendação mais consistente de Anthropic e OpenAI permanece deceptivamente
 - [Constitutional AI — Full Paper PDF](https://arxiv.org/pdf/2212.08073)
 - [How Effective Is Constitutional AI in Small LLMs? (2025)](https://arxiv.org/html/2503.17365v1)
 
-### Automatic Prompt Engineering e Otimização
+### Automatic Prompt Engineering and Optimization
 
 - [APE: Automatic Prompt Engineer — Project Page](https://sites.google.com/view/automatic-prompt-engineer)
 - [OPRO: Large Language Models as Optimizers (Yang et al., 2023)](https://arxiv.org/abs/2309.03409)
@@ -373,7 +373,7 @@ A recomendação mais consistente de Anthropic e OpenAI permanece deceptivamente
 
 ---
 
-## 3. Guias Técnicos e Referências Educacionais de Alta Qualidade
+## 3. High-Quality Technical Guides and Educational References
 
 ### Prompt Engineering Guide (DAIR.AI)
 
@@ -404,7 +404,7 @@ A recomendação mais consistente de Anthropic e OpenAI permanece deceptivamente
 
 ---
 
-## 4. Blogs Técnicos de Empresas e Pesquisadores
+## 4. Technical Blogs from Companies and Researchers
 
 ### IBM
 
@@ -454,7 +454,7 @@ A recomendação mais consistente de Anthropic e OpenAI permanece deceptivamente
 - [Zero-Shot vs Few-Shot Prompting: A Guide with Examples](https://vellum.ai/blog/zero-shot-vs-few-shot-prompting-a-guide-with-examples)
 - [Learn Prompt Chaining: Simple Explanations and Examples](https://www.vellum.ai/blog/what-is-prompt-chaining)
 
-### Outros
+### Other
 
 - [Prompt Engineering Best Practices 2026 — Thomas Wiegold](https://thomas-wiegold.com/blog/prompt-engineering-best-practices-2026/)
 - [A Practitioner's Guide to Prompt Engineering in 2025 — Maxim](https://www.getmaxim.ai/articles/a-practitioners-guide-to-prompt-engineering-in-2025/)
@@ -475,7 +475,7 @@ A recomendação mais consistente de Anthropic e OpenAI permanece deceptivamente
 
 ---
 
-## 5. Structured Output e Formatos
+## 5. Structured Output and Formats
 
 - [Structured Model Outputs — OpenAI API Docs](https://platform.openai.com/docs/guides/structured-outputs)
 - [Taming LLM Outputs: Guide to Structured Text Generation — Dataiku](https://www.dataiku.com/stories/blog/your-guide-to-structured-text-generation)
@@ -484,7 +484,7 @@ A recomendação mais consistente de Anthropic e OpenAI permanece deceptivamente
 
 ---
 
-## 6. RAG (Retrieval-Augmented Generation) — Guias Especializados
+## 6. RAG (Retrieval-Augmented Generation) — Specialized Guides
 
 - [Prompt Engineering for RAG Pipelines: Complete Guide 2026 — StackAI](https://www.stackai.com/blog/prompt-engineering-for-rag-pipelines-the-complete-guide-to-prompt-engineering-for-retrieval-augmented-generation)
 - [RAG — Prompt Engineering Guide](https://www.promptingguide.ai/techniques/rag)
@@ -494,7 +494,7 @@ A recomendação mais consistente de Anthropic e OpenAI permanece deceptivamente
 
 ---
 
-## 7. System Prompts, Role Prompting e Fundamentos
+## 7. System Prompts, Role Prompting, and Fundamentals
 
 - [LLM System Prompt vs. User Prompt — Nebuly](https://www.nebuly.com/blog/llm-system-prompt-vs-user-prompt)
 - [What Should Go in System Prompt vs User Prompt — Hamel Husain](https://hamel.dev/blog/posts/evals-faq/what-should-go-in-the-system-prompt-vs-the-user-prompt.html)
@@ -504,6 +504,6 @@ A recomendação mais consistente de Anthropic e OpenAI permanece deceptivamente
 
 ---
 
-## 8. Referência Enciclopédica
+## 8. Encyclopedic Reference
 
 - [Prompt Engineering — Wikipedia](https://en.wikipedia.org/wiki/Prompt_engineering)
