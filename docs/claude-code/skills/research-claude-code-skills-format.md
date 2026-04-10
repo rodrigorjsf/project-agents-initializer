@@ -3,6 +3,8 @@
 > **Date**: 2026-03-22
 > **Sources**: Anthropic official docs, Agent Skills open standard spec, GitHub repos
 
+**Related documentation**: [Extend Claude with Skills](extend-claude-with-skills.md) (Claude Code tutorial) | [Skill Authoring Best Practices](../../shared/skill-authoring-best-practices.md) (universal guide) | [Agent Skills Standard](../../shared/skills-standard/README.md) (open standard spec)
+
 ---
 
 ## Summary

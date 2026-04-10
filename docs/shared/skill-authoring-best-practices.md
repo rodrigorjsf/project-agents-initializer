@@ -2,6 +2,8 @@
 
 Learn how to write effective Skills that Claude can discover and use successfully.
 
+**Related documentation**: [Extend Claude with Skills](../claude-code/skills/extend-claude-with-skills.md) (Claude Code tutorial) | [Agent Skills Standard](skills-standard/README.md) (open standard spec) | [Research: Skills Format Comparison](../claude-code/skills/research-claude-code-skills-format.md) | [`.claude/rules/`](../claude-code/memory/how-claude-remembers-a-project.md) (path-scoped rules for skill-adjacent conventions)
+
 ---
 
 Good Skills are concise, well-structured, and tested with real usage. This guide provides practical authoring decisions to help you write Skills that Claude can discover and use effectively.
@@ -254,7 +256,7 @@ SKILL.md serves as an overview that points Claude to detailed materials as neede
 
 **Practical guidance:**
 
-- Keep SKILL.md body under 500 lines for optimal performance
+- Keep SKILL.md body under 500 lines (~5,000 tokens) for optimal performance
 - Split content into separate files when approaching this limit
 - Use the patterns below to organize instructions, code, and resources effectively
 
@@ -1117,7 +1119,7 @@ See the [Skills overview](/docs/en/agents-and-tools/agent-skills/overview#skill-
 
 ### Token budgets
 
-Keep SKILL.md body under 500 lines for optimal performance. If your content exceeds this, split it into separate files using the progressive disclosure patterns described earlier. For architectural details, see the [Skills overview](/docs/en/agents-and-tools/agent-skills/overview#how-skills-work).
+Keep SKILL.md body under 500 lines (~5,000 tokens) for optimal performance. A 500-line file typically uses 3,000-5,000 tokens depending on code vs prose density. If your content exceeds this, split it into separate files using the progressive disclosure patterns described earlier. For architectural details, see the [Skills overview](/docs/en/agents-and-tools/agent-skills/overview#how-skills-work).
 
 ## Checklist for effective Skills
 
@@ -1127,7 +1129,7 @@ Before sharing a Skill, verify:
 
 - [ ] Description is specific and includes key terms
 - [ ] Description includes both what the Skill does and when to use it
-- [ ] SKILL.md body is under 500 lines
+- [ ] SKILL.md body is under 500 lines (~5,000 tokens)
 - [ ] Additional details are in separate files (if needed)
 - [ ] No time-sensitive information (or in "old patterns" section)
 - [ ] Consistent terminology throughout

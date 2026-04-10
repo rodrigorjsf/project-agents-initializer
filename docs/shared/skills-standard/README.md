@@ -4,6 +4,8 @@ This directory contains official documentation mirrored from **[agentskills.io](
 
 The Agent Skills standard is widely adopted across GenAI agents (Cursor, Claude Code, Codex, and others). It defines the portable, version-controlled format that allows skills to work across any compliant agent implementation.
 
+**Related documentation**: [Skill Authoring Best Practices](../skill-authoring-best-practices.md) (universal guide) | [Extend Claude with Skills](../../claude-code/skills/extend-claude-with-skills.md) (Claude Code tutorial) | [Research: Skills Format Comparison](../../claude-code/skills/research-claude-code-skills-format.md)
+
 ## Documents
 
 | File | Title | Description |
