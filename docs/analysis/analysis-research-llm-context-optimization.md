@@ -1,100 +1,101 @@
-# Analise: Research LLM Context Optimization for AI Coding Agents
+# Analysis: Research LLM Context Optimization for AI Coding Agents
 
-**Documento analisado**: `docs/research-llm-context-optimization.md`
-**Documento complementar**: `docs/prompt-engineering-guide.md`
-**Data da analise**: 27 de marco de 2026
-
----
-
-## 1. Sumario Executivo
-
-O documento **Research: LLM Context Optimization for AI Coding Agents** e uma sintese abrangente de pesquisas academicas, documentacao oficial da Anthropic e experiencia de praticantes sobre como otimizar o contexto fornecido a agentes de IA para codificacao. Sua contribuicao central e formalizar a ideia de que **contexto e um recurso finito com retornos marginais decrescentes** -- tratar cada token como precioso e curar agressivamente o contexto produz resultados dramaticamente melhores do que simplesmente preencher janelas de contexto grandes. O documento cobre sete areas de pesquisa: otimizacao de janela de contexto, orcamento de instrucoes, progressive disclosure, envenenamento de contexto, configuracao hierarquica/escopada, estruturacao de prompts para agentes, e documentacao just-in-time.
-
-A forca do documento reside em sua capacidade de sintetizar fontes de primeira linha (blog de engenharia da Anthropic, papers academicos como "Lost in the Middle", documentacao oficial) em principios acionaveis e concretos. Ele nao apresenta pesquisa original, mas sim conecta evidencias dispersas em um framework coerente para autores de configuracao de agentes e arquitetos de sistemas agenticos. O resultado e um guia que transforma insight academico em recomendacoes praticas -- do limite de 200 linhas por arquivo de configuracao ate estrategias de compactacao de contexto.
-
-A implicacao mais profunda do documento e a mudanca de paradigma de "prompt engineering" para "context engineering": a gestao holistica de todo o contexto que alimenta o modelo a cada passo, incluindo instrucoes, definicoes de ferramentas, memoria, resultados de acoes anteriores e saidas estruturadas. Esta transicao e o fio condutor que conecta todas as sete areas de pesquisa.
+> **Status**: Current
+> **Source document**: [`docs/general-llm/research-context-engineering-comprehensive.md`](../general-llm/research-context-engineering-comprehensive.md)
+> **Analysis date**: 2026-03-27
+> **Scope**: Comprehensive analysis of research on LLM context optimization strategies for AI coding agents, covering context rot, attention budgets, progressive disclosure, and just-in-time documentation
 
 ---
 
-## 2. Achados e Principios Chave
+## 1. Executive Summary
 
-### 2.1 Otimizacao de Janela de Contexto (Area 1)
+The document **Research: LLM Context Optimization for AI Coding Agents** is a comprehensive synthesis of academic research, official Anthropic documentation, and practitioner experience on how to optimize context provided to AI coding agents. Its central contribution is formalizing the idea that **context is a finite resource with diminishing marginal returns** — treating each token as precious and aggressively curating context produces dramatically better results than simply filling large context windows. The document covers seven research areas: context window optimization, instruction budgeting, progressive disclosure, context poisoning, hierarchical/scoped configuration, prompt structuring for agents, and just-in-time documentation.
 
-#### O problema do "Context Rot"
+The document's strength lies in its ability to synthesize first-rate sources (Anthropic's engineering blog, academic papers such as "Lost in the Middle", official documentation) into actionable and concrete principles. It does not present original research, but rather connects dispersed evidence into a coherent framework for agent configuration authors and agentic systems architects. The result is a guide that transforms academic insight into practical recommendations — from the 200-line limit per configuration file to context compaction strategies.
 
-O achado mais fundamental e que **LLMs perdem foco conforme o contexto cresce**, um fenomeno que a Anthropic formalizou como "context rot":
+The document's most profound implication is the paradigm shift from "prompt engineering" to "context engineering": the holistic management of all context feeding the model at each step, including instructions, tool definitions, memory, results from previous actions, and structured outputs. This transition is the thread connecting all seven research areas.
+
+---
+
+## 2. Key Findings and Principles
+
+### 2.1 Context Window Optimization (Area 1)
+
+#### The "Context Rot" Problem
+
+The most fundamental finding is that **LLMs lose focus as context grows**, a phenomenon Anthropic formalized as "context rot":
 
 > "As the number of tokens in the context window increases, the model's ability to accurately recall information from that context decreases."
 
-A causa arquitetural e clara: transformers criam **n^2 relacoes pareadas** para n tokens -- a atencao se "espalha" conforme o contexto cresce. O resultado nao e um penhasco abrupto, mas um **gradiente de performance** -- o modelo permanece capaz, mas com precisao reduzida.
+The architectural cause is clear: transformers create **n² pairwise relationships** for n tokens — attention "spreads out" as context grows. The result is not an abrupt cliff, but a **performance gradient** — the model remains capable, but with reduced precision.
 
-**Principio derivado**: *"Good context engineering means finding the smallest possible set of high-signal tokens that maximize the likelihood of some desired outcome."*
+**Derived principle**: *"Good context engineering means finding the smallest possible set of high-signal tokens that maximize the likelihood of some desired outcome."*
 
-#### O efeito "Lost in the Middle"
+#### The "Lost in the Middle" Effect
 
-O paper de Liu et al. (arXiv:2307.03172) demonstrou que:
+The paper by Liu et al. (arXiv:2307.03172) demonstrated that:
 
-- Performance e **mais alta quando informacao relevante esta no inicio ou no fim** do contexto
-- Performance **degrada significativamente para informacao no meio** de contextos longos
-- Isto vale **mesmo para modelos treinados especificamente para contextos longos**
+- Performance is **highest when relevant information is at the beginning or end** of the context
+- Performance **degrades significantly for information in the middle** of long contexts
+- This holds **even for models specifically trained for long contexts**
 
-**Implicacao para configuracao**: Instrucoes criticas devem estar no **inicio** dos arquivos de configuracao, com informacoes secundarias ao **final**. Nunca enterrar regras importantes no meio de documentos longos.
+**Implication for configuration**: Critical instructions should be at the **beginning** of configuration files, with secondary information at the **end**. Never bury important rules in the middle of long documents.
 
-#### Vies de recencia (LongICLBench)
+#### Recency Bias (LongICLBench)
 
-O benchmark LongICLBench (arXiv:2404.02060) confirmou um **vies em direcao a labels apresentados mais tarde nas sequencias** (recency bias). Modelos se saem bem em tarefas simples mas **lutam com tarefas complexas** (174 labels) mesmo dentro da janela de contexto.
+The LongICLBench benchmark (arXiv:2404.02060) confirmed a **bias toward labels presented later in sequences** (recency bias). Models perform well on simple tasks but **struggle with complex tasks** (174 labels) even within the context window.
 
 #### Context Awareness (Claude 4.5+)
 
-Claude Sonnet 4.5+ possui **consciencia de contexto embutida** -- o modelo rastreia seu orcamento de tokens restante durante a conversa. Analogia da Anthropic: *"For a model, lacking context awareness is like competing in a cooking show without a clock."*
+Claude Sonnet 4.5+ has **built-in context awareness** — the model tracks its remaining token budget during conversation. Anthropic's analogy: *"For a model, lacking context awareness is like competing in a cooking show without a clock."*
 
-### 2.2 Orcamento de Instrucoes (Area 2)
+### 2.2 Instruction Budgeting (Area 2)
 
-#### O conceito de "Attention Budget"
+#### The "Attention Budget" Concept
 
-A Anthropic introduz o conceito de um **"orcamento de atencao"**:
+Anthropic introduces the concept of an **"attention budget"**:
 
 > "LLMs have an 'attention budget' that they draw on when parsing large volumes of context. Every new token introduced depletes this budget by some amount."
 
-Este nao e um limite rigido de tokens, mas uma funcao de:
+This is not a hard token limit, but a function of:
 
-| Fator | Impacto |
-|-------|---------|
-| Tamanho total do contexto | Mais tokens = menos atencao por instrucao |
-| Especificidade da instrucao | Instrucoes vagas consomem atencao sem guiar comportamento |
-| Conflitos entre instrucoes | Contradicoes causam comportamento arbitrario |
+| Factor | Impact |
+|--------|--------|
+| Total context size | More tokens = less attention per instruction |
+| Instruction specificity | Vague instructions consume attention without guiding behavior |
+| Instruction conflicts | Contradictions cause arbitrary behavior |
 
-#### Limite pratico: ~200 linhas
+#### Practical Limit: ~200 Lines
 
-A recomendacao explicita da Anthropic:
+Anthropic's explicit recommendation:
 
 > **"Target under 200 lines per CLAUDE.md file."** Longer files consume more context and reduce adherence.
 
 > "If Claude keeps doing something you don't want despite having a rule against it, the file is probably too long and the rule is getting lost."
 
-O orcamento pratico de instrucoes por arquivo de configuracao e **~200 linhas (aproximadamente 2.000-4.000 tokens)**.
+The practical instruction budget per configuration file is **~200 lines (approximately 2,000-4,000 tokens)**.
 
-#### Heuristica de qualidade
+#### Quality Heuristic
 
 > *"For each line, ask: 'Would removing this cause Claude to make mistakes?' If not, cut it."*
 
-| Incluir | Excluir |
+| Include | Exclude |
 |---------|---------|
-| Comandos bash que Claude nao pode adivinhar | Qualquer coisa que Claude descobre lendo o codigo |
-| Regras de estilo que diferem dos padroes | Convencoes padrao que Claude ja conhece |
-| Instrucoes de teste | Documentacao detalhada de API (linkar) |
-| Etiqueta do repositorio | Informacao que muda frequentemente |
-| Decisoes arquiteturais | Explicacoes longas ou tutoriais |
-| Peculiaridades do ambiente de desenvolvimento | Descricoes arquivo-por-arquivo do codebase |
-| Gotchas comuns | Praticas auto-evidentes como "escreva codigo limpo" |
+| Bash commands Claude cannot guess | Anything Claude discovers by reading the code |
+| Style rules that differ from defaults | Standard conventions Claude already knows |
+| Testing instructions | Detailed API documentation (link instead) |
+| Repository etiquette | Information that changes frequently |
+| Architectural decisions | Lengthy explanations or tutorials |
+| Development environment quirks | File-by-file codebase descriptions |
+| Common gotchas | Self-evident practices like "write clean code" |
 
-#### Especificidade da instrucao
+#### Instruction Specificity
 
-A "zona Goldilocks" entre dois modos de falha:
+The "Goldilocks zone" between two failure modes:
 
 > "At one extreme, engineers hardcode complex, brittle logic. At the other extreme, engineers provide vague, high-level guidance... The optimal altitude strikes a balance."
 
-Exemplos concretos:
+Concrete examples:
 
 - "Use 2-space indentation" vs. "Format code properly"
 - "Run `npm test` before committing" vs. "Test your changes"
@@ -102,36 +103,36 @@ Exemplos concretos:
 
 ### 2.3 Progressive Disclosure (Area 3)
 
-#### Documentacao Just-In-Time
+#### Just-In-Time Documentation
 
-A Anthropic descreve formalmente a estrategia de contexto "just in time":
+Anthropic formally describes the "just in time" context strategy:
 
 > "Rather than pre-processing all relevant data up front, agents built with the 'just in time' approach maintain lightweight identifiers (file paths, stored queries, web links, etc.) and use these references to dynamically load data into context at runtime using tools."
 
-A analogia com cognicao humana e poderosa:
+The analogy to human cognition is powerful:
 
 > "We generally don't memorize entire corpuses of information, but rather introduce external organization systems like file systems, inboxes, and bookmarks to retrieve relevant information on demand."
 
-#### Modelo hibrido (pre-carregado + sob demanda)
+#### Hybrid Model (Pre-loaded + On-demand)
 
-Claude Code implementa um sistema de duas camadas:
+Claude Code implements a two-layer system:
 
-1. **Sempre carregado**: Regras criticas do projeto (CLAUDE.md) -- pequeno, essencial, sempre presente
-2. **Sob demanda**: Documentacao detalhada, material de referencia -- carregado apenas quando relevante
+1. **Always loaded**: Critical project rules (CLAUDE.md) — small, essential, always present
+2. **On demand**: Detailed documentation, reference material — loaded only when relevant
 
 > "CLAUDE.md files are naively dropped into context up front, while primitives like glob and grep allow it to navigate its environment and retrieve files just-in-time."
 
-#### Skills como progressive disclosure
+#### Skills as Progressive Disclosure
 
 > "Claude sees skill descriptions at session start, but the full content only loads when a skill is used."
 
-Features relevantes:
+Relevant features:
 
-- `disable-model-invocation: true` -- mantem descricoes **fora do contexto** ate ativacao manual
-- `context: fork` -- executa skill em **contexto isolado de subagente**
-- Injecao dinamica com sintaxe `` !`command` `` -- busca dados frescos no momento da invocacao
+- `disable-model-invocation: true` — keeps descriptions **out of context** until manual activation
+- `context: fork` — runs skill in **isolated subagent context**
+- Dynamic injection with `` !`command` `` syntax — fetches fresh data at invocation time
 
-#### Regras com escopo de caminho
+#### Path-Scoped Rules
 
 ```yaml
 ---
@@ -142,76 +143,76 @@ paths:
 - All API endpoints must include input validation
 ```
 
-Regras com `paths` **disparam apenas quando Claude le arquivos correspondentes**, reduzindo ruido e economizando contexto.
+Rules with `paths` **fire only when Claude reads matching files**, reducing noise and conserving context.
 
-#### Hierarquia de CLAUDE.md em subdiretorios
+#### CLAUDE.md Hierarchy in Subdirectories
 
-- **CLAUDE.md raiz**: Sempre carregado, regras do projeto inteiro
-- **CLAUDE.md em subdiretorios**: Carregado sob demanda quando se trabalha naquela area
-- **`~/.claude/CLAUDE.md`**: Sempre carregado, preferencias pessoais
+- **Root CLAUDE.md**: Always loaded, project-wide rules
+- **Subdirectory CLAUDE.md**: Loaded on demand when working in that area
+- **`~/.claude/CLAUDE.md`**: Always loaded, personal preferences
 
-### 2.4 Envenenamento de Contexto (Area 4)
+### 2.4 Context Poisoning (Area 4)
 
-#### Acumulo de abordagens falhas
+#### Accumulation of Failed Approaches
 
 > "Correcting over and over. Claude does something wrong, you correct it, it's still wrong, you correct again. Context is polluted with failed approaches."
 
-> **Solucao**: "After two failed corrections, `/clear` and write a better initial prompt incorporating what you learned."
+> **Solution**: "After two failed corrections, `/clear` and write a better initial prompt incorporating what you learned."
 
 > "A clean session with a better prompt almost always outperforms a long session with accumulated corrections."
 
-#### Anti-padrao "Kitchen Sink"
+#### "Kitchen Sink" Anti-Pattern
 
 > "You start with one task, then ask Claude something unrelated, then go back to the first task. Context is full of irrelevant information."
 
-#### Instrucoes contraditorias
+#### Contradictory Instructions
 
 > "If two rules contradict each other, Claude may pick one arbitrarily."
 
-#### Documentacao desatualizada e pior que nenhuma
+#### Outdated Documentation Is Worse Than None
 
 > "Treat CLAUDE.md like code: review it when things go wrong, prune it regularly, and test changes by observing whether Claude's behavior actually shifts."
 
-Informacao que muda frequentemente e o vetor primario de envenenamento por documentacao desatualizada.
+Information that changes frequently is the primary vector for outdated documentation poisoning.
 
-#### Configuracao hiper-especificada
+#### Hyper-Specified Configuration
 
 > "The over-specified CLAUDE.md. If your CLAUDE.md is too long, Claude ignores half of it because important rules get lost in the noise."
 
-> **Solucao**: "Ruthlessly prune. If Claude already does something correctly without the instruction, delete it or convert it to a hook."
+> **Solution**: "Ruthlessly prune. If Claude already does something correctly without the instruction, delete it or convert it to a hook."
 
-**Insight chave**: Converter instrucoes comportamentais em hooks deterministicos **remove-as do orcamento de contexto** enquanto garante enforcement.
+**Key insight**: Converting behavioral instructions to deterministic hooks **removes them from the context budget** while ensuring enforcement.
 
-### 2.5 Configuracao Escopada/Hierarquica (Area 5)
+### 2.5 Scoped/Hierarchical Configuration (Area 5)
 
-#### Hierarquia de cinco niveis do Claude Code
+#### Claude Code's Five-Level Hierarchy
 
-| Prioridade | Escopo | Localizacao | Compartilhado? |
-|------------|--------|-------------|----------------|
-| 1 (maior) | Managed | Nivel de sistema, MDM, servidor | Sim (IT) |
-| 2 | CLI args | Linha de comando | Nao (sessao) |
-| 3 | Local | `.claude/settings.local.json` | Nao (gitignored) |
-| 4 | Projeto | `.claude/settings.json` | Sim (commitado) |
-| 5 (menor) | Usuario | `~/.claude/settings.json` | Nao (pessoal) |
+| Priority | Scope | Location | Shared? |
+|----------|-------|----------|---------|
+| 1 (highest) | Managed | System level, MDM, server | Yes (IT) |
+| 2 | CLI args | Command line | No (session) |
+| 3 | Local | `.claude/settings.local.json` | No (gitignored) |
+| 4 | Project | `.claude/settings.json` | Yes (committed) |
+| 5 (lowest) | User | `~/.claude/settings.json` | No (personal) |
 
-#### Sistema de regras modular
+#### Modular Rules System
 
 ```
 .claude/
-  CLAUDE.md              # Instrucoes principais
+  CLAUDE.md              # Main instructions
   rules/
-    code-style.md        # Diretrizes de estilo
-    testing.md           # Convencoes de teste
-    security.md          # Requisitos de seguranca
+    code-style.md        # Style guidelines
+    testing.md           # Testing conventions
+    security.md          # Security requirements
     frontend/
-      react.md           # Regras especificas de frontend
+      react.md           # Frontend-specific rules
 ```
 
-Cada arquivo cobre **um topico**, e descoberto **recursivamente**, pode ter **escopo de caminho** com frontmatter YAML, e suporta **symlinks**.
+Each file covers **one topic**, is discovered **recursively**, can have **path scoping** with YAML frontmatter, and supports **symlinks**.
 
-#### Suporte a monorepos
+#### Monorepo Support
 
-`claudeMdExcludes` previne que configuracoes irrelevantes de outras equipes sejam carregadas:
+`claudeMdExcludes` prevents irrelevant configurations from other teams from being loaded:
 
 ```json
 {
@@ -222,87 +223,87 @@ Cada arquivo cobre **um topico**, e descoberto **recursivamente**, pode ter **es
 }
 ```
 
-### 2.6 Estruturacao Otima de Prompts para Agentes (Area 6)
+### 2.6 Optimal Prompt Structuring for Agents (Area 6)
 
-#### Framework "Building Effective Agents" da Anthropic
+#### Anthropic's "Building Effective Agents" Framework
 
-Quatro padroes arquiteturais:
+Four architectural patterns:
 
-1. **Prompt Chaining**: Tarefas sequenciais com portoes de validacao
-2. **Orchestrator-Workers**: LLM central decompoe tarefas e delega
-3. **Evaluator-Optimizer**: Loop gerar -> avaliar -> refinar
-4. **Subagent Architectures**: Janelas de contexto isoladas para trabalho focado
+1. **Prompt Chaining**: Sequential tasks with validation gates
+2. **Orchestrator-Workers**: Central LLM decomposes tasks and delegates
+3. **Evaluator-Optimizer**: Generate → evaluate → refine loop
+4. **Subagent Architectures**: Isolated context windows for focused work
 
-Tres principios fundamentais:
+Three fundamental principles:
 >
-> 1. Manter **simplicidade** no design do agente
-> 2. Priorizar **transparencia** mostrando explicitamente passos de planejamento
-> 3. Projetar cuidadosamente a **ACI (agent-computer interface)**
+> 1. Maintain **simplicity** in agent design
+> 2. Prioritize **transparency** by explicitly showing planning steps
+> 3. Carefully design the **ACI (agent-computer interface)**
 
-#### O loop "Explore -> Plan -> Code -> Verify"
+#### The "Explore → Plan → Code → Verify" Loop
 
-1. **Explore**: Entender o codebase
-2. **Plan**: Criar estrategia (Plan Mode)
-3. **Code**: Implementar a solucao
-4. **Verify**: Rodar testes, comparar screenshots, validar saidas
+1. **Explore**: Understand the codebase
+2. **Plan**: Create strategy (Plan Mode)
+3. **Code**: Implement the solution
+4. **Verify**: Run tests, compare screenshots, validate outputs
 
 > "Claude performs dramatically better when it can verify its own work."
 
-#### Harnesses para agentes de longa duracao
+#### Harnesses for Long-Running Agents
 
-Dois modos de falha criticos:
+Two critical failure modes:
 
-1. **One-shotting**: Agente tenta fazer tudo de uma vez, esgota o contexto
-2. **Premature completion**: Agente ve progresso parcial e declara vitoria
+1. **One-shotting**: Agent tries to do everything at once, exhausts context
+2. **Premature completion**: Agent sees partial progress and declares victory
 
-**Solucao -- Arquitetura de dois agentes**:
+**Solution — Two-Agent Architecture**:
 
-| Agente | Papel |
-|--------|-------|
-| **Initializer** | Primeira sessao. Cria `init.sh`, `claude-progress.txt`, feature list (JSON), commit inicial |
-| **Coding Agent** | Sessoes subsequentes. Progresso incremental, commits, atualizacoes de progresso |
+| Agent | Role |
+|-------|------|
+| **Initializer** | First session. Creates `init.sh`, `claude-progress.txt`, feature list (JSON), initial commit |
+| **Coding Agent** | Subsequent sessions. Incremental progress, commits, progress updates |
 
-**Tecnica chave -- Artefatos de estado estruturados**: Feature list em **JSON** (nao Markdown) -- o modelo tem menos tendencia a modificar JSON inapropriadamente.
+**Key technique — Structured state artifacts**: Feature list in **JSON** (not Markdown) — the model is less likely to inappropriately modify JSON.
 
-#### Design de ferramentas como context engineering
+#### Tool Design as Context Engineering
 
 > "Think about how much effort goes into human-computer interfaces (HCI), and plan to invest just as much effort in creating good agent-computer interfaces (ACI)."
 
-Principios:
+Principles:
 
-- Manter formato proximo do que modelos viram nos dados de treinamento
-- Evitar overhead de formatacao (contar linhas, escapar strings)
-- Dar ao modelo tokens para "pensar" antes de se comprometer com estrutura
-- Descricoes de ferramentas devem incluir exemplos de uso, edge cases e limites claros
+- Keep format close to what models saw in training data
+- Avoid formatting overhead (counting lines, escaping strings)
+- Give the model tokens to "think" before committing to structure
+- Tool descriptions should include usage examples, edge cases, and clear limits
 
-### 2.7 Documentacao Just-In-Time (Area 7)
+### 2.7 Just-In-Time Documentation (Area 7)
 
-#### Padroes de implementacao
+#### Implementation Patterns
 
-| Padrao | Mecanismo | Exemplo |
-|--------|-----------|---------|
-| **Skills** | Descricao carregada; conteudo completo sob demanda | `.claude/skills/deploy/SKILL.md` |
-| **Regras com escopo** | Disparadas quando arquivos correspondentes sao lidos | `.claude/rules/api-design.md` com `paths: ["src/api/**"]` |
-| **CLAUDE.md em subdiretorios** | Carregado quando se trabalha naquele diretorio | `packages/frontend/CLAUDE.md` |
-| **Imports de arquivos** | Referencias `@path` expandidas quando pai carrega | `@docs/git-instructions.md` |
-| **Injecao dinamica** | Comandos shell em skills: `` !`gh pr diff` `` | Dados em tempo real na invocacao |
-| **Subagentes** | Contexto isolado, retornam resumos | Agente de exploracao para pesquisa no codebase |
-| **Auto memory** | Primeiras 200 linhas carregadas; arquivos de topicos sob demanda | `~/.claude/projects/<project>/memory/` |
+| Pattern | Mechanism | Example |
+|---------|-----------|---------|
+| **Skills** | Description loaded; full content on demand | `.claude/skills/deploy/SKILL.md` |
+| **Scoped rules** | Triggered when matching files are read | `.claude/rules/api-design.md` with `paths: ["src/api/**"]` |
+| **Subdirectory CLAUDE.md** | Loaded when working in that directory | `packages/frontend/CLAUDE.md` |
+| **File imports** | `@path` references expanded when parent loads | `@docs/git-instructions.md` |
+| **Dynamic injection** | Shell commands in skills: `` !`gh pr diff` `` | Real-time data at invocation |
+| **Subagents** | Isolated context, return summaries | Exploration agent for codebase research |
+| **Auto memory** | First 200 lines loaded; topic files on demand | `~/.claude/projects/<project>/memory/` |
 
-#### Auto Memory como JIT emergente
+#### Auto Memory as Emergent JIT
 
-- **MEMORY.md** (primeiras 200 linhas carregadas na inicializacao) funciona como um indice
-- **Arquivos de topico** (debugging.md, api-conventions.md, etc.) carregados sob demanda
-- Claude decide o que vale lembrar com base no valor cross-sessao
-- Markdown puro -- editavel por humanos a qualquer momento
+- **MEMORY.md** (first 200 lines loaded at startup) functions as an index
+- **Topic files** (debugging.md, api-conventions.md, etc.) loaded on demand
+- Claude decides what is worth remembering based on cross-session value
+- Plain markdown — human-editable at any time
 
-#### Compactacao como reciclagem de contexto
+#### Compaction as Context Recycling
 
 > "Passing the message history to the model to summarize and compress the most critical details. The model preserves architectural decisions, unresolved bugs, and implementation details while discarding redundant tool outputs."
 
-Customizavel via CLAUDE.md e via `/compact <instructions>`.
+Customizable via CLAUDE.md and via `/compact <instructions>`.
 
-#### A citacao de Boris Cherny sobre simplicidade
+#### Boris Cherny's Quote on Simplicity
 
 > "We had all these crazy ideas about memory architectures... But in the end, the thing we did is ship the simplest thing, which is a file that has some stuff."
 
@@ -310,419 +311,419 @@ Customizavel via CLAUDE.md e via `/compact <instructions>`.
 
 ---
 
-## 3. Pontos de Atencao
+## 3. Points of Attention
 
-### 3.1 O que e facil perder ou interpretar erroneamente
+### 3.1 What Is Easy to Miss or Misinterpret
 
-1. **O limite de 200 linhas e empirico, nao experimental**. Nao existe pesquisa publicada que de numeros exatos para "quantas instrucoes um LLM pode seguir simultaneamente". O numero e derivado da experiencia pratica da Anthropic, nao de estudos controlados. Isso significa que o limite real pode variar por modelo, tarefa e complexidade das instrucoes.
+1. **The 200-line limit is empirical, not experimental**. There is no published research providing exact numbers for "how many instructions an LLM can follow simultaneously." The number derives from Anthropic's practical experience, not controlled studies. This means the actual limit may vary by model, task, and instruction complexity.
 
-2. **"Context rot" e um gradiente, nao um penhasco**. Muitos lerao o conceito e assumirao que existe um ponto de corte abrupto. Na verdade, a degradacao e gradual -- o modelo permanece capaz, mas com precisao reduzida. Isso torna o problema mais insidioso: nao ha sinal obvio de quando o contexto ficou "grande demais".
+2. **"Context rot" is a gradient, not a cliff**. Many will read the concept and assume there is an abrupt cutoff point. In reality, degradation is gradual — the model remains capable, but with reduced precision. This makes the problem more insidious: there is no obvious signal for when context has become "too large."
 
-3. **Hooks e CLAUDE.md nao sao intercambiaveis**. O documento menciona que converter instrucoes comportamentais em hooks remove-as do orcamento de contexto. Mas hooks sao **deterministicos** e CLAUDE.md e **consultivo**. Isso significa que hooks garantem enforcement mas nao permitem julgamento, enquanto CLAUDE.md permite flexibilidade mas nao garante aderencia. A escolha entre os dois e uma decisao de design, nao simplesmente uma questao de economizar tokens.
+3. **Hooks and CLAUDE.md are not interchangeable**. The document mentions that converting behavioral instructions to hooks removes them from the context budget. But hooks are **deterministic** and CLAUDE.md is **advisory**. This means hooks guarantee enforcement but do not allow judgment, while CLAUDE.md allows flexibility but does not guarantee adherence. The choice between them is a design decision, not simply a matter of saving tokens.
 
-4. **O efeito "Lost in the Middle" tem implicacoes nao-obvias para configuracao hierarquica**. Quando multiplos CLAUDE.md sao mesclados (raiz + subdiretorios + regras), o conteudo do "meio" pode ser justamente o material carregado por subdiretorios ou regras que foram injetados entre o cabecalho e o rodape. Isso sugere que a **ordem de injecao** de contexto e tao importante quanto o **conteudo**.
+4. **The "Lost in the Middle" effect has non-obvious implications for hierarchical configuration**. When multiple CLAUDE.md files are merged (root + subdirectories + rules), the "middle" content may be precisely the material loaded from subdirectories or rules injected between the header and footer. This suggests that **injection order** of context is as important as **content**.
 
-5. **A estrategia "hibrida" tem uma tensao inerente**. Pre-carregar CLAUDE.md "ingenuamente" na inicializacao (como descrito pelo documento) contradiz parcialmente o principio de JIT. O arquivo pre-carregado consome orcamento em todas as interacoes, mesmo quando irrelevante. A mitigacao e mante-lo curto, mas a tensao permanece.
+5. **The "hybrid" strategy has an inherent tension**. Naively pre-loading CLAUDE.md at startup (as described by the document) partially contradicts the JIT principle. The pre-loaded file consumes budget on all interactions, even when irrelevant. The mitigation is keeping it short, but the tension remains.
 
-6. **Compactacao nao e lossless**. Quando Claude resume o historico de mensagens, informacoes podem ser perdidas. A customizacao via CLAUDE.md (ex: "sempre preservar a lista de arquivos modificados") e uma mitigacao parcial, mas nao e possivel garantir preservacao completa de todo o contexto relevante.
+6. **Compaction is not lossless**. When Claude summarizes message history, information can be lost. Customization via CLAUDE.md (e.g., "always preserve the list of modified files") is a partial mitigation, but complete preservation of all relevant context cannot be guaranteed.
 
-7. **A recomendacao de "comecar do zero" presume filesystem como estado**. O conselho de que Claude 4.5+ e excelente em redescobrir estado a partir do filesystem so funciona se o estado relevante estiver efetivamente persistido no filesystem. Projetos que dependem de estado em memoria, variaveis de ambiente, ou configuracoes de sessao nao se beneficiam da mesma forma.
+7. **The "start fresh" recommendation assumes filesystem as state**. The advice that Claude 4.5+ excels at rediscovering state from the filesystem only works if the relevant state is effectively persisted in the filesystem. Projects that depend on in-memory state, environment variables, or session configurations do not benefit in the same way.
 
-8. **Artefatos de estado em JSON vs Markdown nao e apenas preferencia de formato**. O documento explica que feature lists em JSON sao menos propensas a modificacao inapropriada pelo modelo. Isso aponta para uma propriedade mais ampla: **o formato do artefato influencia o comportamento do modelo em relacao a ele**. JSON e mais "rigido" perceptivamente, fazendo o modelo tratar os dados com mais cuidado.
+8. **State artifacts in JSON vs Markdown is not just a format preference**. The document explains that feature lists in JSON are less prone to inappropriate modification by the model. This points to a broader property: **the artifact format influences model behavior toward it**. JSON is perceptually more "rigid," causing the model to treat the data with more care.
 
 ---
 
-## 4. Casos de Uso e Escopo
+## 4. Use Cases and Scope
 
 ### 4.1 Context Engineering
 
-O documento se aplica diretamente a qualquer profissional que projete o contexto fornecido a LLMs:
+The document applies directly to any professional designing context provided to LLMs:
 
-- **Autores de system prompts**: Os principios de orcamento de atencao, posicionamento de informacao (inicio/fim) e especificidade se aplicam diretamente
-- **Arquitetos de pipelines RAG**: A estrategia hibrida (pre-carregado + sob demanda) e um padrao direto para RAG agentico
-- **Engenheiros de ferramentas de IA**: O design de ACI e a eficiencia de tokens em saidas de ferramentas sao guias concretos
+- **System prompt authors**: The principles of attention budgeting, information positioning (beginning/end), and specificity apply directly
+- **RAG pipeline architects**: The hybrid strategy (pre-loaded + on-demand) is a direct pattern for agentic RAG
+- **AI tooling engineers**: ACI design and token efficiency in tool outputs are concrete guides
 
-### 4.2 Design de Agentes
+### 4.2 Agent Design
 
-O documento e altamente relevante para:
+The document is highly relevant for:
 
-- **Escolha entre agente unico e multi-agentes**: Os padroes da Anthropic (prompt chaining, orchestrator-workers, evaluator-optimizer, subagentes) fornecem um framework de decisao
-- **Gerenciamento de sessoes longas**: A arquitetura de dois agentes (Initializer + Coding Agent) e as estrategias de compactacao sao diretamente implementaveis
-- **Prevencao de modos de falha**: One-shotting e premature completion sao padroes anti-padroes concretos para monitorar
+- **Choosing between single-agent and multi-agent**: Anthropic's patterns (prompt chaining, orchestrator-workers, evaluator-optimizer, subagents) provide a decision framework
+- **Long session management**: The two-agent architecture (Initializer + Coding Agent) and compaction strategies are directly implementable
+- **Failure mode prevention**: One-shotting and premature completion are concrete anti-patterns to monitor
 
-### 4.3 Autoria de Configuracao de Agentes
+### 4.3 Agent Configuration Authoring
 
-Este e o caso de uso mais direto:
+This is the most direct use case:
 
-- **Criacao de CLAUDE.md / AGENTS.md**: Limite de 200 linhas, heuristica de "removeria isso?", tabela include/exclude
-- **Estruturacao de repositorios**: Hierarquia de configuracao, regras escopadas, subdiretorios
-- **Manutencao de configuracao**: Revisao periodica, poda de instrucoes desatualizadas, deteccao de contradicoes
+- **Creating CLAUDE.md / AGENTS.md**: 200-line limit, "would removing this cause errors?" heuristic, include/exclude table
+- **Repository structuring**: Configuration hierarchy, scoped rules, subdirectories
+- **Configuration maintenance**: Periodic review, pruning outdated instructions, detecting contradictions
 
-### 4.4 Onde o documento NAO se aplica
+### 4.4 Where the Document Does NOT Apply
 
-- **Treinamento ou fine-tuning de modelos**: O documento trata exclusivamente de otimizacao em tempo de inferencia
-- **Modelos de raciocinio avancado** (o1, R1): O prompt engineering guide mostra que estes modelos frequentemente performam pior com tecnicas classicas; o documento de pesquisa nao aborda essa distincao
-- **Linguagens pouco representadas nos dados de treinamento**: O documento reconhece a lacuna, e o paper Evaluating-AGENTS confirma que Python (bem representado) pode tornar context files menos necessarios
-- **Avaliacao quantitativa rigorosa**: O documento sintetiza recomendacoes, mas nao conduz experimentos controlados
+- **Model training or fine-tuning**: The document deals exclusively with inference-time optimization
+- **Advanced reasoning models** (o1, R1): The prompt engineering guide shows that these models often perform worse with classic techniques; the research document does not address this distinction
+- **Languages underrepresented in training data**: The document acknowledges the gap, and the Evaluating-AGENTS paper confirms that Python (well-represented) may make context files less necessary
+- **Rigorous quantitative evaluation**: The document synthesizes recommendations but does not conduct controlled experiments
 
 ---
 
-## 5. Aplicabilidade a Infraestrutura de Agentes
+## 5. Applicability to Agent Infrastructure
 
 ### 5.1 Skills
 
-**Como a otimizacao de contexto afeta o design de skills:**
+**How context optimization affects skill design:**
 
-Skills sao o mecanismo mais puro de progressive disclosure identificado no documento. As implicacoes concretas para design de skills:
+Skills are the purest progressive disclosure mechanism identified in the document. Concrete implications for skill design:
 
-1. **Descricoes de skills devem ser minimas e de alta-sinalizacao**. Como descricoes sao carregadas na inicializacao da sessao, cada token compete com o orcamento de atencao. A descricao ideal usa 1-2 frases que permitem ao modelo decidir **quando** invocar a skill, sem revelar **como** ela funciona.
+1. **Skill descriptions should be minimal and high-signal**. Since descriptions are loaded at session startup, every token competes with the attention budget. The ideal description uses 1-2 sentences that allow the model to decide **when** to invoke the skill, without revealing **how** it works.
 
-2. **Use `disable-model-invocation: true` para skills de baixa frequencia**. Skills que sao invocadas raramente (ex: deploy, migracao de banco) devem ficar completamente fora do contexto automatico. Isso economiza orcamento para skills mais frequentes.
+2. **Use `disable-model-invocation: true` for low-frequency skills**. Skills invoked rarely (e.g., deploy, database migration) should stay completely out of automatic context. This saves budget for more frequent skills.
 
-3. **Use `context: fork` para skills que geram muita saida**. Skills de exploracao de codebase ou pesquisa que leem muitos arquivos devem rodar em contexto isolado de subagente. A saida retorna como resumo, protegendo o contexto principal de "context rot" por acumulo de saidas.
+3. **Use `context: fork` for skills that generate heavy output**. Codebase exploration or research skills that read many files should run in isolated subagent context. Output returns as a summary, protecting the main context from "context rot" through output accumulation.
 
-4. **Injecao dinamica (`` !`command` ``) e JIT puro**. Para skills que dependem de estado atual (ex: diff do PR, status de CI), use comandos shell inline que buscam dados frescos no momento da invocacao. Isso evita documentacao desatualizada.
+4. **Dynamic injection (`` !`command` ``) is pure JIT**. For skills that depend on current state (e.g., PR diff, CI status), use inline shell commands that fetch fresh data at invocation time. This avoids outdated documentation.
 
-5. **Estruture skills em camadas de progressive disclosure**:
-   - **SKILL.md**: Ponto de entrada minimo com instrucoes de fase
-   - **references/**: Guias de analise carregados sob demanda por fase
-   - **assets/templates/**: Templates de saida carregados apenas na fase de geracao
+5. **Structure skills in progressive disclosure layers**:
+   - **SKILL.md**: Minimal entry point with phase instructions
+   - **references/**: Analysis guides loaded on demand per phase
+   - **assets/templates/**: Output templates loaded only during the generation phase
 
-6. **Posicione instrucoes criticas no inicio e fim de SKILL.md** (efeito "Lost in the Middle"). O meio do arquivo deve conter contexto de suporte, nao regras obrigatorias.
+6. **Position critical instructions at the beginning and end of SKILL.md** ("Lost in the Middle" effect). The middle of the file should contain supporting context, not mandatory rules.
 
 ### 5.2 Hooks
 
-**Convertendo instrucoes comportamentais em hooks deterministicos:**
+**Converting behavioral instructions to deterministic hooks:**
 
-O insight mais acionavel do documento para hooks:
+The document's most actionable insight for hooks:
 
 > "If Claude already does something correctly without the instruction, delete it or convert it to a hook."
 
-Orientacoes concretas:
+Concrete guidelines:
 
-1. **Identifique instrucoes de enforcement em CLAUDE.md que devem ser garantidas**. Qualquer regra que diz "SEMPRE faca X" ou "NUNCA faca Y" e candidata a hook. Exemplos: "sempre rode linter antes de commit", "nunca commite .env files".
+1. **Identify enforcement instructions in CLAUDE.md that must be guaranteed**. Any rule that says "ALWAYS do X" or "NEVER do Y" is a hook candidate. Examples: "always run linter before commit", "never commit .env files".
 
-2. **Hooks removem instrucoes do orcamento de atencao**. Cada instrucao convertida em hook libera linhas do limite de ~200 linhas. Em projetos com muitas regras de enforcement, isso pode liberar dezenas de linhas para instrucoes que realmente precisam de julgamento do modelo.
+2. **Hooks remove instructions from the attention budget**. Each instruction converted to a hook frees lines from the ~200-line limit. In projects with many enforcement rules, this can free dozens of lines for instructions that genuinely require model judgment.
 
-3. **Hooks sao deterministicos, CLAUDE.md e consultivo**. Use hooks para regras binarias (faz/nao faz) e CLAUDE.md para heuristicas que exigem julgamento (ex: "quando o teste for complexo, considere mockar dependencias externas").
+3. **Hooks are deterministic, CLAUDE.md is advisory**. Use hooks for binary rules (do/don't) and CLAUDE.md for heuristics that require judgment (e.g., "when the test is complex, consider mocking external dependencies").
 
-4. **Hooks de pre-commit sao os candidatos mais naturais**. Validacao de formato, execucao de linters, verificacao de tipos -- tudo que pode ser expresso como script e mais confiavel como hook do que como instrucao textual.
+4. **Pre-commit hooks are the most natural candidates**. Format validation, linter execution, type checking — everything expressible as a script is more reliable as a hook than as a textual instruction.
 
-5. **Documente hooks minimamente no CLAUDE.md**. Uma unica linha como "hooks de pre-commit verificam formatacao e tipos automaticamente" e suficiente para que o modelo saiba que nao precisa fazer essas verificacoes manualmente.
+5. **Document hooks minimally in CLAUDE.md**. A single line like "pre-commit hooks automatically verify formatting and types" is sufficient for the model to know it doesn't need to perform these checks manually.
 
-### 5.3 Subagentes
+### 5.3 Subagents
 
-**Isolamento de contexto e trabalho focado:**
+**Context isolation and focused work:**
 
-1. **Subagentes previnem context rot no contexto principal**. Ao delegar tarefas exploratoras ou de pesquisa a subagentes, o contexto principal permanece limpo e focado na tarefa atual. O subagente retorna apenas um resumo, nao todo o material bruto que processou.
+1. **Subagents prevent context rot in the main context**. By delegating exploratory or research tasks to subagents, the main context remains clean and focused on the current task. The subagent returns only a summary, not all the raw material it processed.
 
-2. **Cada subagente deve receber contexto minimo e especifico**. Nao repassar todo o CLAUDE.md do projeto para um subagente de pesquisa. Dar apenas a pergunta, o escopo, e as ferramentas necessarias.
+2. **Each subagent should receive minimal, specific context**. Do not pass the entire project CLAUDE.md to a research subagent. Provide only the question, scope, and necessary tools.
 
-3. **Use subagentes para a fase "Explore" do loop Explore -> Plan -> Code -> Verify**. A exploracao do codebase e a atividade que mais gera "lixo de contexto" -- leitura de muitos arquivos, grep de multiplos padroes. Isolar isso em subagente protege o contexto de implementacao.
+3. **Use subagents for the "Explore" phase of the Explore → Plan → Code → Verify loop**. Codebase exploration is the activity that generates the most "context garbage" — reading many files, grepping multiple patterns. Isolating this in a subagent protects the implementation context.
 
-4. **Subagentes devem retornar artefatos estruturados, nao narrativas longas**. Um resumo de 5-10 linhas com paths relevantes, padroes encontrados e decisoes sugeridas e mais util ao contexto principal do que um relatorio detalhado de 200 linhas.
+4. **Subagents should return structured artifacts, not lengthy narratives**. A 5-10 line summary with relevant paths, found patterns, and suggested decisions is more useful to the main context than a detailed 200-line report.
 
-5. **Cuidado com over-delegation**. O documento de prompting best practices alerta:
+5. **Beware of over-delegation**. The prompting best practices document warns:
    > "Claude Opus 4.6 has a strong predilection for subagents and may spawn them in situations where a simpler, direct approach would suffice."
 
-6. **Use role prompting para especializar subagentes**. Cada subagente deve receber uma persona especifica via system prompt. Do guia de prompt engineering:
-   > "Role prompting e o mecanismo fundamental de especializacao em arquiteturas multi-agentes."
+6. **Use role prompting to specialize subagents**. Each subagent should receive a specific persona via system prompt. From the prompt engineering guide:
+   > "Role prompting is the fundamental specialization mechanism in multi-agent architectures."
 
 ### 5.4 Rules (.claude/rules/)
 
-**Regras com escopo de caminho como progressive disclosure:**
+**Path-scoped rules as progressive disclosure:**
 
-1. **Regras sem `paths` frontmatter carregam incondicionalmente** -- sao equivalentes a linhas no CLAUDE.md raiz. Use `paths` sempre que a regra se aplica apenas a parte do codebase.
+1. **Rules without `paths` frontmatter load unconditionally** — they are equivalent to lines in the root CLAUDE.md. Use `paths` whenever the rule applies only to part of the codebase.
 
-2. **Organize regras por topico, nao por arquivo**. Um arquivo `security.md` que cobre todas as regras de seguranca e melhor que regras de seguranca espalhadas por `api.md`, `frontend.md`, `database.md`.
+2. **Organize rules by topic, not by file**. A `security.md` file covering all security rules is better than security rules scattered across `api.md`, `frontend.md`, `database.md`.
 
-3. **Regras sao a forma mais granular de progressive disclosure**. Enquanto subdiretorios CLAUDE.md carregam por area, regras com paths podem ser tao especificas quanto `"src/api/v2/handlers/**/*.ts"`.
+3. **Rules are the most granular form of progressive disclosure**. While subdirectory CLAUDE.md files load by area, rules with paths can be as specific as `"src/api/v2/handlers/**/*.ts"`.
 
-4. **Use regras para mover instrucoes do CLAUDE.md raiz**. Se o CLAUDE.md raiz esta perto do limite de 200 linhas, mover instrucoes especificas de area para `.claude/rules/` com frontmatter de paths e a forma mais direta de reduzir o tamanho.
+4. **Use rules to move instructions out of the root CLAUDE.md**. If the root CLAUDE.md is near the 200-line limit, moving area-specific instructions to `.claude/rules/` with paths frontmatter is the most direct way to reduce size.
 
-5. **Revise regras periodicamente para detectar contradicoes**. Conforme regras sao adicionadas por diferentes desenvolvedores, contradicoes se acumulam. O documento alerta:
+5. **Review rules periodically to detect contradictions**. As rules are added by different developers, contradictions accumulate. The document warns:
    > "Review your CLAUDE.md files, nested CLAUDE.md files in subdirectories, and `.claude/rules/` periodically to remove outdated or conflicting instructions."
 
-6. **Regras com escopo implementam o principio JIT da pesquisa**. Regras so aparecem no contexto quando o modelo toca arquivos relevantes -- e exatamente o padrao "manter identificadores leves e carregar dados dinamicamente em runtime".
+6. **Path-scoped rules implement the JIT principle from the research**. Rules only appear in context when the model touches relevant files — this is exactly the pattern of "maintaining lightweight identifiers and loading data dynamically at runtime."
 
 ### 5.5 Memory
 
-**Auto memory como documentacao JIT e estrategias de compactacao:**
+**Auto memory as JIT documentation and compaction strategies:**
 
-1. **MEMORY.md como indice, nao como enciclopedia**. As primeiras 200 linhas sao carregadas na inicializacao -- use-as como indice para arquivos de topico que serao carregados sob demanda. Nao coloque conteudo detalhado nas primeiras 200 linhas.
+1. **MEMORY.md as index, not encyclopedia**. The first 200 lines are loaded at startup — use them as an index to topic files that will be loaded on demand. Do not place detailed content in the first 200 lines.
 
-2. **Arquivos de topico sao JIT puro**. `debugging.md`, `api-conventions.md`, `architecture-decisions.md` -- cada um carregado apenas quando Claude decide que e relevante. Isso implementa progressive disclosure para conhecimento acumulado cross-sessao.
+2. **Topic files are pure JIT**. `debugging.md`, `api-conventions.md`, `architecture-decisions.md` — each loaded only when Claude decides it is relevant. This implements progressive disclosure for accumulated cross-session knowledge.
 
-3. **Compactacao deve preservar artefatos criticos**. Adicione ao CLAUDE.md instrucoes como:
+3. **Compaction should preserve critical artifacts**. Add instructions to CLAUDE.md such as:
    > "When compacting, always preserve the full list of modified files and any test commands"
 
-4. **Compactacao seletiva via `/compact <instructions>`** permite focar a preservacao em aspectos especificos:
-   - `/compact Focus on the API changes` -- preserva mudancas de API
-   - `/compact Keep the debugging findings` -- preserva achados de debugging
+4. **Selective compaction via `/compact <instructions>`** allows focusing preservation on specific aspects:
+   - `/compact Focus on the API changes` — preserves API changes
+   - `/compact Keep the debugging findings` — preserves debugging findings
 
-5. **Prefira sessao limpa quando possivel**. O documento recomenda:
-   > "Start fresh rather than compact when possible -- Claude 4.5+ excels at rediscovering state from filesystem."
+5. **Prefer a clean session when possible**. The document recommends:
+   > "Start fresh rather than compact when possible — Claude 4.5+ excels at rediscovering state from filesystem."
 
-6. **A simplicidade vence**. Boris Cherny demonstrou que as solucoes mais simples (arquivo de texto para memoria, sumarizacao para compactacao) superam arquiteturas sofisticadas quando o modelo e suficientemente capaz. Resista a tentacao de criar sistemas de memoria complexos.
-
----
-
-## 6. Aplicabilidade do Guia de Prompt Engineering
-
-### 6.1 Chain-of-Thought (CoT) e Context Engineering
-
-CoT e diretamente relevante para agentes de codificacao nos seguintes cenarios:
-
-- **Fase "Plan" do loop Explore -> Plan -> Code -> Verify**: CoT estruturado (com tags `<thinking>` e `<answer>`) e a tecnica ideal para a fase de planejamento. O modelo externaliza seu raciocinio, criando um plano inspecionavel.
-
-- **Compactacao inteligente**: Ao compactar contexto, o modelo usa implicitamente CoT para decidir o que preservar. Instrucoes de compactacao no CLAUDE.md podem ser vistas como "prompt de CoT para sumarizacao".
-
-- **Limitacao critica**: CoT explicitamente pedido pode ser **contraproducente com modelos de raciocinio avancados**. Um estudo da Wharton (2025) encontrou apenas 2-3% de melhoria marginal com 20-80% de aumento no tempo de resposta. Em agentes que usam Claude Opus 4.6 com adaptive thinking, **nao instrua CoT explicito** -- o modelo ja raciocina internamente.
-
-- **Performance degrada apos ~3.000 tokens** de raciocinio (Levy, Jacoby & Goldberg, 2024). Isso tem implicacao direta para configuracao de agentes: prompts de planejamento complexos nao devem incentivar cadeias de raciocinio infinitas.
-
-### 6.2 ReAct e Agentes de Codificacao
-
-ReAct (Pensamento -> Acao -> Observacao) e **o padrao fundamental dos agentes de IA modernos**:
-
-- **Claude Code ja implementa ReAct nativamente**. O loop agentico do Claude Code (gather context -> take action -> verify results) e uma instancia de ReAct. Isso significa que a configuracao do agente deve **facilitar** o ciclo, nao tentar substitui-lo.
-
-- **Implicacao para CLAUDE.md**: Instrucoes devem ser orientadas a acao, nao descritivas. Em vez de explicar a arquitetura do projeto, fornecer **comandos acionaveis** que o agente pode executar no ciclo ReAct (ex: "para verificar tipos, rode `npm run typecheck`").
-
-- **Ferramentas bem projetadas sao a outra metade do ReAct**. O guia de prompt engineering enfatiza: *"A medida que o numero de ferramentas cresce, modelos cometem mais erros."* Isso valida a recomendacao do documento de pesquisa de manter conjuntos de ferramentas **minimos, claros e nao-sobrepostos**.
-
-### 6.3 Tree of Thoughts (ToT) e Planejamento de Agentes
-
-ToT e relevante para cenarios especificos de agentes:
-
-- **Resolucao de problemas complexos com backtracking**: Quando um agente encontra um bug que pode ter multiplas causas raiz, ToT permite explorar caminhos diferentes e voltar atras. No entanto, o custo e 5-20x mais chamadas de API.
-
-- **Aplicacao pratica em context engineering**: ToT pode ser usado na fase de **planejamento** para gerar e avaliar multiplas estrategias de implementacao antes de se comprometer com uma. Isso alinha-se com o principio "separar exploracao de execucao".
-
-- **Limitacao**: Para a maioria das tarefas de codificacao (que sao lineares e nao requerem backtracking), ToT e overkill. CoT ou zero-shot sao suficientes.
-
-### 6.4 Self-Consistency e Verificacao
-
-Self-Consistency (votar entre multiplos caminhos de raciocinio) tem aplicacao direta em context engineering:
-
-- **Validacao de planos**: Gerar 3-5 planos de implementacao diferentes e selecionar o mais consistente antes de executar. Isso implementa o principio "verificar o proprio trabalho".
-
-- **Reducao de alucinacoes**: Em tarefas de pesquisa agentica, Self-Consistency pode reduzir informacoes fabricadas ao exigir concordancia entre multiplas tentativas.
-
-- **Trade-off de custo**: Multiplica o custo de tokens pelo numero de amostras (5-30x). Em agentes com orcamento de tokens limitado, use apenas para decisoes de alto impacto (ex: escolha de arquitetura, nao formatacao de codigo).
-
-### 6.5 Least-to-Most e Decomposicao de Tarefas
-
-Least-to-Most prompting (decompor problemas complexos em subproblemas simples) e diretamente implementado em patterns de agentes:
-
-- **Prompt Chaining da Anthropic** e uma implementacao de Least-to-Most. A saida de um passo alimenta o proximo, e cada passo e um subproblema mais simples.
-
-- **Para skills complexas**: Estruturar a skill em fases progressivas (fase 1: analise, fase 2: planejamento, fase 3: execucao) e aplicar Least-to-Most naturalmente.
-
-- **Para harnesses de longa duracao**: A arquitetura "Initializer + Coding Agent" e Least-to-Most aplicado ao nivel de sessoes: a primeira sessao decompoe o problema, sessoes subsequentes resolvem um pedaco de cada vez.
-
-### 6.6 PAL (Program-Aided Language Models) e Execucao de Codigo
-
-PAL transforma raciocinio em codigo executavel. Implicacoes:
-
-- **Agentes de codificacao ja implementam PAL nativamente**. Quando Claude Code escreve e executa um script para verificar uma hipotese, esta usando PAL.
-
-- **Artefatos de estado em JSON** (recomendacao do documento) alinham-se com PAL: dados estruturados que podem ser lidos e manipulados programaticamente, nao prosa que precisa ser interpretada.
-
-- **Tools como PAL amplificado**: O design de ferramentas do documento (manter formato proximo do treinamento, dar tokens para pensar antes de estruturar) e um refinamento do principio PAL aplicado a ACI.
-
-### 6.7 Reflexion e Auto-Correcao
-
-Reflexion (o agente reflete sobre fracassos e ajusta a estrategia) conecta-se diretamente a:
-
-- **O ciclo Evaluator-Optimizer**: Gerar -> avaliar -> refinar e Reflexion aplicado a nivel de arquitetura.
-
-- **Compactacao como Reflexion** parcial: Quando o modelo sumariza o historico, ele implicitamente reflete sobre o que foi importante e o que nao foi.
-
-- **Prevencao de "accumulated failed approaches"**: O documento recomenda `/clear` apos duas correcoes falhas. Reflexion estruturada (anotar o que falhou e por que antes de recomecar) seria mais eficaz do que simplesmente limpar o contexto.
-
-- **Auto memory como Reflexion persistente**: Quando Claude salva aprendizados em MEMORY.md cross-sessao, esta implementando Reflexion que persiste alem de uma sessao individual.
+6. **Simplicity wins**. Boris Cherny demonstrated that the simplest solutions (text file for memory, summarization for compaction) outperform sophisticated architectures when the model is sufficiently capable. Resist the temptation to create complex memory systems.
 
 ---
 
-## 7. Correlacoes com Outros Documentos Principais
+## 6. Prompt Engineering Guide Applicability
+
+### 6.1 Chain-of-Thought (CoT) and Context Engineering
+
+CoT is directly relevant to coding agents in the following scenarios:
+
+- **"Plan" phase of the Explore → Plan → Code → Verify loop**: Structured CoT (with `<thinking>` and `<answer>` tags) is the ideal technique for the planning phase. The model externalizes its reasoning, creating an inspectable plan.
+
+- **Intelligent compaction**: When compacting context, the model implicitly uses CoT to decide what to preserve. Compaction instructions in CLAUDE.md can be seen as "CoT prompts for summarization."
+
+- **Critical limitation**: Explicitly requested CoT can be **counterproductive with advanced reasoning models**. A Wharton study (2025) found only 2-3% marginal improvement with 20-80% increase in response time. In agents using Claude Opus 4.6 with adaptive thinking, **do not instruct explicit CoT** — the model already reasons internally.
+
+- **Performance degrades after ~3,000 tokens** of reasoning (Levy, Jacoby & Goldberg, 2024). This has direct implications for agent configuration: complex planning prompts should not incentivize infinite reasoning chains.
+
+### 6.2 ReAct and Coding Agents
+
+ReAct (Thought → Action → Observation) is **the fundamental pattern of modern AI agents**:
+
+- **Claude Code already implements ReAct natively**. Claude Code's agentic loop (gather context → take action → verify results) is a ReAct instance. This means agent configuration should **facilitate** the cycle, not try to replace it.
+
+- **Implication for CLAUDE.md**: Instructions should be action-oriented, not descriptive. Instead of explaining the project architecture, provide **actionable commands** the agent can execute in the ReAct cycle (e.g., "to check types, run `npm run typecheck`").
+
+- **Well-designed tools are the other half of ReAct**. The prompt engineering guide emphasizes: *"As the number of tools grows, models make more errors."* This validates the research document's recommendation to keep tool sets **minimal, clear, and non-overlapping**.
+
+### 6.3 Tree of Thoughts (ToT) and Agent Planning
+
+ToT is relevant for specific agent scenarios:
+
+- **Complex problem solving with backtracking**: When an agent encounters a bug that may have multiple root causes, ToT allows exploring different paths and backtracking. However, the cost is 5-20x more API calls.
+
+- **Practical application in context engineering**: ToT can be used in the **planning** phase to generate and evaluate multiple implementation strategies before committing to one. This aligns with the principle of "separating exploration from execution."
+
+- **Limitation**: For most coding tasks (which are linear and do not require backtracking), ToT is overkill. CoT or zero-shot are sufficient.
+
+### 6.4 Self-Consistency and Verification
+
+Self-Consistency (voting among multiple reasoning paths) has direct application in context engineering:
+
+- **Plan validation**: Generate 3-5 different implementation plans and select the most consistent one before executing. This implements the principle of "verifying one's own work."
+
+- **Hallucination reduction**: In agentic research tasks, Self-Consistency can reduce fabricated information by requiring agreement across multiple attempts.
+
+- **Cost trade-off**: Multiplies token cost by the number of samples (5-30x). In agents with limited token budgets, use only for high-impact decisions (e.g., architecture choice, not code formatting).
+
+### 6.5 Least-to-Most and Task Decomposition
+
+Least-to-Most prompting (decomposing complex problems into simple subproblems) is directly implemented in agent patterns:
+
+- **Anthropic's Prompt Chaining** is a Least-to-Most implementation. The output of one step feeds the next, and each step is a simpler subproblem.
+
+- **For complex skills**: Structuring the skill in progressive phases (phase 1: analysis, phase 2: planning, phase 3: execution) is applying Least-to-Most naturally.
+
+- **For long-running harnesses**: The "Initializer + Coding Agent" architecture is Least-to-Most applied at the session level: the first session decomposes the problem, subsequent sessions solve one piece at a time.
+
+### 6.6 PAL (Program-Aided Language Models) and Code Execution
+
+PAL transforms reasoning into executable code. Implications:
+
+- **Coding agents already implement PAL natively**. When Claude Code writes and executes a script to verify a hypothesis, it is using PAL.
+
+- **JSON state artifacts** (the document's recommendation) align with PAL: structured data that can be read and manipulated programmatically, not prose that needs interpretation.
+
+- **Tools as amplified PAL**: The document's tool design principles (keep format close to training data, give tokens to think before structuring) are a refinement of the PAL principle applied to ACI.
+
+### 6.7 Reflexion and Self-Correction
+
+Reflexion (the agent reflects on failures and adjusts strategy) connects directly to:
+
+- **The Evaluator-Optimizer cycle**: Generate → evaluate → refine is Reflexion applied at the architectural level.
+
+- **Compaction as partial Reflexion**: When the model summarizes history, it implicitly reflects on what was important and what was not.
+
+- **Prevention of "accumulated failed approaches"**: The document recommends `/clear` after two failed corrections. Structured Reflexion (noting what failed and why before restarting) would be more effective than simply clearing context.
+
+- **Auto memory as persistent Reflexion**: When Claude saves learnings to MEMORY.md cross-session, it is implementing Reflexion that persists beyond an individual session.
+
+---
+
+## 7. Correlations with Other Main Documents
 
 ### 7.1 Evaluating-AGENTS-paper.md
 
-O paper da ETH Zurich fornece **validacao empirica** dos principios do documento de pesquisa, mas tambem **desafia algumas suposicoes**:
+The ETH Zurich paper provides **empirical validation** of the research document's principles, but also **challenges some assumptions**:
 
-**Validacoes:**
+**Validations:**
 
-- O achado de que context files gerados por LLM **reduzem** performance em 3% na media confirma diretamente o aviso sobre envenenamento de contexto e documentacao desnecessaria: *"unnecessary requirements from context files make tasks harder."*
-- O aumento de custo de **20%+** com context files confirma que tokens adicionais consomem orcamento de atencao sem retorno proporcional.
-- A constatacao de que instrucoes sao **geralmente seguidas** (ex: `uv` usado 1.6x/instancia quando mencionado vs. 0.01x quando nao) valida que o orcamento de atencao funciona -- instrucoes sao processadas, mas a pergunta e se elas **ajudam**.
+- The finding that LLM-generated context files **reduce** performance by 3% on average directly confirms the warning about context poisoning and unnecessary documentation: *"unnecessary requirements from context files make tasks harder."*
+- The **20%+** cost increase with context files confirms that additional tokens consume attention budget without proportional return.
+- The finding that instructions are **generally followed** (e.g., `uv` used 1.6x/instance when mentioned vs. 0.01x when not) validates that the attention budget works — instructions are processed, but the question is whether they **help**.
 
-**Desafios e nuances:**
+**Challenges and nuances:**
 
-- Context files de **desenvolvedores humanos** tiveram ganho marginal de ~4%, enquanto o documento de pesquisa sugere que configuracao bem feita deveria ter impacto significativo. Isso sugere que o gap entre teoria e pratica e maior do que o documento admite.
-- A conclusao do paper de que "context files do not provide effective overviews" contradiz a recomendacao do documento de incluir descricao do projeto. Porem, o paper testa overviews longos (media de 641 palavras, ate 29 secoes), nao o "one-liner" recomendado pelo guia a-guide-to-agents.
-- O achado de que context files **aumentam exploracao e teste** mesmo sem melhorar a taxa de resolucao sugere que os principios de context engineering do documento podem precisar de uma dimensao adicional: **custo-efetividade da exploracao induzida**.
+- **Human developer** context files had a marginal gain of ~4%, while the research document suggests that well-crafted configuration should have significant impact. This suggests the gap between theory and practice is larger than the document admits.
+- The paper's conclusion that "context files do not provide effective overviews" contradicts the document's recommendation to include project descriptions. However, the paper tests long overviews (average 641 words, up to 29 sections), not the "one-liner" recommended by the a-guide-to-agents.
+- The finding that context files **increase exploration and testing** even without improving resolution rate suggests that the document's context engineering principles may need an additional dimension: **cost-effectiveness of induced exploration**.
 
-**Implicacao pratica**: O documento de pesquisa e o paper de avaliacao convergem na recomendacao de **minimalismo** -- apenas context files humanos, minimais, focados em requisitos especificos (tooling, comandos nao-obvios) mostram beneficio liquido.
+**Practical implication**: The research document and the evaluation paper converge on the recommendation of **minimalism** — only human-authored, minimal context files focused on specific requirements (tooling, non-obvious commands) show net benefit.
 
 ### 7.2 a-guide-to-agents.md
 
-Este guia e a **implementacao pratica direta** dos principios do documento de pesquisa. As correlacoes sao quase 1:1:
+This guide is the **direct practical implementation** of the research document's principles. Correlations are nearly 1:1:
 
-| Principio do documento de pesquisa | Recomendacao do guia a-guide-to-agents |
+| Research document principle | a-guide-to-agents recommendation |
 |-------------------------------------|----------------------------------------|
-| Limite de ~200 linhas / orcamento de instrucoes | "~150-200 instructions with reasonable consistency" |
-| Progressive disclosure JIT | "give the agent only what it needs right now" |
-| Documentacao desatualizada envenena | "stale information actively poisons the context" |
-| Especificidade da instrucao | "no 'always,' no all-caps forcing. Just a conversational reference" |
-| Skills como progressive disclosure | "agent skills: the agent pulls in knowledge only when needed" |
-| Hierarquia de configuracao | Monorepo AGENTS.md em subdiretorios |
-| Nao auto-gerar | "Never use initialization scripts to auto-generate your AGENTS.md" |
+| ~200-line limit / instruction budget | "~150-200 instructions with reasonable consistency" |
+| JIT progressive disclosure | "give the agent only what it needs right now" |
+| Outdated documentation poisons | "stale information actively poisons the context" |
+| Instruction specificity | "no 'always,' no all-caps forcing. Just a conversational reference" |
+| Skills as progressive disclosure | "agent skills: the agent pulls in knowledge only when needed" |
+| Configuration hierarchy | Monorepo AGENTS.md in subdirectories |
+| Do not auto-generate | "Never use initialization scripts to auto-generate your AGENTS.md" |
 
-A correlacao mais importante e a validacao mutua do conceito de **instruction budget**: ambos os documentos convergem em ~150-200 como o limite pratico, embora nenhum cite evidencia experimental direta.
+The most important correlation is the mutual validation of the **instruction budget** concept: both documents converge on ~150-200 as the practical limit, although neither cites direct experimental evidence.
 
-O guia adiciona um insight nao presente no documento de pesquisa: **descrever capacidades em vez de estrutura de arquivos**. *"Instead of documenting structure, describe capabilities."* Isso e uma aplicacao do principio de evitar documentacao que muda frequentemente.
+The guide adds an insight not present in the research document: **describe capabilities instead of file structure**. *"Instead of documenting structure, describe capabilities."* This is an application of the principle of avoiding frequently changing documentation.
 
-### 7.3 a-guide-to-claude.md
+### 7.3 a-guide-to-agents.md (CLAUDE.md / Claude Code perspective)
 
-Este documento e essencialmente o mesmo que a-guide-to-agents mas especifico para Claude Code. As correlacoes adicionais relevantes:
+The merged guide covers both AGENTS.md and CLAUDE.md contexts. Claude Code-specific correlations from the former `a-guide-to-claude.md` content:
 
-- **Prompt de refatoracao de CLAUDE.md**: O guia fornece um prompt concreto para refatorar CLAUDE.md seguindo principios de progressive disclosure (encontrar contradicoes -> identificar essenciais -> agrupar o resto -> criar estrutura de arquivos). Isso e uma implementacao pratica da recomendacao do documento de pesquisa de "revisar e podar regularmente".
+- **CLAUDE.md refactoring prompt**: The guide provides a concrete prompt for refactoring CLAUDE.md following progressive disclosure principles (find contradictions → identify essentials → group the rest → create file structure). This is a practical implementation of the research document's recommendation to "review and prune regularly."
 
-- **Hierarquia CLAUDE.md em monorepos**: O padrao Raiz + Package alinha-se com a hierarquia de cinco niveis documentada na pesquisa, mas com foco na perspectiva do usuario, nao da arquitetura do sistema.
+- **CLAUDE.md hierarchy in monorepos**: The Root + Package pattern aligns with the five-level hierarchy documented in the research, but from the user's perspective rather than the system architecture.
 
 ### 7.4 claude-prompting-best-practices.md
 
-Este documento da Anthropic e a **fonte primaria** para varias recomendacoes do documento de pesquisa. Correlacoes profundas:
+This Anthropic document is the **primary source** for several research document recommendations. Deep correlations:
 
-**Posicionamento de informacao:**
+**Information positioning:**
 
-- Pesquisa: "Put the most critical instructions at the start"
+- Research: "Put the most critical instructions at the start"
 - Prompting: *"Put longform data at the top... Queries at the end can improve response quality by up to 30%."*
 
-**XML tags para estruturacao:**
+**XML tags for structuring:**
 
-- Pesquisa: Usa XML como formato preferido para delimitacao
-- Prompting: *"XML tags help Claude parse complex prompts unambiguously"* -- e um principio de design de prompt que se aplica diretamente a estruturacao de CLAUDE.md e skills
+- Research: Uses XML as the preferred format for delimitation
+- Prompting: *"XML tags help Claude parse complex prompts unambiguously"* — a prompt design principle directly applicable to structuring CLAUDE.md and skills
 
-**Subagentes:**
+**Subagents:**
 
-- Pesquisa: Subagentes para isolamento de contexto
-- Prompting: *"Claude Opus 4.6 has a strong predilection for subagents and may spawn them in situations where a simpler, direct approach would suffice."* -- Um aviso pratico que complementa a recomendacao teorica
+- Research: Subagents for context isolation
+- Prompting: *"Claude Opus 4.6 has a strong predilection for subagents and may spawn them in situations where a simpler, direct approach would suffice."* — A practical warning that complements the theoretical recommendation
 
 **Multi-context window:**
 
-- Pesquisa: Arquitetura Initializer + Coding Agent
-- Prompting: Fornece implementacao detalhada com `tests.json`, `progress.txt`, `init.sh`, e git como mecanismo de rastreamento de estado. Adiciona o detalhe critico de que *"It is unacceptable to remove or edit tests."*
+- Research: Initializer + Coding Agent architecture
+- Prompting: Provides detailed implementation with `tests.json`, `progress.txt`, `init.sh`, and git as state tracking mechanism. Adds the critical detail that *"It is unacceptable to remove or edit tests."*
 
-**Adaptive thinking vs CoT explicito:**
+**Adaptive thinking vs explicit CoT:**
 
-- Pesquisa: Recomenda separacao de raciocinio com tags `<thinking>` e `<answer>`
-- Prompting: Claude 4.6 usa **adaptive thinking** que torna CoT explicito redundante. *"Prefer general instructions over prescriptive steps."* Isso atualiza a recomendacao da pesquisa para modelos mais recentes.
+- Research: Recommends reasoning separation with `<thinking>` and `<answer>` tags
+- Prompting: Claude 4.6 uses **adaptive thinking** that makes explicit CoT redundant. *"Prefer general instructions over prescriptive steps."* This updates the research recommendation for newer models.
 
 **Overengineering:**
 
-- Pesquisa: Principio de simplicidade ("maintain simplicity")
-- Prompting: *"Claude Opus 4.5 and Claude Opus 4.6 have a tendency to overengineer."* Fornece prompt concreto para mitigar, complementando o principio teorico com implementacao pratica.
+- Research: Simplicity principle ("maintain simplicity")
+- Prompting: *"Claude Opus 4.5 and Claude Opus 4.6 have a tendency to overengineer."* Provides a concrete prompt to mitigate, complementing the theoretical principle with practical implementation.
 
 ---
 
-## 8. Forcas e Limitacoes
+## 8. Strengths and Limitations
 
-### 8.1 Forcas
+### 8.1 Strengths
 
-1. **Fontes de alta autoridade**. O documento baseia-se primariamente em pesquisa de primeira linha da Anthropic (criadores do Claude), papers academicos publicados (TACL, NeurIPS, ICLR), e documentacao oficial. Isso da peso as recomendacoes.
+1. **High-authority sources**. The document is primarily based on first-rate research from Anthropic (Claude's creators), published academic papers (TACL, NeurIPS, ICLR), and official documentation. This lends weight to the recommendations.
 
-2. **Sintese coerente de fontes dispersas**. A principal contribuicao e conectar pesquisa academica (Lost in the Middle, LongICLBench), engenharia pratica (blog da Anthropic), e documentacao oficial em um framework unico e acionavel.
+2. **Coherent synthesis of dispersed sources**. The main contribution is connecting academic research (Lost in the Middle, LongICLBench), practical engineering (Anthropic's blog), and official documentation into a single actionable framework.
 
-3. **Princípios acionáveis**. Cada secao termina com implicacoes praticas. A tabela include/exclude, o limite de 200 linhas, os padroes de implementacao JIT -- tudo e diretamente implementavel.
+3. **Actionable principles**. Each section ends with practical implications. The include/exclude table, the 200-line limit, the JIT implementation patterns — all are directly implementable.
 
-4. **Cobertura abrangente**. As sete areas de pesquisa cobrem desde fundamentos teoricos (por que contexto degrada) ate implementacao pratica (como configurar .claude/rules/). Pouco e deixado sem abordagem.
+4. **Comprehensive coverage**. The seven research areas cover from theoretical foundations (why context degrades) to practical implementation (how to configure .claude/rules/). Little is left unaddressed.
 
-5. **Reconhecimento explicito de lacunas**. O documento honestamente lista seis areas que carecem de pesquisa formal, incluindo a base empirica do limite de 200 linhas e estudos formais de envenenamento de contexto.
+5. **Explicit acknowledgment of gaps**. The document honestly lists six areas lacking formal research, including the empirical basis for the 200-line limit and formal studies on context poisoning.
 
-6. **Indice de fontes organizado**. A tabela de fontes com URLs, tipos e autoridade facilita verificacao e aprofundamento.
+6. **Organized source index**. The source table with URLs, types, and authority facilitates verification and deeper exploration.
 
-### 8.2 Limitacoes
+### 8.2 Limitations
 
-1. **Nenhuma pesquisa original**. O documento e uma sintese, nao um estudo. Nao conduz experimentos, nao apresenta dados novos, nao valida quantitativamente suas recomendacoes. A forca de suas conclusoes depende inteiramente das fontes citadas.
+1. **No original research**. The document is a synthesis, not a study. It does not conduct experiments, present new data, or quantitatively validate its recommendations. The strength of its conclusions depends entirely on the cited sources.
 
-2. **Vies em direcao ao ecossistema Anthropic/Claude**. A maioria das fontes e recomendacoes e especifica para Claude Code e CLAUDE.md. Generalizacao para outros agentes (Codex, Qwen Code, Aider) nao e validada.
+2. **Bias toward the Anthropic/Claude ecosystem**. Most sources and recommendations are specific to Claude Code and CLAUDE.md. Generalization to other agents (Codex, Qwen Code, Aider) is not validated.
 
-3. **O limite de 200 linhas carece de fundamentacao experimental**. O proprio documento admite: *"No published research gives exact numbers for 'how many instructions can an LLM follow simultaneously.'"* Este e o achado mais citavel do documento e, ironicamente, o menos fundamentado.
+3. **The 200-line limit lacks experimental foundation**. The document itself admits: *"No published research gives exact numbers for 'how many instructions can an LLM follow simultaneously.'"* This is the document's most citable finding and, ironically, the least grounded.
 
-4. **Ausencia de analise de custo-beneficio**. O documento recomenda progressive disclosure, subagentes, skills, etc., mas nao analisa o custo de implementacao e manutencao dessas estrategias. Para equipes pequenas, a complexidade adicional pode nao compensar.
+4. **Absence of cost-benefit analysis**. The document recommends progressive disclosure, subagents, skills, etc., but does not analyze the implementation and maintenance cost of these strategies. For small teams, the additional complexity may not be worthwhile.
 
-5. **Data de publicacao e contexto temporal**. Como sintese de pesquisas de 2024-2026, algumas recomendacoes podem se tornar obsoletas com novos modelos. O documento nao aborda como lidar com evolucoes de modelo (ex: Claude 4.6 com adaptive thinking torna CoT explicito contraproducente).
+5. **Publication date and temporal context**. As a synthesis of 2024-2026 research, some recommendations may become obsolete with new models. The document does not address how to handle model evolution (e.g., Claude 4.6 with adaptive thinking makes explicit CoT counterproductive).
 
-6. **Foco em Python e projetos de codigo aberto**. O paper Evaluating-AGENTS confirmou que resultados em Python (bem representado no treinamento) podem nao generalizar para linguagens menos comuns. O documento de pesquisa nao aborda essa limitacao.
+6. **Focus on Python and open-source projects**. The Evaluating-AGENTS paper confirmed that results in Python (well-represented in training) may not generalize to less common languages. The research document does not address this limitation.
 
-7. **Ausencia de estudo comparativo de abordagens de configuracao**. O documento cita como lacuna a falta de comparacao sistematica entre configuracao flat vs. hierarquica vs. escopada por caminho, mas tambem nao oferece evidencia para preferir uma sobre outra alem de raciocinios logicos.
+7. **Absence of comparative study of configuration approaches**. The document cites as a gap the lack of systematic comparison between flat vs. hierarchical vs. path-scoped configuration, but also offers no evidence for preferring one over another beyond logical reasoning.
 
-8. **Coordenacao multi-agente nao resolvida**. O documento reconhece que compartilhamento eficiente de contexto entre agentes paralelos e uma area aberta, mas oferece poucas orientacoes praticas para cenarios multi-agente complexos.
-
----
-
-## 9. Recomendacoes Praticas
-
-### 9.1 Para autores de configuracao (CLAUDE.md / AGENTS.md)
-
-| # | Recomendacao | Fundamento |
-|---|-------------|------------|
-| 1 | **Mantenha sob 200 linhas** por arquivo de configuracao | Orcamento de atencao empirico da Anthropic |
-| 2 | **Posicione instrucoes criticas no inicio e no fim** | Efeito "Lost in the Middle" (Liu et al.) |
-| 3 | **Seja especifico e verificavel**: "Use 2-space indentation" vs. "Format code nicely" | Zona Goldilocks de especificidade |
-| 4 | **Remova qualquer coisa que o modelo ja sabe**: nao ensine convencoes padrao | Heuristica "removeria isso causa erros?" |
-| 5 | **Converta instrucoes de enforcement em hooks** quando o cumprimento deve ser garantido | Hooks sao deterministicos e nao consomem orcamento de contexto |
-| 6 | **Revise e pode regularmente**: trate configuracao como codigo | Documentacao desatualizada envenena contexto |
-| 7 | **Use hierarquia**: raiz para regras universais, subdiretorios para regras de area, `.claude/rules/` para topicos especificos | Hierarquia de cinco niveis + progressive disclosure |
-| 8 | **Descreva capacidades, nao estrutura de arquivos** | Caminhos mudam constantemente; capacidades sao estaveis |
-| 9 | **Nunca auto-gere CLAUDE.md/AGENTS.md** | Paper ETH Zurich: LLM-generated files reduzem performance em 3% |
-| 10 | **Detecte e resolva contradicoes** periodicamente entre CLAUDE.md, subdiretorios e rules | Contradicoes causam comportamento arbitrario |
-
-### 9.2 Para arquitetos de sistemas agenticos
-
-| # | Recomendacao | Fundamento |
-|---|-------------|------------|
-| 1 | **Separe exploracao de execucao**: planeje primeiro, codifique depois | Loop Explore -> Plan -> Code -> Verify |
-| 2 | **Use subagentes para investigacao**: mantenha o contexto principal limpo | Isolamento de contexto previne context rot |
-| 3 | **Implemente progressive disclosure**: carregue documentacao apenas quando relevante | Estrategia hibrida pre-carregado + sob demanda |
-| 4 | **Projete para progresso incremental**: uma feature por vez em tarefas longas | Arquitetura Initializer + Coding Agent |
-| 5 | **Forneca mecanismos de verificacao**: testes, screenshots, linters | "Claude performs dramatically better when it can verify its own work" |
-| 6 | **Use artefatos de estado estruturados**: JSON para estado de maquina, markdown para prosa | Modelos modificam JSON com mais cuidado |
-| 7 | **Limpe contexto entre tarefas nao-relacionadas** | Anti-padrao "kitchen sink" |
-| 8 | **Prefira sessao limpa quando possivel**: Claude 4.5+ redescobre estado do filesystem | Compactacao e lossy; filesystem e duravel |
-| 9 | **Invista em ACI tanto quanto em HCI**: ferramentas com descricoes claras, exemplos, limites definidos | "If a human engineer can't say which tool, an AI can't either" |
-| 10 | **Comece simples e so aumente complexidade quando demonstravelmente necessario** | Principio dominante da Anthropic ("simplest thing usually works") |
-
-### 9.3 Para context engineering em geral
-
-| # | Recomendacao | Fundamento |
-|---|-------------|------------|
-| 1 | **Trate contexto como recurso finito precioso** com retornos decrescentes | Principio central do documento |
-| 2 | **Cure o menor conjunto de tokens de alta-sinalizacao** para cada interacao | "smallest possible set of high-signal tokens" |
-| 3 | **Dados longos no topo, queries no final** | Melhoria de ate 30% na qualidade (Anthropic) |
-| 4 | **Use XML tags** para delimitar secoes de prompts complexos | Claude treinado para reconhecer XML; 15-20% boost |
-| 5 | **Implemente compactacao** para sessoes longas, preservando artefatos criticos | Reciclagem de contexto evita acumulo |
-| 6 | **Projete ferramentas para serem eficientes em tokens** nas suas saidas | Saidas de ferramentas competem com orcamento |
-| 7 | **Deixe agentes navegar metadados** (nomes de arquivo, estrutura de pastas) antes de carregar conteudo completo | Progressive disclosure via exploracao |
-| 8 | **Nao use CoT explicito com modelos de raciocinio avancado** (Claude 4.6 com adaptive thinking) | CoT explicito e redundante e pode prejudicar |
-| 9 | **Teste e meca**: otimizacao automatica de prompts supera otimizacao manual | APE, OPRO, DSPy produzem resultados melhores |
-| 10 | **Monitore o custo total**: o prompt otimizado pode custar 70% menos que o naive com qualidade igual ou superior | Levy, Jacoby & Goldberg (2024): sweet spot ~150-300 palavras |
+8. **Multi-agent coordination unresolved**. The document acknowledges that efficient context sharing between parallel agents is an open area, but offers few practical guidelines for complex multi-agent scenarios.
 
 ---
 
-## Apendice: Mapa de Fontes Citadas no Documento
+## 9. Practical Recommendations
 
-| # | Fonte | Tipo | Relevancia |
-|---|-------|------|-----------|
-| 1 | Effective Context Engineering for AI Agents (Anthropic) | Blog de Engenharia | Central -- define context rot, attention budget, JIT, progressive disclosure |
-| 2 | Effective Harnesses for Long-Running Agents (Anthropic) | Blog de Engenharia | Arquitetura Initializer + Coding Agent, artefatos de estado |
-| 3 | Building Effective Agents (Anthropic Research) | Pesquisa | Padroes arquiteturais (chaining, orchestrator-workers, evaluator-optimizer) |
-| 4 | Claude Code Best Practices (Anthropic Docs) | Documentacao Oficial | Orcamento de instrucoes, anti-padroes, verificacao |
-| 5 | Claude Code Memory (Anthropic Docs) | Documentacao Oficial | Hierarquia CLAUDE.md, regras escopadas, auto memory |
-| 6 | Lost in the Middle (arXiv:2307.03172) | Paper Academico | Efeito de posicionamento de informacao em contextos longos |
-| 7 | LongICLBench (arXiv:2404.02060) | Paper Academico | Vies de recencia, limites de tarefas complexas |
-| 8 | Prompting Best Practices (Anthropic Docs) | Documentacao Oficial | Zona Goldilocks de especificidade, XML tags, dados longos no topo |
-| 9 | Harper Reed's LLM Codegen Workflow | Blog de Praticante | Workflow Spec -> Plan -> Execute |
-| 10 | Latent Space Podcast: Claude Code Episode | Entrevista | Filosofia de simplicidade de Boris Cherny |
+### 9.1 For Configuration Authors (CLAUDE.md / AGENTS.md)
+
+| # | Recommendation | Foundation |
+|---|---------------|------------|
+| 1 | **Keep under 200 lines** per configuration file | Anthropic's empirical attention budget |
+| 2 | **Position critical instructions at the beginning and end** | "Lost in the Middle" effect (Liu et al.) |
+| 3 | **Be specific and verifiable**: "Use 2-space indentation" vs. "Format code nicely" | Goldilocks zone of specificity |
+| 4 | **Remove anything the model already knows**: don't teach standard conventions | "Would removing this cause errors?" heuristic |
+| 5 | **Convert enforcement instructions to hooks** when compliance must be guaranteed | Hooks are deterministic and don't consume context budget |
+| 6 | **Review and prune regularly**: treat configuration as code | Outdated documentation poisons context |
+| 7 | **Use hierarchy**: root for universal rules, subdirectories for area rules, `.claude/rules/` for specific topics | Five-level hierarchy + progressive disclosure |
+| 8 | **Describe capabilities, not file structure** | Paths change constantly; capabilities are stable |
+| 9 | **Never auto-generate CLAUDE.md/AGENTS.md** | ETH Zurich paper: LLM-generated files reduce performance by 3% |
+| 10 | **Detect and resolve contradictions** periodically across CLAUDE.md, subdirectories, and rules | Contradictions cause arbitrary behavior |
+
+### 9.2 For Agentic Systems Architects
+
+| # | Recommendation | Foundation |
+|---|---------------|------------|
+| 1 | **Separate exploration from execution**: plan first, code later | Explore → Plan → Code → Verify loop |
+| 2 | **Use subagents for investigation**: keep main context clean | Context isolation prevents context rot |
+| 3 | **Implement progressive disclosure**: load documentation only when relevant | Hybrid pre-loaded + on-demand strategy |
+| 4 | **Design for incremental progress**: one feature at a time in long tasks | Initializer + Coding Agent architecture |
+| 5 | **Provide verification mechanisms**: tests, screenshots, linters | "Claude performs dramatically better when it can verify its own work" |
+| 6 | **Use structured state artifacts**: JSON for machine state, markdown for prose | Models modify JSON with more care |
+| 7 | **Clear context between unrelated tasks** | "Kitchen sink" anti-pattern |
+| 8 | **Prefer clean session when possible**: Claude 4.5+ rediscovers state from filesystem | Compaction is lossy; filesystem is durable |
+| 9 | **Invest in ACI as much as HCI**: tools with clear descriptions, examples, defined limits | "If a human engineer can't say which tool, an AI can't either" |
+| 10 | **Start simple and only increase complexity when demonstrably necessary** | Anthropic's dominant principle ("simplest thing usually works") |
+
+### 9.3 For Context Engineering in General
+
+| # | Recommendation | Foundation |
+|---|---------------|------------|
+| 1 | **Treat context as a precious finite resource** with diminishing returns | Document's central principle |
+| 2 | **Curate the smallest set of high-signal tokens** for each interaction | "smallest possible set of high-signal tokens" |
+| 3 | **Long data at top, queries at end** | Up to 30% quality improvement (Anthropic) |
+| 4 | **Use XML tags** to delimit sections in complex prompts | Claude trained to recognize XML; 15-20% boost |
+| 5 | **Implement compaction** for long sessions, preserving critical artifacts | Context recycling prevents accumulation |
+| 6 | **Design tools to be token-efficient** in their outputs | Tool outputs compete with budget |
+| 7 | **Let agents navigate metadata** (filenames, folder structure) before loading full content | Progressive disclosure via exploration |
+| 8 | **Do not use explicit CoT with advanced reasoning models** (Claude 4.6 with adaptive thinking) | Explicit CoT is redundant and can be harmful |
+| 9 | **Test and measure**: automatic prompt optimization outperforms manual optimization | APE, OPRO, DSPy produce better results |
+| 10 | **Monitor total cost**: the optimized prompt can cost 70% less than the naive one with equal or superior quality | Levy, Jacoby & Goldberg (2024): sweet spot ~150-300 words |
+
+---
+
+## Appendix: Map of Sources Cited in the Document
+
+| # | Source | Type | Relevance |
+|---|--------|------|-----------|
+| 1 | Effective Context Engineering for AI Agents (Anthropic) | Engineering Blog | Central — defines context rot, attention budget, JIT, progressive disclosure |
+| 2 | Effective Harnesses for Long-Running Agents (Anthropic) | Engineering Blog | Initializer + Coding Agent architecture, state artifacts |
+| 3 | Building Effective Agents (Anthropic Research) | Research | Architectural patterns (chaining, orchestrator-workers, evaluator-optimizer) |
+| 4 | Claude Code Best Practices (Anthropic Docs) | Official Documentation | Instruction budget, anti-patterns, verification |
+| 5 | Claude Code Memory (Anthropic Docs) | Official Documentation | CLAUDE.md hierarchy, scoped rules, auto memory |
+| 6 | Lost in the Middle (arXiv:2307.03172) | Academic Paper | Information positioning effect in long contexts |
+| 7 | LongICLBench (arXiv:2404.02060) | Academic Paper | Recency bias, complex task limits |
+| 8 | Prompting Best Practices (Anthropic Docs) | Official Documentation | Goldilocks zone of specificity, XML tags, long data at top |
+| 9 | Harper Reed's LLM Codegen Workflow | Practitioner Blog | Spec → Plan → Execute workflow |
+| 10 | Latent Space Podcast: Claude Code Episode | Interview | Boris Cherny's simplicity philosophy |

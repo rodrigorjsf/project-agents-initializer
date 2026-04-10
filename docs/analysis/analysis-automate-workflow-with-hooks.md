@@ -1,98 +1,99 @@
-# Analise: Automate Workflows with Hooks
+# Analysis: Automate Workflows with Hooks
 
-**Documento fonte**: `docs/hooks/automate-workflow-with-hooks.md`
-**Data da analise**: Março 2026
-**Escopo**: Guia pratico de automação de workflows via hooks no Claude Code
-
----
-
-## 1. Sumario Executivo
-
-O documento "Automate Workflows with Hooks" serve como guia introdutorio e pratico para o sistema de hooks do Claude Code. Diferentemente do documento de referencia tecnica, este foca em **casos de uso concretos e configurações prontas para copiar**, cobrindo desde notificações de desktop ate auto-formatação de codigo e proteção de arquivos sensíveis. O documento posiciona hooks como a camada de **controle deterministico** sobre o comportamento do Claude Code — garantindo que certas ações sempre aconteçam, independentemente do julgamento do LLM.
-
-O guia introduz quatro tipos de hooks (`command`, `http`, `prompt`, `agent`) e 22 eventos de ciclo de vida, mas concentra a maioria dos exemplos em `command` hooks por serem os mais acessíveis. A abordagem é progressiva: começa com um hook trivial de notificação, avança para formatação automatica e proteção de arquivos, e termina com hooks baseados em LLM para decisões que exigem julgamento. Esta progressão espelha a estrategia de divulgação progressiva documentada na pesquisa de otimização de contexto.
-
-O valor central do documento para infraestrutura de agentes esta na demonstração de que **instruções comportamentais podem ser convertidas em hooks deterministicos**, removendo-as do orçamento de atenção do LLM enquanto garantem enforcement absoluto. Isto conecta diretamente com os princípios de context engineering da Anthropic sobre manter o menor conjunto possível de tokens de alto sinal.
+> **Status**: Current
+> **Source document**: [Automate Workflows with Hooks](https://docs.anthropic.com/en/docs/claude-code/hooks)
+> **Analysis date**: 2026-03
+> **Scope**: Practical guide for workflow automation via hooks in Claude Code
 
 ---
 
-## 2. Conceitos e Mecanismos Chave
+## 1. Executive Summary
 
-### 2.1 Tipos de Hook
+The document "Automate Workflows with Hooks" serves as an introductory and practical guide to the Claude Code hooks system. Unlike the technical reference document, it focuses on **concrete use cases and copy-ready configurations**, covering everything from desktop notifications to auto-formatting code and protecting sensitive files. The document positions hooks as the layer of **deterministic control** over Claude Code behavior — ensuring that certain actions always happen, regardless of LLM judgment.
 
-| Tipo | Mecanismo | Caso de Uso | Complexidade |
-|------|-----------|-------------|--------------|
-| `command` | Executa comando shell | Formatação, validação, notificação | Baixa |
-| `http` | POST para endpoint HTTP | Auditoria centralizada, serviços externos | Media |
-| `prompt` | Avaliação LLM single-turn | Decisões que exigem julgamento | Media |
-| `agent` | Subagente com acesso a ferramentas | Verificação complexa contra o codebase | Alta |
+The guide introduces four types of hooks (`command`, `http`, `prompt`, `agent`) and 22 lifecycle events, but concentrates most examples on `command` hooks as they are the most accessible. The approach is progressive: it starts with a trivial notification hook, advances to automatic formatting and file protection, and ends with LLM-based hooks for decisions that require judgment. This progression mirrors the progressive disclosure strategy documented in the context optimization research.
 
-### 2.2 Ciclo de Vida dos Eventos
+The core value of the document for agent infrastructure lies in demonstrating that **behavioral instructions can be converted into deterministic hooks**, removing them from the LLM's attention budget while ensuring absolute enforcement. This connects directly with Anthropic's context engineering principles about maintaining the smallest possible set of high-signal tokens.
 
-O documento apresenta 22 eventos organizados temporalmente:
+---
 
-**Eventos de sessão:**
+## 2. Key Concepts and Mechanisms
 
-- `SessionStart` — inicio/retomada de sessão (matcher: `startup`, `resume`, `clear`, `compact`)
-- `SessionEnd` — termino de sessão (matcher: `clear`, `resume`, `logout`, etc.)
+### 2.1 Hook Types
 
-**Eventos do loop agentico:**
+| Type | Mechanism | Use Case | Complexity |
+|------|-----------|----------|------------|
+| `command` | Executes shell command | Formatting, validation, notification | Low |
+| `http` | POST to HTTP endpoint | Centralized auditing, external services | Medium |
+| `prompt` | Single-turn LLM evaluation | Decisions that require judgment | Medium |
+| `agent` | Subagent with tool access | Complex verification against the codebase | High |
 
-- `UserPromptSubmit` — antes do Claude processar o prompt
-- `PreToolUse` — antes da execução de ferramenta (pode bloquear)
-- `PermissionRequest` — quando dialogo de permissão aparece
-- `PostToolUse` — apos ferramenta executar com sucesso
-- `PostToolUseFailure` — apos falha de ferramenta
+### 2.2 Event Lifecycle
 
-**Eventos de subagentes:**
+The document presents 22 events organized temporally:
 
-- `SubagentStart` / `SubagentStop` — spawn e termino de subagentes
+**Session events:**
 
-**Eventos de compactação:**
+- `SessionStart` — session start/resume (matcher: `startup`, `resume`, `clear`, `compact`)
+- `SessionEnd` — session termination (matcher: `clear`, `resume`, `logout`, etc.)
 
-- `PreCompact` / `PostCompact` — antes e apos compactação
+**Agentic loop events:**
 
-**Eventos de controle:**
+- `UserPromptSubmit` — before Claude processes the prompt
+- `PreToolUse` — before tool execution (can block)
+- `PermissionRequest` — when permission dialog appears
+- `PostToolUse` — after tool executes successfully
+- `PostToolUseFailure` — after tool failure
 
-- `Stop` / `StopFailure` — quando Claude termina resposta
-- `TaskCompleted` — quando tarefa é marcada como completa
-- `TeammateIdle` — quando membro de equipe vai ficar idle
+**Subagent events:**
 
-**Eventos de configuração:**
+- `SubagentStart` / `SubagentStop` — spawn and termination of subagents
 
-- `ConfigChange` — quando arquivo de configuração muda
-- `InstructionsLoaded` — quando CLAUDE.md ou rules são carregados
+**Compaction events:**
 
-**Eventos de worktree:**
+- `PreCompact` / `PostCompact` — before and after compaction
 
-- `WorktreeCreate` / `WorktreeRemove` — criação e remoção de worktrees
+**Control events:**
 
-**Eventos MCP:**
+- `Stop` / `StopFailure` — when Claude finishes response
+- `TaskCompleted` — when task is marked as complete
+- `TeammateIdle` — when teammate is about to go idle
 
-- `Elicitation` / `ElicitationResult` — input de servidor MCP
+**Configuration events:**
 
-### 2.3 Comunicação Hook ↔ Claude Code
+- `ConfigChange` — when configuration file changes
+- `InstructionsLoaded` — when CLAUDE.md or rules are loaded
+
+**Worktree events:**
+
+- `WorktreeCreate` / `WorktreeRemove` — creation and removal of worktrees
+
+**MCP events:**
+
+- `Elicitation` / `ElicitationResult` — MCP server input
+
+### 2.3 Hook ↔ Claude Code Communication
 
 ```
 ┌──────────────┐     stdin (JSON)      ┌──────────────┐
 │  Claude Code │ ─────────────────────> │  Hook Script │
 │              │                        │              │
 │              │ <───────────────────── │              │
-│              │  stdout (JSON/texto)   │              │
-│              │  stderr (mensagens)    │              │
+│              │  stdout (JSON/text)    │              │
+│              │  stderr (messages)     │              │
 │              │  exit code (0/2/N)     │              │
 └──────────────┘                        └──────────────┘
 ```
 
 **Exit codes:**
 
-- `0` — ação prossegue; stdout é processado como JSON ou contexto
-- `2` — ação bloqueada; stderr é feedback para Claude
-- Qualquer outro — ação prossegue; stderr aparece em modo verbose
+- `0` — action proceeds; stdout is processed as JSON or context
+- `2` — action blocked; stderr is feedback for Claude
+- Any other — action proceeds; stderr appears in verbose mode
 
-### 2.4 Matchers (Filtros)
+### 2.4 Matchers (Filters)
 
-Matchers são expressões regex que filtram quando hooks disparam. Cada evento filtra em campos diferentes:
+Matchers are regex expressions that filter when hooks fire. Each event filters on different fields:
 
 ```json
 {
@@ -109,7 +110,7 @@ Matchers são expressões regex que filtram quando hooks disparam. Cada evento f
 }
 ```
 
-**Campos de filtragem por evento:**
+**Filter fields by event:**
 
 - Tool events (`PreToolUse`, `PostToolUse`, etc.) → `tool_name`
 - `SessionStart` → `source` (startup, resume, clear, compact)
@@ -118,44 +119,44 @@ Matchers são expressões regex que filtram quando hooks disparam. Cada evento f
 - `ConfigChange` → configuration source
 - `SubagentStart`/`SubagentStop` → agent type
 
-### 2.5 Escopo de Configuração
+### 2.5 Configuration Scope
 
-| Localização | Escopo | Compartilhavel |
-|-------------|--------|----------------|
-| `~/.claude/settings.json` | Todos os projetos | Nao (local) |
-| `.claude/settings.json` | Projeto unico | Sim (commit) |
-| `.claude/settings.local.json` | Projeto unico | Nao (gitignored) |
-| Managed policy settings | Organizacional | Sim (admin) |
-| Plugin `hooks/hooks.json` | Quando plugin ativo | Sim (bundled) |
-| Skill/Agent frontmatter | Enquanto componente ativo | Sim (definido no arquivo) |
+| Location | Scope | Shareable |
+|----------|-------|-----------|
+| `~/.claude/settings.json` | All projects | No (local) |
+| `.claude/settings.json` | Single project | Yes (commit) |
+| `.claude/settings.local.json` | Single project | No (gitignored) |
+| Managed policy settings | Organizational | Yes (admin) |
+| Plugin `hooks/hooks.json` | When plugin active | Yes (bundled) |
+| Skill/Agent frontmatter | While component active | Yes (defined in file) |
 
 ---
 
-## 3. Pontos de Atenção
+## 3. Points of Attention
 
-### 3.1 Armadilhas Comuns
+### 3.1 Common Pitfalls
 
-**Loop infinito no Stop hook:**
-O erro mais critico documentado. Se um Stop hook bloqueia Claude de parar sem verificar se ja esta em continuação, cria um loop infinito. A solução é verificar `stop_hook_active`:
+**Infinite loop in Stop hook:**
+The most critical documented error. If a Stop hook blocks Claude from stopping without checking if it's already in a continuation, it creates an infinite loop. The solution is to check `stop_hook_active`:
 
 ```bash
 #!/bin/bash
 INPUT=$(cat)
 if [ "$(echo "$INPUT" | jq -r '.stop_hook_active')" = "true" ]; then
-  exit 0  # Permite Claude parar
+  exit 0  # Allow Claude to stop
 fi
-# ... resto da logica
+# ... rest of logic
 ```
 
-**JSON invalido por echo no shell profile:**
-Quando `~/.zshrc` ou `~/.bashrc` contem `echo` incondicional, a saida contamina o stdout do hook:
+**Invalid JSON from echo in shell profile:**
+When `~/.zshrc` or `~/.bashrc` contains unconditional `echo`, the output contaminates the hook's stdout:
 
 ```text
-Shell ready on arm64        ← texto do profile
-{"decision": "block"}       ← JSON do hook
+Shell ready on arm64        ← text from profile
+{"decision": "block"}       ← JSON from hook
 ```
 
-Solução:
+Solution:
 
 ```bash
 if [[ $- == *i* ]]; then
@@ -163,56 +164,56 @@ if [[ $- == *i* ]]; then
 fi
 ```
 
-**Matcher case-sensitive:**
-Matchers são regex case-sensitive. `"bash"` nao corresponde a `"Bash"`.
+**Case-sensitive matcher:**
+Matchers are case-sensitive regex. `"bash"` does not match `"Bash"`.
 
-**PermissionRequest nao dispara em modo headless:**
-Hooks `PermissionRequest` nao funcionam com `-p` (modo nao-interativo). Use `PreToolUse` como alternativa.
+**PermissionRequest does not fire in headless mode:**
+`PermissionRequest` hooks do not work with `-p` (non-interactive mode). Use `PreToolUse` as an alternative.
 
-**PostToolUse nao pode desfazer:**
-A ferramenta ja executou. O hook so pode fornecer feedback, nao reverter a ação.
+**PostToolUse cannot undo:**
+The tool has already executed. The hook can only provide feedback, not revert the action.
 
-### 3.2 Considerações de Segurança
+### 3.2 Security Considerations
 
-- Hooks de comando executam com **permissões completas do usuario do sistema**
-- Sempre validar e sanitizar inputs JSON do stdin
-- Sempre usar aspas em variaveis shell (`"$VAR"` e nao `$VAR`)
-- Verificar path traversal (`..` em caminhos de arquivo)
-- Usar caminhos absolutos (`$CLAUDE_PROJECT_DIR`)
-- Evitar processar arquivos sensiveis (`.env`, `.git/`, chaves)
+- Command hooks execute with **full system user permissions**
+- Always validate and sanitize JSON inputs from stdin
+- Always quote shell variables (`"$VAR"` not `$VAR`)
+- Check for path traversal (`..` in file paths)
+- Use absolute paths (`$CLAUDE_PROJECT_DIR`)
+- Avoid processing sensitive files (`.env`, `.git/`, keys)
 
-### 3.3 Ordem de Execução
+### 3.3 Execution Order
 
-- Todos os hooks que correspondem a um evento rodam **em paralelo**
-- Hooks identicos (mesmo comando) são **deduplicados automaticamente**
-- Timeout padrao: 10 minutos (configuravel por hook)
-- Hooks async nao bloqueiam execução e nao podem controlar comportamento
+- All hooks matching an event run **in parallel**
+- Identical hooks (same command) are **automatically deduplicated**
+- Default timeout: 10 minutes (configurable per hook)
+- Async hooks do not block execution and cannot control behavior
 
-### 3.4 Prioridade de Deny Rules
+### 3.4 Deny Rules Priority
 
-Retornar `"allow"` em um `PreToolUse` hook **nao sobrescreve** deny rules de permissão. Regras de negação, incluindo managed settings, sempre tem prioridade sobre aprovações de hooks.
+Returning `"allow"` in a `PreToolUse` hook **does not override** permission deny rules. Deny rules, including managed settings, always take priority over hook approvals.
 
 ---
 
-## 4. Casos de Uso e Escopo
+## 4. Use Cases and Scope
 
-### 4.1 Quando Hooks São a Ferramenta Certa
+### 4.1 When Hooks Are the Right Tool
 
-| Cenario | Hook | Rule | CLAUDE.md | Skill |
-|---------|------|------|-----------|-------|
-| Formatar codigo apos edição | **Hook** (determinismo) | - | - | - |
-| Bloquear edição de .env | **Hook** (enforcement) | - | - | - |
-| Notificar quando aguardando input | **Hook** (side-effect) | - | - | - |
-| Estilo de codigo preferido | - | - | **CLAUDE.md** | - |
-| Padrão de API a seguir | - | **Rule** | - | - |
-| Deploy complexo | - | - | - | **Skill** |
-| Verificar testes antes de parar | **Hook** (gate) | - | - | - |
-| Reinjetar contexto apos compactação | **Hook** (lifecycle) | - | - | - |
-| Auditoria de mudanças de config | **Hook** (observabilidade) | - | - | - |
+| Scenario | Hook | Rule | CLAUDE.md | Skill |
+|----------|------|------|-----------|-------|
+| Format code after editing | **Hook** (determinism) | - | - | - |
+| Block editing of .env | **Hook** (enforcement) | - | - | - |
+| Notify when awaiting input | **Hook** (side-effect) | - | - | - |
+| Preferred code style | - | - | **CLAUDE.md** | - |
+| API pattern to follow | - | **Rule** | - | - |
+| Complex deploy | - | - | - | **Skill** |
+| Verify tests before stopping | **Hook** (gate) | - | - | - |
+| Re-inject context after compaction | **Hook** (lifecycle) | - | - | - |
+| Audit config changes | **Hook** (observability) | - | - | - |
 
-### 4.2 Padrões Primarios Documentados
+### 4.2 Primary Documented Patterns
 
-**1. Notificação (side-effect puro):**
+**1. Notification (pure side-effect):**
 
 ```json
 {
@@ -223,7 +224,7 @@ Retornar `"allow"` em um `PreToolUse` hook **nao sobrescreve** deny rules de per
         "hooks": [
           {
             "type": "command",
-            "command": "notify-send 'Claude Code' 'Precisa de atenção'"
+            "command": "notify-send 'Claude Code' 'Needs attention'"
           }
         ]
       }
@@ -232,7 +233,7 @@ Retornar `"allow"` em um `PreToolUse` hook **nao sobrescreve** deny rules de per
 }
 ```
 
-**2. Auto-formatação (pos-processamento):**
+**2. Auto-formatting (post-processing):**
 
 ```json
 {
@@ -252,10 +253,10 @@ Retornar `"allow"` em um `PreToolUse` hook **nao sobrescreve** deny rules de per
 }
 ```
 
-**3. Proteção de arquivos (pre-validação com bloqueio):**
-Script separado que verifica padrões protegidos e sai com codigo 2 para bloquear.
+**3. File protection (pre-validation with blocking):**
+Separate script that checks protected patterns and exits with code 2 to block.
 
-**4. Reinjeção de contexto apos compactação:**
+**4. Context re-injection after compaction:**
 
 ```json
 {
@@ -266,7 +267,7 @@ Script separado que verifica padrões protegidos e sai com codigo 2 para bloquea
         "hooks": [
           {
             "type": "command",
-            "command": "echo 'Lembrete: use Bun, não npm. Execute bun test antes de commitar.'"
+            "command": "echo 'Reminder: use Bun, not npm. Run bun test before committing.'"
           }
         ]
       }
@@ -275,7 +276,7 @@ Script separado que verifica padrões protegidos e sai com codigo 2 para bloquea
 }
 ```
 
-**5. Auto-aprovação seletiva (controle de permissão):**
+**5. Selective auto-approval (permission control):**
 
 ```json
 {
@@ -295,7 +296,7 @@ Script separado que verifica padrões protegidos e sai com codigo 2 para bloquea
 }
 ```
 
-**6. Verificação baseada em LLM (Stop hook com prompt):**
+**6. LLM-based verification (Stop hook with prompt):**
 
 ```json
 {
@@ -305,7 +306,7 @@ Script separado que verifica padrões protegidos e sai com codigo 2 para bloquea
         "hooks": [
           {
             "type": "prompt",
-            "prompt": "Verifique se todas as tarefas estão completas."
+            "prompt": "Verify that all tasks are complete."
           }
         ]
       }
@@ -316,23 +317,23 @@ Script separado que verifica padrões protegidos e sai com codigo 2 para bloquea
 
 ---
 
-## 5. Aplicabilidade a Infraestrutura de Agentes
+## 5. Applicability to Agent Infrastructure
 
 ### 5.1 Skills
 
-**Interação hooks ↔ skills:**
+**Hook ↔ skill interaction:**
 
-- Skills podem definir hooks no seu frontmatter YAML — hooks escopados ao ciclo de vida do skill
-- `PostToolUse` hooks podem validar outputs de ferramentas usadas por skills
-- `PreToolUse` hooks podem interceptar chamadas de ferramentas dentro de skills
-- O campo `once: true` permite hooks de skill que executam apenas uma vez por sessão
+- Skills can define hooks in their YAML frontmatter — hooks scoped to the skill's lifecycle
+- `PostToolUse` hooks can validate outputs of tools used by skills
+- `PreToolUse` hooks can intercept tool calls within skills
+- The `once: true` field allows skill hooks that execute only once per session
 
-**Padrão: Skill com hook de segurança integrado:**
+**Pattern: Skill with integrated safety hook:**
 
 ```yaml
 ---
 name: deploy-production
-description: Deploy seguro para produção
+description: Safe deploy to production
 hooks:
   PreToolUse:
     - matcher: "Bash"
@@ -342,35 +343,35 @@ hooks:
 ---
 ```
 
-**Hooks como alternativa a instruções em skills:**
-Quando um skill tem regras de enforcement (ex: "nunca execute rm -rf"), converter essas regras em hooks `PreToolUse` remove-as do orçamento de atenção do skill e garante enforcement deterministico.
+**Hooks as an alternative to instructions in skills:**
+When a skill has enforcement rules (e.g., "never execute rm -rf"), converting those rules into `PreToolUse` hooks removes them from the skill's attention budget and ensures deterministic enforcement.
 
 ### 5.2 Hooks (Design Patterns)
 
-**Padrão Guardião (Gate Pattern):**
-Hooks `PreToolUse` e `Stop` que atuam como portões de qualidade — bloqueiam ações que nao atendem criterios.
+**Guardian Pattern (Gate Pattern):**
+`PreToolUse` and `Stop` hooks that act as quality gates — blocking actions that do not meet criteria.
 
 ```bash
 #!/bin/bash
-# gate-pattern: bloqueia commits sem testes passando
+# gate-pattern: blocks commits without passing tests
 INPUT=$(cat)
 if [ "$(echo "$INPUT" | jq -r '.stop_hook_active')" = "true" ]; then
   exit 0
 fi
 npm test 2>&1 > /dev/null
 if [ $? -ne 0 ]; then
-  echo '{"decision": "block", "reason": "Testes falhando. Corrija antes de finalizar."}'
+  echo '{"decision": "block", "reason": "Tests failing. Fix them before finishing."}'
 fi
 ```
 
-**Padrão Observador (Observer Pattern):**
-Hooks `PostToolUse`, `Notification`, `SessionEnd` que registram eventos sem interferir no fluxo.
+**Observer Pattern:**
+`PostToolUse`, `Notification`, `SessionEnd` hooks that log events without interfering with the flow.
 
-**Padrão Injetor de Contexto (Context Injection Pattern):**
-Hooks `SessionStart` e `UserPromptSubmit` que adicionam informação ao contexto do Claude.
+**Context Injection Pattern:**
+`SessionStart` and `UserPromptSubmit` hooks that add information to Claude's context.
 
-**Padrão Composto (Composition Pattern):**
-Multiplos hooks no mesmo evento para diferentes preocupações:
+**Composition Pattern:**
+Multiple hooks on the same event for different concerns:
 
 ```json
 {
@@ -386,23 +387,23 @@ Multiplos hooks no mesmo evento para diferentes preocupações:
 }
 ```
 
-**Teste e Depuração:**
+**Testing and Debugging:**
 
-- `/hooks` para inspecionar configuração
-- `Ctrl+O` (verbose mode) para ver saida de hooks no transcrito
-- `claude --debug` para detalhes completos de execução
-- Testar manualmente com `echo '{"tool_name":"Bash"}' | ./hook.sh; echo $?`
+- `/hooks` to inspect configuration
+- `Ctrl+O` (verbose mode) to see hook output in the transcript
+- `claude --debug` for full execution details
+- Test manually with `echo '{"tool_name":"Bash"}' | ./hook.sh; echo $?`
 
-### 5.3 Subagentes
+### 5.3 Subagents
 
-**Hooks em contexto de subagentes:**
+**Hooks in subagent context:**
 
-- `SubagentStart` hooks podem injetar contexto adicional no subagente via `additionalContext`
-- `SubagentStop` hooks podem impedir o subagente de parar (mesma semantica que `Stop`)
-- Hooks de subagente definidos em frontmatter convertem `Stop` para `SubagentStop` automaticamente
-- O campo `agent_id` no input distingue chamadas de subagente vs. thread principal
+- `SubagentStart` hooks can inject additional context into the subagent via `additionalContext`
+- `SubagentStop` hooks can prevent the subagent from stopping (same semantics as `Stop`)
+- Subagent hooks defined in frontmatter automatically convert `Stop` to `SubagentStop`
+- The `agent_id` field in the input distinguishes subagent calls vs. the main thread
 
-**Padrão: Injetar diretrizes de segurança em subagentes:**
+**Pattern: Inject security guidelines into subagents:**
 
 ```json
 {
@@ -413,7 +414,7 @@ Multiplos hooks no mesmo evento para diferentes preocupações:
         "hooks": [
           {
             "type": "command",
-            "command": "echo '{\"hookSpecificOutput\": {\"hookEventName\": \"SubagentStart\", \"additionalContext\": \"Siga diretrizes de segurança OWASP Top 10\"}}'"
+            "command": "echo '{\"hookSpecificOutput\": {\"hookEventName\": \"SubagentStart\", \"additionalContext\": \"Follow OWASP Top 10 security guidelines\"}}'"
           }
         ]
       }
@@ -422,54 +423,54 @@ Multiplos hooks no mesmo evento para diferentes preocupações:
 }
 ```
 
-**Isolamento:**
+**Isolation:**
 
-- Hooks definidos em settings globais se aplicam a subagentes tambem
-- Hooks definidos em frontmatter de agente são escopados ao ciclo de vida daquele agente
-- `agent_type` no input permite filtrar hooks por tipo de subagente
+- Hooks defined in global settings also apply to subagents
+- Hooks defined in agent frontmatter are scoped to that agent's lifecycle
+- `agent_type` in the input allows filtering hooks by subagent type
 
 ### 5.4 Rules
 
-**Hooks vs Rules — quando usar cada um:**
+**Hooks vs Rules — when to use each:**
 
-| Aspecto | Hooks | Rules (`.claude/rules/`) |
-|---------|-------|--------------------------|
-| Natureza | Deterministico, enforcement | Consultivo, orientação |
-| Execução | Automatica, no lifecycle | Injetado no contexto |
-| Impacto no contexto | Zero (executa externamente) | Consome orçamento de atenção |
-| Flexibilidade | Binario (allow/block) | Nuanceado (julgamento) |
-| Path-scoping | Via matcher regex | Via frontmatter `paths:` |
-| Confiabilidade | 100% (se hook funciona) | Depende do LLM seguir |
+| Aspect | Hooks | Rules (`.claude/rules/`) |
+|--------|-------|--------------------------|
+| Nature | Deterministic, enforcement | Advisory, guidance |
+| Execution | Automatic, in the lifecycle | Injected into context |
+| Context impact | Zero (executes externally) | Consumes attention budget |
+| Flexibility | Binary (allow/block) | Nuanced (judgment) |
+| Path-scoping | Via regex matcher | Via frontmatter `paths:` |
+| Reliability | 100% (if hook works) | Depends on the LLM following |
 
-**Padrão complementar:**
-Rules definem o "por que" e a orientação; hooks enforcam o "o que" de forma deterministica.
+**Complementary pattern:**
+Rules define the "why" and the guidance; hooks enforce the "what" deterministically.
 
-Exemplo: Uma rule diz "Preferir rg sobre grep para melhor performance". Um hook `PreToolUse` intercepta chamadas Bash com `grep` e sugere `rg`:
+Example: A rule says "Prefer rg over grep for better performance". A `PreToolUse` hook intercepts Bash calls with `grep` and suggests `rg`:
 
 ```bash
 #!/bin/bash
 INPUT=$(cat)
 COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command')
 if echo "$COMMAND" | grep -q '^grep '; then
-  echo '{"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "Use rg ao inves de grep para melhor performance"}}'
+  echo '{"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "Use rg instead of grep for better performance"}}'
 fi
 exit 0
 ```
 
 ### 5.5 Memory
 
-**Hooks que gerenciam memoria:**
+**Hooks that manage memory:**
 
-- `SessionStart` com matcher `compact` reinjeta contexto critico perdido durante compactação
-- `PostCompact` pode salvar o `compact_summary` para persistencia externa
-- `InstructionsLoaded` registra quando arquivos CLAUDE.md ou rules são carregados (auditoria)
+- `SessionStart` with matcher `compact` re-injects critical context lost during compaction
+- `PostCompact` can save the `compact_summary` for external persistence
+- `InstructionsLoaded` logs when CLAUDE.md or rules files are loaded (auditing)
 
-**Hooks disparados por eventos de memoria:**
+**Hooks triggered by memory events:**
 
-- `ConfigChange` com matcher `skills` detecta mudanças em arquivos de skill
-- `InstructionsLoaded` com matcher `path_glob_match` detecta carregamento lazy de rules
+- `ConfigChange` with matcher `skills` detects changes in skill files
+- `InstructionsLoaded` with matcher `path_glob_match` detects lazy loading of rules
 
-**Padrão: Contexto critico resiliente a compactação:**
+**Pattern: Critical context resilient to compaction:**
 
 ```json
 {
@@ -489,180 +490,180 @@ exit 0
 }
 ```
 
-O conteudo de `.claude/critical-context.txt` é adicionado automaticamente ao contexto do Claude apos cada compactação, eliminando a necessidade de manter essas informações no CLAUDE.md (que já é carregado via mecanismo proprio).
+The contents of `.claude/critical-context.txt` are automatically added to Claude's context after each compaction, eliminating the need to maintain this information in CLAUDE.md (which is already loaded via its own mechanism).
 
 ---
 
-## 6. Aplicabilidade do Guia de Engenharia de Prompts
+## 6. Applicability of the Prompt Engineering Guide
 
-### 6.1 ReAct para Hooks Baseados em Agent
+### 6.1 ReAct for Agent-Based Hooks
 
-O padrão ReAct (Pensamento → Ação → Observação) é o loop central de hooks `type: "agent"`. O subagente spawned por um agent hook executa exatamente este ciclo:
+The ReAct pattern (Thought → Action → Observation) is the core loop of `type: "agent"` hooks. The subagent spawned by an agent hook executes exactly this cycle:
 
-1. **Pensamento**: analisa o prompt e contexto do hook
-2. **Ação**: usa ferramentas (Read, Grep, Glob) para investigar
-3. **Observação**: avalia resultados e retorna decisão `{ok: true/false}`
+1. **Thought**: analyzes the hook's prompt and context
+2. **Action**: uses tools (Read, Grep, Glob) to investigate
+3. **Observation**: evaluates results and returns a decision `{ok: true/false}`
 
-**Aplicação pratica**: Um hook agent que verifica se testes passam antes de permitir Claude parar usa ReAct internamente — lê arquivos de teste, executa o test suite, observa resultados, decide.
+**Practical application**: An agent hook that verifies if tests pass before allowing Claude to stop uses ReAct internally — reads test files, runs the test suite, observes results, decides.
 
-### 6.2 Prompt Chaining para Composição de Hooks
+### 6.2 Prompt Chaining for Hook Composition
 
-Hooks multiplos no mesmo evento implementam prompt chaining deterministico. A saida de cada hook não alimenta o proximo diretamente, mas o efeito cumulativo no Claude Code cria uma pipeline:
+Multiple hooks on the same event implement deterministic prompt chaining. The output of each hook does not feed directly into the next, but the cumulative effect on Claude Code creates a pipeline:
 
-1. `PreToolUse` hook 1: valida segurança do comando → permite
-2. `PreToolUse` hook 2: verifica patterns protegidos → permite
-3. Ferramenta executa
-4. `PostToolUse` hook 1: formata codigo
-5. `PostToolUse` hook 2: executa linter
+1. `PreToolUse` hook 1: validates command security → allows
+2. `PreToolUse` hook 2: checks protected patterns → allows
+3. Tool executes
+4. `PostToolUse` hook 1: formats code
+5. `PostToolUse` hook 2: runs linter
 
-### 6.3 Constitutional AI para Stop Hooks
+### 6.3 Constitutional AI for Stop Hooks
 
-O padrão de Constitutional AI (critique → revise) se aplica diretamente a hooks `type: "prompt"` no evento `Stop`:
+The Constitutional AI pattern (critique → revise) applies directly to `type: "prompt"` hooks on the `Stop` event:
 
 ```json
 {
   "type": "prompt",
-  "prompt": "Avalie se Claude completou todas as tarefas solicitadas. Princípios: (1) Todas as funcionalidades foram implementadas (2) Testes foram escritos e passam (3) Nenhum erro pendente. Se algum principio nao foi atendido, responda {\"ok\": false, \"reason\": \"<explicação>\"}."
+  "prompt": "Evaluate whether Claude completed all requested tasks. Principles: (1) All features were implemented (2) Tests were written and pass (3) No pending errors. If any principle was not met, respond {\"ok\": false, \"reason\": \"<explanation>\"}."
 }
 ```
 
-A "constituição" são os principios contra os quais o LLM avalia; a decisão `ok: false` com `reason` é a revisão que volta para o Claude principal.
+The "constitution" consists of the principles against which the LLM evaluates; the `ok: false` decision with `reason` is the revision that returns to the main Claude.
 
-### 6.4 Structured Output para Comunicação Hook ↔ Claude Code
+### 6.4 Structured Output for Hook ↔ Claude Code Communication
 
-Toda comunicação de hook é baseada em JSON estruturado. As recomendações do guia de engenharia de prompts se aplicam:
+All hook communication is based on structured JSON. The prompt engineering guide recommendations apply:
 
-- Separar raciocinio de decisão (o hook raciocina internamente, retorna decisão estruturada)
-- Usar campos bem definidos (`permissionDecision`, `reason`, `additionalContext`)
-- Evitar misturar texto livre com JSON
+- Separate reasoning from decision (the hook reasons internally, returns structured decision)
+- Use well-defined fields (`permissionDecision`, `reason`, `additionalContext`)
+- Avoid mixing free text with JSON
 
-### 6.5 Least-to-Most para Decomposição de Hooks Complexos
+### 6.5 Least-to-Most for Complex Hook Decomposition
 
-Hooks complexos devem ser decompostos em scripts menores e focados, cada um resolvendo um subproblema. Em vez de um mega-script que valida, formata e testa:
+Complex hooks should be decomposed into smaller, focused scripts, each solving a subproblem. Instead of a mega-script that validates, formats, and tests:
 
 ```
 hooks/
-├── validate-security.sh      # Subproblema 1
-├── format-code.sh             # Subproblema 2
-├── run-tests.sh               # Subproblema 3
-└── check-protected-files.sh   # Subproblema 4
+├── validate-security.sh      # Subproblem 1
+├── format-code.sh             # Subproblem 2
+├── run-tests.sh               # Subproblem 3
+└── check-protected-files.sh   # Subproblem 4
 ```
 
-Cada script é simples, testavel e compostavel.
+Each script is simple, testable, and composable.
 
-### 6.6 Role Prompting para Hooks Prompt/Agent
+### 6.6 Role Prompting for Prompt/Agent Hooks
 
-Em hooks `type: "prompt"` e `type: "agent"`, usar role prompting melhora a precisão da avaliação:
+In `type: "prompt"` and `type: "agent"` hooks, using role prompting improves evaluation accuracy:
 
 ```json
 {
   "type": "prompt",
-  "prompt": "Voce é um revisor de codigo senior especializado em segurança. Avalie se o comando a seguir é seguro: $ARGUMENTS"
+  "prompt": "You are a senior code reviewer specializing in security. Evaluate whether the following command is safe: $ARGUMENTS"
 }
 ```
 
-O papel especializado direciona a distribuição de probabilidades do modelo para decisões mais rigorosas e fundamentadas.
+The specialized role directs the model's probability distribution toward more rigorous and well-founded decisions.
 
 ---
 
-## 7. Correlações com Documentos Principais
+## 7. Correlations with Key Documents
 
-### 7.1 Context Optimization (Otimização de Contexto)
+### 7.1 Context Optimization
 
-**Conexão direta**: O documento de pesquisa de otimização de contexto afirma que "converter instruções comportamentais em hooks deterministicos remove-as do orçamento de contexto". O guia de hooks demonstra exatamente isso:
+**Direct connection**: The context optimization research document states that "converting behavioral instructions into deterministic hooks removes them from the context budget". The hooks guide demonstrates exactly this:
 
-- Regra "sempre formate com Prettier" → hook `PostToolUse` com Prettier (0 tokens de contexto)
-- Regra "nunca edite .env" → hook `PreToolUse` com exit 2 (0 tokens de contexto)
+- Rule "always format with Prettier" → `PostToolUse` hook with Prettier (0 context tokens)
+- Rule "never edit .env" → `PreToolUse` hook with exit 2 (0 context tokens)
 
-**Quantificação**: Cada regra convertida em hook economiza ~20-50 tokens no CLAUDE.md, que em um arquivo de 200 linhas (~3000 tokens) representa 0.7-1.7% do orçamento por regra.
+**Quantification**: Each rule converted to a hook saves ~20-50 tokens in CLAUDE.md, which in a 200-line file (~3000 tokens) represents 0.7-1.7% of the budget per rule.
 
-### 7.2 Instruction Budget (Orçamento de Instruções)
+### 7.2 Instruction Budget
 
-**Conexão direta**: O principio de manter CLAUDE.md abaixo de 200 linhas é viabilizado por hooks. Regras de enforcement que antes consumiam linhas no CLAUDE.md agora vivem em hooks:
+**Direct connection**: The principle of keeping CLAUDE.md under 200 lines is enabled by hooks. Enforcement rules that previously consumed lines in CLAUDE.md now live in hooks:
 
-| Antes (CLAUDE.md) | Depois (Hook) | Economia |
-|-------------------|---------------|----------|
-| "NUNCA edite .env ou package-lock.json" | `PreToolUse` protect-files.sh | ~1 linha |
-| "Sempre execute prettier apos editar" | `PostToolUse` prettier | ~1 linha |
-| "Notifique quando aguardando input" | `Notification` notify-send | ~1 linha |
-| "Sempre execute testes antes de commitar" | `Stop` hook com npm test | ~2 linhas |
+| Before (CLAUDE.md) | After (Hook) | Savings |
+|---------------------|--------------|---------|
+| "NEVER edit .env or package-lock.json" | `PreToolUse` protect-files.sh | ~1 line |
+| "Always run prettier after editing" | `PostToolUse` prettier | ~1 line |
+| "Notify when awaiting input" | `Notification` notify-send | ~1 line |
+| "Always run tests before committing" | `Stop` hook with npm test | ~2 lines |
 
-### 7.3 Progressive Disclosure (Divulgação Progressiva)
+### 7.3 Progressive Disclosure
 
-**Conexão direta**: Hooks implementam divulgação progressiva temporal:
+**Direct connection**: Hooks implement temporal progressive disclosure:
 
-- `SessionStart` carrega contexto inicial
-- `PreToolUse`/`PostToolUse` executam no momento exato da ação
-- `InstructionsLoaded` reage ao carregamento lazy de regras
-- `SessionStart` com matcher `compact` reinjeta contexto critico just-in-time
+- `SessionStart` loads initial context
+- `PreToolUse`/`PostToolUse` execute at the exact moment of the action
+- `InstructionsLoaded` reacts to lazy loading of rules
+- `SessionStart` with matcher `compact` re-injects critical context just-in-time
 
-Diferente de CLAUDE.md (pre-carregado) e rules (carregadas por path), hooks operam em **pontos especificos do ciclo de vida** — a forma mais precisa de "just in time".
+Unlike CLAUDE.md (pre-loaded) and rules (loaded by path), hooks operate at **specific lifecycle points** — the most precise form of "just in time".
 
-### 7.4 Context Poisoning (Envenenamento de Contexto)
+### 7.4 Context Poisoning
 
-**Conexão direta**: Hooks resolvem dois vetores de envenenamento identificados na pesquisa:
+**Direct connection**: Hooks address two poisoning vectors identified in the research:
 
-1. **Instruções desatualizadas**: Hooks executam logica programatica, nao dependem de o LLM "lembrar" a instrução
-2. **Instruções contraditorias**: Hooks são deterministicos — nao ha ambiguidade sobre qual regra prevalece
+1. **Outdated instructions**: Hooks execute programmatic logic, they do not depend on the LLM "remembering" the instruction
+2. **Contradictory instructions**: Hooks are deterministic — there is no ambiguity about which rule prevails
 
-O hook `SessionStart` com matcher `compact` resolve especificamente o problema de **perda de contexto critico durante compactação** — um vetor de envenenamento por omissão.
+The `SessionStart` hook with matcher `compact` specifically solves the problem of **critical context loss during compaction** — a poisoning vector through omission.
 
-### 7.5 AGENTS Evaluation (Avaliação de Config de Agentes)
+### 7.5 Agent Config Evaluation
 
-**Conexão direta**: O principio de que "arquivos de configuração funcionam melhor quando focam em orientação, nao enforcement" é implementado pela divisão hooks/rules:
+**Direct connection**: The principle that "configuration files work best when they focus on guidance, not enforcement" is implemented by the hooks/rules division:
 
-- CLAUDE.md e rules: orientação, preferencias, convenções (advisory)
-- Hooks: enforcement, validação, bloqueio (deterministic)
+- CLAUDE.md and rules: guidance, preferences, conventions (advisory)
+- Hooks: enforcement, validation, blocking (deterministic)
 
 ---
 
-## 8. Framework de Decisão
+## 8. Decision Framework
 
-### 8.1 Arvore de Decisão
+### 8.1 Decision Tree
 
 ```
-A regra precisa ser seguida 100% das vezes?
-├── SIM → A regra pode ser verificada programaticamente?
-│   ├── SIM → Use um HOOK
-│   │   ├── Precisa bloquear antes da ação? → PreToolUse hook
-│   │   ├── Precisa processar apos a ação? → PostToolUse hook
-│   │   ├── Precisa controlar quando Claude para? → Stop hook
-│   │   └── Precisa reagir a eventos de ciclo de vida? → Evento apropriado
-│   └── NÃO → Use um HOOK tipo prompt/agent (avaliação LLM)
-├── NÃO, mas é importante → A regra é especifica a um caminho/area?
-│   ├── SIM → Use uma RULE com paths: frontmatter
-│   └── NÃO → A regra é universal para o projeto?
-│       ├── SIM → Coloque no CLAUDE.md do projeto
-│       └── NÃO → Coloque no CLAUDE.md do subdiretorio
-└── É uma capacidade complexa com multiplos passos?
-    └── SIM → Use um SKILL
+Does the rule need to be followed 100% of the time?
+├── YES → Can the rule be verified programmatically?
+│   ├── YES → Use a HOOK
+│   │   ├── Need to block before the action? → PreToolUse hook
+│   │   ├── Need to process after the action? → PostToolUse hook
+│   │   ├── Need to control when Claude stops? → Stop hook
+│   │   └── Need to react to lifecycle events? → Appropriate event
+│   └── NO → Use a prompt/agent type HOOK (LLM evaluation)
+├── NO, but it's important → Is the rule specific to a path/area?
+│   ├── YES → Use a RULE with paths: frontmatter
+│   └── NO → Is the rule universal for the project?
+│       ├── YES → Place in the project's CLAUDE.md
+│       └── NO → Place in the subdirectory's CLAUDE.md
+└── Is it a complex capability with multiple steps?
+    └── YES → Use a SKILL
 ```
 
-### 8.2 Matriz de Decisão
+### 8.2 Decision Matrix
 
-| Criterio | Hook (command) | Hook (prompt/agent) | Rule | CLAUDE.md | Skill |
-|----------|---------------|--------------------|----|-----------|-------|
-| Enforcement 100% | Sim | ~95% | Nao | Nao | Nao |
-| Zero custo de contexto | Sim | Nao (custo API) | Nao | Nao | Parcial |
-| Julgamento necessario | Nao | Sim | Sim | Sim | Sim |
-| Complexidade de setup | Media | Baixa | Baixa | Minima | Media-Alta |
-| Auditavel | Sim (logs) | Sim (transcrito) | Nao | Nao | Nao |
-| Compartilhavel via git | Sim (.claude/settings.json) | Sim | Sim | Sim | Sim |
-| Escopo temporal | Ponto no lifecycle | Ponto no lifecycle | Sempre em contexto | Sempre em contexto | Sob demanda |
+| Criterion | Hook (command) | Hook (prompt/agent) | Rule | CLAUDE.md | Skill |
+|-----------|---------------|--------------------|----|-----------|-------|
+| 100% enforcement | Yes | ~95% | No | No | No |
+| Zero context cost | Yes | No (API cost) | No | No | Partial |
+| Judgment required | No | Yes | Yes | Yes | Yes |
+| Setup complexity | Medium | Low | Low | Minimal | Medium-High |
+| Auditable | Yes (logs) | Yes (transcript) | No | No | No |
+| Shareable via git | Yes (.claude/settings.json) | Yes | Yes | Yes | Yes |
+| Temporal scope | Lifecycle point | Lifecycle point | Always in context | Always in context | On demand |
 
-### 8.3 Regra de Ouro
+### 8.3 Golden Rule
 
-> **Se a consequencia de violar a regra é severa (segurança, dados, compliance), use um hook.**
-> **Se a consequencia é qualidade degradada mas aceitavel, use CLAUDE.md ou rules.**
-> **Se a regra requer multiplos passos de execução, use um skill.**
+> **If the consequence of violating the rule is severe (security, data, compliance), use a hook.**
+> **If the consequence is degraded but acceptable quality, use CLAUDE.md or rules.**
+> **If the rule requires multiple execution steps, use a skill.**
 
 ---
 
-## 9. Recomendações Praticas
+## 9. Practical Recommendations
 
-### 9.1 Starter Kit para Projetos Novos
+### 9.1 Starter Kit for New Projects
 
-Configuração minima recomendada para `.claude/settings.json`:
+Minimum recommended configuration for `.claude/settings.json`:
 
 ```json
 {
@@ -673,7 +674,7 @@ Configuração minima recomendada para `.claude/settings.json`:
         "hooks": [
           {
             "type": "command",
-            "command": "notify-send 'Claude Code' 'Precisa de atenção'"
+            "command": "notify-send 'Claude Code' 'Needs attention'"
           }
         ]
       }
@@ -715,7 +716,7 @@ Configuração minima recomendada para `.claude/settings.json`:
 }
 ```
 
-### 9.2 Script de Proteção de Arquivos Robusto
+### 9.2 Robust File Protection Script
 
 ```bash
 #!/bin/bash
@@ -742,7 +743,7 @@ PROTECTED_PATTERNS=(
 
 for pattern in "${PROTECTED_PATTERNS[@]}"; do
   if [[ "$FILE_PATH" == *"$pattern"* ]]; then
-    echo "Bloqueado: $FILE_PATH corresponde ao padrão protegido '$pattern'" >&2
+    echo "Blocked: $FILE_PATH matches protected pattern '$pattern'" >&2
     exit 2
   fi
 done
@@ -750,34 +751,34 @@ done
 exit 0
 ```
 
-### 9.3 Stop Hook Seguro com Verificação de Testes
+### 9.3 Safe Stop Hook with Test Verification
 
 ```bash
 #!/bin/bash
 # .claude/hooks/verify-before-stop.sh
 INPUT=$(cat)
 
-# Prevenir loop infinito
+# Prevent infinite loop
 if [ "$(echo "$INPUT" | jq -r '.stop_hook_active')" = "true" ]; then
   exit 0
 fi
 
-# Verificar se ha arquivos modificados que precisam de teste
+# Check if there are modified files that need testing
 MODIFIED=$(git diff --name-only 2>/dev/null | grep -E '\.(ts|js|py)$' | head -1)
 if [ -z "$MODIFIED" ]; then
-  exit 0  # Sem arquivos modificados, pode parar
+  exit 0  # No modified files, can stop
 fi
 
-# Executar testes
+# Run tests
 if ! npm test 2>&1 > /dev/null; then
-  echo '{"decision": "block", "reason": "Testes falhando. Corrija os testes antes de finalizar."}'
+  echo '{"decision": "block", "reason": "Tests failing. Fix the tests before finishing."}'
   exit 0
 fi
 
 exit 0
 ```
 
-### 9.4 Auditoria Completa para Compliance
+### 9.4 Complete Audit for Compliance
 
 ```json
 {
@@ -809,7 +810,7 @@ exit 0
 }
 ```
 
-### 9.5 Hook HTTP para Time Distribuido
+### 9.5 HTTP Hook for Distributed Teams
 
 ```json
 {
@@ -832,17 +833,17 @@ exit 0
 }
 ```
 
-Para times que precisam de auditoria centralizada, um serviço HTTP local recebe todos os eventos de uso de ferramentas. O header `Authorization` usa interpolação de variavel de ambiente com `allowedEnvVars` para segurança.
+For teams that need centralized auditing, a local HTTP service receives all tool usage events. The `Authorization` header uses environment variable interpolation with `allowedEnvVars` for security.
 
-### 9.6 Checklist de Implementação
+### 9.6 Implementation Checklist
 
-1. Identificar regras de enforcement no CLAUDE.md que podem ser convertidas em hooks
-2. Para cada regra, determinar o evento correto (Pre/PostToolUse, Stop, etc.)
-3. Escrever o script de hook com tratamento adequado de JSON
-4. Tornar o script executavel (`chmod +x`)
-5. Testar manualmente com `echo '{...}' | ./hook.sh; echo $?`
-6. Adicionar ao settings.json com matcher apropriado
-7. Verificar com `/hooks` no Claude Code
-8. Testar em cenario real e verificar com `Ctrl+O` (verbose mode)
-9. Remover a regra correspondente do CLAUDE.md
-10. Documentar o hook e seu proposito
+1. Identify enforcement rules in CLAUDE.md that can be converted to hooks
+2. For each rule, determine the correct event (Pre/PostToolUse, Stop, etc.)
+3. Write the hook script with proper JSON handling
+4. Make the script executable (`chmod +x`)
+5. Test manually with `echo '{...}' | ./hook.sh; echo $?`
+6. Add to settings.json with appropriate matcher
+7. Verify with `/hooks` in Claude Code
+8. Test in a real scenario and verify with `Ctrl+O` (verbose mode)
+9. Remove the corresponding rule from CLAUDE.md
+10. Document the hook and its purpose

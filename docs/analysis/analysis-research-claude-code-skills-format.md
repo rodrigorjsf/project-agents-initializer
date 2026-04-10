@@ -1,132 +1,133 @@
-# Analise: Research Claude Code Skills & Plugin Marketplace Format
+# Analysis: Research Claude Code Skills & Plugin Marketplace Format
 
-> Analise do documento de pesquisa sobre formatos de skills, plugins e marketplaces do Claude Code.
-> **Documento fonte**: `docs/skills/research-claude-code-skills-format.md`
-> **Data da analise**: 2026-03-27
-
----
-
-## 1. Sumario Executivo
-
-O documento "Research: Claude Code Skills & Plugin Marketplace Format" e uma pesquisa tecnica que mapeia o ecossistema completo de extensibilidade do Claude Code em tres camadas: Skills standalone (SKILL.md seguindo o padrao Agent Skills), Plugins (pacotes que agrupam skills + agents + hooks + MCP/LSP servers) e Marketplaces (catalogos de plugins distribuidores via repositorios GitHub). A pesquisa foi realizada em marco de 2026 com fontes oficiais da Anthropic, o padrao aberto Agent Skills e repositorios da comunidade.
-
-A contribuicao mais significativa deste documento e a clarificacao do ecossistema de distribuicao: nao existe `npx skills add` -- a instalacao ocorre via `/plugin install` dentro do Claude Code ou `claude plugin install` na CLI. Isso corrige um equivoco comum e posiciona o sistema de plugins como o mecanismo canonico de distribuicao. O documento tambem mapeia a compatibilidade cross-agent do formato SKILL.md, demonstrando que o mesmo arquivo funciona em Claude Code (`.claude/skills/`), VS Code/GitHub Copilot (`.agents/skills/`) e OpenAI Codex.
-
-A terceira contribuicao e a documentacao da distincao entre o Agent Skills Open Standard (campos minimos: `name` e `description`) e as extensoes proprietarias do Claude Code (`disable-model-invocation`, `context`, `agent`, `hooks`, `model`, `effort`). Esta distincao e critica para autores que desejam criar skills portaveis vs skills que exploram capacidades avancadas do Claude Code.
+> **Status**: Current
+> **Source document**: [`docs/skills/research-claude-code-skills-format.md`](../skills/research-claude-code-skills-format.md)
+> **Analysis date**: 2026-03-27
+> **Scope**: Analysis of the research document on Claude Code skills formats, plugins, and marketplaces
 
 ---
 
-## 2. Conceitos e Mecanismos Chave
+## 1. Executive Summary
 
-### 2.1 As Tres Camadas de Extensibilidade
+The document "Research: Claude Code Skills & Plugin Marketplace Format" is a technical research piece that maps the complete Claude Code extensibility ecosystem across three layers: Standalone Skills (SKILL.md following the Agent Skills standard), Plugins (packages that bundle skills + agents + hooks + MCP/LSP servers), and Marketplaces (plugin catalogs distributed via GitHub repositories). The research was conducted in March 2026 using official Anthropic sources, the open Agent Skills standard, and community repositories.
 
-O documento revela uma arquitetura em tres camadas que escala de simples a complexo:
+The most significant contribution of this document is the clarification of the distribution ecosystem: there is no `npx skills add` — installation occurs via `/plugin install` within Claude Code or `claude plugin install` on the CLI. This corrects a common misconception and positions the plugin system as the canonical distribution mechanism. The document also maps SKILL.md cross-agent compatibility, demonstrating that the same file works in Claude Code (`.claude/skills/`), VS Code/GitHub Copilot (`.agents/skills/`), and OpenAI Codex.
+
+The third contribution is the documentation of the distinction between the Agent Skills Open Standard (minimum fields: `name` and `description`) and Claude Code proprietary extensions (`disable-model-invocation`, `context`, `agent`, `hooks`, `model`, `effort`). This distinction is critical for authors who wish to create portable skills vs skills that leverage advanced Claude Code capabilities.
+
+---
+
+## 2. Key Concepts and Mechanisms
+
+### 2.1 The Three Layers of Extensibility
+
+The document reveals a three-layer architecture that scales from simple to complex:
 
 ```
-Camada 1: Skill (SKILL.md)
-  - Unidade atomica de extensao
-  - Formato: diretorio com SKILL.md + arquivos de suporte
-  - Invocacao: /skill-name
+Layer 1: Skill (SKILL.md)
+  - Atomic unit of extension
+  - Format: directory with SKILL.md + supporting files
+  - Invocation: /skill-name
 
-Camada 2: Plugin (diretorio com .claude-plugin/)
-  - Pacote de distribuicao agrupando multiplos componentes
-  - Contem: skills/ + agents/ + hooks/ + .mcp.json + .lsp.json
-  - Invocacao: /plugin-name:skill-name
-  - Manifesto: .claude-plugin/plugin.json
+Layer 2: Plugin (directory with .claude-plugin/)
+  - Distribution package bundling multiple components
+  - Contains: skills/ + agents/ + hooks/ + .mcp.json + .lsp.json
+  - Invocation: /plugin-name:skill-name
+  - Manifest: .claude-plugin/plugin.json
 
-Camada 3: Marketplace (repositorio com marketplace.json)
-  - Catalogo de plugins para descoberta e instalacao
-  - Contem: .claude-plugin/marketplace.json + plugins/
-  - Instalacao: /plugin install name@marketplace
+Layer 3: Marketplace (repository with marketplace.json)
+  - Plugin catalog for discovery and installation
+  - Contains: .claude-plugin/marketplace.json + plugins/
+  - Installation: /plugin install name@marketplace
 ```
 
 ### 2.2 Agent Skills Open Standard vs Claude Code Extensions
 
-**Campos do padrao aberto (agentskills.io):**
+**Open standard fields (agentskills.io):**
 
-| Campo | Obrigatorio | Limite |
-|-------|-------------|--------|
-| `name` | Sim* | 64 chars, kebab-case |
-| `description` | Sim* | 1024 chars |
-| `license` | Nao | - |
-| `compatibility` | Nao | 500 chars |
-| `metadata` | Nao | Key-value arbitrario |
-| `allowed-tools` | Nao (experimental) | Lista separada por espacos |
+| Field | Required | Limit |
+|-------|----------|-------|
+| `name` | Yes* | 64 chars, kebab-case |
+| `description` | Yes* | 1024 chars |
+| `license` | No | - |
+| `compatibility` | No | 500 chars |
+| `metadata` | No | Arbitrary key-value |
+| `allowed-tools` | No (experimental) | Space-separated list |
 
-*No Claude Code, ambos sao tecnicamente opcionais com fallbacks: `name` usa o nome do diretorio, `description` usa o primeiro paragrafo do conteudo.
+*In Claude Code, both are technically optional with fallbacks: `name` uses the directory name, `description` uses the first paragraph of content.
 
-**Extensoes proprietarias do Claude Code:**
+**Claude Code proprietary extensions:**
 
-| Campo | Funcao |
-|-------|--------|
-| `argument-hint` | Dica de autocomplete (ex: `[issue-number]`) |
-| `disable-model-invocation` | Impede invocacao automatica pelo Claude |
-| `user-invocable` | Esconde do menu `/` (background knowledge) |
-| `model` | Override de modelo quando skill ativa |
-| `effort` | Nivel de esforco: low, medium, high, max |
-| `context` | `fork` para execucao em subagente isolado |
-| `agent` | Tipo de subagente (Explore, Plan, general-purpose) |
-| `hooks` | Hooks scoped ao lifecycle da skill |
+| Field | Function |
+|-------|----------|
+| `argument-hint` | Autocomplete hint (e.g., `[issue-number]`) |
+| `disable-model-invocation` | Prevents automatic invocation by Claude |
+| `user-invocable` | Hides from `/` menu (background knowledge) |
+| `model` | Model override when skill is active |
+| `effort` | Effort level: low, medium, high, max |
+| `context` | `fork` for execution in isolated subagent |
+| `agent` | Subagent type (Explore, Plan, general-purpose) |
+| `hooks` | Hooks scoped to the skill lifecycle |
 
-**Implicacao para portabilidade**: Skills que usam apenas campos do padrao aberto funcionam em Claude Code, VS Code/Copilot e OpenAI Codex. Skills com extensoes Claude Code sao especificas da plataforma.
+**Portability implication**: Skills using only open standard fields work in Claude Code, VS Code/Copilot, and OpenAI Codex. Skills with Claude Code extensions are platform-specific.
 
-### 2.3 Regras de Validacao de Nomes
+### 2.3 Name Validation Rules
 
-O documento detalha regras rigorosas de validacao:
+The document details strict validation rules:
 
-- 1-64 caracteres
-- Apenas lowercase `a-z`, numeros e hifens
-- NAO pode iniciar ou terminar com `-`
-- NAO pode conter `--` consecutivos
-- DEVE corresponder ao nome do diretorio pai
-- NAO pode conter palavras reservadas: "anthropic", "claude"
-- NAO pode conter tags XML
+- 1-64 characters
+- Only lowercase `a-z`, numbers, and hyphens
+- CANNOT start or end with `-`
+- CANNOT contain consecutive `--`
+- MUST match the parent directory name
+- CANNOT contain reserved words: "anthropic", "claude"
+- CANNOT contain XML tags
 
-### 2.4 Variaveis de Substituicao
+### 2.4 Substitution Variables
 
-| Variavel | Descricao | Exemplo de uso |
-|----------|-----------|----------------|
-| `$ARGUMENTS` | Todos os argumentos | `Analise $ARGUMENTS` |
-| `$ARGUMENTS[N]` / `$N` | Argumento por indice | `Migre $0 de $1 para $2` |
-| `${CLAUDE_SESSION_ID}` | ID da sessao | Logging, correlacao |
-| `${CLAUDE_SKILL_DIR}` | Diretorio da skill | Scripts bundled |
+| Variable | Description | Usage Example |
+|----------|-------------|---------------|
+| `$ARGUMENTS` | All arguments | `Analyze $ARGUMENTS` |
+| `$ARGUMENTS[N]` / `$N` | Argument by index | `Migrate $0 from $1 to $2` |
+| `${CLAUDE_SESSION_ID}` | Session ID | Logging, correlation |
+| `${CLAUDE_SKILL_DIR}` | Skill directory | Bundled scripts |
 
-### 2.5 Injecao Dinamica de Contexto
+### 2.5 Dynamic Context Injection
 
-A sintaxe `` !`<command>` `` executa comandos shell ANTES do envio ao Claude:
+The `` !`<command>` `` syntax executes shell commands BEFORE sending to Claude:
 
 ```markdown
 - Diff: !`gh pr diff`
 - Comments: !`gh pr view --comments`
 ```
 
-**Mecanismo**: Pre-processamento puro. O comando executa, o output substitui o placeholder, Claude recebe apenas o resultado final. Nao e execucao pelo Claude.
+**Mechanism**: Pure pre-processing. The command executes, the output replaces the placeholder, Claude receives only the final result. It is not execution by Claude.
 
-### 2.6 Estrutura de Plugin Completa
+### 2.6 Complete Plugin Structure
 
 ```
 my-plugin/
   .claude-plugin/
-    plugin.json          # Manifesto (opcional - auto-discovery funciona)
-  skills/                # Skills (formato Agent Skills)
-  agents/                # Definicoes de subagentes
-  commands/              # Comandos legacy (markdown)
+    plugin.json          # Manifest (optional — auto-discovery works)
+  skills/                # Skills (Agent Skills format)
+  agents/                # Subagent definitions
+  commands/              # Legacy commands (markdown)
   hooks/
-    hooks.json           # Configuracoes de hooks
-  scripts/               # Scripts para hooks e utilidades
-  settings.json          # Configuracoes default
-  .mcp.json              # Servidores MCP
-  .lsp.json              # Servidores LSP
+    hooks.json           # Hook configurations
+  scripts/               # Scripts for hooks and utilities
+  settings.json          # Default settings
+  .mcp.json              # MCP servers
+  .lsp.json              # LSP servers
 ```
 
-**Campo minimo do plugin.json**: Apenas `name` e obrigatorio se o manifesto existir. O manifesto em si e opcional -- Claude Code auto-descobre componentes em locais default.
+**Minimum plugin.json field**: Only `name` is required if the manifest exists. The manifest itself is optional — Claude Code auto-discovers components in default locations.
 
-**Variaveis de ambiente para plugins:**
+**Environment variables for plugins:**
 
-- `${CLAUDE_PLUGIN_ROOT}` -- Path absoluto do diretorio de instalacao (muda em updates)
-- `${CLAUDE_PLUGIN_DATA}` -- Diretorio de dados persistentes que sobrevive updates
+- `${CLAUDE_PLUGIN_ROOT}` — Absolute path to the installation directory (changes on updates)
+- `${CLAUDE_PLUGIN_DATA}` — Persistent data directory that survives updates
 
-### 2.7 Formato marketplace.json
+### 2.7 marketplace.json Format
 
 ```json
 {
@@ -144,9 +145,9 @@ my-plugin/
 }
 ```
 
-**Tipos de source suportados:**
+**Supported source types:**
 
-- Caminho relativo: `"./plugins/my-plugin"`
+- Relative path: `"./plugins/my-plugin"`
 - GitHub repo: `{ "source": "github", "repo": "owner/repo" }`
 - Git URL: `{ "source": "url", "url": "https://..." }`
 - Git subdirectory: `{ "source": "git-subdir", "url": "...", "path": "tools/plugin" }`
@@ -154,151 +155,151 @@ my-plugin/
 
 **Strict mode:**
 
-- `true` (default): `plugin.json` e autoridade; marketplace entry apenas complementa
-- `false`: Marketplace entry e a definicao completa
+- `true` (default): `plugin.json` is authoritative; marketplace entry only supplements
+- `false`: Marketplace entry is the complete definition
 
-### 2.8 Mecanismo de Instalacao
+### 2.8 Installation Mechanism
 
 ```bash
-# Adicionar marketplace
+# Add marketplace
 /plugin marketplace add owner/repo
 
-# Instalar plugin
+# Install plugin
 /plugin install plugin-name@marketplace-name
 
-# CLI nao-interativa
+# Non-interactive CLI
 claude plugin install formatter@my-marketplace --scope project
 
-# Escopos de instalacao
-# user (default) - pessoal, todos os projetos
-# project - compartilhado via .claude/settings.json
-# local - gitignored, apenas para voce neste projeto
+# Installation scopes
+# user (default) - personal, all projects
+# project - shared via .claude/settings.json
+# local - gitignored, only for you on this project
 ```
 
 ### 2.9 Progressive Disclosure Model
 
-O documento formaliza o modelo de 3 niveis:
+The document formalizes the 3-level model:
 
-1. **Metadados** (~100 tokens): `name` + `description` -- carregados no startup para TODAS as skills
-2. **Instrucoes** (<5000 tokens recomendados): Corpo do SKILL.md -- carregado quando skill ativa
-3. **Recursos** (conforme necessidade): Scripts, referencias, assets -- carregados sob demanda
-
----
-
-## 3. Pontos de Atencao
-
-### 3.1 Erros Comuns e Confusoes
-
-1. **Confusao `npx skills add`**: NAO EXISTE. A instalacao e via `/plugin install` ou `claude plugin install`. Ferramentas comunitarias como CCPI podem oferecer alternativas, mas nao sao oficiais.
-
-2. **Confusao `skills.json`**: NAO EXISTE manifesto de skills. O "manifesto" e o proprio SKILL.md (frontmatter). Para plugins, o manifesto e `plugin.json`. Para marketplaces, `marketplace.json`.
-
-3. **Portabilidade assumida**: Skills com campos Claude Code (`context`, `hooks`, `agent`) NAO funcionam em VS Code/Copilot ou OpenAI Codex. Apenas campos do padrao aberto sao portaveis.
-
-4. **Nome vs diretorio**: O campo `name` DEVE corresponder ao nome do diretorio pai. Uma skill em `my-skill/SKILL.md` deve ter `name: my-skill`.
-
-5. **Namespace de plugins**: Skills de plugins usam `plugin-name:skill-name`. Skills de projeto/pessoal NAO tem namespace -- conflitos sao resolvidos por prioridade (enterprise > personal > project).
-
-### 3.2 Armadilhas de Contexto
-
-- **Descricoes de skills consomem 2% da janela de contexto**: Com muitas skills, o orcamento de descricoes pode estourar silenciosamente
-- **plugins.json strict mode**: No modo strict (default), inconsistencias entre plugin.json e marketplace.json podem causar comportamento inesperado
-- **Auto-discovery em monorepo**: Claude auto-descobre `.claude/skills/` em subdiretorios quando editando arquivos la. Isso pode carregar skills inesperadas.
-
-### 3.3 Lacunas Identificadas pelo Documento
-
-O proprio documento identifica gaps importantes:
-
-1. **Sem `npx skills add`**: O mecanismo de distribuicao standalone de skills (sem plugin wrapper) e limitado a copia manual
-2. **Sem `skills.json`**: Nao ha manifesto de colecao de skills. Cada skill e auto-contida
-3. **Padrao aberto minimo**: O Agent Skills Open Standard define apenas SKILL.md com name + description. Claude Code adiciona a maioria das funcionalidades
-4. **Compatibilidade cross-agent limitada**: Embora o formato seja o mesmo, funcionalidades avancadas sao especificas de cada plataforma
+1. **Metadata** (~100 tokens): `name` + `description` — loaded at startup for ALL skills
+2. **Instructions** (<5000 tokens recommended): SKILL.md body — loaded when skill is activated
+3. **Resources** (as needed): Scripts, references, assets — loaded on demand
 
 ---
 
-## 4. Casos de Uso e Escopo
+## 3. Points of Attention
 
-### 4.1 Decisao de Distribuicao
+### 3.1 Common Errors and Misconceptions
 
-| Cenario | Mecanismo Recomendado |
-|---------|----------------------|
-| Skill pessoal para meu workflow | `~/.claude/skills/skill-name/SKILL.md` |
-| Skill compartilhada com time | `.claude/skills/skill-name/SKILL.md` (commit) |
-| Colecao de skills + hooks + MCP | Plugin com `.claude-plugin/plugin.json` |
-| Distribuicao publica de multiplos plugins | Marketplace com `marketplace.json` |
-| Skill cross-platform (Claude + Copilot) | Manter apenas campos do padrao aberto |
-| Skill com funcionalidades avancadas Claude Code | Usar extensoes proprietarias (aceitar lock-in) |
+1. **`npx skills add` misconception**: DOES NOT EXIST. Installation is via `/plugin install` or `claude plugin install`. Community tools like CCPI may offer alternatives, but they are not official.
 
-### 4.2 Quando Criar Plugin vs Skill Standalone
+2. **`skills.json` misconception**: There is NO skills manifest. The "manifest" is the SKILL.md itself (frontmatter). For plugins, the manifest is `plugin.json`. For marketplaces, `marketplace.json`.
 
-**Skill standalone quando:**
+3. **Assumed portability**: Skills with Claude Code fields (`context`, `hooks`, `agent`) DO NOT work in VS Code/Copilot or OpenAI Codex. Only open standard fields are portable.
 
-- Funcionalidade unica e auto-contida
-- Sem necessidade de hooks, MCP ou LSP
-- Distribuicao por copia/git e suficiente
-- Portabilidade cross-agent e desejada
+4. **Name vs directory**: The `name` field MUST match the parent directory name. A skill in `my-skill/SKILL.md` must have `name: my-skill`.
 
-**Plugin quando:**
+5. **Plugin namespace**: Plugin skills use `plugin-name:skill-name`. Project/personal skills DO NOT have a namespace — conflicts are resolved by priority (enterprise > personal > project).
 
-- Multiplas skills relacionadas
-- Necessidade de hooks integrados
-- Necessidade de servidores MCP/LSP
-- Distribuicao via marketplace desejada
-- Configuracoes default necessarias (settings.json)
-- Scripts utilitarios compartilhados entre skills
+### 3.2 Context Pitfalls
 
-### 4.3 Quando Usar Marketplace vs Distribuicao Direta
+- **Skill descriptions consume 2% of the context window**: With many skills, the description budget can silently overflow
+- **plugins.json strict mode**: In strict mode (default), inconsistencies between plugin.json and marketplace.json can cause unexpected behavior
+- **Auto-discovery in monorepo**: Claude auto-discovers `.claude/skills/` in subdirectories when editing files there. This can load unexpected skills.
 
-**Marketplace quando:**
+### 3.3 Gaps Identified by the Document
 
-- Multiplos plugins para descoberta
-- Equipe/organizacao com catalogo interno
-- Versionamento e atualizacao automatica desejados
-- Necessidade de categorias e tags para discovery
+The document itself identifies important gaps:
 
-**Distribuicao direta (GitHub repo) quando:**
-
-- Plugin unico
-- Atualizacao manual e aceitavel
-- Simplicidade e prioridade
+1. **No `npx skills add`**: The standalone skill distribution mechanism (without plugin wrapper) is limited to manual copying
+2. **No `skills.json`**: There is no skill collection manifest. Each skill is self-contained
+3. **Minimal open standard**: The Agent Skills Open Standard defines only SKILL.md with name + description. Claude Code adds most of the functionality
+4. **Limited cross-agent compatibility**: Although the format is the same, advanced features are platform-specific
 
 ---
 
-## 5. Aplicabilidade a Infraestrutura de Agentes
+## 4. Use Cases and Scope
 
-### 5.1 Skills (Design Patterns para Portabilidade)
+### 4.1 Distribution Decision
 
-**Padrao 1: Skill portavel (padrao aberto puro)**
+| Scenario | Recommended Mechanism |
+|----------|----------------------|
+| Personal skill for my workflow | `~/.claude/skills/skill-name/SKILL.md` |
+| Skill shared with team | `.claude/skills/skill-name/SKILL.md` (commit) |
+| Collection of skills + hooks + MCP | Plugin with `.claude-plugin/plugin.json` |
+| Public distribution of multiple plugins | Marketplace with `marketplace.json` |
+| Cross-platform skill (Claude + Copilot) | Use only open standard fields |
+| Skill with advanced Claude Code features | Use proprietary extensions (accept lock-in) |
+
+### 4.2 When to Create Plugin vs Standalone Skill
+
+**Standalone skill when:**
+
+- Single, self-contained functionality
+- No need for hooks, MCP, or LSP
+- Distribution via copy/git is sufficient
+- Cross-agent portability is desired
+
+**Plugin when:**
+
+- Multiple related skills
+- Need for integrated hooks
+- Need for MCP/LSP servers
+- Distribution via marketplace desired
+- Default settings needed (settings.json)
+- Utility scripts shared across skills
+
+### 4.3 When to Use Marketplace vs Direct Distribution
+
+**Marketplace when:**
+
+- Multiple plugins for discovery
+- Team/organization with internal catalog
+- Automatic versioning and updates desired
+- Need for categories and tags for discovery
+
+**Direct distribution (GitHub repo) when:**
+
+- Single plugin
+- Manual updates are acceptable
+- Simplicity is the priority
+
+---
+
+## 5. Applicability to Agent Infrastructure
+
+### 5.1 Skills (Design Patterns for Portability)
+
+**Pattern 1: Portable skill (pure open standard)**
 
 ```yaml
 ---
 name: code-review-checklist
-description: Checklist de revisao de codigo. Usar quando revisando PRs, fazendo code review, ou analisando qualidade de codigo.
+description: Code review checklist. Use when reviewing PRs, performing code review, or analyzing code quality.
 ---
 
-# Checklist de Code Review
+# Code Review Checklist
 
-## Corretude
-- A logica esta correta para todos os edge cases?
-- Inputs sao validados adequadamente?
+## Correctness
+- Is the logic correct for all edge cases?
+- Are inputs properly validated?
 
 ## Performance
-- Ha queries N+1?
-- Loops desnecessarios?
+- Are there N+1 queries?
+- Unnecessary loops?
 
-## Seguranca
-- Inputs sao sanitizados?
-- Autorizacao esta verificada?
+## Security
+- Are inputs sanitized?
+- Is authorization verified?
 ```
 
-Esta skill funciona identicamente em Claude Code, VS Code/Copilot e OpenAI Codex.
+This skill works identically in Claude Code, VS Code/Copilot, and OpenAI Codex.
 
-**Padrao 2: Skill avancada (extensoes Claude Code)**
+**Pattern 2: Advanced skill (Claude Code extensions)**
 
 ```yaml
 ---
 name: security-scan
-description: Varredura de seguranca automatizada do codebase
+description: Automated security scan of the codebase
 context: fork
 agent: Explore
 disable-model-invocation: true
@@ -306,33 +307,33 @@ allowed-tools: Read, Grep, Glob
 effort: high
 hooks:
   PostSkillExecution:
-    - command: "echo 'Scan concluido em $(date)' >> security-scan.log"
+    - command: "echo 'Scan completed on $(date)' >> security-scan.log"
 ---
 
-# Varredura de Seguranca
+# Security Scan
 
-1. Identifique todos os pontos de entrada (endpoints HTTP, handlers)
-2. Para cada ponto, verifique:
-   - Validacao de input
-   - Autorizacao
+1. Identify all entry points (HTTP endpoints, handlers)
+2. For each point, verify:
+   - Input validation
+   - Authorization
    - Rate limiting
-3. Gere relatorio priorizado por severidade
+3. Generate report prioritized by severity
 ```
 
-Esta skill explora todo o potencial do Claude Code mas nao funciona em outras plataformas.
+This skill leverages the full potential of Claude Code but does not work on other platforms.
 
-**Estrategia de composicao cross-platform:**
+**Cross-platform composition strategy:**
 
 ```
 my-skill/
-  SKILL.md              # Instrucoes usando apenas padrao aberto
-  .claude-extensions.md  # Extensoes Claude Code (referenciado apenas em SKILL.md
-                         # com instrucoes condicionais)
+  SKILL.md              # Instructions using only the open standard
+  .claude-extensions.md  # Claude Code extensions (referenced only in SKILL.md
+                         # with conditional instructions)
 ```
 
-### 5.2 Hooks (Integracao com Plugins)
+### 5.2 Hooks (Integration with Plugins)
 
-O formato de plugin permite bundling de hooks junto com skills:
+The plugin format allows bundling hooks alongside skills:
 
 ```json
 // hooks/hooks.json
@@ -348,16 +349,16 @@ O formato de plugin permite bundling de hooks junto com skills:
 }
 ```
 
-**Padroes de integracao hook-skill:**
+**Hook-skill integration patterns:**
 
-1. **Hook pre-skill**: Validacao de pre-condicoes antes da execucao da skill
-2. **Hook pos-skill**: Logging, notificacao ou limpeza apos execucao
-3. **Hook que ativa skill**: Hook detecta evento e instrui invocacao de skill
-4. **Skill que configura hooks**: Skill de setup que instala hooks no projeto
+1. **Pre-skill hook**: Pre-condition validation before skill execution
+2. **Post-skill hook**: Logging, notification, or cleanup after execution
+3. **Hook that triggers skill**: Hook detects event and instructs skill invocation
+4. **Skill that configures hooks**: Setup skill that installs hooks in the project
 
-### 5.3 Subagentes (Composicao via Plugins)
+### 5.3 Subagents (Composition via Plugins)
 
-Plugins permitem bundling de agents customizados:
+Plugins allow bundling custom agents:
 
 ```markdown
 # agents/data-analyst.md
@@ -369,299 +370,299 @@ allowed-tools: Read, Grep, Glob, Bash(bq *)
 model: claude-sonnet-4-5-20250514
 ---
 
-Voce e um analista de dados especializado.
-Use as skills carregadas para responder queries sobre dados.
+You are a specialized data analyst.
+Use the loaded skills to answer data queries.
 ```
 
-**Padroes de composicao subagente-plugin:**
+**Subagent-plugin composition patterns:**
 
-| Padrao | Descricao | Caso de Uso |
-|--------|-----------|-------------|
-| Subagente com skills pre-carregadas | Agent .md com campo `skills` | Especialista com conhecimento de dominio |
-| Skill com fork para subagente | SKILL.md com `context: fork` | Tarefa isolada com resultado focado |
-| Plugin como unidade de deployment | Plugin agrupa agent + skills + hooks | Pacote completo para um dominio |
+| Pattern | Description | Use Case |
+|---------|-------------|----------|
+| Subagent with preloaded skills | Agent .md with `skills` field | Domain knowledge specialist |
+| Skill with fork to subagent | SKILL.md with `context: fork` | Isolated task with focused output |
+| Plugin as deployment unit | Plugin bundles agent + skills + hooks | Complete package for a domain |
 
-### 5.4 Rules (Complemento no Plugin)
+### 5.4 Rules (Complement in Plugin)
 
-Plugins podem incluir rules via `CLAUDE.md` no diretorio do plugin (carregado quando o plugin esta ativo). Isso permite:
+Plugins can include rules via `CLAUDE.md` in the plugin directory (loaded when the plugin is active). This enables:
 
-- Rules especificas do dominio do plugin
-- Convencoes que complementam skills do plugin
-- Instrucoes de integracao com o projeto host
+- Domain-specific rules for the plugin
+- Conventions that complement plugin skills
+- Integration instructions with the host project
 
-### 5.5 Memory (Plugins com Dados Persistentes)
+### 5.5 Memory (Plugins with Persistent Data)
 
-A variavel `${CLAUDE_PLUGIN_DATA}` aponta para um diretorio persistente que sobrevive updates do plugin:
+The `${CLAUDE_PLUGIN_DATA}` variable points to a persistent directory that survives plugin updates:
 
 ```
 ~/.claude/plugins/data/{plugin-id}/
 ```
 
-Isso permite:
+This enables:
 
-- Cache de resultados entre sessoes
-- Configuracoes persistentes do usuario
-- Historico de execucoes
-- Estado compartilhado entre skills do mesmo plugin
+- Cross-session result caching
+- Persistent user settings
+- Execution history
+- Shared state between skills of the same plugin
 
-**Template de skill que usa dados persistentes:**
+**Template for skill using persistent data:**
 
 ```yaml
 ---
 name: project-stats
-description: Estatisticas do projeto com historico
+description: Project statistics with history
 ---
 
-## Coleta de estatisticas
+## Statistics Collection
 
-1. Colete metricas atuais do projeto
-2. Compare com historico em ${CLAUDE_PLUGIN_DATA}/stats-history.json
-3. Gere relatorio de tendencias
-4. Salve metricas atuais no historico
+1. Collect current project metrics
+2. Compare with history in ${CLAUDE_PLUGIN_DATA}/stats-history.json
+3. Generate trends report
+4. Save current metrics to history
 ```
 
 ---
 
-## 6. Aplicabilidade do Guia de Engenharia de Prompts
+## 6. Prompt Engineering Guide Applicability
 
-### 6.1 CoT para Workflows Multi-Step em Plugins
+### 6.1 CoT for Multi-Step Workflows in Plugins
 
-Plugins que agrupam multiplas skills se beneficiam de CoT explicito para orquestracao. O guia documenta que CoT melhora raciocinio multi-passo de 17,9% para 58,1%:
+Plugins that bundle multiple skills benefit from explicit CoT for orchestration. The guide documents that CoT improves multi-step reasoning from 17.9% to 58.1%:
 
 ```yaml
 ---
 name: full-audit
-description: Auditoria completa do projeto (seguranca + performance + qualidade)
+description: Complete project audit (security + performance + quality)
 context: fork
 ---
 
-Conduza a auditoria em cadeia de raciocinio:
+Conduct the audit using chain of thought reasoning:
 
-1. **Raciocinio**: Qual aspecto devo analisar primeiro e por que?
-2. **Seguranca**: Execute analise de seguranca (patterns OWASP)
-3. **Raciocinio**: Dados os achados de seguranca, que impacto em performance espero?
-4. **Performance**: Analise pontos de performance
-5. **Raciocinio**: Quais problemas de qualidade podem causar os problemas ja encontrados?
-6. **Qualidade**: Analise de qualidade de codigo
-7. **Sintese**: Consolide achados com dependencias entre categorias
+1. **Reasoning**: Which aspect should I analyze first and why?
+2. **Security**: Run security analysis (OWASP patterns)
+3. **Reasoning**: Given the security findings, what performance impact do I expect?
+4. **Performance**: Analyze performance points
+5. **Reasoning**: Which quality issues might cause the problems already found?
+6. **Quality**: Code quality analysis
+7. **Synthesis**: Consolidate findings with cross-category dependencies
 ```
 
-### 6.2 ReAct para Skills com Ferramentas em Plugin
+### 6.2 ReAct for Tool-Using Skills in Plugins
 
-O padrao ReAct e natural para skills de plugin que integram com ferramentas externas (MCP, Bash, etc.). O guia documenta +34% de taxa de sucesso:
+The ReAct pattern is natural for plugin skills that integrate with external tools (MCP, Bash, etc.). The guide documents a +34% success rate:
 
 ```yaml
 ---
 name: data-pipeline-debug
-description: Debug de pipelines de dados
+description: Data pipeline debugging
 allowed-tools: Bash(bq *), Read, Grep
 ---
 
-Siga o loop ReAct para debugar o pipeline:
+Follow the ReAct loop to debug the pipeline:
 
-Para cada iteracao:
-1. **Pensamento**: Qual parte do pipeline suspeito? Que query BQ me daria evidencia?
-2. **Acao**: Execute a query ou leia o arquivo relevante
-3. **Observacao**: O que os dados me dizem sobre a causa raiz?
+For each iteration:
+1. **Thought**: Which part of the pipeline do I suspect? What BQ query would give me evidence?
+2. **Action**: Execute the query or read the relevant file
+3. **Observation**: What do the data tell me about the root cause?
 
-Continue ate identificar o ponto de falha com evidencia concreta.
+Continue until identifying the failure point with concrete evidence.
 ```
 
-### 6.3 Tree of Thoughts para Decisoes de Arquitetura de Plugin
+### 6.3 Tree of Thoughts for Plugin Architecture Decisions
 
-Quando um plugin precisa tomar decisoes complexas sobre qual abordagem seguir:
+When a plugin needs to make complex decisions about which approach to follow:
 
 ```yaml
 ---
 name: migration-planner
-description: Planejar migracoes complexas de banco de dados
+description: Plan complex database migrations
 context: fork
 effort: high
 ---
 
-Para planejar a migracao de $ARGUMENTS:
+To plan the migration of $ARGUMENTS:
 
-1. **Gere 3 estrategias** de migracao:
-   - Migracao incremental (zero downtime)
-   - Migracao big-bang (downtime planejado)
-   - Migracao dual-write (paralelo temporario)
+1. **Generate 3 strategies** for migration:
+   - Incremental migration (zero downtime)
+   - Big-bang migration (planned downtime)
+   - Dual-write migration (temporary parallel)
 
-2. **Avalie cada estrategia**:
-   - Risco de perda de dados (1-5)
-   - Complexidade de implementacao (1-5)
-   - Tempo de downtime estimado
+2. **Evaluate each strategy**:
+   - Data loss risk (1-5)
+   - Implementation complexity (1-5)
+   - Estimated downtime
    - Rollback capability
 
-3. **Descarte** estrategias com risco > 3
-4. **Aprofunde** nas restantes com plano detalhado
-5. **Recomende** com justificativa baseada nos trade-offs
+3. **Discard** strategies with risk > 3
+4. **Deep dive** into remaining ones with detailed plan
+5. **Recommend** with justification based on trade-offs
 ```
 
-### 6.4 Least-to-Most para Skills de Decomposicao em Plugin
+### 6.4 Least-to-Most for Decomposition Skills in Plugins
 
-Para plugins que decompoe tarefas grandes em subtarefas progressivamente mais complexas:
+For plugins that decompose large tasks into progressively more complex subtasks:
 
 ```yaml
 ---
 name: codebase-modernization
-description: Modernizacao incremental de codebase legado
+description: Incremental modernization of legacy codebase
 ---
 
-Modernize $ARGUMENTS usando decomposicao progressiva:
+Modernize $ARGUMENTS using progressive decomposition:
 
-1. **Identifique a mudanca mais simples**: Qual e a menor melhoria que agrega valor?
-   (Ex: atualizar uma dependencia, remover um deprecation warning)
-2. **Implemente e valide**
-3. **Identifique a proxima mudanca**: Com base no que foi feito, qual e a proxima?
-4. **Repita** ate que o escopo da modernizacao esteja completo
-5. **Documente** cada mudanca com motivacao e impacto
+1. **Identify the simplest change**: What is the smallest improvement that adds value?
+   (E.g.: update a dependency, remove a deprecation warning)
+2. **Implement and validate**
+3. **Identify the next change**: Based on what was done, what comes next?
+4. **Repeat** until the modernization scope is complete
+5. **Document** each change with motivation and impact
 ```
 
-### 6.5 Self-Consistency para Validacao Cross-Plugin
+### 6.5 Self-Consistency for Cross-Plugin Validation
 
-Para garantir consistencia entre skills de um mesmo plugin:
+To ensure consistency across skills within the same plugin:
 
 ```yaml
 ---
 name: validate-plugin-consistency
-description: Valida consistencia entre todas as skills do plugin
+description: Validates consistency across all plugin skills
 context: fork
 agent: Explore
 ---
 
-Para cada skill no plugin:
-1. **Leia** o SKILL.md completo
-2. **Extraia** convencoes e padroes declarados
+For each skill in the plugin:
+1. **Read** the complete SKILL.md
+2. **Extract** declared conventions and patterns
 
-Depois:
-3. **Compare** padroes entre skills (terminologia, formato, estilo)
-4. **Identifique** inconsistencias
-5. **Classifique**:
-   - Presente em 2+ skills: PADRAO ESTABELECIDO
-   - Presente em apenas 1: POSSIVEL INCONSISTENCIA
-6. **Recomende** alinhamento para inconsistencias encontradas
+Then:
+3. **Compare** patterns across skills (terminology, format, style)
+4. **Identify** inconsistencies
+5. **Classify**:
+   - Present in 2+ skills: ESTABLISHED PATTERN
+   - Present in only 1: POSSIBLE INCONSISTENCY
+6. **Recommend** alignment for identified inconsistencies
 ```
 
-### 6.6 Reflexion para Melhoria Iterativa de Plugins
+### 6.6 Reflexion for Iterative Plugin Improvement
 
-Para skills de plugin que melhoram por iteracao:
+For plugin skills that improve through iteration:
 
 ```yaml
 ---
 name: plugin-quality-check
-description: Verificacao de qualidade do plugin com ciclo de melhoria
+description: Plugin quality check with improvement cycle
 context: fork
 ---
 
-Para cada componente do plugin:
-1. **Avalie**: Qualidade, completude, consistencia
-2. **Critique**: O que falta? O que esta redundante?
-3. **Reflita**: Como posso melhorar com minimo esforco maximo impacto?
-4. **Melhore**: Aplique as melhorias identificadas
-5. **Re-avalie**: A nota melhorou? Se < 8/10, repita.
+For each plugin component:
+1. **Evaluate**: Quality, completeness, consistency
+2. **Critique**: What is missing? What is redundant?
+3. **Reflect**: How can I improve with minimum effort, maximum impact?
+4. **Improve**: Apply the identified improvements
+5. **Re-evaluate**: Has the score improved? If < 8/10, repeat.
 ```
 
 ---
 
-## 7. Correlacoes com Documentos Principais
+## 7. Correlations with Main Documents
 
-### 7.1 Com extend-claude-with-skills.md
+### 7.1 With extend-claude-with-skills.md
 
-O documento de research complementa a documentacao oficial com:
+The research document complements the official documentation with:
 
-| Aspecto | extend-claude-with-skills | research-skills-format |
-|---------|---------------------------|----------------------|
-| Formato SKILL.md | Documentacao de uso | Especificacao tecnica detalhada |
-| Frontmatter | Campos e exemplos | Regras de validacao rigorosas |
-| Distribuicao | Mencao a plugins e managed | Detalhamento completo de plugins e marketplaces |
-| Cross-platform | Mencao ao Agent Skills standard | Comparacao detalhada Claude Code vs VS Code vs Codex |
-| Instalacao | Nao detalhada | `/plugin install`, `claude plugin install`, escopos |
+| Aspect | extend-claude-with-skills | research-skills-format |
+|--------|---------------------------|----------------------|
+| SKILL.md format | Usage documentation | Detailed technical specification |
+| Frontmatter | Fields and examples | Strict validation rules |
+| Distribution | Mention of plugins and managed | Complete detailing of plugins and marketplaces |
+| Cross-platform | Mention of Agent Skills standard | Detailed comparison Claude Code vs VS Code vs Codex |
+| Installation | Not detailed | `/plugin install`, `claude plugin install`, scopes |
 
-### 7.2 Com skill-authoring-best-practices.md
+### 7.2 With skill-authoring-best-practices.md
 
-O research fornece o "o que" (formatos e estruturas) enquanto best practices fornece o "como" (qualidade e eficacia):
+The research provides the "what" (formats and structures) while best practices provide the "how" (quality and effectiveness):
 
-- **Research**: Estrutura de diretorio, campos de frontmatter, regras de validacao
-- **Best practices**: Como escrever descricoes eficazes, progressive disclosure, workflows
-- **Complementaridade**: Research para implementacao tecnica correta, best practices para eficacia de conteudo
+- **Research**: Directory structure, frontmatter fields, validation rules
+- **Best practices**: How to write effective descriptions, progressive disclosure, workflows
+- **Complementarity**: Research for correct technical implementation, best practices for content effectiveness
 
-### 7.3 Com research-llm-context-optimization.md
+### 7.3 With research-context-engineering-comprehensive.md
 
-| Conceito de Otimizacao | Implementacao no Ecossistema de Skills |
-|------------------------|----------------------------------------|
-| Context rot | Progressive disclosure em 3 niveis evita sobrecarga |
-| Attention budget | Orcamento de descricoes (2% janela contexto) gerencia budget |
-| Just-in-time docs | Skills carregam sob demanda; plugins usam `${CLAUDE_PLUGIN_DATA}` para persistencia |
-| Isolamento de contexto | `context: fork` + `agent` type = subagente com contexto isolado |
-| Hierarquia de configuracao | Enterprise > Personal > Project > Plugin |
-| Hooks como enforcement | Plugin bundling de hooks + skills garante enforcement deterministico |
+| Optimization Concept | Implementation in Skills Ecosystem |
+|----------------------|----------------------------------------|
+| Context rot | 3-level progressive disclosure prevents overload |
+| Attention budget | Description budget (2% context window) manages budget |
+| Just-in-time docs | Skills load on demand; plugins use `${CLAUDE_PLUGIN_DATA}` for persistence |
+| Context isolation | `context: fork` + `agent` type = subagent with isolated context |
+| Configuration hierarchy | Enterprise > Personal > Project > Plugin |
+| Hooks as enforcement | Plugin bundling of hooks + skills ensures deterministic enforcement |
 
-### 7.4 Com prompt-engineering-guide.md
+### 7.4 With prompt-engineering-guide.md
 
-| Tecnica de Prompting | Aplicacao no Ecossistema |
+| Prompting Technique | Ecosystem Application |
 |---------------------|--------------------------|
-| Role prompting | Agent definitions em plugins (agents/*.md) |
-| Few-shot | Exemplos em supporting files de skills |
-| CoT | Workflows multi-step em SKILL.md |
-| ReAct | Skills com `allowed-tools` e loop iterativo |
-| Structured outputs | Comunicacao entre skills e subagentes via JSON |
-| Prompt chaining | Plugins que orquestram multiplas skills em sequencia |
-| RAG patterns | Skills com injecao dinamica (`` !`command` ``) como RAG em tempo real |
+| Role prompting | Agent definitions in plugins (agents/*.md) |
+| Few-shot | Examples in skill supporting files |
+| CoT | Multi-step workflows in SKILL.md |
+| ReAct | Skills with `allowed-tools` and iterative loop |
+| Structured outputs | Communication between skills and subagents via JSON |
+| Prompt chaining | Plugins that orchestrate multiple skills in sequence |
+| RAG patterns | Skills with dynamic injection (`` !`command` ``) as real-time RAG |
 
 ---
 
-## 8. Forcas e Limitacoes
+## 8. Strengths and Limitations
 
-### 8.1 Forcas
+### 8.1 Strengths
 
-1. **Ecossistema completo documentado**: O documento mapeia todas as camadas de extensibilidade (skills -> plugins -> marketplaces) com estruturas e schemas
-2. **Cross-platform awareness**: Documenta compatibilidade e diferencas entre Claude Code, VS Code/Copilot e OpenAI Codex
-3. **Regras de validacao explicitas**: Detalhamento de regras de validacao de nomes que nao estao obvias na documentacao oficial
-4. **Exemplos reais**: Referencia a repositorios reais da comunidade (davepoon/buildwithclaude, jeremylongshore/claude-code-plugins-plus-skills, etc.)
-5. **Correcao de equivocos**: Clarifica que `npx skills add` nao existe, que nao ha `skills.json`, e que o padrao aberto e minimo
-6. **Multiplos tipos de source**: Documenta todas as formas de referenciar plugins (relativo, GitHub, Git URL, Git subdir, npm)
-7. **Strict mode explicado**: Clarifica o comportamento de strict mode no marketplace e suas implicacoes
+1. **Complete ecosystem documented**: The document maps all extensibility layers (skills -> plugins -> marketplaces) with structures and schemas
+2. **Cross-platform awareness**: Documents compatibility and differences between Claude Code, VS Code/Copilot, and OpenAI Codex
+3. **Explicit validation rules**: Detailed name validation rules not obvious in official documentation
+4. **Real examples**: References to real community repositories (davepoon/buildwithclaude, jeremylongshore/claude-code-plugins-plus-skills, etc.)
+5. **Misconception correction**: Clarifies that `npx skills add` does not exist, that there is no `skills.json`, and that the open standard is minimal
+6. **Multiple source types**: Documents all ways to reference plugins (relative, GitHub, Git URL, Git subdir, npm)
+7. **Strict mode explained**: Clarifies marketplace strict mode behavior and its implications
 
-### 8.2 Limitacoes
+### 8.2 Limitations
 
-1. **Ponto no tempo**: Pesquisa de marco 2026 -- o ecossistema de plugins esta evoluindo rapidamente e partes podem ficar desatualizadas
-2. **Sem benchmarks de performance**: Nao ha dados sobre impacto de performance de plugins vs skills standalone
-3. **Sem guia de migracao**: Nao ha instrucoes para migrar de commands/ para skills/ ou de skills standalone para plugins
-4. **Lacuna de marketplace privado**: Documentacao de marketplaces foca em repositorios publicos; marketplaces corporativos internos tem menos cobertura
-5. **Sem analise de seguranca**: Nao discute implicacoes de seguranca de instalar plugins de terceiros (execucao de scripts, acesso a ferramentas)
-6. **Comunidade vs oficial**: Alguns repositorios listados sao comunitarios e podem nao seguir as melhores praticas
-7. **Validacao limitada**: O comando `/plugin validate` e mencionado mas nao detalhado em termos de o que exatamente valida
+1. **Point in time**: March 2026 research — the plugin ecosystem is evolving rapidly and parts may become outdated
+2. **No performance benchmarks**: No data on performance impact of plugins vs standalone skills
+3. **No migration guide**: No instructions for migrating from commands/ to skills/ or from standalone skills to plugins
+4. **Private marketplace gap**: Marketplace documentation focuses on public repositories; internal corporate marketplaces have less coverage
+5. **No security analysis**: Does not discuss security implications of installing third-party plugins (script execution, tool access)
+6. **Community vs official**: Some listed repositories are community-maintained and may not follow best practices
+7. **Limited validation**: The `/plugin validate` command is mentioned but not detailed in terms of what exactly it validates
 
 ---
 
-## 9. Recomendacoes Praticas
+## 9. Practical Recommendations
 
-### 9.1 Para Autores de Skills
+### 9.1 For Skill Authors
 
-1. **Decida a portabilidade primeiro**: Se a skill deve funcionar em VS Code/Copilot, use APENAS campos do padrao aberto. Se e exclusiva Claude Code, use extensoes.
+1. **Decide portability first**: If the skill should work in VS Code/Copilot, use ONLY open standard fields. If it is exclusive to Claude Code, use extensions.
 
-2. **Siga as regras de validacao de nomes rigorosamente**:
-   - Apenas lowercase, numeros e hifens
-   - Sem `--` consecutivos
-   - Sem iniciar/terminar com `-`
-   - Sem "anthropic" ou "claude"
-   - Nome deve = nome do diretorio
+2. **Follow name validation rules rigorously**:
+   - Only lowercase, numbers, and hyphens
+   - No consecutive `--`
+   - Cannot start/end with `-`
+   - No "anthropic" or "claude"
+   - Name must = directory name
 
-3. **Use `${CLAUDE_SKILL_DIR}` em vez de paths hardcoded**: Garante portabilidade entre instalacoes e plataformas.
+3. **Use `${CLAUDE_SKILL_DIR}` instead of hardcoded paths**: Ensures portability across installations and platforms.
 
-4. **Mantenha descricoes sob 200 caracteres quando possivel**: Cada caractere consome orcamento de contexto. Descricoes de 1024 chars sao o maximo, nao o ideal.
+4. **Keep descriptions under 200 characters when possible**: Every character consumes context budget. 1024-char descriptions are the maximum, not the ideal.
 
-### 9.2 Para Autores de Plugins
+### 9.2 For Plugin Authors
 
-1. **Crie plugin.json mesmo sendo opcional**: A auto-discovery funciona, mas o manifesto explicito evita ambiguidades e permite metadados adicionais.
+1. **Create plugin.json even though it's optional**: Auto-discovery works, but an explicit manifest avoids ambiguity and allows additional metadata.
 
-2. **Use `${CLAUDE_PLUGIN_ROOT}` para paths de scripts**: Garante que scripts funcionem independente do diretorio de instalacao.
+2. **Use `${CLAUDE_PLUGIN_ROOT}` for script paths**: Ensures scripts work regardless of installation directory.
 
-3. **Use `${CLAUDE_PLUGIN_DATA}` para dados persistentes**: Nao armazene dados no diretorio do plugin -- ele muda em updates.
+3. **Use `${CLAUDE_PLUGIN_DATA}` for persistent data**: Do not store data in the plugin directory — it changes on updates.
 
-4. **Defina escopos de instalacao claros na documentacao**: Indique se o plugin deve ser instalado no escopo user, project ou local.
+4. **Define clear installation scopes in documentation**: Indicate whether the plugin should be installed at user, project, or local scope.
 
-5. **Template de plugin minimo:**
+5. **Minimal plugin template:**
 
 ```
 my-plugin/
@@ -679,72 +680,72 @@ my-plugin/
 {
   "name": "my-plugin",
   "version": "1.0.0",
-  "description": "Descricao concisa do plugin",
-  "author": { "name": "Autor" },
+  "description": "Concise plugin description",
+  "author": { "name": "Author" },
   "license": "MIT"
 }
 ```
 
-### 9.3 Para Autores de Marketplaces
+### 9.3 For Marketplace Authors
 
-1. **Use categorias e tags consistentes**: Facilita discovery quando o marketplace cresce.
+1. **Use consistent categories and tags**: Facilitates discovery as the marketplace grows.
 
-2. **Prefira strict mode (default)**: Deixe cada plugin definir seu proprio manifesto. Use `strict: false` apenas para plugins sem manifesto.
+2. **Prefer strict mode (default)**: Let each plugin define its own manifest. Use `strict: false` only for plugins without a manifest.
 
-3. **Template de marketplace minimo:**
+3. **Minimal marketplace template:**
 
 ```json
 {
   "name": "my-marketplace",
-  "owner": { "name": "Organizacao" },
+  "owner": { "name": "Organization" },
   "plugins": [
     {
       "name": "plugin-1",
-      "description": "O que faz",
+      "description": "What it does",
       "source": "./plugins/plugin-1"
     }
   ]
 }
 ```
 
-### 9.4 Para Estrategia de Distribuicao
+### 9.4 For Distribution Strategy
 
-1. **Skill pessoal -> Skill de projeto -> Plugin -> Marketplace**: Evolua a distribuicao conforme o publico cresce.
+1. **Personal skill -> Project skill -> Plugin -> Marketplace**: Evolve distribution as the audience grows.
 
-2. **Comece com skills standalone**: Crie e teste skills individualmente antes de empacotar em plugin.
+2. **Start with standalone skills**: Create and test individual skills before packaging into a plugin.
 
-3. **Use namespacing de plugin para evitar conflitos**: O namespace `plugin-name:skill-name` evita conflitos com skills de projeto/pessoais.
+3. **Use plugin namespacing to avoid conflicts**: The `plugin-name:skill-name` namespace prevents conflicts with project/personal skills.
 
-4. **Monitore repositorios da comunidade**: Os repos listados no documento (davepoon/buildwithclaude, numman-ali/n-skills, etc.) sao fontes de inspiracao e padroes emergentes.
+4. **Monitor community repositories**: The repos listed in the document (davepoon/buildwithclaude, numman-ali/n-skills, etc.) are sources of inspiration and emerging patterns.
 
-### 9.5 Template de SKILL.md Portavel Cross-Platform
+### 9.5 Cross-Platform Portable SKILL.md Template
 
 ```yaml
 ---
 name: universal-skill
 description: >
-  Skill portavel que funciona em Claude Code, VS Code/Copilot e OpenAI Codex.
-  Usa apenas campos do padrao aberto Agent Skills.
+  Portable skill that works in Claude Code, VS Code/Copilot, and OpenAI Codex.
+  Uses only Agent Skills open standard fields.
 ---
 
 # Universal Skill
 
-## Instrucoes
-[Instrucoes que nao dependem de funcionalidades especificas de plataforma]
+## Instructions
+[Instructions that do not depend on platform-specific features]
 
-## Recursos
-- Para detalhes: [reference.md](reference.md)
-- Para exemplos: [examples.md](examples.md)
+## Resources
+- For details: [reference.md](reference.md)
+- For examples: [examples.md](examples.md)
 ```
 
-### 9.6 Template de SKILL.md Avancado (Claude Code)
+### 9.6 Advanced SKILL.md Template (Claude Code)
 
 ```yaml
 ---
 name: advanced-skill
 description: >
-  Skill avancada usando funcionalidades exclusivas do Claude Code.
-  Executa em subagente isolado com ferramentas restritas.
+  Advanced skill using Claude Code exclusive features.
+  Runs in an isolated subagent with restricted tools.
 context: fork
 agent: Explore
 disable-model-invocation: true
@@ -755,14 +756,14 @@ argument-hint: "[target-path] [options]"
 
 # Advanced Skill
 
-## Contexto dinamico
-- Status atual: !`git status --short`
+## Dynamic Context
+- Current status: !`git status --short`
 - Branch: !`git branch --show-current`
 
-## Instrucoes
-Analise $ARGUMENTS[0] com opcoes $ARGUMENTS[1]:
+## Instructions
+Analyze $ARGUMENTS[0] with options $ARGUMENTS[1]:
 
-1. [Passo 1 com ferramenta]
-2. [Passo 2 com validacao]
-3. [Passo 3 com output estruturado]
+1. [Step 1 with tool]
+2. [Step 2 with validation]
+3. [Step 3 with structured output]
 ```

@@ -1,37 +1,42 @@
-# Analise: Pesquisa de Melhores Praticas para Subagentes
+# Analysis: Research on Subagent Best Practices
+
+> **Status**: Current
+> **Source document**: [`docs/subagents/research-subagent-best-practices.md`](../subagents/research-subagent-best-practices.md)
+> **Analysis date**: 2026-03-27
+> **Scope**: Analysis of the research document on subagent best practices, covering delegation patterns, community patterns, anti-patterns, and prompt engineering for agent system prompts
 
 ---
 
-## 1. Resumo Executivo
+## 1. Executive Summary
 
-O documento de pesquisa sobre melhores praticas de subagentes e o mais abrangente dos cinco documentos analisados, compilando informacoes de documentacao oficial da Anthropic, repositorios da comunidade (97k+ stars no everything-claude-code), guias de prompt engineering e padroes emergentes do ecossistema. Ele sintetiza 17 secoes cobrindo desde a especificacao oficial ate templates completos de definicao de agentes, com foco pratico em anti-patterns a evitar e padroes de sucesso comprovados.
+The research document on subagent best practices is the most comprehensive of the five analyzed documents, compiling information from official Anthropic documentation, community repositories (97k+ stars on everything-claude-code), prompt engineering guides, and emerging ecosystem patterns. It synthesizes 17 sections covering from the official specification to complete agent definition templates, with a practical focus on anti-patterns to avoid and proven success patterns.
 
-As descobertas mais valiosas incluem: (1) a importancia critica do campo `description` como unico sinal de roteamento para delegacao automatica; (2) o padrao de "Confidence-Based Filtering" que reduz ruido nas saidas de subagentes; (3) a observacao de que agentes read-only dominam nos repositorios da comunidade; (4) a estrutura eficaz de system prompt (Role -> Process -> Checklist -> Output Format -> Approval Criteria); e (5) os 10 anti-patterns documentados que representam as falhas mais comuns. O documento tambem mapeia a relacao bidirecional entre skills e subagentes (`context: fork` em skills vs campo `skills` em subagentes) e fornece analise de selecao de modelo com justificativa por tipo de tarefa.
+The most valuable findings include: (1) the critical importance of the `description` field as the sole routing signal for automatic delegation; (2) the "Confidence-Based Filtering" pattern that reduces noise in subagent outputs; (3) the observation that read-only agents dominate in community repositories; (4) the effective system prompt structure (Role → Process → Checklist → Output Format → Approval Criteria); and (5) the 10 documented anti-patterns representing the most common failures. The document also maps the bidirectional relationship between skills and subagents (`context: fork` in skills vs `skills` field in subagents) and provides model selection analysis with justification by task type.
 
-A contribuicao unica deste documento em relacao a documentacao oficial e a compilacao de padroes da comunidade, a analise de anti-patterns, e a ponte explicita entre subagentes e tecnicas de prompt engineering aplicaveis a system prompts de agentes.
+The unique contribution of this document relative to official documentation is the compilation of community patterns, anti-pattern analysis, and the explicit bridge between subagents and prompt engineering techniques applicable to agent system prompts.
 
 ---
 
-## 2. Conceitos e Mecanismos Chave
+## 2. Key Concepts and Mechanisms
 
-### 2.1 Delegacao Automatica
+### 2.1 Automatic Delegation
 
-O Claude decide quando delegar com base em tres fatores:
+Claude decides when to delegate based on three factors:
 
-1. Descricao da tarefa na solicitacao do usuario
-2. Campo `description` nas configuracoes de subagentes
-3. Contexto atual da conversa
+1. Task description in the user's request
+2. `description` field in subagent configurations
+3. Current conversation context
 
-Para encorajar delegacao proativa, incluir frases como **"use proactively"** no campo description.
+To encourage proactive delegation, include phrases like **"use proactively"** in the description field.
 
-### 2.2 Relacao Bidirecional Skills ↔ Subagentes
+### 2.2 Bidirectional Relationship Skills ↔ Subagents
 
-| Abordagem | System Prompt | Tarefa | Tambem Carrega |
-|-----------|---------------|--------|----------------|
-| Skill com `context: fork` | Do tipo de agente (Explore, Plan, etc.) | Conteudo do SKILL.md | CLAUDE.md |
-| Subagente com campo `skills` | Corpo markdown do subagente | Mensagem de delegacao do Claude | Skills pre-carregadas + CLAUDE.md |
+| Approach | System Prompt | Task | Also Loads |
+|----------|---------------|------|------------|
+| Skill with `context: fork` | From agent type (Explore, Plan, etc.) | SKILL.md content | CLAUDE.md |
+| Subagent with `skills` field | Subagent's markdown body | Claude's delegation message | Preloaded skills + CLAUDE.md |
 
-**Skill que roda em subagente**:
+**Skill running in a subagent**:
 
 ```yaml
 ---
@@ -43,7 +48,7 @@ agent: Explore
 Research $ARGUMENTS thoroughly...
 ```
 
-**Subagente que carrega skills**:
+**Subagent that loads skills**:
 
 ```yaml
 ---
@@ -55,9 +60,9 @@ skills:
 ---
 ```
 
-### 2.3 Injecao Dinamica de Contexto
+### 2.3 Dynamic Context Injection
 
-A sintaxe `` !`<command>` `` em skills executa comandos shell antes do conteudo ser enviado ao Claude:
+The `` !`<command>` `` syntax in skills executes shell commands before the content is sent to Claude:
 
 ```yaml
 ---
@@ -74,60 +79,60 @@ allowed-tools: Bash(gh *)
 Summarize this pull request...
 ```
 
-Comandos executam imediatamente (pre-processamento); output substitui o placeholder.
+Commands execute immediately (pre-processing); output replaces the placeholder.
 
-### 2.4 Estrutura Eficaz de System Prompt
+### 2.4 Effective System Prompt Structure
 
-Baseado na analise de exemplos oficiais e padroes da comunidade:
+Based on analysis of official examples and community patterns:
 
 ```
 1. Role Definition -- "You are a [specific role] specializing in [domain]"
-2. Responsibilities -- Bullets claros do que o agente faz
-3. Process Steps -- Numerados: gather context -> analyze -> act -> verify -> report
-4. Checklist/Criteria -- Categorizado por severidade (CRITICAL -> LOW)
-5. Output Format -- Formato exato esperado
-6. Approval/Success Criteria -- Quando aprovar vs quando sinalizar
+2. Responsibilities -- Clear bullets of what the agent does
+3. Process Steps -- Numbered: gather context -> analyze -> act -> verify -> report
+4. Checklist/Criteria -- Categorized by severity (CRITICAL -> LOW)
+5. Output Format -- Exact expected format
+6. Approval/Success Criteria -- When to approve vs when to flag
 ```
 
-### 2.5 Selecao de Modelo
+### 2.5 Model Selection
 
-| Alias | Mapeia Para | Melhor Para |
-|-------|-------------|-------------|
-| `haiku` | Claude Haiku 4.5 | Tarefas rapidas, exploracao, analise simples |
-| `sonnet` | Claude Sonnet 4.6 | Tarefas padrao, reviews, trabalho diario |
-| `opus` | Claude Opus 4.6 | Raciocinio complexo, arquitetura, planejamento |
-| `inherit` | Mesmo da conversacao principal | Comportamento default |
-| `sonnet[1m]` | Sonnet com contexto 1M | Sessoes longas com codebases grandes |
-| `opus[1m]` | Opus com contexto 1M | Sessoes longas com raciocinio complexo |
+| Alias | Maps To | Best For |
+|-------|---------|----------|
+| `haiku` | Claude Haiku 4.5 | Fast tasks, exploration, simple analysis |
+| `sonnet` | Claude Sonnet 4.6 | Standard tasks, reviews, daily work |
+| `opus` | Claude Opus 4.6 | Complex reasoning, architecture, planning |
+| `inherit` | Same as main conversation | Default behavior |
+| `sonnet[1m]` | Sonnet with 1M context | Long sessions with large codebases |
+| `opus[1m]` | Opus with 1M context | Long sessions with complex reasoning |
 
-**Principio**: Opus para arquitetura, Sonnet para tudo mais. Haiku apenas para tarefas mecanicas e de exploracao.
+**Principle**: Opus for architecture, Sonnet for everything else. Haiku only for mechanical and exploration tasks.
 
-### 2.6 Niveis de Esforco
+### 2.6 Effort Levels
 
-| Nivel | Comportamento | Melhor Para |
-|-------|---------------|-------------|
-| `low` | Thinking minimo, respostas rapidas | Tarefas simples, mecanicas |
-| `medium` | Thinking equilibrado | Tarefas padrao |
-| `high` | Thinking profundo | Problemas complexos |
-| `max` | Sem restricao de tokens de thinking (Opus 4.6 only) | Problemas mais dificeis |
+| Level | Behavior | Best For |
+|-------|----------|----------|
+| `low` | Minimal thinking, fast responses | Simple, mechanical tasks |
+| `medium` | Balanced thinking | Standard tasks |
+| `high` | Deep thinking | Complex problems |
+| `max` | No thinking token restriction (Opus 4.6 only) | Hardest problems |
 
-### 2.7 Padroes da Comunidade (everything-claude-code, 97k+ stars)
+### 2.7 Community Patterns (everything-claude-code, 97k+ stars)
 
-| Agente | Modelo | Ferramentas | Padrao |
-|--------|--------|-------------|--------|
-| `code-reviewer` | sonnet | Read, Grep, Glob, Bash | Read-only com confidence filtering |
-| `architect` | opus | Read, Grep, Glob | Read-only com analise de trade-offs |
-| `security-reviewer` | sonnet | Read, Write, Edit, Bash, Grep, Glob | Auditoria de seguranca full-capability |
-| `debugger` | inherit | Read, Edit, Bash, Grep, Glob | Workflow analise + fix |
-| `typescript-reviewer` | implied | Read, Grep, Glob, Bash | Review language-specific |
+| Agent | Model | Tools | Pattern |
+|-------|-------|-------|---------|
+| `code-reviewer` | sonnet | Read, Grep, Glob, Bash | Read-only with confidence filtering |
+| `architect` | opus | Read, Grep, Glob | Read-only with trade-off analysis |
+| `security-reviewer` | sonnet | Read, Write, Edit, Bash, Grep, Glob | Full-capability security audit |
+| `debugger` | inherit | Read, Edit, Bash, Grep, Glob | Analysis + fix workflow |
+| `typescript-reviewer` | implied | Read, Grep, Glob, Bash | Language-specific review |
 
-**Padroes observados**:
+**Observed patterns**:
 
-1. Agentes read-only dominam (maioria restringe a Read, Grep, Glob, Bash)
-2. Reviewers language-specific com checklists por tecnologia
-3. Opus reservado para `architect`; Sonnet para todo o resto
-4. Checklists detalhados com prioridade (CRITICAL -> LOW)
-5. Formato de output estruturado com tabelas e sumarios
+1. Read-only agents dominate (majority restricted to Read, Grep, Glob, Bash)
+2. Language-specific reviewers with technology-specific checklists
+3. Opus reserved for `architect`; Sonnet for everything else
+4. Detailed checklists with priority (CRITICAL → LOW)
+5. Structured output format with tables and summaries
 
 ### 2.8 Confidence-Based Filtering
 
@@ -143,123 +148,123 @@ Baseado na analise de exemplos oficiais e padroes da comunidade:
 - **Prioritize** issues that could cause bugs, security vulnerabilities, or data loss
 ```
 
-Este padrao reduz significativamente o ruido e torna a saida do agente acionavel.
+This pattern significantly reduces noise and makes agent output actionable.
 
 ---
 
-## 3. Pontos de Atencao
+## 3. Points of Attention
 
-### 3.1 Os 10 Anti-Patterns Documentados
+### 3.1 The 10 Documented Anti-Patterns
 
-| # | Anti-Pattern | Consequencia | Mitigacao |
-|---|-------------|--------------|-----------|
-| 1 | Prompts de delegacao agressivos ("CRITICAL: You MUST...") | Overtriggering com Opus 4.6 | Usar linguagem normal ("Use this tool when...") |
-| 2 | Muitas skills/agentes | Excedem orcamento de contexto (2% por skill description) | Monitorar via `/context` |
-| 3 | Subagentes para operacoes grep simples | Desperdicio de tokens e latencia | Orientar para uso direto da ferramenta |
-| 4 | Nao restringir ferramentas | Modificacoes nao intencionais, contexto desperdicado | Allowlist minimo necessario |
-| 5 | Descricoes vagas | Delegacao inconsistente ou ausente | "Use proactively when [trigger]" |
-| 6 | God agents (faz tudo) | Perde proposito de especializacao | Um dominio por agente |
-| 7 | Sem especificacao de formato de output | Resultados inconsistentes e dificieis de usar | Especificar formato exato no prompt |
-| 8 | Ignorar gap de contexto do pai | Agente nao tem informacao necessaria | Tudo no system prompt ou via ferramentas |
-| 9 | Sem etapa de coleta de contexto | Analise sem fundamentacao | Sempre comecar com "gather context" |
-| 10 | Sem `maxTurns` | Agentes rodam indefinidamente consumindo tokens | Definir limite razoavel (10-30) |
+| # | Anti-Pattern | Consequence | Mitigation |
+|---|-------------|-------------|------------|
+| 1 | Aggressive delegation prompts ("CRITICAL: You MUST...") | Overtriggering with Opus 4.6 | Use normal language ("Use this tool when...") |
+| 2 | Too many skills/agents | Exceed context budget (2% per skill description) | Monitor via `/context` |
+| 3 | Subagents for simple grep operations | Wasted tokens and latency | Guide toward direct tool use |
+| 4 | Not restricting tools | Unintended modifications, wasted context | Minimum necessary allowlist |
+| 5 | Vague descriptions | Inconsistent or absent delegation | "Use proactively when [trigger]" |
+| 6 | God agents (does everything) | Loses purpose of specialization | One domain per agent |
+| 7 | No output format specification | Inconsistent and hard-to-use results | Specify exact format in prompt |
+| 8 | Ignoring parent context gap | Agent lacks necessary information | Everything in system prompt or via tools |
+| 9 | No context gathering step | Analysis without grounding | Always start with "gather context" |
+| 10 | No `maxTurns` | Agents run indefinitely consuming tokens | Set reasonable limit (10-30) |
 
-### 3.2 Custo de Tool Descriptions no Contexto
+### 3.2 Tool Description Cost in Context
 
-Skill descriptions ocupam ~2% da janela de contexto. Com muitos agentes e skills registrados, esse custo acumula. Use `/context` para verificar warnings sobre excesso.
+Skill descriptions occupy ~2% of the context window. With many registered agents and skills, this cost accumulates. Use `/context` to check for excess warnings.
 
-### 3.3 Claude Opus 4.6 e Responsividade Excessiva
+### 3.3 Claude Opus 4.6 and Excessive Responsiveness
 
-Opus 4.6 e mais responsivo a system prompts, o que significa que linguagem agressiva ("CRITICAL", "YOU MUST", "NEVER") causa overtriggering. A recomendacao e usar linguagem normal e confiar na capacidade do modelo de interpretar instrucoes sem enfase artificial.
+Opus 4.6 is more responsive to system prompts, meaning aggressive language ("CRITICAL", "YOU MUST", "NEVER") causes overtriggering. The recommendation is to use normal language and trust the model's ability to interpret instructions without artificial emphasis.
 
-### 3.4 Orquestracao Nativa vs Prescritiva
+### 3.4 Native vs Prescriptive Orchestration
 
-Os modelos mais recentes do Claude possuem orquestracao nativa de subagentes. A recomendacao da Anthropic e: "Prefer general instructions over prescriptive steps" -- "think thoroughly" frequentemente produz raciocinio melhor que planos step-by-step escritos manualmente.
+The latest Claude models have native subagent orchestration. Anthropic's recommendation is: "Prefer general instructions over prescriptive steps" — "think thoroughly" often produces better reasoning than manually written step-by-step plans.
 
-### 3.5 Seguranca de Plugins
+### 3.5 Plugin Security
 
-Agentes de plugins NAO podem usar `hooks`, `mcpServers` ou `permissionMode`. Campos suportados: `name`, `description`, `model`, `effort`, `maxTurns`, `tools`, `disallowedTools`, `skills`, `memory`, `background`, `isolation`.
-
----
-
-## 4. Casos de Uso e Escopo
-
-### 4.1 Perfis de Ferramentas por Tipo de Agente
-
-| Tipo de Agente | Ferramentas Recomendadas | Justificativa |
-|----------------|-------------------------|---------------|
-| Read-only reviewer | Read, Grep, Glob, Bash | Inspeciona sem modificar |
-| Code modifier | Read, Edit, Bash, Grep, Glob | Analisa e corrige |
-| Explorer/researcher | Read, Grep, Glob | Exploracao pura, sem efeitos colaterais |
-| Full-capability | Herda todas | Operacoes complexas multi-passo |
-
-### 4.2 Quando Usar `context: fork` em Skills
-
-- Tarefas orientadas a resultado que devem rodar em isolamento
-- Pesquisa profunda que geraria muito output no contexto principal
-- Tarefas que se beneficiam de subagente especifico (ex: Explore para read-only)
-
-### 4.3 Quando Usar Preload de Skills em Subagentes
-
-- Subagentes que precisam de conhecimento de dominio especifico
-- Convencoes de API, padroes de error handling, guias de estilo
-- Quando o conhecimento deve estar no contexto desde o inicio (nao descoberto sob demanda)
+Plugin agents CANNOT use `hooks`, `mcpServers`, or `permissionMode`. Supported fields: `name`, `description`, `model`, `effort`, `maxTurns`, `tools`, `disallowedTools`, `skills`, `memory`, `background`, `isolation`.
 
 ---
 
-## 5. Aplicabilidade a Infraestrutura de Agentes
+## 4. Use Cases and Scope
+
+### 4.1 Tool Profiles by Agent Type
+
+| Agent Type | Recommended Tools | Justification |
+|------------|------------------|---------------|
+| Read-only reviewer | Read, Grep, Glob, Bash | Inspects without modifying |
+| Code modifier | Read, Edit, Bash, Grep, Glob | Analyzes and fixes |
+| Explorer/researcher | Read, Grep, Glob | Pure exploration, no side effects |
+| Full-capability | Inherits all | Complex multi-step operations |
+
+### 4.2 When to Use `context: fork` in Skills
+
+- Result-oriented tasks that should run in isolation
+- Deep research that would generate excessive output in the main context
+- Tasks that benefit from a specific subagent (e.g., Explore for read-only)
+
+### 4.3 When to Use Skill Preloading in Subagents
+
+- Subagents that need specific domain knowledge
+- API conventions, error handling patterns, style guides
+- When knowledge should be in context from the start (not discovered on demand)
+
+---
+
+## 5. Applicability to Agent Infrastructure
 
 ### 5.1 Skills
 
-- **Relacao bidirecional**: Skills podem rodar em subagentes (`context: fork`) E subagentes podem carregar skills (`skills` field)
-- **Injecao dinamica**: `` !`command` `` permite dados em tempo real no skill content
-- **Descricoes como custo**: Cada skill description consome ~2% do orcamento de contexto
-- **Disable-model-invocation**: `true` mantem descricoes fora do contexto ate invocacao manual
-- **Plugin skills**: Skills de plugins sao invocaveis por subagentes com namespace `plugin-name:skill-name`
+- **Bidirectional relationship**: Skills can run in subagents (`context: fork`) AND subagents can load skills (`skills` field)
+- **Dynamic injection**: `` !`command` `` enables real-time data in skill content
+- **Descriptions as cost**: Each skill description consumes ~2% of the context budget
+- **Disable-model-invocation**: `true` keeps descriptions out of context until manual invocation
+- **Plugin skills**: Plugin skills are invocable by subagents with `plugin-name:skill-name` namespace
 
 ### 5.2 Hooks
 
-- **PreToolUse para guardrails**: Validacao de comandos antes da execucao (ex: bloquear SQL write)
-- **PostToolUse para qualidade**: Linter apos edicoes, testes apos mudancas
-- **Stop -> SubagentStop**: Conversao automatica no runtime
-- **SubagentStart/SubagentStop**: Hooks de ciclo de vida no settings.json para setup/cleanup
-- **Quatro tipos**: `command` (shell), `http` (POST), `prompt` (avaliacao Claude), `agent` (subagente verificador)
-- **Exit codes**: 0 = permite, 2 = bloqueia (stderr vira feedback para o Claude)
+- **PreToolUse for guardrails**: Command validation before execution (e.g., block SQL write)
+- **PostToolUse for quality**: Linter after edits, tests after changes
+- **Stop → SubagentStop**: Automatic conversion at runtime
+- **SubagentStart/SubagentStop**: Lifecycle hooks in settings.json for setup/cleanup
+- **Four types**: `command` (shell), `http` (POST), `prompt` (Claude evaluation), `agent` (verifier subagent)
+- **Exit codes**: 0 = allow, 2 = block (stderr becomes feedback to Claude)
 
-### 5.3 Subagentes
+### 5.3 Subagents
 
-- **Anti-aninhamento**: Subagentes nao podem spawnar outros subagentes
-- **Hub-and-spoke**: Resultados retornam apenas ao caller
-- **Retomada**: SendMessage com agent ID preserva historico
-- **Isolamento**: worktree para operacoes arriscadas, cleanup automatico
-- **Delegacao**: description e o sinal de roteamento; "use proactively" melhora delegacao
-- **Agent(type)**: Restringe quais subagentes podem ser spawnados no modo `--agent`
-- **CLI-defined**: JSON via `--agents` para sessoes temporarias e automacao
+- **Anti-nesting**: Subagents cannot spawn other subagents
+- **Hub-and-spoke**: Results return only to the caller
+- **Resumption**: SendMessage with agent ID preserves history
+- **Isolation**: worktree for risky operations, automatic cleanup
+- **Delegation**: description is the routing signal; "use proactively" improves delegation
+- **Agent(type)**: Restricts which subagents can be spawned in `--agent` mode
+- **CLI-defined**: JSON via `--agents` for temporary sessions and automation
 
 ### 5.4 Rules
 
-- **Em contexto de subagente**: `.claude/rules/` carregadas normalmente
-- **Path-scoped**: Ativadas conforme subagente le arquivos correspondentes
-- **Plugin-scoped**: Carregadas pelo subagente junto com o plugin
-- **Conflitos**: Se rules contradizem o system prompt do subagente, o system prompt prevalece
-- **Hierarquia**: Managed > project > user, mesma ordem dentro do subagente
+- **In subagent context**: `.claude/rules/` loaded normally
+- **Path-scoped**: Activated as the subagent reads matching files
+- **Plugin-scoped**: Loaded by the subagent along with the plugin
+- **Conflicts**: If rules contradict the subagent's system prompt, the system prompt prevails
+- **Hierarchy**: Managed > project > user, same order within the subagent
 
-### 5.5 Memoria
+### 5.5 Memory
 
-- **Tres escopos**: user (cross-projeto), project (versionavel), local (nao commitavel)
-- **MEMORY.md index**: Primeiras 200 linhas no startup
-- **Topic files**: Carregados sob demanda
-- **Instrucoes no prompt**: "Read memory before starting, update after finishing"
-- **Curadoria automatica**: Subagente instruidoa a curar MEMORY.md se exceder 200 linhas
-- **Auto-enable**: Read, Write, Edit habilitados automaticamente quando memory esta ativo
+- **Three scopes**: user (cross-project), project (versionable), local (not committable)
+- **MEMORY.md index**: First 200 lines at startup
+- **Topic files**: Loaded on demand
+- **Prompt instructions**: "Read memory before starting, update after finishing"
+- **Automatic curation**: Subagent instructed to curate MEMORY.md if exceeding 200 lines
+- **Auto-enable**: Read, Write, Edit automatically enabled when memory is active
 
 ---
 
-## 6. Aplicabilidade do Guia de Engenharia de Prompts
+## 6. Prompt Engineering Guide Applicability
 
-### 6.1 CoT para Cadeias de Raciocinio de Subagentes
+### 6.1 CoT for Subagent Reasoning Chains
 
-O documento enfatiza que o system prompt do subagente e TUDO que ele tem. CoT no system prompt melhora a qualidade de raciocinio, especialmente para reviews e debugging. A estrutura recomendada:
+The document emphasizes that the subagent's system prompt is ALL it has. CoT in the system prompt improves reasoning quality, especially for reviews and debugging. The recommended structure:
 
 ```markdown
 When invoked:
@@ -270,137 +275,137 @@ When invoked:
 5. Report -- structured output
 ```
 
-**Alerta**: Com Opus 4.6, "think thoroughly" frequentemente supera steps prescritivos de CoT. CoT explicito e mais eficaz com Sonnet e Haiku.
+**Warning**: With Opus 4.6, "think thoroughly" often outperforms prescriptive CoT steps. Explicit CoT is more effective with Sonnet and Haiku.
 
-### 6.2 ReAct para Subagentes com Acesso a Ferramentas
+### 6.2 ReAct for Subagents with Tool Access
 
-O padrao ReAct e o loop fundamental de cada subagente com ferramentas. Os melhores exemplos da comunidade (code-reviewer, debugger) implementam ReAct implicitamente:
+The ReAct pattern is the fundamental loop of every subagent with tools. The best community examples (code-reviewer, debugger) implement ReAct implicitly:
 
-1. **Pensamento**: "Preciso entender as mudancas recentes"
-2. **Acao**: `git diff --staged`
-3. **Observacao**: Analise do output
-4. **Repeticao**: Proxima ferramenta ou conclusao
+1. **Thought**: "I need to understand the recent changes"
+2. **Action**: `git diff --staged`
+3. **Observation**: Output analysis
+4. **Repeat**: Next tool or conclusion
 
-O system prompt deve estruturar o workflow para encorajar esse ciclo naturalmente.
+The system prompt should structure the workflow to naturally encourage this cycle.
 
-### 6.3 Tree of Thoughts para Subagentes de Exploracao
+### 6.3 Tree of Thoughts for Exploration Subagents
 
-Multiplos subagentes em paralelo implementam ToT distribuido:
+Multiple parallel subagents implement distributed ToT:
 
-- Cada subagente explora um ramo (hipotese, modulo, abordagem)
-- O agente principal avalia e sintetiza os resultados
-- Implementacao natural via: "Research authentication, database, and API modules in parallel using separate subagents"
+- Each subagent explores a branch (hypothesis, module, approach)
+- The main agent evaluates and synthesizes results
+- Natural implementation via: "Research authentication, database, and API modules in parallel using separate subagents"
 
-### 6.4 Self-Consistency para Validacao entre Multiplos Subagentes
+### 6.4 Self-Consistency for Validation Across Multiple Subagents
 
-O padrao Confidence-Based Filtering e uma forma de Self-Consistency interna ao subagente. Para Self-Consistency entre subagentes:
+The Confidence-Based Filtering pattern is a form of Self-Consistency internal to the subagent. For Self-Consistency across subagents:
 
-- Executar multiplos subagentes de review no mesmo codigo
-- Comparar findings: issues reportadas por multiplas execucoes tem maior confianca
-- Custo multiplicado pelo numero de execucoes
+- Run multiple review subagents on the same code
+- Compare findings: issues reported by multiple runs have higher confidence
+- Cost multiplied by the number of executions
 
-### 6.5 Reflexion para Melhoria Iterativa de Subagentes
+### 6.5 Reflexion for Iterative Subagent Improvement
 
-A memoria persistente implementa Reflexion cross-session:
+Persistent memory implements cross-session Reflexion:
 
-- Subagente aprende com reviews anteriores (armazenados em MEMORY.md)
-- Padroes recorrentes sao documentados e consultados
-- Cada sessao melhora a base de conhecimento
+- Subagent learns from previous reviews (stored in MEMORY.md)
+- Recurring patterns are documented and consulted
+- Each session improves the knowledge base
 
-Dentro de uma sessao, chaining de subagentes implementa Reflexion:
+Within a session, subagent chaining implements Reflexion:
 
 ```
-reviewer -> fixer -> reviewer (validacao)
+reviewer -> fixer -> reviewer (validation)
 ```
 
-### 6.6 Least-to-Most para Decomposicao de Tarefas entre Subagentes
+### 6.6 Least-to-Most for Task Decomposition Across Subagents
 
-O padrao "Explore -> Plan -> Code -> Verify" e uma implementacao de Least-to-Most:
+The "Explore → Plan → Code → Verify" pattern is a Least-to-Most implementation:
 
-1. Subagente Explore (tarefa mais simples: mapear)
-2. Subagente Plan (intermediario: planejar)
-3. Subagente general-purpose (mais complexo: implementar)
-4. Subagente reviewer (validacao final)
+1. Explore subagent (simplest task: map)
+2. Plan subagent (intermediate: plan)
+3. general-purpose subagent (most complex: implement)
+4. Reviewer subagent (final validation)
 
 ---
 
-## 7. Correlacoes com os Documentos Principais
+## 7. Correlations with Main Documents
 
-### Com "Creating Custom Subagents"
+### With "Creating Custom Subagents"
 
-Este documento de research e o complemento pratico direto da documentacao oficial. Onde a doc oficial apresenta campos e opcoes, o research fornece:
+This research document is the direct practical complement to the official documentation. Where the official docs present fields and options, the research provides:
 
-- Exemplos concretos da comunidade (27+ agentes do everything-claude-code)
-- Anti-patterns que a doc oficial nao cobre
-- Padroes de prompt engineering especificos para system prompts de agentes
-- Analise de custo por modelo com justificativa
+- Concrete community examples (27+ agents from everything-claude-code)
+- Anti-patterns not covered by official docs
+- Prompt engineering patterns specific to agent system prompts
+- Cost analysis by model with justification
 
-### Com "Orchestrate Teams of Claude Code Sessions"
+### With "Orchestrate Teams of Claude Code Sessions"
 
-A secao 15 (Agent Teams vs Subagents) fornece a tabela comparativa que ajuda na decisao. O ponto-chave que nao esta na doc de teams: subagentes sao para tarefas focadas com resultado sumarizado; teams sao para trabalho complexo com debate.
+Section 15 (Agent Teams vs Subagents) provides the comparative table that aids decision-making. The key point not in the teams documentation: subagents are for focused tasks with summarized results; teams are for complex work with debate.
 
-### Com "How Claude Remembers a Project"
+### With "How Claude Remembers a Project"
 
-A secao 11 (Persistent Memory) aplica os mecanismos de memoria do CLAUDE.md/auto memory especificamente para subagentes. A recomendacao de `memory: project` como default alinha com a filosofia de versionamento da doc de memoria. O limite de 200 linhas do MEMORY.md e consistente entre as duas documentacoes.
+Section 11 (Persistent Memory) applies the CLAUDE.md/auto memory mechanisms specifically to subagents. The recommendation of `memory: project` as default aligns with the versioning philosophy from the memory documentation. The 200-line MEMORY.md limit is consistent between both documentations.
 
-### Com "Create Plugins"
+### With "Create Plugins"
 
-A secao 16 (Plugin-Shipped Agents) documenta as restricoes de seguranca de agentes em plugins. A estrutura de diretorio (`agents/` no plugin root) e consistente com a arquitetura de plugins. A limitacao de campos suportados e uma informacao unica deste documento.
+Section 16 (Plugin-Shipped Agents) documents the security restrictions of agents in plugins. The directory structure (`agents/` in the plugin root) is consistent with plugin architecture. The supported field limitation is unique information from this document.
 
-### Com "Research: LLM Context Optimization"
+### With "Research: LLM Context Optimization"
 
-As recomendacoes de "attention budget" mapeiam diretamente para:
+The "attention budget" recommendations map directly to:
 
-- Anti-pattern #2 (muitas skills/agentes consomem orcamento de contexto)
-- Anti-pattern #4 (tool descriptions de ferramentas nao utilizadas)
-- Principio de selecao de modelo (haiku para tarefas simples = menos custo de tokens)
-- Confidence-Based Filtering (reduz tokens de output desperdicados)
+- Anti-pattern #2 (too many skills/agents consume context budget)
+- Anti-pattern #4 (tool descriptions of unused tools)
+- Model selection principle (haiku for simple tasks = lower token cost)
+- Confidence-Based Filtering (reduces wasted output tokens)
 
-O principio "lost in the middle" implica que a estrutura do system prompt importa: informacoes criticas no inicio e no fim.
-
----
-
-## 8. Forcas e Limitacoes
-
-### Forcas
-
-1. **Abrangencia**: 17 secoes cobrindo da especificacao oficial a padroes da comunidade
-2. **Praticidade**: Anti-patterns concretos com mitigacoes
-3. **Template completo**: Apendice A com template de definicao de agente pronto para uso
-4. **Dados da comunidade**: 97k+ stars do everything-claude-code validam os padroes
-5. **Ponte skills-subagentes**: Documentacao clara da relacao bidirecional
-6. **Tabela de selecao de modelo**: Justificativa por tipo de tarefa
-7. **Confidence-Based Filtering**: Padrao replicavel para qualquer agente de review
-8. **Prompt engineering para agentes**: Secao dedicada com principios da Anthropic
-
-### Limitacoes
-
-1. **Datacao**: Data de marco 2026 -- features experimentais podem ter mudado
-2. **Sem benchmarks quantitativos**: Nao ha metricas de performance comparativa entre padroes
-3. **Foco em review/analise**: A maioria dos exemplos e para agentes de review, com menos cobertura de agentes de implementacao
-4. **Ausencia de testing**: Nao ha secao sobre como testar subagentes de forma sistematica
-5. **Comunidade como fonte**: Padroes da comunidade podem nao refletir melhores praticas oficiais
-6. **Sem analise de custo real**: Recomendacoes de modelo sao qualitativas, sem dados de custo por tarefa
+The "lost in the middle" principle implies that system prompt structure matters: critical information at the beginning and end.
 
 ---
 
-## 9. Recomendacoes Praticas
+## 8. Strengths and Limitations
 
-### 9.1 Checklist para Criacao de Subagente
+### Strengths
+
+1. **Comprehensiveness**: 17 sections covering from official specification to community patterns
+2. **Practicality**: Concrete anti-patterns with mitigations
+3. **Complete template**: Appendix A with ready-to-use agent definition template
+4. **Community data**: 97k+ stars from everything-claude-code validate the patterns
+5. **Skills-subagents bridge**: Clear documentation of the bidirectional relationship
+6. **Model selection table**: Justification by task type
+7. **Confidence-Based Filtering**: Replicable pattern for any review agent
+8. **Prompt engineering for agents**: Dedicated section with Anthropic principles
+
+### Limitations
+
+1. **Dating**: March 2026 date — experimental features may have changed
+2. **No quantitative benchmarks**: No comparative performance metrics between patterns
+3. **Focus on review/analysis**: Most examples are for review agents, with less coverage of implementation agents
+4. **Absence of testing**: No section on how to systematically test subagents
+5. **Community as source**: Community patterns may not reflect official best practices
+6. **No real cost analysis**: Model recommendations are qualitative, without per-task cost data
+
+---
+
+## 9. Practical Recommendations
+
+### 9.1 Checklist for Subagent Creation
 
 ```
-[ ] name: identificador unico, lowercase com hifens
-[ ] description: inclui "Use proactively when..." ou "Use after..."
-[ ] tools: minimo necessario (preferir Read, Grep, Glob, Bash para read-only)
-[ ] model: sonnet como default, haiku para exploracao, opus para arquitetura
-[ ] maxTurns: definido (10-30 para a maioria dos cenarios)
-[ ] System prompt: segue Role -> Process -> Checklist -> Output Format
-[ ] Confidence filter: incluido para agentes de review
-[ ] Memory: definida se aprendizado cross-session e valioso
-[ ] Testado: invocado manualmente e verificado output
+[ ] name: unique identifier, lowercase with hyphens
+[ ] description: includes "Use proactively when..." or "Use after..."
+[ ] tools: minimum necessary (prefer Read, Grep, Glob, Bash for read-only)
+[ ] model: sonnet as default, haiku for exploration, opus for architecture
+[ ] maxTurns: defined (10-30 for most scenarios)
+[ ] System prompt: follows Role -> Process -> Checklist -> Output Format
+[ ] Confidence filter: included for review agents
+[ ] Memory: defined if cross-session learning is valuable
+[ ] Tested: manually invoked and output verified
 ```
 
-### 9.2 Padrao de Review Agent com Confidence Filtering
+### 9.2 Review Agent Pattern with Confidence Filtering
 
 ```markdown
 ---
@@ -443,33 +448,33 @@ Issue: Description
 Fix: Suggested fix
 ```
 
-### 9.3 Estrategia de Selecao de Modelo para o Projeto
+### 9.3 Model Selection Strategy for the Project
 
 ```
-Regra simples:
-- Exploracao, busca, tarefas mecanicas -> haiku
-- Reviews, debugging, implementacao -> sonnet
-- Arquitetura, planejamento complexo -> opus
-- Em duvida -> sonnet (melhor custo/qualidade)
+Simple rule:
+- Exploration, search, mechanical tasks -> haiku
+- Reviews, debugging, implementation -> sonnet
+- Architecture, complex planning -> opus
+- When in doubt -> sonnet (best cost/quality ratio)
 ```
 
-### 9.4 Migrar de Plugin Agent para Project Agent
+### 9.4 Migrating from Plugin Agent to Project Agent
 
-Quando um agente de plugin precisa de `hooks`, `mcpServers` ou `permissionMode`:
+When a plugin agent needs `hooks`, `mcpServers`, or `permissionMode`:
 
 ```bash
-# Copiar do diretorio do plugin para o projeto
+# Copy from plugin directory to project
 cp path/to/plugin/agents/reviewer.md .claude/agents/reviewer.md
 
-# Adicionar campos restritos no frontmatter
-# hooks:, mcpServers:, permissionMode: agora funcionam
+# Add restricted fields in frontmatter
+# hooks:, mcpServers:, permissionMode: now work
 ```
 
-### 9.5 Automatizar Verificacao de Orcamento de Contexto
+### 9.5 Automating Context Budget Verification
 
-Executar periodicamente `/context` para verificar se skills e agentes estao consumindo orcamento excessivo. Se warnings aparecerem:
+Periodically run `/context` to verify whether skills and agents are consuming excessive budget. If warnings appear:
 
-1. Reduzir numero de agentes registrados
-2. Usar `disable-model-invocation: true` em skills nao essenciais
-3. Mover skills raramente usadas para invocacao manual
-4. Consolidar agentes com dominios sobrepostos
+1. Reduce number of registered agents
+2. Use `disable-model-invocation: true` on non-essential skills
+3. Move rarely used skills to manual invocation
+4. Consolidate agents with overlapping domains

@@ -1,220 +1,225 @@
-# Análise Completa: Claude Hook Reference Doc
+# Analysis: Claude Hook Reference Doc
 
-## 1. Sumário Executivo
+> **Status**: Current
+> **Source document**: [claude-hook-reference-doc.md](https://docs.anthropic.com/en/docs/claude-code/hooks)
+> **Analysis date**: 2025-06-01
+> **Scope**: Complete technical reference for the Claude Code hook system — lifecycle events, handler types, decision patterns, and integration with skills, subagents, and MCP
 
-O documento **claude-hook-reference-doc.md** é a referência técnica definitiva do sistema de hooks do Claude Code — o mecanismo que permite interceptar, validar, bloquear, modificar e estender o comportamento do agente em pontos específicos do seu ciclo de vida. Diferente do guia introdutório (`automate-workflow-with-hooks.md`), este documento especifica com precisão milimétrica cada evento, schema de entrada/saída JSON, códigos de saída, padrões de decisão e tipos de hook (command, HTTP, prompt, agent).
+## 1. Executive Summary
 
-O sistema de hooks representa a implementação mais sofisticada do princípio de **enforcement determinístico** identificado na pesquisa de otimização de contexto: ao converter instruções comportamentais em hooks programáticos, removemos regras do budget de atenção do modelo enquanto garantimos sua aplicação 100% consistente. O documento cobre 22 eventos de lifecycle, 4 tipos de handler (command, HTTP, prompt, agent), mecanismos de decisão por evento, hooks assíncronos, e integração com skills, subagents, worktrees e MCP.
+The **claude-hook-reference-doc.md** is the definitive technical reference for the Claude Code hook system — the mechanism that allows intercepting, validating, blocking, modifying, and extending agent behavior at specific points in its lifecycle. Unlike the introductory guide (`automate-workflow-with-hooks.md`), this document specifies with pinpoint precision each event, JSON input/output schema, exit codes, decision patterns, and hook types (command, HTTP, prompt, agent).
 
-A riqueza deste documento está no nível de controle granular que ele expõe: desde a capacidade de modificar inputs de ferramentas antes da execução (`updatedInput`), injetar contexto adicional em subagents (`SubagentStart.additionalContext`), até controlar programaticamente permissões (`PermissionRequest.updatedPermissions`). Para quem constrói infraestrutura de agentes, este é o documento que transforma o Claude Code de um assistente passivo em uma plataforma programável.
+The hook system represents the most sophisticated implementation of the **deterministic enforcement** principle identified in context optimization research: by converting behavioral instructions into programmatic hooks, we remove rules from the model's attention budget while ensuring their 100% consistent application. The document covers 22 lifecycle events, 4 handler types (command, HTTP, prompt, agent), per-event decision mechanisms, asynchronous hooks, and integration with skills, subagents, worktrees, and MCP.
 
-## 2. Conceitos e Mecanismos-Chave
+The richness of this document lies in the level of granular control it exposes: from the ability to modify tool inputs before execution (`updatedInput`), inject additional context into subagents (`SubagentStart.additionalContext`), to programmatically controlling permissions (`PermissionRequest.updatedPermissions`). For anyone building agent infrastructure, this is the document that transforms Claude Code from a passive assistant into a programmable platform.
 
-### 2.1 Arquitetura do Lifecycle de Hooks
+## 2. Key Concepts and Mechanisms
 
-O sistema opera em três níveis de aninhamento:
+### 2.1 Hook Lifecycle Architecture
 
-| Nível | Componente | Função |
-|-------|------------|--------|
-| 1 | **Hook Event** | Ponto do lifecycle (ex: `PreToolUse`, `Stop`) |
-| 2 | **Matcher Group** | Filtro regex que determina quando disparar |
-| 3 | **Hook Handler** | O que executar quando há match (command/http/prompt/agent) |
+The system operates at three nesting levels:
 
-### 2.2 Os 22 Eventos de Lifecycle
+| Level | Component | Function |
+|-------|-----------|----------|
+| 1 | **Hook Event** | Lifecycle point (e.g., `PreToolUse`, `Stop`) |
+| 2 | **Matcher Group** | Regex filter that determines when to fire |
+| 3 | **Hook Handler** | What to execute on match (command/http/prompt/agent) |
 
-O documento categoriza os eventos em grupos funcionais:
+### 2.2 The 22 Lifecycle Events
 
-**Eventos de Sessão:**
+The document categorizes events into functional groups:
 
-- `SessionStart` — Início/resumo de sessão. Único evento com acesso a `CLAUDE_ENV_FILE` para persistir variáveis de ambiente.
-- `SessionEnd` — Término de sessão. Timeout padrão de 1.5s (configurável via `CLAUDE_CODE_SESSIONEND_HOOKS_TIMEOUT_MS`).
+**Session Events:**
 
-**Eventos do Loop Agêntico (pré-execução):**
+- `SessionStart` — Session start/resume. Only event with access to `CLAUDE_ENV_FILE` for persisting environment variables.
+- `SessionEnd` — Session termination. Default timeout of 1.5s (configurable via `CLAUDE_CODE_SESSIONEND_HOOKS_TIMEOUT_MS`).
 
-- `UserPromptSubmit` — Antes do Claude processar o prompt do usuário. Pode bloquear ou adicionar contexto.
-- `PreToolUse` — Antes de qualquer ferramenta executar. Controle mais rico: allow/deny/ask + `updatedInput`.
-- `PermissionRequest` — Quando o diálogo de permissão apareceria. Pode auto-aprovar com `updatedPermissions`.
+**Agentic Loop Events (pre-execution):**
 
-**Eventos do Loop Agêntico (pós-execução):**
+- `UserPromptSubmit` — Before Claude processes the user prompt. Can block or add context.
+- `PreToolUse` — Before any tool executes. Richest control: allow/deny/ask + `updatedInput`.
+- `PermissionRequest` — When the permission dialog would appear. Can auto-approve with `updatedPermissions`.
 
-- `PostToolUse` — Após execução bem-sucedida de ferramenta. Pode fornecer feedback e até substituir output de MCP tools.
-- `PostToolUseFailure` — Após falha de ferramenta. Contexto adicional para o Claude sobre a falha.
+**Agentic Loop Events (post-execution):**
 
-**Eventos de Subagent:**
+- `PostToolUse` — After successful tool execution. Can provide feedback and even replace MCP tool output.
+- `PostToolUseFailure` — After tool failure. Additional context for Claude about the failure.
 
-- `SubagentStart` — Ao spawn de subagent. Pode injetar contexto no subagent.
-- `SubagentStop` — Ao término de subagent. Mesmo controle que `Stop`.
+**Subagent Events:**
 
-**Eventos de Parada:**
+- `SubagentStart` — On subagent spawn. Can inject context into the subagent.
+- `SubagentStop` — On subagent termination. Same control as `Stop`.
 
-- `Stop` — Quando o Claude termina de responder. Pode forçá-lo a continuar.
-- `StopFailure` — Quando a resposta falha por erro de API. Sem controle de decisão.
+**Stop Events:**
 
-**Eventos de Equipe:**
+- `Stop` — When Claude finishes responding. Can force it to continue.
+- `StopFailure` — When the response fails due to an API error. No decision control.
 
-- `TeammateIdle` — Quando um teammate está prestes a ficar ocioso.
-- `TaskCompleted` — Quando uma task é marcada como completa. Pode impedir a conclusão.
+**Team Events:**
 
-**Eventos de Configuração e Instrução:**
+- `TeammateIdle` — When a teammate is about to become idle.
+- `TaskCompleted` — When a task is marked as complete. Can prevent completion.
 
-- `ConfigChange` — Mudança em settings. Pode bloquear (exceto `policy_settings`).
-- `InstructionsLoaded` — Quando CLAUDE.md ou rules são carregados. Somente observação.
+**Configuration and Instruction Events:**
 
-**Eventos de Compactação:**
+- `ConfigChange` — Settings change. Can block (except `policy_settings`).
+- `InstructionsLoaded` — When CLAUDE.md or rules are loaded. Observation only.
 
-- `PreCompact` — Antes da compactação de contexto.
-- `PostCompact` — Após compactação, com acesso ao `compact_summary`.
+**Compaction Events:**
 
-**Eventos de Worktree:**
+- `PreCompact` — Before context compaction.
+- `PostCompact` — After compaction, with access to the `compact_summary`.
 
-- `WorktreeCreate` — Substitui o comportamento padrão de `git worktree`. Deve retornar path absoluto.
-- `WorktreeRemove` — Cleanup de worktrees.
+**Worktree Events:**
 
-**Eventos de MCP:**
+- `WorktreeCreate` — Overrides default `git worktree` behavior. Must return an absolute path.
+- `WorktreeRemove` — Worktree cleanup.
 
-- `Elicitation` — Interceptação de pedidos de input de MCP servers.
-- `ElicitationResult` — Modificação de respostas a elicitações.
+**MCP Events:**
 
-**Evento de Notificação:**
+- `Elicitation` — Intercepts input requests from MCP servers.
+- `ElicitationResult` — Modifies responses to elicitations.
 
-- `Notification` — Dispara em notificações do sistema.
+**Notification Event:**
 
-### 2.3 Quatro Tipos de Hook Handler
+- `Notification` — Fires on system notifications.
 
-| Tipo | Mecanismo | Eventos Suportados | Timeout Padrão |
-|------|-----------|-------------------|----------------|
-| `command` | Shell script via stdin/stdout | Todos os 22 eventos | 600s |
-| `http` | POST para endpoint HTTP | 8 eventos do loop agêntico | 30s |
-| `prompt` | LLM single-turn para decisão | 8 eventos do loop agêntico | 30s |
-| `agent` | Subagent com acesso a ferramentas | 8 eventos do loop agêntico | 60s |
+### 2.3 Four Hook Handler Types
 
-Os 8 eventos que suportam todos os tipos: `PreToolUse`, `PostToolUse`, `PostToolUseFailure`, `PermissionRequest`, `UserPromptSubmit`, `Stop`, `SubagentStop`, `TaskCompleted`.
+| Type | Mechanism | Supported Events | Default Timeout |
+|------|-----------|-----------------|----------------|
+| `command` | Shell script via stdin/stdout | All 22 events | 600s |
+| `http` | POST to HTTP endpoint | 8 agentic loop events | 30s |
+| `prompt` | LLM single-turn for decisions | 8 agentic loop events | 30s |
+| `agent` | Subagent with tool access | 8 agentic loop events | 60s |
 
-### 2.4 Sistema de Decisão por Evento
+The 8 events that support all types: `PreToolUse`, `PostToolUse`, `PostToolUseFailure`, `PermissionRequest`, `UserPromptSubmit`, `Stop`, `SubagentStop`, `TaskCompleted`.
 
-O documento revela três padrões distintos de controle de decisão:
+### 2.4 Per-Event Decision System
+
+The document reveals three distinct decision control patterns:
 
 ```
-Padrão 1: Top-level decision
+Pattern 1: Top-level decision
   → UserPromptSubmit, PostToolUse, PostToolUseFailure, Stop, SubagentStop, ConfigChange
   → { "decision": "block", "reason": "..." }
 
-Padrão 2: hookSpecificOutput com permissionDecision
+Pattern 2: hookSpecificOutput with permissionDecision
   → PreToolUse
   → { "hookSpecificOutput": { "permissionDecision": "allow|deny|ask" } }
 
-Padrão 3: hookSpecificOutput com decision.behavior
+Pattern 3: hookSpecificOutput with decision.behavior
   → PermissionRequest
   → { "hookSpecificOutput": { "decision": { "behavior": "allow|deny" } } }
 ```
 
-### 2.5 Mecanismo de Exit Codes
+### 2.5 Exit Code Mechanism
 
-| Exit Code | Significado | Processamento JSON |
-|-----------|-------------|-------------------|
-| 0 | Sucesso — ação permitida | Sim, stdout é parseado como JSON |
-| 2 | Erro bloqueante — ação impedida | Não, stderr usado como mensagem |
-| Outro | Erro não-bloqueante — continua | Não, stderr mostrado em modo verbose |
+| Exit Code | Meaning | JSON Processing |
+|-----------|---------|-----------------|
+| 0 | Success — action allowed | Yes, stdout is parsed as JSON |
+| 2 | Blocking error — action prevented | No, stderr used as message |
+| Other | Non-blocking error — continues | No, stderr shown in verbose mode |
 
-### 2.6 Locais de Configuração (Hierarquia de Escopo)
+### 2.6 Configuration Locations (Scope Hierarchy)
 
-| Local | Escopo | Compartilhável |
-|-------|--------|---------------|
-| `~/.claude/settings.json` | Todos os projetos | Não |
-| `.claude/settings.json` | Projeto único | Sim (versionável) |
-| `.claude/settings.local.json` | Projeto único | Não (gitignored) |
-| Managed policy settings | Organização | Sim (admin) |
-| Plugin `hooks/hooks.json` | Plugin ativo | Sim |
-| Skill/Agent YAML frontmatter | Componente ativo | Sim |
+| Location | Scope | Shareable |
+|----------|-------|-----------|
+| `~/.claude/settings.json` | All projects | No |
+| `.claude/settings.json` | Single project | Yes (versionable) |
+| `.claude/settings.local.json` | Single project | No (gitignored) |
+| Managed policy settings | Organization | Yes (admin) |
+| Plugin `hooks/hooks.json` | Active plugin | Yes |
+| Skill/Agent YAML frontmatter | Active component | Yes |
 
-### 2.7 Hooks Assíncronos
+### 2.7 Asynchronous Hooks
 
-A flag `"async": true` (apenas para `type: "command"`) permite execução em background:
+The `"async": true` flag (for `type: "command"` only) enables background execution:
 
-- Claude continua trabalhando imediatamente
-- Output entregue no próximo turno via `systemMessage` ou `additionalContext`
-- Campos de decisão são ignorados (ação já procedeu)
-- Sem deduplicação entre múltiplas execuções
+- Claude continues working immediately
+- Output delivered on the next turn via `systemMessage` or `additionalContext`
+- Decision fields are ignored (action has already proceeded)
+- No deduplication between multiple executions
 
-### 2.8 Hooks em Skills e Agents
+### 2.8 Hooks in Skills and Agents
 
-Hooks podem ser definidos diretamente no frontmatter YAML de skills e subagents:
+Hooks can be defined directly in the YAML frontmatter of skills and subagents:
 
-- Escopo limitado ao lifecycle do componente
-- Cleanup automático ao término
-- `Stop` hooks em subagents são convertidos automaticamente para `SubagentStop`
-- Suportam `"once": true` para execução única por sessão
+- Scope limited to the component's lifecycle
+- Automatic cleanup on termination
+- `Stop` hooks in subagents are automatically converted to `SubagentStop`
+- Support `"once": true` for single execution per session
 
-## 3. Pontos de Atenção
+## 3. Points of Attention
 
-### 3.1 Gotchas Críticos
+### 3.1 Critical Gotchas
 
-| Ponto | Detalhe | Impacto |
-|-------|---------|---------|
-| **Loop infinito de Stop hooks** | Se um Stop hook sempre retorna `"block"`, Claude nunca para | Sessão travada; verificar `stop_hook_active` |
-| **Exit code 2 ≠ block para todos** | Eventos como `PostToolUse` e `SessionStart` ignoram exit 2 como decisão | Comportamento inconsistente se não checado |
-| **JSON parsing com shell profile** | Se o shell profile imprime texto no startup, interfere com parsing JSON | Hooks command falham silenciosamente |
-| **Hooks HTTP não bloqueiam por status** | Non-2xx é erro não-bloqueante; para bloquear, retorne 2xx com JSON de deny | Falsa sensação de segurança |
-| **policy_settings não bloqueáveis** | `ConfigChange` hooks com `"block"` são ignorados para `policy_settings` | Design intencional para enterprise |
-| **SessionEnd timeout de 1.5s** | Hooks de cleanup podem não completar a tempo | Usar `CLAUDE_CODE_SESSIONEND_HOOKS_TIMEOUT_MS` |
-| **Matchers são regex, não glob** | `Edit|Write` usa `|` como OR regex, não shell glob | Padrões inesperados se não escapados |
-| **Hooks assíncronos sem decisão** | `decision`, `permissionDecision`, `continue` ignorados em async | Usar apenas para side-effects |
+| Point | Detail | Impact |
+|-------|--------|--------|
+| **Stop hook infinite loop** | If a Stop hook always returns `"block"`, Claude never stops | Session hangs; check `stop_hook_active` |
+| **Exit code 2 ≠ block for all** | Events like `PostToolUse` and `SessionStart` ignore exit 2 as a decision | Inconsistent behavior if not checked |
+| **JSON parsing with shell profile** | If the shell profile prints text on startup, it interferes with JSON parsing | Command hooks fail silently |
+| **HTTP hooks don't block by status** | Non-2xx is a non-blocking error; to block, return 2xx with deny JSON | False sense of security |
+| **policy_settings not blockable** | `ConfigChange` hooks with `"block"` are ignored for `policy_settings` | Intentional enterprise design |
+| **SessionEnd 1.5s timeout** | Cleanup hooks may not complete in time | Use `CLAUDE_CODE_SESSIONEND_HOOKS_TIMEOUT_MS` |
+| **Matchers are regex, not glob** | `Edit|Write` uses `|` as regex OR, not shell glob | Unexpected patterns if not escaped |
+| **Async hooks without decisions** | `decision`, `permissionDecision`, `continue` ignored in async | Use only for side-effects |
 
-### 3.2 Segurança
+### 3.2 Security
 
-- **Hooks command executam com permissões completas do usuário** — podem acessar, modificar ou deletar qualquer arquivo
-- Variáveis de shell devem ser SEMPRE quotadas (`"$VAR"` não `$VAR`)
-- Paths devem ser absolutos, usando `$CLAUDE_PROJECT_DIR`
-- Inputs devem ser validados e sanitizados
-- Verificar path traversal (`..` em file paths)
-- Evitar processar `.env`, `.git/`, chaves privadas
+- **Command hooks execute with full user permissions** — they can access, modify, or delete any file
+- Shell variables must ALWAYS be quoted (`"$VAR"` not `$VAR`)
+- Paths must be absolute, using `$CLAUDE_PROJECT_DIR`
+- Inputs must be validated and sanitized
+- Check for path traversal (`..` in file paths)
+- Avoid processing `.env`, `.git/`, private keys
 
-### 3.3 Ordem de Execução
+### 3.3 Execution Order
 
-- Todos os hooks matching para um evento executam em paralelo
-- Handlers idênticos são deduplicados (por command string ou URL)
-- Hooks de múltiplas fontes (user, project, plugin, skill) se combinam
-- `disableAllHooks: true` desabilita todos exceto managed hooks
+- All matching hooks for an event execute in parallel
+- Identical handlers are deduplicated (by command string or URL)
+- Hooks from multiple sources (user, project, plugin, skill) are combined
+- `disableAllHooks: true` disables all except managed hooks
 
-## 4. Casos de Uso e Escopo
+## 4. Use Cases and Scope
 
-### 4.1 Quando Usar Cada Evento
+### 4.1 When to Use Each Event
 
-| Cenário | Evento Recomendado | Tipo de Hook |
-|---------|--------------------|----|
-| Bloquear comandos destrutivos | `PreToolUse` matcher `Bash` | command |
-| Auto-aprovar comandos seguros | `PermissionRequest` | command/prompt |
-| Lint após edição de arquivo | `PostToolUse` matcher `Edit\|Write` | command (async) |
-| Carregar contexto de projeto | `SessionStart` | command |
-| Garantir testes passando antes de parar | `Stop` | agent |
-| Logging de operações MCP | `PreToolUse` matcher `mcp__.*` | command |
-| Validação de PR antes de commit | `PreToolUse` matcher `Bash` | command |
-| Injetar guidelines em subagents | `SubagentStart` | command |
-| Auditoria de mudanças de config | `ConfigChange` | command |
-| Prevenir conclusão prematura de tasks | `TaskCompleted` | command/prompt |
-| Cleanup de worktrees custom (SVN/Perforce) | `WorktreeCreate` + `WorktreeRemove` | command |
-| Automação de respostas MCP | `Elicitation` | command |
+| Scenario | Recommended Event | Hook Type |
+|----------|-------------------|-----------|
+| Block destructive commands | `PreToolUse` matcher `Bash` | command |
+| Auto-approve safe commands | `PermissionRequest` | command/prompt |
+| Lint after file edit | `PostToolUse` matcher `Edit\|Write` | command (async) |
+| Load project context | `SessionStart` | command |
+| Ensure tests pass before stopping | `Stop` | agent |
+| Log MCP operations | `PreToolUse` matcher `mcp__.*` | command |
+| PR validation before commit | `PreToolUse` matcher `Bash` | command |
+| Inject guidelines into subagents | `SubagentStart` | command |
+| Config change auditing | `ConfigChange` | command |
+| Prevent premature task completion | `TaskCompleted` | command/prompt |
+| Custom worktree cleanup (SVN/Perforce) | `WorktreeCreate` + `WorktreeRemove` | command |
+| MCP response automation | `Elicitation` | command |
 
-### 4.2 Quando NÃO Usar Hooks
+### 4.2 When NOT to Use Hooks
 
-| Cenário | Alternativa Melhor | Por quê |
-|---------|-------------------|---------|
-| Guidance sobre estilo de código | Rules (`.claude/rules/`) | Não precisa enforcement determinístico |
-| Documentação de projeto | CLAUDE.md | Hooks não adicionam contexto persistente |
-| Instruções complexas multi-passo | Skills | Hooks são para ações pontuais, não workflows |
-| Regras que precisam de julgamento do modelo | Rules + CoT | Hooks command são binários (allow/block) |
+| Scenario | Better Alternative | Why |
+|----------|-------------------|-----|
+| Code style guidance | Rules (`.claude/rules/`) | Does not need deterministic enforcement |
+| Project documentation | CLAUDE.md | Hooks don't add persistent context |
+| Complex multi-step instructions | Skills | Hooks are for point actions, not workflows |
+| Rules requiring model judgment | Rules + CoT | Command hooks are binary (allow/block) |
 
-## 5. Aplicabilidade à Infraestrutura de Agentes
+## 5. Applicability to Agent Infrastructure
 
 ### 5.1 Skills
 
-**Hooks como extensão de skills:**
+**Hooks as skill extensions:**
 
-- Skills podem definir hooks no seu frontmatter YAML, criando workflows auto-contidos
-- Um skill de "database migration" pode ter um `PreToolUse` hook que valida comandos SQL antes da execução
-- Flag `"once": true` é ideal para hooks de setup que devem rodar apenas na ativação do skill
+- Skills can define hooks in their YAML frontmatter, creating self-contained workflows
+- A "database migration" skill can have a `PreToolUse` hook that validates SQL commands before execution
+- The `"once": true` flag is ideal for setup hooks that should run only on skill activation
 
-**Padrão: Skill com validação por hook**
+**Pattern: Skill with hook-based validation**
 
 ```yaml
 ---
@@ -233,97 +238,97 @@ hooks:
 ---
 ```
 
-**Ciclo de vida complementar:**
+**Complementary lifecycle:**
 
-- Hook `SessionStart` pode carregar estado que skills precisam
-- Hook `PostToolUse` pode validar outputs de scripts executados por skills
-- Hook `Stop` (tipo agent) pode verificar se o skill completou corretamente
+- `SessionStart` hook can load state that skills need
+- `PostToolUse` hook can validate outputs of scripts executed by skills
+- `Stop` hook (agent type) can verify whether the skill completed correctly
 
 ### 5.2 Hooks (Design Patterns)
 
-**Padrão 1: Guardrail em Camadas**
+**Pattern 1: Layered Guardrail**
 
 ```
-PreToolUse (command) → Validação rápida e determinística
-  ↓ Se "ask"
-PermissionRequest (prompt) → Avaliação por LLM se ambíguo
-  ↓ Se "allow"
-PostToolUse (command) → Verificação de resultado
+PreToolUse (command) → Fast, deterministic validation
+  ↓ If "ask"
+PermissionRequest (prompt) → LLM evaluation if ambiguous
+  ↓ If "allow"
+PostToolUse (command) → Result verification
   ↓
-Stop (agent) → Verificação final com acesso a ferramentas
+Stop (agent) → Final verification with tool access
 ```
 
-**Padrão 2: Feedback Loop Assíncrono**
+**Pattern 2: Asynchronous Feedback Loop**
 
 ```
-PostToolUse (async command) → Roda testes em background
-  → Claude continua trabalhando
-  → Resultado entregue como systemMessage no próximo turno
-  → Claude corrige se testes falharam
+PostToolUse (async command) → Runs tests in background
+  → Claude continues working
+  → Result delivered as systemMessage on the next turn
+  → Claude corrects if tests failed
 ```
 
-**Padrão 3: Context Injection Dinâmico**
+**Pattern 3: Dynamic Context Injection**
 
 ```
-SessionStart → Carrega issues do GitHub, estado do CI
-SubagentStart → Injeta guidelines específicas para o tipo de subagent
-UserPromptSubmit → Adiciona metadata sobre o estado atual do projeto
+SessionStart → Loads GitHub issues, CI state
+SubagentStart → Injects guidelines specific to the subagent type
+UserPromptSubmit → Adds metadata about the current project state
 ```
 
-**Padrão 4: Composição de Hooks de Múltiplas Fontes**
+**Pattern 4: Multi-Source Hook Composition**
 
-- User settings: hooks globais de segurança
-- Project settings: hooks de linting e testing
-- Plugin hooks: hooks de formatação
-- Skill frontmatter: hooks específicos do workflow
+- User settings: global security hooks
+- Project settings: linting and testing hooks
+- Plugin hooks: formatting hooks
+- Skill frontmatter: workflow-specific hooks
 
 ### 5.3 Subagents
 
-**Hooks que afetam subagents:**
+**Hooks that affect subagents:**
 
-- `SubagentStart` — Injetar contexto e guidelines antes do subagent começar a trabalhar
-- `SubagentStop` — Validar que o subagent completou satisfatoriamente (mesmo padrão de `Stop`)
-- `PreToolUse` com `agent_id` no input — Permite distinguir chamadas de subagents vs main thread
-- Hooks definidos em agent frontmatter são scoped ao lifecycle do subagent
+- `SubagentStart` — Inject context and guidelines before the subagent starts working
+- `SubagentStop` — Validate that the subagent completed satisfactorily (same pattern as `Stop`)
+- `PreToolUse` with `agent_id` in input — Allows distinguishing subagent calls vs. main thread
+- Hooks defined in agent frontmatter are scoped to the subagent's lifecycle
 
-**Campo `agent_id` e `agent_type`:**
-O input de hooks inclui `agent_id` e `agent_type` quando executando em contexto de subagent, permitindo lógica condicional:
+**`agent_id` and `agent_type` fields:**
+The hook input includes `agent_id` and `agent_type` when executing in a subagent context, enabling conditional logic:
 
 ```bash
 AGENT_TYPE=$(echo "$INPUT" | jq -r '.agent_type // empty')
 if [ "$AGENT_TYPE" = "Explore" ]; then
-  # Regras diferentes para agents de exploração
+  # Different rules for exploration agents
 fi
 ```
 
 ### 5.4 Rules
 
-**Hooks vs Rules — Framework de Decisão:**
+**Hooks vs Rules — Decision Framework:**
 
-| Critério | Hook | Rule |
-|----------|------|------|
-| Enforcement | Determinístico (programático) | Probabilístico (via atenção do modelo) |
-| Custo de contexto | Zero (fora da janela) | Consome tokens do budget |
-| Flexibilidade | Binário (allow/block) ou LLM (prompt/agent) | Nuançado, contextual |
-| Quando carregar | Sempre ativo (lifecycle) | Path-scoped, lazy |
-| Manutenção | Scripts externos | Markdown inline |
-| Verificabilidade | Testável independentemente | Depende do comportamento do modelo |
+| Criterion | Hook | Rule |
+|-----------|------|------|
+| Enforcement | Deterministic (programmatic) | Probabilistic (via model attention) |
+| Context cost | Zero (outside the window) | Consumes budget tokens |
+| Flexibility | Binary (allow/block) or LLM (prompt/agent) | Nuanced, contextual |
+| When loaded | Always active (lifecycle) | Path-scoped, lazy |
+| Maintenance | External scripts | Inline Markdown |
+| Verifiability | Independently testable | Depends on model behavior |
 
-**Princípio derivado do research-llm-context-optimization:**
-> "Converter instruções comportamentais que são enforced em hooks remove-as do budget de atenção enquanto garante enforcement determinístico."
+**Principle derived from research-context-engineering-comprehensive:
+> "Converting behavioral instructions that are enforced into hooks removes them from the attention budget while ensuring deterministic enforcement."
 
-**Regra prática:** Se a instrução pode ser verificada programaticamente e deve SEMPRE ser seguida, use hook. Se requer julgamento contextual, use rule.
+**Practical rule:** If the instruction can be verified programmatically and must ALWAYS be followed, use a hook. If it requires contextual judgment, use a rule.
 
 ### 5.5 Memory
 
-**Hooks que interagem com memória:**
+**Hooks that interact with memory:**
 
-- `SessionStart` pode verificar se MEMORY.md existe e está atualizado
-- `PostCompact` pode salvar `compact_summary` para referência futura
-- `InstructionsLoaded` pode auditar quais arquivos de memória foram carregados e quando
-- `ConfigChange` com matcher `skills` pode detectar quando skills que geram memória são modificados
+- `SessionStart` can check whether MEMORY.md exists and is up to date
+- `PostCompact` can save `compact_summary` for future reference
+- `InstructionsLoaded` can audit which memory files were loaded and when
+- `ConfigChange` with `skills` matcher can detect when skills that generate memory are modified
 
-**Padrão: Auto-cleanup de memória via PostCompact:**
+**Pattern: Auto-cleanup of memory via PostCompact:**
 
 ```bash
 #!/bin/bash
@@ -332,19 +337,19 @@ SUMMARY=$(echo "$INPUT" | jq -r '.compact_summary')
 echo "$SUMMARY" >> ~/.claude/projects/my-project/compaction-history.log
 ```
 
-## 6. Aplicabilidade do Guia de Engenharia de Prompts
+## 6. Applicability of the Prompt Engineering Guide
 
-### 6.1 Técnicas Aplicáveis a Hooks
+### 6.1 Techniques Applicable to Hooks
 
-| Técnica | Tipo de Hook | Aplicação |
-|---------|-------------|-----------|
-| **ReAct** | `type: "agent"` | Agent hooks naturalmente implementam ReAct: raciocinam sobre o estado, usam ferramentas para investigar, decidem |
-| **Chain-of-Thought** | `type: "prompt"` | Prompts de hooks podem incluir "Analise passo a passo antes de decidir" para melhor julgamento |
-| **Self-Consistency** | Múltiplos hooks prompt | Rodar 2-3 prompt hooks para o mesmo evento e requerer consenso (via script wrapper) |
-| **Least-to-Most** | Composição de hooks | Decompor validações complexas: hook 1 verifica sintaxe → hook 2 verifica segurança → hook 3 verifica compliance |
-| **Prompt Chaining** | Pipeline de eventos | `PreToolUse` → `PostToolUse` → `Stop` formam uma chain natural de validação |
+| Technique | Hook Type | Application |
+|-----------|-----------|-------------|
+| **ReAct** | `type: "agent"` | Agent hooks naturally implement ReAct: reason about state, use tools to investigate, decide |
+| **Chain-of-Thought** | `type: "prompt"` | Hook prompts can include "Analyze step by step before deciding" for better judgment |
+| **Self-Consistency** | Multiple prompt hooks | Run 2-3 prompt hooks for the same event and require consensus (via wrapper script) |
+| **Least-to-Most** | Hook composition | Decompose complex validations: hook 1 checks syntax → hook 2 checks security → hook 3 checks compliance |
+| **Prompt Chaining** | Event pipeline | `PreToolUse` → `PostToolUse` → `Stop` form a natural validation chain |
 
-### 6.2 Exemplo: Stop Hook com CoT
+### 6.2 Example: Stop Hook with CoT
 
 ```json
 {
@@ -352,132 +357,132 @@ echo "$SUMMARY" >> ~/.claude/projects/my-project/compaction-history.log
     "Stop": [{
       "hooks": [{
         "type": "prompt",
-        "prompt": "Analise passo a passo se Claude completou a tarefa. Context: $ARGUMENTS\n\n1. Quais tarefas foram solicitadas?\n2. Quais foram completadas?\n3. Há erros pendentes?\n4. Testes passaram?\n\nPasso a passo, determine se é seguro parar."
+        "prompt": "Analyze step by step whether Claude completed the task. Context: $ARGUMENTS\n\n1. What tasks were requested?\n2. Which ones were completed?\n3. Are there pending errors?\n4. Did tests pass?\n\nStep by step, determine whether it is safe to stop."
       }]
     }]
   }
 }
 ```
 
-### 6.3 Quando NÃO Usar Técnicas Avançadas em Hooks
+### 6.3 When NOT to Use Advanced Techniques in Hooks
 
-- **Tree of Thoughts**: Excessivo para hooks — latência alta, custo alto
-- **PAL**: Hooks command já são código; PAL é redundante
-- **Few-shot CoT**: Hooks prompt devem ser concisos (timeout de 30s); exemplos longos são contra-producentes
-- **Reflexion**: Hooks são stateless entre execuções; não há memória de tentativas anteriores
+- **Tree of Thoughts**: Excessive for hooks — high latency, high cost
+- **PAL**: Command hooks are already code; PAL is redundant
+- **Few-shot CoT**: Hook prompts should be concise (30s timeout); long examples are counterproductive
+- **Reflexion**: Hooks are stateless between executions; there is no memory of previous attempts
 
-## 7. Correlações com Documentos Principais
+## 7. Correlations with Core Documents
 
-### 7.1 research-llm-context-optimization.md
+### 7.1 research-context-engineering-comprehensive.md
 
-| Princípio de Contexto | Implementação via Hooks |
-|----------------------|------------------------|
-| Instruction budget (~150-200) | Hooks removem regras enforced do CLAUDE.md, liberando budget |
-| Progressive disclosure | `InstructionsLoaded` rastreia carregamento lazy; `SessionStart` injeta contexto JIT |
-| Context poisoning | Hooks impedem ações que poderiam poluir contexto (ex: bloquear tools desnecessários) |
-| Lost-in-the-middle | Hooks com `additionalContext` injetam informação em posições privilegiadas |
-| Compaction awareness | `PreCompact`/`PostCompact` permitem reagir à compactação |
+| Context Principle | Implementation via Hooks |
+|-------------------|--------------------------|
+| Instruction budget (~150-200) | Hooks remove enforced rules from CLAUDE.md, freeing budget |
+| Progressive disclosure | `InstructionsLoaded` tracks lazy loading; `SessionStart` injects JIT context |
+| Context poisoning | Hooks prevent actions that could pollute context (e.g., blocking unnecessary tools) |
+| Lost-in-the-middle | Hooks with `additionalContext` inject information at privileged positions |
+| Compaction awareness | `PreCompact`/`PostCompact` allow reacting to compaction |
 
 ### 7.2 Evaluating-AGENTS-paper.md
 
-| Achado do Paper | Relação com Hooks |
-|-----------------|-------------------|
-| Arquivos gerados por LLM reduzem performance | Hooks enforcam regras sem adicionar texto ao contexto |
-| "More testing" aumenta com config files | `Stop` hooks com agent type validam testes explicitamente |
-| Instruções são seguidas — esse é o problema | Hooks enforcement é externo ao modelo, evitando o dilema |
+| Paper Finding | Relationship with Hooks |
+|---------------|------------------------|
+| LLM-generated files reduce performance | Hooks enforce rules without adding text to the context |
+| "More testing" increases with config files | `Stop` hooks with agent type explicitly validate tests |
+| Instructions are followed — that's the problem | Hook enforcement is external to the model, avoiding the dilemma |
 
 ### 7.3 claude-prompting-best-practices.md
 
-| Best Practice | Aplicação em Hooks |
-|---------------|-------------------|
-| System prompts para constraints rígidos | Hooks implementam constraints como código, mais confiável que prompts |
-| Structured output com JSON | Toda comunicação hook↔Claude usa JSON structured |
-| Tool use patterns | `PreToolUse`/`PostToolUse` controlam exatamente o uso de ferramentas |
+| Best Practice | Application in Hooks |
+|---------------|---------------------|
+| System prompts for hard constraints | Hooks implement constraints as code, more reliable than prompts |
+| Structured output with JSON | All hook↔Claude communication uses structured JSON |
+| Tool use patterns | `PreToolUse`/`PostToolUse` control exactly how tools are used |
 
-### 7.4 a-guide-to-agents.md / a-guide-to-claude.md
+### 7.4 a-guide-to-agents.md / a-guide-to-agents.md
 
-| Princípio do Guide | Hooks como Implementação |
-|--------------------|----|
-| Keep config minimal | Hooks permitem CLAUDE.md menor removendo enforcement rules |
-| Progressive disclosure | Hook `InstructionsLoaded` monitora lazy loading |
-| Don't auto-generate | Hooks são code, não generated text — sempre intencionais |
+| Guide Principle | Hooks as Implementation |
+|-----------------|------------------------|
+| Keep config minimal | Hooks allow a smaller CLAUDE.md by removing enforcement rules |
+| Progressive disclosure | `InstructionsLoaded` hook monitors lazy loading |
+| Don't auto-generate | Hooks are code, not generated text — always intentional |
 
-## 8. Framework de Decisão
+## 8. Decision Framework
 
-### Árvore de Decisão: Hook vs Rule vs CLAUDE.md vs Skill
+### Decision Tree: Hook vs Rule vs CLAUDE.md vs Skill
 
 ```
-A instrução precisa ser SEMPRE seguida sem exceção?
-├── SIM → Pode ser verificada programaticamente?
-│   ├── SIM → Use HOOK (command type)
-│   │   └── É uma regra simples (regex match)?
-│   │       ├── SIM → PreToolUse/PermissionRequest com exit code
-│   │       └── NÃO → PreToolUse/Stop com agent type
-│   └── NÃO → Use RULE com linguagem forte ("MUST", "NEVER")
-│       └── É scoped a um path específico?
-│           ├── SIM → .claude/rules/ com paths: frontmatter
-│           └── NÃO → CLAUDE.md principal
-└── NÃO → É guidance contextual?
-    ├── SIM → É específica de um workflow?
-    │   ├── SIM → Use SKILL (SKILL.md)
-    │   └── NÃO → Use RULE ou CLAUDE.md
-    └── NÃO → Provavelmente não precisa ser documentada
+Does the instruction need to be ALWAYS followed without exception?
+├── YES → Can it be verified programmatically?
+│   ├── YES → Use HOOK (command type)
+│   │   └── Is it a simple rule (regex match)?
+│   │       ├── YES → PreToolUse/PermissionRequest with exit code
+│   │       └── NO → PreToolUse/Stop with agent type
+│   └── NO → Use RULE with strong language ("MUST", "NEVER")
+│       └── Is it scoped to a specific path?
+│           ├── YES → .claude/rules/ with paths: frontmatter
+│           └── NO → Main CLAUDE.md
+└── NO → Is it contextual guidance?
+    ├── YES → Is it specific to a workflow?
+    │   ├── YES → Use SKILL (SKILL.md)
+    │   └── NO → Use RULE or CLAUDE.md
+    └── NO → Probably doesn't need to be documented
 ```
 
-### Matriz de Decisão Rápida
+### Quick Decision Matrix
 
-| Necessidade | Mecanismo | Exemplo |
-|-------------|-----------|---------|
-| Bloquear `rm -rf` | Hook command em `PreToolUse` | `block-rm.sh` |
-| Rodar testes após edição | Hook async em `PostToolUse` | `run-tests-async.sh` |
-| Garantir tipo commit conventional | Hook prompt em `PreToolUse[Bash]` | Prompt avaliando formato |
-| Estilo de código preferido | Rule em `.claude/rules/` | `code-style.md` |
-| Como rodar migrations | Skill | `db-migration/SKILL.md` |
-| Arquitetura do projeto | CLAUDE.md | Seção de overview |
-| Auto-aprovar `npm test` | Hook command em `PermissionRequest` | Script com `updatedPermissions` |
+| Need | Mechanism | Example |
+|------|-----------|---------|
+| Block `rm -rf` | Hook command on `PreToolUse` | `block-rm.sh` |
+| Run tests after edit | Async hook on `PostToolUse` | `run-tests-async.sh` |
+| Ensure conventional commit format | Prompt hook on `PreToolUse[Bash]` | Prompt evaluating format |
+| Preferred code style | Rule in `.claude/rules/` | `code-style.md` |
+| How to run migrations | Skill | `db-migration/SKILL.md` |
+| Project architecture | CLAUDE.md | Overview section |
+| Auto-approve `npm test` | Hook command on `PermissionRequest` | Script with `updatedPermissions` |
 
-## 9. Recomendações Práticas
+## 9. Practical Recommendations
 
-### 9.1 Padrões de Implementação Essenciais
+### 9.1 Essential Implementation Patterns
 
-**1. Guard Script Template (reutilizável):**
+**1. Guard Script Template (reusable):**
 
 ```bash
 #!/bin/bash
-# Template base para hooks command
+# Base template for command hooks
 INPUT=$(cat)
 TOOL_NAME=$(echo "$INPUT" | jq -r '.tool_name // empty')
 TOOL_INPUT=$(echo "$INPUT" | jq -r '.tool_input // empty')
 AGENT_TYPE=$(echo "$INPUT" | jq -r '.agent_type // empty')
 
-# Sua lógica aqui
-# exit 0 = permitir, exit 2 = bloquear (stderr), JSON stdout = controle fino
+# Your logic here
+# exit 0 = allow, exit 2 = block (stderr), JSON stdout = fine control
 ```
 
-**2. Separação de Concerns por Configuração:**
+**2. Separation of Concerns by Configuration:**
 
-- `~/.claude/settings.json` — Hooks de segurança global (block destructive commands)
-- `.claude/settings.json` — Hooks de qualidade do projeto (lint, test, format)
-- `.claude/settings.local.json` — Hooks pessoais (notificações, logging)
-- Skill frontmatter — Hooks específicos de workflow
+- `~/.claude/settings.json` — Global security hooks (block destructive commands)
+- `.claude/settings.json` — Project quality hooks (lint, test, format)
+- `.claude/settings.local.json` — Personal hooks (notifications, logging)
+- Skill frontmatter — Workflow-specific hooks
 
-**3. Stop Hook com Proteção Anti-Loop:**
+**3. Stop Hook with Anti-Loop Protection:**
 
 ```bash
 #!/bin/bash
 INPUT=$(cat)
 STOP_HOOK_ACTIVE=$(echo "$INPUT" | jq -r '.stop_hook_active')
 if [ "$STOP_HOOK_ACTIVE" = "true" ]; then
-  exit 0  # Não entrar em loop
+  exit 0  # Don't enter a loop
 fi
-# Verificações aqui
+# Checks here
 ```
 
 **4. Context Injection via SessionStart:**
 
 ```bash
 #!/bin/bash
-# Carregar contexto dinâmico no início da sessão
+# Load dynamic context at session start
 ISSUES=$(gh issue list --limit 5 --json title,number 2>/dev/null)
 BRANCH=$(git branch --show-current 2>/dev/null)
 LAST_COMMIT=$(git log --oneline -1 2>/dev/null)
@@ -492,26 +497,26 @@ cat <<EOF
 EOF
 ```
 
-### 9.2 Checklist de Implementação
+### 9.2 Implementation Checklist
 
-- [ ] Hooks de segurança (PreToolUse para comandos destrutivos) como primeira prioridade
-- [ ] Hooks de qualidade (PostToolUse async para testes) como segunda prioridade
-- [ ] Stop hooks COM proteção `stop_hook_active` para evitar loops
-- [ ] Usar `$CLAUDE_PROJECT_DIR` em paths de scripts
-- [ ] Quotar todas as variáveis shell
-- [ ] Testar com `claude --debug` para verificar matching e execução
-- [ ] Verificar `/hooks` menu para confirmar configuração final
-- [ ] Hooks prompt/agent apenas para os 8 eventos suportados
-- [ ] Timeouts adequados: command (600s), prompt (30s), agent (60s), async (custom)
-- [ ] Manter scripts hook versionados em `.claude/hooks/` com permissão executável
+- [ ] Security hooks (PreToolUse for destructive commands) as first priority
+- [ ] Quality hooks (PostToolUse async for tests) as second priority
+- [ ] Stop hooks WITH `stop_hook_active` protection to avoid loops
+- [ ] Use `$CLAUDE_PROJECT_DIR` in script paths
+- [ ] Quote all shell variables
+- [ ] Test with `claude --debug` to verify matching and execution
+- [ ] Check `/hooks` menu to confirm final configuration
+- [ ] Prompt/agent hooks only for the 8 supported events
+- [ ] Appropriate timeouts: command (600s), prompt (30s), agent (60s), async (custom)
+- [ ] Keep hook scripts versioned in `.claude/hooks/` with executable permissions
 
-### 9.3 Anti-Padrões a Evitar
+### 9.3 Anti-Patterns to Avoid
 
-| Anti-Padrão | Problema | Solução |
-|-------------|----------|---------|
-| Hook síncrono para testes longos | Bloqueia Claude por minutos | Usar `"async": true` |
-| Stop hook sem check de `stop_hook_active` | Loop infinito | Sempre verificar o campo |
-| Hooks HTTP para segurança crítica | Non-2xx não bloqueia | Usar command hooks para segurança |
-| Hooks agent para validações simples | Latência e custo desnecessários | Command hook com jq é suficiente |
-| Mesmo hook em user + project settings | Deduplicação por string exata apenas | Consolidar em um local |
-| Hooks que imprimem para stdout além do JSON | Interfere com parsing JSON | Redirecionar debug para stderr |
+| Anti-Pattern | Problem | Solution |
+|--------------|---------|----------|
+| Synchronous hook for long-running tests | Blocks Claude for minutes | Use `"async": true` |
+| Stop hook without `stop_hook_active` check | Infinite loop | Always check the field |
+| HTTP hooks for critical security | Non-2xx doesn't block | Use command hooks for security |
+| Agent hooks for simple validations | Unnecessary latency and cost | Command hook with jq is sufficient |
+| Same hook in user + project settings | Deduplication by exact string only | Consolidate in one location |
+| Hooks that print to stdout beyond JSON | Interferes with JSON parsing | Redirect debug output to stderr |

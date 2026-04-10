@@ -1,480 +1,481 @@
-# Analise: Evaluating AGENTS.md — Are Repository-Level Context Files Helpful for Coding Agents?
+# Analysis: Evaluating AGENTS.md — Are Repository-Level Context Files Helpful for Coding Agents?
 
-> **Documento analisado:** Gloaguen, T., Mundler, N., Muller, M., Raychev, V., & Vechev, M. (ETH Zurich / LogicStar.ai). Preprint, fevereiro de 2026. arXiv:2602.11988v1
->
-> **Objetivo desta analise:** Extrair, interpretar e traduzir em orientacoes praticas todos os achados do paper, conectando-os a engenharia de prompts e a infraestrutura de agentes (skills, hooks, subagents, rules, memory).
-
----
-
-## 1. Sumario Executivo
-
-Este paper e a primeira investigacao rigorosa e em escala sobre o impacto real de arquivos de contexto (AGENTS.md, CLAUDE.md) na capacidade de agentes de codificacao resolverem tarefas de engenharia de software do mundo real. Ate entao, a adocao massiva desses arquivos (mais de 60.000 repositorios) baseava-se exclusivamente em recomendacoes de desenvolvedores de agentes e evidencias anedoticas. Os autores construiram um benchmark novo (AGENTBENCH, 138 instancias de 12 repositorios com arquivos de contexto escritos por desenvolvedores) e avaliaram quatro agentes (Claude Code com Sonnet 4.5, Codex com GPT-5.2 e GPT-5.1 Mini, Qwen Code com Qwen3-30B-Coder) em tres cenarios: sem contexto, com contexto gerado por LLM, e com contexto escrito por humanos.
-
-O achado central e contra-intuitivo: **arquivos de contexto gerados por LLM tendem a reduzir a taxa de sucesso** (queda media de 0,5% no SWE-bench Lite e 2% no AGENTBENCH), enquanto **arquivos escritos por humanos oferecem apenas ganho marginal** (aumento medio de 4% no AGENTBENCH). Em todos os cenarios, arquivos de contexto aumentam consistentemente o numero de passos (+2,45 a +3,92 em media) e o custo de inferencia em mais de 20%. A analise de traces revela que as instrucoes dos arquivos sao de fato seguidas — o problema nao e desobediencia, mas sim que requisitos desnecessarios tornam as tarefas mais dificeis.
-
-A implicacao pratica e clara: a recomendacao vigente de "sempre gerar um AGENTS.md via /init" deve ser questionada. Arquivos de contexto so sao justificaveis quando escritos manualmente, mantidos minimos, e focados em requisitos genuinamente necessarios que o agente nao conseguiria descobrir sozinho. Documentacao redundante com o que ja existe no repositorio nao apenas nao ajuda — ela atrapalha.
+> **Status**: Current
+> **Source document**: [Gloaguen et al. (ETH Zurich / LogicStar.ai) — arXiv:2602.11988v1](https://arxiv.org/abs/2602.11988v1)
+> **Analysis date**: 2026-02-01
+> **Scope**: Rigorous evaluation of AGENTS.md/CLAUDE.md context files' impact on coding agent performance, cost, and behavior
 
 ---
 
-## 2. Achados e Principios-Chave
+## 1. Executive Summary
 
-### 2.1. Arquivos gerados por LLM prejudicam mais do que ajudam
+This paper is the first rigorous, large-scale investigation into the real impact of context files (AGENTS.md, CLAUDE.md) on coding agents' ability to solve real-world software engineering tasks. Until then, the massive adoption of these files (over 60,000 repositories) was based exclusively on agent developer recommendations and anecdotal evidence. The authors built a new benchmark (AGENTBENCH, 138 instances from 12 repositories with developer-written context files) and evaluated four agents (Claude Code with Sonnet 4.5, Codex with GPT-5.2 and GPT-5.1 Mini, Qwen Code with Qwen3-30B-Coder) across three scenarios: no context, LLM-generated context, and human-written context.
 
-| Metrica | Sem Contexto | LLM-Gerado | Humano |
-|---------|-------------|-------------|--------|
-| Taxa de sucesso (AGENTBENCH, media) | Baseline | -2% | +4% |
-| Taxa de sucesso (SWE-bench Lite, media) | Baseline | -0,5% | N/A |
-| Custo por instancia | Baseline | +20-23% | +19% |
-| Passos por instancia | Baseline | +2,45 a +3,92 | +3,34 |
+The central finding is counter-intuitive: **LLM-generated context files tend to reduce success rates** (average drop of 0.5% on SWE-bench Lite and 2% on AGENTBENCH), while **human-written files offer only marginal gains** (average increase of 4% on AGENTBENCH). Across all scenarios, context files consistently increase the number of steps (+2.45 to +3.92 on average) and inference cost by over 20%. Trace analysis reveals that file instructions are indeed followed — the problem is not disobedience, but rather that unnecessary requirements make tasks harder.
+
+The practical implication is clear: the prevailing recommendation to "always generate an AGENTS.md via /init" should be questioned. Context files are only justifiable when manually written, kept minimal, and focused on genuinely necessary requirements that the agent could not discover on its own. Documentation that is redundant with what already exists in the repository not only does not help — it hurts.
+
+---
+
+## 2. Key Findings and Principles
+
+### 2.1. LLM-generated files hurt more than they help
+
+| Metric | No Context | LLM-Generated | Human |
+|--------|-----------|---------------|-------|
+| Success rate (AGENTBENCH, avg) | Baseline | -2% | +4% |
+| Success rate (SWE-bench Lite, avg) | Baseline | -0.5% | N/A |
+| Cost per instance | Baseline | +20-23% | +19% |
+| Steps per instance | Baseline | +2.45 to +3.92 | +3.34 |
 
 > "LLM-generated context files have a marginal negative effect on task success rates, while developer-written ones provide a marginal performance gain."
 
-**Principio derivado:** A geracao automatica de contexto via `/init` e, no melhor caso, neutra e, no caso tipico, prejudicial. O custo extra e consistente e inequivoco.
+**Derived principle:** Automatic context generation via `/init` is, at best, neutral and, in the typical case, harmful. The extra cost is consistent and unequivocal.
 
-### 2.2. Overviews de codebase sao ineficazes
+### 2.2. Codebase overviews are ineffective
 
-Apesar de 100% dos arquivos gerados por Sonnet 4.5 e ~99% dos gerados por GPT-5.2 conterem overviews de codebase, esses overviews **nao reduzem o numero de passos necessarios para o agente encontrar os arquivos relevantes**. O paper mede explicitamente isso (Figura 4) e conclui:
+Despite 100% of files generated by Sonnet 4.5 and ~99% of those generated by GPT-5.2 containing codebase overviews, these overviews **do not reduce the number of steps needed for the agent to find relevant files**. The paper explicitly measures this (Figure 4) and concludes:
 
 > "Context files, even developer-provided ones, are not effective at providing a repository overview."
 
-**Principio derivado:** Listar diretorios e componentes no arquivo de contexto e desperdicio de tokens. Agentes ja sabem navegar repositorios via ferramentas (grep, find, read). O guia da Anthropic para CLAUDE.md ja alertava contra isso ("warns against listing components that are easily discoverable"), e este paper confirma empiricamente.
+**Derived principle:** Listing directories and components in the context file is a waste of tokens. Agents already know how to navigate repositories via tools (grep, find, read). Anthropic's guide for CLAUDE.md already warned against this ("warns against listing components that are easily discoverable"), and this paper confirms it empirically.
 
-### 2.3. Instrucoes sao seguidas — esse e o problema
+### 2.3. Instructions are followed — that is the problem
 
-A analise de traces demonstra que agentes **seguem fielmente** as instrucoes dos arquivos de contexto:
+Trace analysis demonstrates that agents **faithfully follow** the instructions in context files:
 
-- `uv` e usado 1,6 vezes por instancia quando mencionado vs. <0,01 quando nao mencionado
-- Ferramentas especificas de repositorio sao usadas 2,5 vezes quando mencionadas vs. <0,05 quando nao
-- Testes sao executados com mais frequencia quando o arquivo instrui a testar
+- `uv` is used 1.6 times per instance when mentioned vs. <0.01 when not mentioned
+- Repository-specific tools are used 2.5 times when mentioned vs. <0.05 when not
+- Tests are run more frequently when the file instructs to test
 
 > "Instructions in context files are typically followed [...] the absence of improvements with context files is not due to a lack of instruction-following."
 
-**Principio derivado:** Cada instrucao adicionada ao arquivo de contexto sera executada. Se a instrucao nao for essencial para resolver a tarefa, ela consumira passos, tokens e custo sem contribuir para o resultado. A obediencia do agente transforma instrucoes desnecessarias em carga ativa.
+**Derived principle:** Every instruction added to the context file will be executed. If the instruction is not essential for solving the task, it will consume steps, tokens, and cost without contributing to the outcome. The agent's obedience transforms unnecessary instructions into active overhead.
 
-### 2.4. Contexto adicional exige mais raciocinio
+### 2.4. Additional context requires more reasoning
 
-Modelos com raciocinio adaptativo (GPT-5.2, GPT-5.1 Mini) gastam significativamente mais tokens de raciocinio quando arquivos de contexto estao presentes:
+Models with adaptive reasoning (GPT-5.2, GPT-5.1 Mini) spend significantly more reasoning tokens when context files are present:
 
-- GPT-5.2: +22% de tokens de raciocinio no SWE-bench Lite com contexto LLM
-- GPT-5.1 Mini: +14% no SWE-bench Lite com contexto LLM
+- GPT-5.2: +22% reasoning tokens on SWE-bench Lite with LLM context
+- GPT-5.1 Mini: +14% on SWE-bench Lite with LLM context
 
 > "Following context files requires more thinking [...] these additional instructions make the task harder."
 
-**Principio derivado:** Mais contexto nao e mais ajuda — e mais carga cognitiva para o modelo. Isso alinha-se diretamente com a pesquisa sobre "context rot" e limites de janela de contexto documentados em `research-llm-context-optimization.md`.
+**Derived principle:** More context is not more help — it is more cognitive load for the model. This aligns directly with research on "context rot" and context window limits documented in `research-context-engineering-comprehensive.md`.
 
-### 2.5. Arquivos de contexto sao documentacao redundante
+### 2.5. Context files are redundant documentation
 
-O experimento mais revelador: quando **toda a documentacao do repositorio e removida** (arquivos .md, docs/, exemplos), arquivos de contexto gerados por LLM passam a melhorar a performance em +2,7% em media e superam a documentacao original.
+The most revealing experiment: when **all repository documentation is removed** (.md files, docs/, examples), LLM-generated context files improve performance by +2.7% on average and outperform the original documentation.
 
 > "LLM-generated context files not only consistently improve performance [...] but also outperform developer-written documentation. This may explain anecdotal evidence reporting that coding agents perform better after adding context files, since many less popular repositories contain little to no documentation."
 
-**Principio derivado:** Arquivos de contexto sao uteis quando substituem documentacao ausente — nao quando duplicam documentacao existente. Em repositorios bem documentados, sao redundantes. Em repositorios mal documentados, preenchem uma lacuna real.
+**Derived principle:** Context files are useful when they replace missing documentation — not when they duplicate existing documentation. In well-documented repositories, they are redundant. In poorly documented repositories, they fill a real gap.
 
-### 2.6. Modelos mais fortes nao geram arquivos melhores
+### 2.6. Stronger models do not generate better files
 
-GPT-5.2 (via Codex) gerou contextos que melhoraram performance no SWE-bench Lite (+2% em media) mas pioraram no AGENTBENCH (-3% em media). O prompt usado (Codex vs. Claude Code) tambem nao faz diferenca consistente.
+GPT-5.2 (via Codex) generated contexts that improved performance on SWE-bench Lite (+2% on average) but worsened it on AGENTBENCH (-3% on average). The prompt used (Codex vs. Claude Code) also makes no consistent difference.
 
-**Principio derivado:** O problema nao esta na qualidade da geracao, mas na natureza do que e gerado — informacao generica e redundante que o agente ja poderia descobrir.
+**Derived principle:** The problem is not in generation quality, but in the nature of what is generated — generic, redundant information that the agent could already discover on its own.
 
-### 2.7. GPT-5.1 Mini exibe comportamento patologico com arquivos de contexto
+### 2.7. GPT-5.1 Mini exhibits pathological behavior with context files
 
-O paper documenta que GPT-5.1 Mini, quando detecta a presenca de arquivos de contexto, emite multiplos comandos para encontra-los e le-los repetidamente, mesmo quando ja estao no contexto do agente. Esse comportamento so ocorre quando arquivos de contexto existem.
+The paper documents that GPT-5.1 Mini, upon detecting the presence of context files, issues multiple commands to find and read them repeatedly, even when they are already in the agent's context. This behavior only occurs when context files exist.
 
-**Principio derivado:** A mera existencia de um arquivo de contexto pode alterar o comportamento do agente de formas imprevisiveis, incluindo loops de leitura redundante. Isso reforça a recomendacao de so incluir arquivos quando estritamente necessario.
+**Derived principle:** The mere existence of a context file can alter agent behavior in unpredictable ways, including redundant read loops. This reinforces the recommendation to only include files when strictly necessary.
 
 ---
 
-## 3. Pontos de Atencao (faceis de perder ou interpretar mal)
+## 3. Points of Attention (easy to miss or misinterpret)
 
-### 3.1. O paper NAO diz que arquivos de contexto sao inuteis
+### 3.1. The paper does NOT say context files are useless
 
-O paper diz que **na forma como estao sendo gerados e usados atualmente**, eles nao ajudam. Arquivos escritos por humanos **com conteudo minimal** mostram ganho marginal positivo. A conclusao e sobre a pratica atual, nao sobre o conceito.
+The paper says that **in the way they are currently being generated and used**, they do not help. Human-written files **with minimal content** show a marginal positive gain. The conclusion is about the current practice, not about the concept.
 
-### 3.2. O benchmark e centrado em Python
+### 3.2. The benchmark is Python-centric
 
 > "The current evaluation is focused heavily on Python. Since this is a language that is widely represented in the training data, much detailed knowledge about tooling, dependencies, and other repository specifics might be present in the models' parametric knowledge, nullifying the effect of context files."
 
-Para linguagens menos representadas no treinamento (Rust, Zig, linguagens de nicho), o efeito de arquivos de contexto pode ser significativamente maior. Nao generalize esses resultados para todo ecossistema.
+For languages less represented in training data (Rust, Zig, niche languages), the effect of context files may be significantly larger. Do not generalize these results to every ecosystem.
 
-### 3.3. O paper avalia apenas resolucao de tarefas
+### 3.3. The paper evaluates only task resolution
 
 > "We evaluate the impact of context files on task resolution rate. However, there are many other relevant aspects of coding agents, such as code efficiency and security."
 
-Arquivos de contexto podem ser valiosos para **qualidade do codigo**, **aderencia a padroes**, **seguranca** e **experiencia do desenvolvedor** — dimensoes nao medidas aqui.
+Context files may be valuable for **code quality**, **standards adherence**, **security**, and **developer experience** — dimensions not measured here.
 
-### 3.4. A metrica "mais testes" nao e automaticamente ruim
+### 3.4. The metric "more tests" is not automatically bad
 
-O paper mostra que contexto leva a mais testes e mais exploracao. Embora isso aumente custo sem melhorar resolucao, em cenarios de producao real, mais testes podem ser desejavel como garantia de qualidade — mesmo que nao mude a taxa de "patch correto" no benchmark.
+The paper shows that context leads to more tests and more exploration. While this increases cost without improving resolution, in real production scenarios, more tests may be desirable as quality assurance — even if it does not change the "correct patch" rate in the benchmark.
 
-### 3.5. Repositorios "niche" vs. "populares"
+### 3.5. "Niche" vs. "popular" repositories
 
-O SWE-bench Lite usa repositorios populares (bem conhecidos pelos modelos via treinamento). O AGENTBENCH usa repositorios de nicho. Os resultados diferem entre os dois: contexto humano melhora +4% no AGENTBENCH mas nao ajuda no SWE-bench Lite. Isso sugere que **quanto menos o modelo conhece o repositorio, mais util e o contexto** — uma intuicao que o paper confirma.
+SWE-bench Lite uses popular repositories (well-known to models via training). AGENTBENCH uses niche repositories. Results differ between the two: human context improves +4% on AGENTBENCH but does not help on SWE-bench Lite. This suggests that **the less the model knows about the repository, the more useful the context** — an intuition that the paper confirms.
 
-### 3.6. Os testes do AGENTBENCH sao gerados por LLM
+### 3.6. AGENTBENCH tests are LLM-generated
 
-75% de cobertura media nos testes gerados e alta, mas testes gerados por LLM podem ter vieses. Os autores fizeram validacao manual e melhoraram testes over-especificados, mas e um ponto de atencao metodologico.
+75% average coverage in the generated tests is high, but LLM-generated tests may have biases. The authors performed manual validation and improved over-specified tests, but this is a methodological point of attention.
 
-### 3.7. Sub-agentes e compressao de contexto
+### 3.7. Sub-agents and context compression
 
-Claude Code usa o Task tool que delega a Haiku 4.5 para sub-tarefas. Qwen Code usa compressao de chat a 60% do limite de contexto. Essas estrategias afetam como o contexto e processado e podem modular o impacto dos arquivos — mas o paper nao isola esses efeitos.
-
----
-
-## 4. Casos de Uso e Escopo de Aplicacao
-
-### Quando arquivos de contexto AJUDAM (baseado nas evidencias)
-
-| Cenario | Razao | Evidencia no paper |
-|---------|-------|--------------------|
-| Repositorio sem documentacao | Substitui documentacao ausente | +2,7% quando docs removidos |
-| Repositorio de nicho/pouco conhecido | Modelo tem pouco conhecimento parametrico | +4% no AGENTBENCH vs SWE-bench |
-| Linguagens pouco representadas | Modelo precisa de orientacao sobre tooling | Secao 5 (Limitations) |
-| Informacoes nao-descobriveis | Tooling especifico, CI/CD, convencoes nao-obvias | uv, repo_tool usados quando mencionados |
-| Restricoes de seguranca/compliance | Agente nao inferiria sozinho | Secao 5 (Future Work) |
-
-### Quando arquivos de contexto PREJUDICAM
-
-| Cenario | Razao | Evidencia no paper |
-|---------|-------|--------------------|
-| Repositorio bem documentado | Redundancia com docs existentes | -0,5% a -2% com LLM-gerado |
-| Overviews extensos de diretorio | Agente descobre sozinho via ferramentas | Figura 4, nenhuma reducao de passos |
-| Instrucoes genericas ("use boas praticas") | Adicionam carga sem valor concreto | +22% tokens de raciocinio |
-| Geracao automatica via /init | Conteudo generico e redundante | Degradacao consistente em 5/8 cenarios |
-| Python em repositorios populares | Modelo ja conhece o ecossistema | SWE-bench Lite sem melhora |
+Claude Code uses the Task tool that delegates to Haiku 4.5 for sub-tasks. Qwen Code uses chat compression at 60% of the context limit. These strategies affect how context is processed and can modulate the impact of the files — but the paper does not isolate these effects.
 
 ---
 
-## 5. Aplicabilidade a Infraestrutura de Agentes
+## 4. Use Cases and Scope of Application
 
-### 5.1. Skills (criacao, evolucao, refatoracao, atualizacao)
+### When context files HELP (evidence-based)
 
-**Principio central: skills devem encapsular conhecimento nao-descobrivel, nao repetir o que o agente ja sabe.**
+| Scenario | Reason | Paper evidence |
+|----------|--------|----------------|
+| Repository without documentation | Replaces missing documentation | +2.7% when docs removed |
+| Niche/lesser-known repository | Model has little parametric knowledge | +4% on AGENTBENCH vs SWE-bench |
+| Underrepresented languages | Model needs tooling guidance | Section 5 (Limitations) |
+| Non-discoverable information | Specific tooling, CI/CD, non-obvious conventions | uv, repo_tool used when mentioned |
+| Security/compliance constraints | Agent would not infer on its own | Section 5 (Future Work) |
 
-- **Criacao:** Ao criar uma nova skill, perguntar: "O agente conseguiria descobrir isso navegando o repositorio?" Se sim, a skill e redundante e potencialmente prejudicial. Skills devem conter apenas instrucoes que o agente nao derivaria sozinho — convencoes de estilo nao-obvias, workflows especificos de CI/CD, restricoes de seguranca.
+### When context files HURT
 
-- **Evolucao:** O paper mostra que o impacto varia por repositorio (Figura 12, Apendice A.3). Skills devem ser avaliadas por impacto real: se uma skill nao esta melhorando resultados mensuravelmente, ela esta adicionando custo (+20% em media). Implementar metricas de uso e impacto.
+| Scenario | Reason | Paper evidence |
+|----------|--------|----------------|
+| Well-documented repository | Redundancy with existing docs | -0.5% to -2% with LLM-generated |
+| Extensive directory overviews | Agent discovers on its own via tools | Figure 4, no step reduction |
+| Generic instructions ("use best practices") | Add load without concrete value | +22% reasoning tokens |
+| Automatic generation via /init | Generic and redundant content | Consistent degradation in 5/8 scenarios |
+| Python in popular repositories | Model already knows the ecosystem | SWE-bench Lite no improvement |
 
-- **Refatoracao:** Skills longas e abrangentes devem ser decompostas em unidades minimas focadas. O paper mostra que cada instrucao adicional gera passos adicionais e custo adicional. Remover instrucoes genericas ("mantenha codigo limpo", "siga boas praticas") que nao contem informacao concreta.
+---
 
-- **Atualizacao:** Documentacao stale e pior que nenhuma documentacao. O paper confirma que contexto incorreto ou desatualizado nao e ignorado — e seguido. Skills devem ter revisao periodica para remover informacao que se tornou descobrivel ou obsoleta.
+## 5. Applicability to Agent Infrastructure
 
-**Acao concreta:** Antes de adicionar qualquer instrucao a uma skill, aplicar o teste: "Se eu remover esta instrucao, o agente falhara em algo que nao conseguiria descobrir sozinho?" Se a resposta for nao, nao adicionar.
+### 5.1. Skills (creation, evolution, refactoring, updating)
 
-### 5.2. Hooks (quando usar hooks vs. outros mecanismos)
+**Core principle: skills should encapsulate non-discoverable knowledge, not repeat what the agent already knows.**
 
-**Principio central: hooks executam acoes automaticas sem consumir contexto, evitando o overhead documentado no paper.**
+- **Creation:** When creating a new skill, ask: "Could the agent discover this by navigating the repository?" If yes, the skill is redundant and potentially harmful. Skills should contain only instructions the agent would not derive on its own — non-obvious style conventions, specific CI/CD workflows, security constraints.
 
-O paper demonstra que instrucoes como "rode testes antes de commitar" e "use uv para gerenciamento de dependencias" no arquivo de contexto:
+- **Evolution:** The paper shows that impact varies by repository (Figure 12, Appendix A.3). Skills should be evaluated by real impact: if a skill is not measurably improving results, it is adding cost (+20% on average). Implement usage and impact metrics.
 
-1. Consomem tokens de contexto
-2. Aumentam passos (+2,45 a +3,92)
-3. Aumentam custo (+20-23%)
-4. Sao seguidas fielmente — mas nao necessariamente no momento certo
+- **Refactoring:** Long, comprehensive skills should be decomposed into minimal focused units. The paper shows that each additional instruction generates additional steps and additional cost. Remove generic instructions ("keep code clean", "follow best practices") that contain no concrete information.
 
-**Hooks como alternativa superior a instrucoes de contexto:**
+- **Updating:** Stale documentation is worse than no documentation. The paper confirms that incorrect or outdated context is not ignored — it is followed. Skills should undergo periodic review to remove information that has become discoverable or obsolete.
 
-| Instrucao no Contexto | Hook Equivalente | Vantagem do Hook |
-|------------------------|------------------|------------------|
-| "Rode testes antes de commitar" | Pre-commit hook com pytest | Zero tokens de contexto, execucao garantida |
-| "Use linter X no codigo" | Pre-commit hook com linter | Sem dependencia de obediencia do agente |
-| "Verifique tipos com mypy" | Hook pos-save com mypy | Feedback imediato, sem instrucao explicita |
-| "Formate com black/ruff" | Pre-commit hook de formatacao | Enforcement mecanico, nao instrucional |
+**Concrete action:** Before adding any instruction to a skill, apply the test: "If I remove this instruction, will the agent fail at something it could not discover on its own?" If the answer is no, do not add it.
 
-**Regra decisoria:** Se uma instrucao pode ser transformada em hook, **sempre** prefira o hook. Hooks eliminam o custo de +20% de inferencia e garantem execucao. Reserve o arquivo de contexto para informacao que NAO pode ser automatizada (convencoes de arquitetura, decisoes de design, restricoes de dominio).
+### 5.2. Hooks (when to use hooks vs. other mechanisms)
 
-### 5.3. Subagentes (orquestracao, isolamento de contexto, padroes de delegacao)
+**Core principle: hooks execute automatic actions without consuming context, avoiding the overhead documented in the paper.**
 
-**Principio central: subagentes devem receber apenas o contexto minimo necessario para sua sub-tarefa, nao o arquivo de contexto completo.**
+The paper demonstrates that instructions like "run tests before committing" and "use uv for dependency management" in the context file:
 
-O paper documenta que Claude Code usa o Task tool delegando a Haiku 4.5 para sub-tarefas (Apendice A.1). Isso e eficaz porque **isola o contexto**: o subagente recebe apenas a descricao da sub-tarefa, sem a carga do arquivo de contexto completo.
+1. Consume context tokens
+2. Increase steps (+2.45 to +3.92)
+3. Increase cost (+20-23%)
+4. Are faithfully followed — but not necessarily at the right time
 
-**Padroes derivados do paper:**
+**Hooks as a superior alternative to context instructions:**
 
-1. **Isolamento de contexto por sub-tarefa:** Nao propagar o CLAUDE.md completo para subagentes. O paper mostra que quanto mais instrucoes o agente recebe, mais passos ele executa sem melhoria proporcional. Cada subagente deve receber apenas as instrucoes relevantes a sua sub-tarefa especifica.
+| Context Instruction | Equivalent Hook | Hook Advantage |
+|---------------------|-----------------|----------------|
+| "Run tests before committing" | Pre-commit hook with pytest | Zero context tokens, guaranteed execution |
+| "Use linter X on code" | Pre-commit hook with linter | No dependency on agent obedience |
+| "Check types with mypy" | Post-save hook with mypy | Immediate feedback, no explicit instruction |
+| "Format with black/ruff" | Pre-commit formatting hook | Mechanical enforcement, not instructional |
 
-2. **Delegacao de exploracao:** O paper confirma que contexto NAO ajuda na navegacao do repositorio. Portanto, sub-tarefas de exploracao ("encontre os arquivos relevantes para X") podem ser delegadas sem nenhum contexto adicional — o subagente explorara via ferramentas tao eficientemente quanto com contexto.
+**Decision rule:** If an instruction can be transformed into a hook, **always** prefer the hook. Hooks eliminate the +20% inference cost and guarantee execution. Reserve the context file for information that CANNOT be automated (architecture conventions, design decisions, domain constraints).
 
-3. **Contexto para sub-tarefas de tooling:** O unico cenario onde contexto importa para subagentes e quando a sub-tarefa envolve tooling nao-obvio. Se o subagente precisa usar `uv` ou uma ferramenta especifica do repositorio, inclua apenas essa instrucao.
+### 5.3. Sub-agents (orchestration, context isolation, delegation patterns)
 
-4. **Custo de sub-agentes com contexto:** O aumento de 20% em custo por instancia se multiplica por cada subagente que recebe contexto desnecessario. Em uma arvore de subagentes, o overhead pode ser exponencial.
+**Core principle: sub-agents should receive only the minimum context necessary for their sub-task, not the complete context file.**
 
-### 5.4. Rules (.claude/rules/ — path-scoped, configuracao modular)
+The paper documents that Claude Code uses the Task tool delegating to Haiku 4.5 for sub-tasks (Appendix A.1). This is effective because it **isolates context**: the sub-agent receives only the sub-task description, without the load of the complete context file.
 
-**Principio central: rules path-scoped sao o mecanismo correto para entregar contexto just-in-time, evitando o overhead de contexto global.**
+**Patterns derived from the paper:**
 
-O paper demonstra o problema de contexto global: instrucoes aplicadas uniformemente aumentam custo sem beneficio proporcional. Rules path-scoped resolvem isso ao ativar instrucoes apenas quando o agente opera em caminhos relevantes.
+1. **Context isolation per sub-task:** Do not propagate the full CLAUDE.md to sub-agents. The paper shows that the more instructions the agent receives, the more steps it executes without proportional improvement. Each sub-agent should receive only the instructions relevant to its specific sub-task.
 
-**Padroes derivados:**
+2. **Exploration delegation:** The paper confirms that context does NOT help with repository navigation. Therefore, exploration sub-tasks ("find the files related to X") can be delegated without any additional context — the sub-agent will explore via tools just as efficiently as with context.
 
-1. **Granularidade maxima:** Em vez de um CLAUDE.md dizendo "use pytest para testes e ruff para linting", criar:
-   - `.claude/rules/testing.md` com regras de teste (ativado apenas em contexto de teste)
-   - `.claude/rules/linting.md` com regras de formatacao (ativado apenas em contexto de codigo)
+3. **Context for tooling sub-tasks:** The only scenario where context matters for sub-agents is when the sub-task involves non-obvious tooling. If the sub-agent needs to use `uv` or a repository-specific tool, include only that instruction.
 
-2. **Eliminacao de overviews:** O paper prova que overviews sao inuteis. Rules path-scoped eliminam a necessidade de overview porque o contexto relevante e entregue automaticamente quando o agente navega para aquele diretorio.
+4. **Cost of sub-agents with context:** The 20% cost increase per instance multiplies for each sub-agent that receives unnecessary context. In a sub-agent tree, the overhead can be exponential.
 
-3. **Regras como substituto de contexto global:** A Tabela 2 mostra que o cenario "NONE" (sem contexto) tem menor custo em TODOS os 8 cenarios testados. Rules path-scoped aproximam-se do cenario "NONE" para a maioria das operacoes (sem overhead global), ativando contexto apenas quando necessario.
+### 5.4. Rules (.claude/rules/ — path-scoped, modular configuration)
 
-4. **Regras de tooling especifico por diretorio:**
+**Core principle: path-scoped rules are the correct mechanism for delivering just-in-time context, avoiding the overhead of global context.**
+
+The paper demonstrates the problem of global context: instructions applied uniformly increase cost without proportional benefit. Path-scoped rules solve this by activating instructions only when the agent operates in relevant paths.
+
+**Derived patterns:**
+
+1. **Maximum granularity:** Instead of a CLAUDE.md saying "use pytest for tests and ruff for linting", create:
+   - `.claude/rules/testing.md` with test rules (activated only in test context)
+   - `.claude/rules/linting.md` with formatting rules (activated only in code context)
+
+2. **Elimination of overviews:** The paper proves that overviews are useless. Path-scoped rules eliminate the need for overviews because relevant context is delivered automatically when the agent navigates to that directory.
+
+3. **Rules as a substitute for global context:** Table 2 shows that the "NONE" scenario (no context) has the lowest cost in ALL 8 tested scenarios. Path-scoped rules approximate the "NONE" scenario for most operations (no global overhead), activating context only when necessary.
+
+4. **Directory-specific tooling rules:**
 
    ```
-   # .claude/rules/infra-terraform.md (ativado em /infrastructure/)
-   Use `terraform fmt` e `terraform validate` antes de propor mudancas.
+   # .claude/rules/infra-terraform.md (activated in /infrastructure/)
+   Use `terraform fmt` and `terraform validate` before proposing changes.
    ```
 
-   Isso evita que a instrucao de terraform polua o contexto quando o agente trabalha em /src/.
+   This prevents the terraform instruction from polluting context when the agent works in /src/.
 
 ### 5.5. Memory (auto memory, MEMORY.md, topic files)
 
-**Principio central: memoria deve capturar o que o agente aprendeu sobre o repositorio ao longo do tempo, nao replicar documentacao estatica.**
+**Core principle: memory should capture what the agent learned about the repository over time, not replicate static documentation.**
 
-O paper demonstra que documentacao estatica (overviews, listagem de componentes) nao ajuda. Memoria util e aquela que captura **conhecimento tacito** — o tipo de informacao que um desenvolvedor humano acumula ao longo de meses trabalhando no projeto.
+The paper demonstrates that static documentation (overviews, component listings) does not help. Useful memory is that which captures **tacit knowledge** — the type of information a human developer accumulates over months working on the project.
 
-**Padroes derivados:**
+**Derived patterns:**
 
-1. **Memoria como alternativa a geracao automatica:** Em vez de gerar um AGENTS.md via `/init`, deixar o agente construir memoria incrementalmente a partir de experiencias reais. Cada tarefa resolvida pode enriquecer a memoria com informacoes genuinamente uteis (ex: "o modulo X tem uma dependencia circular com Y que exige importacao lazy").
+1. **Memory as an alternative to automatic generation:** Instead of generating an AGENTS.md via `/init`, let the agent build memory incrementally from real experiences. Each resolved task can enrich memory with genuinely useful information (e.g., "module X has a circular dependency with Y that requires lazy import").
 
-2. **Topic files para informacao nao-descobrivel:** Criar arquivos de memoria por topico para informacoes que nao estao em nenhuma documentacao:
-   - `memory/deployment-quirks.md` — peculiaridades do processo de deploy
-   - `memory/test-flakiness.md` — testes intermitentes conhecidos
-   - `memory/api-compatibility.md` — restricoes de compatibilidade retroativa
+2. **Topic files for non-discoverable information:** Create memory files per topic for information not found in any documentation:
+   - `memory/deployment-quirks.md` — deployment process quirks
+   - `memory/test-flakiness.md` — known intermittent tests
+   - `memory/api-compatibility.md` — backward compatibility constraints
 
-3. **Poda ativa de memoria:** O paper mostra que mais contexto = mais custo sem mais qualidade. Memoria deve ser podada regularmente: informacoes que se tornaram obvias (por melhoria na documentacao ou no modelo) devem ser removidas.
+3. **Active memory pruning:** The paper shows that more context = more cost without more quality. Memory should be pruned regularly: information that has become obvious (through documentation improvement or model improvement) should be removed.
 
-4. **Auto-memory como aprendizado incremental:** O paper menciona na secao de trabalhos futuros:
+4. **Auto-memory as incremental learning:** The paper mentions in the future work section:
    > "Several related works in the direction of planning and continuous learning from prior tasks may be applicable for this task. By tackling this challenge, future agents could gain a long-term capability at meaningful self-improvement."
 
-   Auto-memory que registra padroes de sucesso e falha ao longo de multiplas sessoes representa o caminho mais promissor para contexto que genuinamente melhora performance.
+   Auto-memory that records success and failure patterns across multiple sessions represents the most promising path for context that genuinely improves performance.
 
 ---
 
-## 6. Aplicabilidade do Guia de Engenharia de Prompts
+## 6. Prompt Engineering Guide Applicability
 
 ### 6.1. Context Engineering > Prompt Engineering
 
-O guia de engenharia de prompts documenta a transicao de "prompt engineering" para "context engineering":
+The prompt engineering guide documents the transition from "prompt engineering" to "context engineering":
 
-> "O LLM e uma CPU, a janela de contexto e RAM, e voce e o sistema operacional." — Andrej Karpathy
+> "The LLM is a CPU, the context window is RAM, and you are the operating system." — Andrej Karpathy
 
-O paper sobre AGENTS.md confirma empiricamente essa transicao: o problema nao e a qualidade do prompt usado para gerar o arquivo de contexto (a Secao 4.4 mostra que diferentes prompts produzem resultados similares), mas sim **o que entra no contexto e quando**.
+The AGENTS.md paper empirically confirms this transition: the problem is not the quality of the prompt used to generate the context file (Section 4.4 shows that different prompts produce similar results), but rather **what enters the context and when**.
 
-**Conexao direta:** As quatro estrategias de contexto do LangChain mencionadas no guia — Write, Select, Compress, Isolate — sao diretamente aplicaveis:
+**Direct connection:** The four LangChain context strategies mentioned in the guide — Write, Select, Compress, Isolate — are directly applicable:
 
-| Estrategia LangChain | Aplicacao ao Problema do Paper |
-|-----------------------|--------------------------------|
-| **Write** (persistir externamente) | Mover informacao do CLAUDE.md para rules path-scoped e topic files |
-| **Select** (recuperar via RAG) | Carregar apenas o contexto relevante para a tarefa atual |
-| **Compress** (sumarizar) | Reduzir o conteudo do arquivo de contexto ao minimo essencial |
-| **Isolate** (separar contextos) | Nao propagar contexto global para subagentes |
+| LangChain Strategy | Application to the Paper's Problem |
+|--------------------|-----------------------------------|
+| **Write** (persist externally) | Move information from CLAUDE.md to path-scoped rules and topic files |
+| **Select** (retrieve via RAG) | Load only the context relevant to the current task |
+| **Compress** (summarize) | Reduce the context file content to the essential minimum |
+| **Isolate** (separate contexts) | Do not propagate global context to sub-agents |
 
-### 6.2. O Principio da Solucao Mais Simples
+### 6.2. The Simplest Solution Principle
 
-O guia documenta o principio dominante da Anthropic:
+The guide documents Anthropic's dominant principle:
 
-> "Encontrar a solucao mais simples possivel, so aumentando complexidade quando necessario."
+> "Find the simplest possible solution, only increasing complexity when necessary."
 
-O paper confirma: o cenario "NONE" (sem contexto) e consistentemente o mais barato e, em 5/8 cenarios com LLM-gerado, tambem o mais eficaz. A solucao mais simples (nao ter arquivo de contexto) e frequentemente a melhor.
+The paper confirms: the "NONE" scenario (no context) is consistently the cheapest and, in 5/8 scenarios with LLM-generated content, also the most effective. The simplest solution (having no context file) is frequently the best.
 
-### 6.3. Role Prompting e Especializacao de Subagentes
+### 6.3. Role Prompting and Sub-Agent Specialization
 
-O guia documenta que role prompting e o mecanismo fundamental de especializacao em multi-agentes. O paper mostra que Claude Code usa subagentes especializados (Haiku 4.5 para sub-tarefas via Task tool). A conexao e:
+The guide documents that role prompting is the fundamental specialization mechanism in multi-agent systems. The paper shows that Claude Code uses specialized sub-agents (Haiku 4.5 for sub-tasks via Task tool). The connection is:
 
-- **Role prompting focado** para cada subagente e mais eficaz que contexto global generico
-- Subagentes com role prompting especifico ("voce e um explorador de codebase — encontre os arquivos relacionados a X") nao precisam de arquivo de contexto
-- O overhead de +20% em custo vem de contexto generico aplicado indiscriminadamente
+- **Focused role prompting** for each sub-agent is more effective than generic global context
+- Sub-agents with specific role prompting ("you are a codebase explorer — find files related to X") do not need a context file
+- The +20% cost overhead comes from generic context applied indiscriminately
 
-### 6.4. Chain-of-Thought e o Aumento de Tokens de Raciocinio
+### 6.4. Chain-of-Thought and Reasoning Token Increase
 
-O guia documenta que:
+The guide documents that:
 
-> "Performance de raciocinio comeca a degradar em torno de 3.000 tokens."
+> "Reasoning performance begins to degrade around 3,000 tokens."
 
-O paper confirma que arquivos de contexto aumentam tokens de raciocinio em +14% a +22%, potencialmente empurrando o modelo para alem do sweet spot de raciocinio. A combinacao "contexto longo + raciocinio complexo" e listada no guia como combinacao prejudicial.
+The paper confirms that context files increase reasoning tokens by +14% to +22%, potentially pushing the model beyond the reasoning sweet spot. The combination "long context + complex reasoning" is listed in the guide as a harmful combination.
 
-**Tecnica aplicavel:** Chain of Draft (CoD) do guia, que iguala acuracia de CoT usando apenas ~7,6% dos tokens, e relevante para reduzir o overhead quando contexto adicional e inevitavel.
+**Applicable technique:** Chain of Draft (CoD) from the guide, which matches CoT accuracy using only ~7.6% of the tokens, is relevant for reducing overhead when additional context is unavoidable.
 
-### 6.5. ReAct e o Loop de Exploracao
+### 6.5. ReAct and the Exploration Loop
 
-O guia documenta ReAct como "O padrao fundamental para agentes de IA modernos" (Pensamento -> Acao -> Observacao). O paper mostra que agentes com contexto executam mais acoes de exploracao (mais grep, mais leituras de arquivo, mais testes). Isso significa que o contexto esta adicionando iteracoes ao loop ReAct sem melhorar a resolucao.
+The guide documents ReAct as "The fundamental pattern for modern AI agents" (Thought → Action → Observation). The paper shows that agents with context execute more exploration actions (more grep, more file reads, more tests). This means context is adding iterations to the ReAct loop without improving resolution.
 
-**Implicacao:** Instrucoes no arquivo de contexto devem ser formuladas para **reduzir** iteracoes do loop ReAct (ex: "o entrypoint para testes e `pytest tests/unit/`", nao "explore o repositorio para entender a estrutura de testes").
+**Implication:** Instructions in the context file should be formulated to **reduce** ReAct loop iterations (e.g., "the test entry point is `pytest tests/unit/`", not "explore the repository to understand the test structure").
 
-### 6.6. Structured Outputs e Comunicacao Inter-Agentes
+### 6.6. Structured Outputs and Inter-Agent Communication
 
-O guia documenta que structured outputs garantem comunicacao confiavel entre agentes. O paper usa JSON structures extensivamente nos prompts de benchmark (Apendice B). Para a geracao de contexto, estruturar o output em schema estrito poderia forcar a concisao e eliminar conteudo generico.
+The guide documents that structured outputs ensure reliable communication between agents. The paper uses JSON structures extensively in benchmark prompts (Appendix B). For context generation, structuring output in a strict schema could enforce conciseness and eliminate generic content.
 
-### 6.7. Modelos de Raciocinio e a Inversao de Paradigma
+### 6.7. Reasoning Models and the Paradigm Inversion
 
-O guia documenta a descoberta contra-intuitiva:
+The guide documents the counterintuitive finding:
 
-> "Modelos de raciocinio avancados (o1, R1, GPT-5) frequentemente performam pior com tecnicas classicas como few-shot e CoT explicito."
+> "Advanced reasoning models (o1, R1, GPT-5) frequently perform worse with classic techniques like few-shot and explicit CoT."
 
-O paper usa GPT-5.2 e GPT-5.1 Mini, que sao modelos com raciocinio adaptativo. Para esses modelos, **menos contexto e melhor**, confirmando que instrucoes explicitas de "como pensar" prejudicam modelos que ja possuem raciocinio interno robusto.
+The paper uses GPT-5.2 and GPT-5.1 Mini, which are models with adaptive reasoning. For these models, **less context is better**, confirming that explicit "how to think" instructions harm models that already possess robust internal reasoning.
 
-### 6.8. RAG como Alternativa a Contexto Pre-Carregado
+### 6.8. RAG as an Alternative to Pre-Loaded Context
 
-O guia documenta a evolucao para Agentic RAG, onde o LLM decide quando recuperar contexto. Isso se alinha com a conclusao do paper: em vez de pre-carregar um arquivo de contexto completo, implementar um mecanismo onde o agente recupera informacao especifica apenas quando precisa.
+The guide documents the evolution toward Agentic RAG, where the LLM decides when to retrieve context. This aligns with the paper's conclusion: instead of pre-loading a complete context file, implement a mechanism where the agent retrieves specific information only when needed.
 
-### 6.9. Meta-Prompting e Geracao de Contexto
+### 6.9. Meta-Prompting and Context Generation
 
-O guia documenta que meta-prompting (usar um modelo para gerar/otimizar prompts para outro) supera prompting manual. A Secao 4.4 do paper mostra que modelos mais fortes nao geram contextos melhores, sugerindo que o problema nao e a otimizacao do prompt de geracao, mas a natureza do que e gerado. Meta-prompting poderia ser aplicado para gerar contexto **minimal e nao-redundante**, em vez de contexto **abrangente**.
+The guide documents that meta-prompting (using a model to generate/optimize prompts for another) outperforms manual prompting. Section 4.4 of the paper shows that stronger models do not generate better contexts, suggesting the problem is not the optimization of the generation prompt, but the nature of what is generated. Meta-prompting could be applied to generate **minimal and non-redundant** context, rather than **comprehensive** context.
 
 ### 6.10. Automatic Prompt Engineering (APE/OPRO/DSPy)
 
-O guia documenta que otimizacao automatica de prompts supera otimizacao manual. Para a geracao de arquivos de contexto, isso implica:
+The guide documents that automatic prompt optimization outperforms manual optimization. For context file generation, this implies:
 
-- Usar frameworks como DSPy para otimizar o conteudo do arquivo de contexto contra uma metrica de resolucao de tarefas
-- Iterar automaticamente removendo seccoes que nao contribuem para a taxa de sucesso
-- O paper fornece o benchmark (AGENTBENCH) que possibilita exatamente esse tipo de otimizacao
+- Using frameworks like DSPy to optimize context file content against a task resolution metric
+- Automatically iterating by removing sections that do not contribute to the success rate
+- The paper provides the benchmark (AGENTBENCH) that enables exactly this type of optimization
 
 ---
 
-## 7. Correlacoes com Outros Documentos Principais
+## 7. Correlations with Other Key Documents
 
-### 7.1. research-llm-context-optimization.md
+### 7.1. research-context-engineering-comprehensive.md
 
-Este e o documento com maior correlacao. O paper confirma empiricamente os seguintes principios documentados em `research-llm-context-optimization.md`:
+This is the document with the highest correlation. The paper empirically confirms the following principles documented in `research-context-engineering-comprehensive.md`:
 
-| Principio do Research Doc | Confirmacao no Paper |
-|---------------------------|---------------------|
-| **Context rot** (retornos decrescentes com mais contexto) | Mais contexto = +20% custo, -0,5% a -2% performance |
-| **Lost-in-the-middle effect** | GPT-5.1 Mini le contexto multiplas vezes; overviews nao reduzem passos |
-| **Instruction budget (~150-200 instrucoes max)** | Cada instrucao adicional gera passos adicionais sem melhoria |
-| **Quality over quantity** | Humano (minimal, curado) > LLM (abrangente, generico) |
-| **Progressive disclosure** | Cenario NONE supera LLM; contexto deve ser entregue sob demanda |
-| **Hybrid pre-loaded + on-demand** | Remover docs + manter contexto = melhor resultado |
-| **Context poisoning from stale docs** | Instrucoes redundantes com docs existentes prejudicam |
-| **Just-in-time documentation** | Contexto so ajuda quando substitui documentacao ausente |
+| Research Doc Principle | Paper Confirmation |
+|------------------------|-------------------|
+| **Context rot** (diminishing returns with more context) | More context = +20% cost, -0.5% to -2% performance |
+| **Lost-in-the-middle effect** | GPT-5.1 Mini reads context multiple times; overviews do not reduce steps |
+| **Instruction budget (~150-200 instructions max)** | Each additional instruction generates additional steps without improvement |
+| **Quality over quantity** | Human (minimal, curated) > LLM (comprehensive, generic) |
+| **Progressive disclosure** | NONE scenario outperforms LLM; context should be delivered on-demand |
+| **Hybrid pre-loaded + on-demand** | Remove docs + keep context = best result |
+| **Context poisoning from stale docs** | Redundant instructions with existing docs are harmful |
+| **Just-in-time documentation** | Context only helps when it replaces missing documentation |
 
-**Divergencia notavel:** O research doc sugere <200 linhas por arquivo de configuracao. A media dos arquivos de contexto no AGENTBENCH e 641 palavras (~30-40 linhas), dentro do limite, mas ainda assim prejudicial quando redundante.
+**Notable divergence:** The research doc suggests <200 lines per configuration file. The average context file in AGENTBENCH is 641 words (~30-40 lines), within the limit, yet still harmful when redundant.
 
 ### 7.2. claude-prompting-best-practices.md
 
-O guia de prompting da Anthropic recomenda:
+Anthropic's prompting guide recommends:
 
-- System prompts persistentes com role e restricoes
-- Queries ao final do prompt apos contexto
-- Prompt caching para system prompts repetidos
+- Persistent system prompts with role and constraints
+- Queries at the end of the prompt after context
+- Prompt caching for repeated system prompts
 
-O paper confirma que o posicionamento do contexto importa: quando o contexto e injetado automaticamente, o agente o processa antes da tarefa. As recomendacoes de posicionamento (tarefa ao final) sao consistentes com a pratica atual dos agentes.
+The paper confirms that context positioning matters: when context is injected automatically, the agent processes it before the task. The positioning recommendations (task at the end) are consistent with current agent practice.
 
-**Tensao:** O guia recomenda ser "explicito, detalhado e intencional" em prompts de subagentes. O paper mostra que detalhe excessivo no arquivo de contexto prejudica. A reconciliacao e: **prompts de subagentes devem ser detalhados e intencionais sobre a sub-tarefa especifica, nao sobre o contexto global do repositorio**.
+**Tension:** The guide recommends being "explicit, detailed, and intentional" in sub-agent prompts. The paper shows that excessive detail in the context file is harmful. The reconciliation is: **sub-agent prompts should be detailed and intentional about the specific sub-task, not about the repository's global context**.
 
 ### 7.3. a-guide-to-agents.md
 
-O guia AGENTS.md enfatiza:
+The AGENTS.md guide emphasizes:
 
-- Manter minimal
+- Keep minimal
 - Progressive disclosure
 - Instruction budget
 - Stale docs poison context
-- Nao auto-gerar
+- Do not auto-generate
 
-O paper e a validacao empirica direta de todas essas recomendacoes:
+The paper is the direct empirical validation of all these recommendations:
 
-| Recomendacao do Guia | Evidencia no Paper |
-|----------------------|--------------------|
-| Keep minimal | Contexto humano (curado) > contexto LLM (abrangente) |
-| Progressive disclosure | Cenario NONE supera LLM; contexto sob demanda melhor |
-| Instruction budget | Cada instrucao gera passos extras |
-| Stale docs poison context | Redundancia com docs existentes = prejudicial |
-| Nao auto-gerar | Confirmado: /init prejudica em 5/8 cenarios |
+| Guide Recommendation | Paper Evidence |
+|----------------------|----------------|
+| Keep minimal | Human context (curated) > LLM context (comprehensive) |
+| Progressive disclosure | NONE scenario outperforms LLM; on-demand context is better |
+| Instruction budget | Each instruction generates extra steps |
+| Stale docs poison context | Redundancy with existing docs = harmful |
+| Do not auto-generate | Confirmed: /init is harmful in 5/8 scenarios |
 
-### 7.4. a-guide-to-claude.md
+### 7.4. a-guide-to-agents.md
 
-O guia CLAUDE.md segue os mesmos principios do AGENTS.md com foco em Claude Code. O paper testa explicitamente Claude Code (Sonnet 4.5) e confirma que:
+The CLAUDE.md guide follows the same principles as AGENTS.md with a focus on Claude Code. The paper explicitly tests Claude Code (Sonnet 4.5) and confirms that:
 
-- Claude Code com contexto LLM performa **pior** que sem contexto no AGENTBENCH
-- O prompt de geracao do Claude Code avisa contra listar componentes descobriveis — e o paper prova que esse aviso e correto
-- Claude Code e o agente mais caro entre os testados (custo medio de $1,30 por instancia), tornando o overhead de +20% particularmente impactante
-
----
-
-## 8. Forcas e Limitacoes da Abordagem do Paper
-
-### Forcas
-
-1. **Primeira avaliacao rigorosa em escala:** 138 instancias proprias + 300 do SWE-bench Lite, 4 agentes, 3 cenarios. Nenhum trabalho anterior oferecia esse nivel de rigor.
-
-2. **Benchmark complementar:** AGENTBENCH preenche uma lacuna real — repositorios de nicho com arquivos de contexto escritos por desenvolvedores. O SWE-bench Lite sozinho seria insuficiente (repositorios populares sem arquivos de contexto).
-
-3. **Analise comportamental profunda:** Nao se limita a medir resolucao; analisa traces, contagem de ferramentas, tokens de raciocinio e intencoes de acoes. Isso permite entender **por que** o contexto nao ajuda.
-
-4. **Ablacoes informativas:** Testar "sem documentacao + com contexto" versus "com documentacao + com contexto" revela o mecanismo causal (redundancia).
-
-5. **Reproducibilidade:** Todos os prompts sao publicados nos apendices. O benchmark sera disponibilizado.
-
-### Limitacoes
-
-1. **Centrado em Python:** A linguagem mais representada nos dados de treinamento. Resultados podem nao generalizar para linguagens de nicho onde o efeito do contexto seria maior.
-
-2. **Apenas resolucao de tarefas:** Nao mede qualidade do codigo, seguranca, aderencia a padroes, ou satisfacao do desenvolvedor. Esses podem ser os cenarios onde contexto mais importa.
-
-3. **Testes gerados por LLM:** 75% de cobertura media e boa, mas testes gerados podem ter vieses sistematicos. Validacao manual em 10% das instancias mitiga mas nao elimina o risco.
-
-4. **Temperatura zero em 3/4 agentes:** Reduz variancia experimental mas nao reflete uso real (onde temperatura > 0 e comum).
-
-5. **Uma amostra por instancia:** Sem repeticao, a variancia estatistica de instancias individuais e alta. Os resultados sao robustos em agregado mas nao por instancia.
-
-6. **Repositorios recentes:** Contextos files sao formalizados desde agosto 2025. Os repositorios e PRs sao muito recentes, possivelmente nao representando praticas maduras.
-
-7. **Ausencia de contexto personalizado por tarefa:** O paper testa o mesmo arquivo de contexto para todas as tarefas de um repositorio. Contexto personalizado por tarefa (como rules path-scoped) poderia ter resultados diferentes.
-
-8. **Nao testa composicao de mecanismos:** Rules + skills + hooks + memoria nao sao testados — apenas o arquivo de contexto monolitico.
+- Claude Code with LLM context performs **worse** than without context on AGENTBENCH
+- The Claude Code generation prompt warns against listing discoverable components — and the paper proves this warning is correct
+- Claude Code is the most expensive agent among those tested (average cost of $1.30 per instance), making the +20% overhead particularly impactful
 
 ---
 
-## 9. Recomendacoes Praticas
+## 8. Strengths and Limitations of the Paper's Approach
 
-### 9.1. Para quem mantem arquivos CLAUDE.md / AGENTS.md
+### Strengths
 
-1. **Nao use `/init` para gerar automaticamente.** O paper prova que contexto gerado por LLM e, no caso medio, prejudicial. Se precisar de um ponto de partida, escreva manualmente.
+1. **First rigorous evaluation at scale:** 138 proprietary instances + 300 from SWE-bench Lite, 4 agents, 3 scenarios. No prior work offered this level of rigor.
 
-2. **Aplique o Teste de Necessidade para cada instrucao:** "O agente conseguiria resolver a tarefa sem esta instrucao?" Se sim, remova-a.
+2. **Complementary benchmark:** AGENTBENCH fills a real gap — niche repositories with context files written by developers. SWE-bench Lite alone would be insufficient (popular repositories without context files).
 
-3. **Elimine overviews de codebase.** Eles nao reduzem passos de descoberta e consomem tokens. O agente navega via ferramentas.
+3. **Deep behavioral analysis:** Not limited to measuring resolution; analyzes traces, tool counts, reasoning tokens, and action intents. This allows understanding **why** context does not help.
 
-4. **Foque em informacao nao-descobrivel:**
-   - Tooling especifico e nao-obvio (ex: "use `uv` em vez de `pip`")
-   - Convencoes de CI/CD que nao estao documentadas em lugar nenhum
-   - Restricoes de compatibilidade retroativa
-   - Decisoes arquiteturais que nao sao evidentes no codigo
+4. **Informative ablations:** Testing "without documentation + with context" versus "with documentation + with context" reveals the causal mechanism (redundancy).
 
-5. **Remova qualquer informacao que duplique docs existentes.** Se esta no README, nos docstrings, ou nos comentarios, nao repita no arquivo de contexto.
+5. **Reproducibility:** All prompts are published in the appendices. The benchmark will be made available.
 
-6. **Mantenha abaixo de 200 palavras.** A media dos arquivos no AGENTBENCH e 641 palavras — e eles mal ajudam. Corte para um terco.
+### Limitations
 
-### 9.2. Para quem projeta sistemas de skills
+1. **Python-centric:** The most represented language in training data. Results may not generalize to niche languages where the context effect would be larger.
 
-1. **Prefira skills on-demand a contexto pre-carregado.** A skill deve ser invocada quando necessaria, nao injetada no contexto desde o inicio.
+2. **Task resolution only:** Does not measure code quality, security, standards adherence, or developer satisfaction. These may be the scenarios where context matters most.
 
-2. **Cada skill deve conter maximo 3-5 instrucoes acionaveis.** O paper mostra que cada instrucao gera ~0,5-1 passo adicional.
+3. **LLM-generated tests:** 75% average coverage is good, but generated tests may have systematic biases. Manual validation on 10% of instances mitigates but does not eliminate the risk.
 
-3. **Skills de exploracao nao precisam de contexto.** Delegue exploracao para subagentes sem contexto — o paper prova que contexto nao acelera descoberta.
+4. **Zero temperature in 3/4 agents:** Reduces experimental variance but does not reflect real usage (where temperature > 0 is common).
 
-4. **Implemente metricas de impacto por skill.** Meça taxa de resolucao com e sem cada skill. Se nao ha melhoria mensuravel, a skill esta adicionando custo.
+5. **One sample per instance:** Without repetition, the statistical variance of individual instances is high. Results are robust in aggregate but not per instance.
 
-### 9.3. Para quem configura hooks e rules
+6. **Recent repositories:** Context files have been formalized since August 2025. The repositories and PRs are very recent, possibly not representing mature practices.
 
-1. **Converta instrucoes automatizaveis em hooks.** Tudo que pode ser hook (linting, formatacao, testes) deve ser hook, nao instrucao no arquivo de contexto.
+7. **Absence of per-task personalized context:** The paper tests the same context file for all tasks in a repository. Per-task personalized context (like path-scoped rules) could have different results.
 
-2. **Use rules path-scoped para contexto just-in-time.** Em vez de um CLAUDE.md monolitico, distribua regras por diretorio. Isso aproxima o cenario do "NONE" (baixo custo) quando o agente nao esta naquele diretorio.
+8. **Does not test mechanism composition:** Rules + skills + hooks + memory are not tested — only the monolithic context file.
 
-3. **Regras devem ser imperativas e especificas, nao descritivas.** "Rode `pytest tests/unit/` para validar" e util. "O repositorio tem uma suite de testes abrangente usando pytest" nao e — o agente descobriria isso sozinho.
+---
 
-### 9.4. Para quem desenvolve sistemas de memoria
+## 9. Practical Recommendations
 
-1. **Memoria incremental > geracao unica.** Em vez de gerar contexto uma vez, deixe o agente acumular aprendizados ao longo de multiplas sessoes.
+### 9.1. For those maintaining CLAUDE.md / AGENTS.md files
 
-2. **Poda ativa de memoria.** Remova regularmente informacoes que se tornaram obvias. O paper mostra que informacao redundante e ativamente prejudicial.
+1. **Do not use `/init` to generate automatically.** The paper proves that LLM-generated context is, on average, harmful. If you need a starting point, write manually.
 
-3. **Topic files para conhecimento tacito.** Capture quirks, workarounds e decisoes historicas que nao estao em nenhuma documentacao formal.
+2. **Apply the Necessity Test for each instruction:** "Could the agent resolve the task without this instruction?" If yes, remove it.
 
-### 9.5. Para quem avalia e testa configuracoes de agentes
+3. **Eliminate codebase overviews.** They do not reduce discovery steps and consume tokens. The agent navigates via tools.
 
-1. **Sempre compare com o baseline "sem contexto".** O paper prova que "mais contexto" nao e automaticamente "melhor". Toda configuracao deve superar o cenario vazio para justificar sua existencia.
+4. **Focus on non-discoverable information:**
+   - Specific and non-obvious tooling (e.g., "use `uv` instead of `pip`")
+   - CI/CD conventions not documented anywhere
+   - Backward compatibility constraints
+   - Architectural decisions not evident in the code
 
-2. **Meça custo alem de resolucao.** Um ganho de +4% em resolucao acompanhado de +20% em custo pode nao ser justificavel dependendo do volume de uso.
+5. **Remove any information that duplicates existing docs.** If it is in the README, docstrings, or comments, do not repeat it in the context file.
 
-3. **Teste em repositorios de nicho, nao apenas em populares.** O beneficio de contexto e maior em repositorios menos conhecidos. Se voce so testa em repositorios populares, vai subestimar o valor de contexto bem escrito.
+6. **Keep under 200 words.** The average file in AGENTBENCH is 641 words — and they barely help. Cut to one-third.
 
-4. **Avalie dimensoes alem de resolucao.** Qualidade de codigo, seguranca, aderencia a padroes — o paper nao mede essas dimensoes, mas elas podem ser onde o contexto mais impacta.
+### 9.2. For those designing skill systems
+
+1. **Prefer on-demand skills over pre-loaded context.** The skill should be invoked when needed, not injected into context from the start.
+
+2. **Each skill should contain a maximum of 3-5 actionable instructions.** The paper shows that each instruction generates ~0.5-1 additional step.
+
+3. **Exploration skills do not need context.** Delegate exploration to sub-agents without context — the paper proves that context does not accelerate discovery.
+
+4. **Implement impact metrics per skill.** Measure resolution rate with and without each skill. If there is no measurable improvement, the skill is adding cost.
+
+### 9.3. For those configuring hooks and rules
+
+1. **Convert automatable instructions into hooks.** Everything that can be a hook (linting, formatting, tests) should be a hook, not an instruction in the context file.
+
+2. **Use path-scoped rules for just-in-time context.** Instead of a monolithic CLAUDE.md, distribute rules by directory. This approximates the "NONE" scenario (low cost) when the agent is not in that directory.
+
+3. **Rules should be imperative and specific, not descriptive.** "Run `pytest tests/unit/` to validate" is useful. "The repository has a comprehensive test suite using pytest" is not — the agent would discover this on its own.
+
+### 9.4. For those developing memory systems
+
+1. **Incremental memory > one-time generation.** Instead of generating context once, let the agent accumulate learnings across multiple sessions.
+
+2. **Active memory pruning.** Regularly remove information that has become obvious. The paper shows that redundant information is actively harmful.
+
+3. **Topic files for tacit knowledge.** Capture quirks, workarounds, and historical decisions not found in any formal documentation.
+
+### 9.5. For those evaluating and testing agent configurations
+
+1. **Always compare against the "no context" baseline.** The paper proves that "more context" is not automatically "better". Every configuration must outperform the empty scenario to justify its existence.
+
+2. **Measure cost beyond resolution.** A +4% resolution gain accompanied by +20% cost increase may not be justifiable depending on usage volume.
+
+3. **Test on niche repositories, not just popular ones.** The benefit of context is greater in lesser-known repositories. If you only test on popular repositories, you will underestimate the value of well-written context.
+
+4. **Evaluate dimensions beyond resolution.** Code quality, security, standards adherence — the paper does not measure these dimensions, but they may be where context has the most impact.
