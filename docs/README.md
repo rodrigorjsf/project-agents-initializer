@@ -6,18 +6,17 @@ Navigation guide for LLM agents and developers. Documents are organized by scope
 
 | Directory | Scope | Contents | When to Load |
 |-----------|-------|----------|-------------|
-| `claude-code/` | Claude Code | CLAUDE.md guide, hooks, memory, plugins, skills, subagents | Working on Claude Code artifacts |
+| `claude-code/` | Claude Code | Hooks, memory, plugins, skills, subagents, prompting | Working on Claude Code artifacts |
 | `cursor/` | Cursor IDE | Rules, hooks, MCP, plugins, skills, subagents, tools | Working on Cursor artifacts |
-| `general-llm/` | Any LLM/agent | AGENTS.md guide, research papers, prompt engineering, context optimization | Research, cross-tool decisions |
+| `general-llm/` | Any LLM/agent | AGENTS.md guide, research, prompt engineering, context optimization | Research, cross-tool decisions |
 | `shared/` | Cross-tool | Agent Skills open standard, skill authoring best practices | Building portable skills |
-| `analysis/` | Project-internal | Deep extraction analysis of each source document (Portuguese) | Understanding source doc implications |
+| `analysis/` | Project-internal | Deep extraction analysis of each source document | Understanding source doc implications |
 | `plans/` | Project-internal | Dated design documents for this project | Planning new features |
 
 ## Claude Code (`claude-code/`)
 
 | File | Description |
 |------|-------------|
-| `a-guide-to-claude.md` | Complete guide to CLAUDE.md — hierarchy, progressive disclosure, instruction budget |
 | `claude-prompting-best-practices.md` | Official Anthropic prompting best practices for Claude models |
 | `hooks/automate-workflow-with-hooks.md` | Setting up Claude Code hooks for workflow automation |
 | `hooks/claude-hook-reference-doc.md` | Technical reference: 14 event types, JSON schemas, handlers |
@@ -36,15 +35,20 @@ Covers: rules (4 types), hooks (JSON stdio), MCP integration, plugins (marketpla
 
 ## General LLM (`general-llm/`)
 
-| File | Description | Language |
-|------|-------------|----------|
-| `a-guide-to-agents.md` | Complete guide to AGENTS.md open standard — cross-agent compatibility | English |
-| `Evaluating-AGENTS-paper.md` | ETH Zurich study (Feb 2026): minimal files outperform comprehensive ones | English |
-| `Evaluating-AGENTS-paper.pdf` | Original PDF of the ETH Zurich paper | English |
-| `research-context-engineering-comprehensive.md` | **Primary research reference** — context rot, poisoning, attention budget, whitespace, multilingual performance, English vs Portuguese. 52 citations | English |
-| `research-llm-context-optimization.md` | Earlier context optimization research (⚠️ largely superseded by comprehensive file above) | English |
-| `prompt-engineering-guide.md` | 58+ prompt engineering techniques with benchmarks and token costs (2022-2026) | **Portuguese** |
-| `subagents/research-subagent-best-practices.md` | Cross-tool subagent design patterns and best practices | English |
+| File | Description |
+|------|-------------|
+| `a-guide-to-agents.md` | Complete guide to AGENTS.md open standard — cross-agent compatibility, path-scoped rules |
+| `Evaluating-AGENTS-paper.md` | ETH Zurich study (Feb 2026): minimal files outperform comprehensive ones |
+| `Evaluating-AGENTS-paper.pdf` | Original PDF of the ETH Zurich paper |
+| `research-context-engineering-comprehensive.md` | **Hub file** — Executive summary, recommendations, myths/reality, confidence assessment, and full 55-citation list. Links to scoped child files |
+| `research-context-rot-and-management.md` | Context rot mechanisms, attention budget, lost-in-middle, poisoning, compression, RAG quality (Parts 1–8) |
+| `research-whitespace-and-formatting.md` | Whitespace tokenization, structural cues, formatting impact on output quality (Part 9) |
+| `research-multilingual-performance.md` | English vs other languages: token cost, reasoning routing, Portuguese/Romance language benchmarks (Parts 10–11) |
+| `research-agent-workflows-and-patterns.md` | Multi-agent orchestration, tool use patterns, memory systems, progressive disclosure implementation (Section 13) |
+| `prompt-engineering-guide.md` | 58+ prompt engineering techniques with benchmarks and token costs (2022–2026) |
+| `subagents/research-subagent-best-practices.md` | Cross-tool subagent design patterns and best practices |
+
+**Related documentation**: [skill-authoring-best-practices](shared/skill-authoring-best-practices.md) | [skills-standard](shared/skills-standard/README.md)
 
 ## Shared Standards (`shared/`)
 
@@ -59,20 +63,18 @@ Covers: rules (4 types), hooks (JSON stdio), MCP integration, plugins (marketpla
 | `skills-standard/agentskills-optimizing-descriptions.md` | Writing descriptions that trigger reliable invocation |
 | `skills-standard/agentskills-evaluating-skills.md` | Measuring and improving skill output quality |
 
+## Analysis (`analysis/`)
+
+16 deep extraction files — one per source document. Each contains actionable findings, quality ratings, and recommendations for this project. Metadata headers identify source document, analysis date, and scope.
+
 ## Reading Order by Task
 
-**Setting up Claude Code for a project**: `claude-code/a-guide-to-claude.md` → `claude-code/memory/` → `claude-code/hooks/`
+**Setting up Claude Code**: `general-llm/a-guide-to-agents.md` → `claude-code/memory/` → `claude-code/hooks/`
 
-**Setting up Cursor for a project**: `cursor/README.md` → `cursor/rules/` → `cursor/hooks/`
+**Setting up Cursor**: `cursor/README.md` → `cursor/rules/` → `cursor/hooks/`
 
 **Creating skills (any tool)**: `shared/skill-authoring-best-practices.md` → `shared/skills-standard/` → tool-specific: `claude-code/skills/` or `cursor/skills/`
 
-**Understanding context optimization**: `general-llm/research-context-engineering-comprehensive.md` (start here) → `general-llm/Evaluating-AGENTS-paper.md`
+**Understanding context optimization**: `general-llm/research-context-engineering-comprehensive.md` (hub + summary) → specific scope files (`research-context-rot-and-management.md`, `research-whitespace-and-formatting.md`, `research-multilingual-performance.md`, `research-agent-workflows-and-patterns.md`) → `general-llm/Evaluating-AGENTS-paper.md`
 
-**Prompt engineering deep dive**: `claude-code/claude-prompting-best-practices.md` (English, Claude-focused) or `general-llm/prompt-engineering-guide.md` (Portuguese, 58+ techniques, tool-agnostic)
-
-## Notes
-
-- **Portuguese content**: `general-llm/prompt-engineering-guide.md` and all `analysis/` files are written in Portuguese. They contain unique benchmarks and analysis not duplicated in English docs.
-- **Superseded file**: `general-llm/research-llm-context-optimization.md` is largely superseded by `general-llm/research-context-engineering-comprehensive.md` but retained for existing references.
-- **analysis/ files**: Each corresponds to a source document and contains deep extraction with actionable findings. Useful for understanding implications of each source doc for this project.
+**Prompt engineering deep dive**: `claude-code/claude-prompting-best-practices.md` (Claude-focused) or `general-llm/prompt-engineering-guide.md` (58+ techniques, tool-agnostic)
