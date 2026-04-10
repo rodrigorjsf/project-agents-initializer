@@ -34,7 +34,7 @@ The plugin uses **subagent-driven development**: subagents (running on Claude So
 | Anthropic Engineering (Context Engineering) | "Context is a finite resource with diminishing marginal returns" | Minimal token footprint per scope |
 | Anthropic Engineering (Context Engineering) | Progressive disclosure via subdirectory CLAUDE.md, path-scoped rules, skills | Generate hierarchical file trees, not flat files |
 | Lost in the Middle (TACL 2023) | Information in the middle of long contexts gets lost | Keep files short; critical instructions at start |
-| a-guide-to-agents.md / a-guide-to-claude.md | Progressive disclosure patterns, monorepo support, domain files | Generate BUILD.md, TESTING.md, etc. as separate files |
+| a-guide-to-agents.md / a-guide-to-agents.md | Progressive disclosure patterns, monorepo support, domain files | Generate BUILD.md, TESTING.md, etc. as separate files |
 
 ## Architecture
 
@@ -272,9 +272,9 @@ agent-engineering-toolkit/
 ├── LICENSE
 └── docs/
     ├── a-guide-to-agents.md     # Reference: AGENTS.md guide
-    ├── a-guide-to-claude.md     # Reference: CLAUDE.md guide
+    ├── a-guide-to-agents.md     # Reference: CLAUDE.md guide
     ├── Evaluating-AGENTS-paper.pdf  # Research paper
-    ├── research-llm-context-optimization.md  # Context optimization research
+    ├── research-context-engineering-comprehensive.md  # Context optimization research
     ├── research-claude-code-skills-format.md  # Skills/plugin format research
     └── plans/
         └── 2026-03-22-agents-initializer-plugin-design.md  # This document

@@ -2,7 +2,7 @@
 
 Standards for writing effective GitHub Copilot review instruction files. Derived from GitHub official documentation and this project's prompt engineering research.
 
-Source: GitHub Docs — Adding repository custom instructions, Copilot code review tutorial, docs/claude-prompting-best-practices.md
+Source: GitHub Docs — Adding repository custom instructions, Copilot code review tutorial, docs/claude-code/claude-prompting-best-practices.md
 
 ## Hard Constraints
 

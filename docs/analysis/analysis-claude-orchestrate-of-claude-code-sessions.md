@@ -1,51 +1,56 @@
-# Analise: Orquestracao de Times de Agentes no Claude Code
+# Analysis: Orchestrating Agent Teams in Claude Code
+
+> **Status**: Current
+> **Source document**: [claude-orchestrate-of-claude-code-sessions.md](https://docs.anthropic.com/en/docs/claude-code/agent-teams)
+> **Analysis date**: 2025-06-01
+> **Scope**: Experimental agent teams mechanism — peer-to-peer coordination, shared task lists, team hooks, and comparison with traditional subagents
 
 ---
 
-## 1. Resumo Executivo
+## 1. Executive Summary
 
-O documento sobre orquestracao de times de agentes (Agent Teams) descreve um mecanismo experimental do Claude Code (v2.1.32+) que permite coordenar multiplas instancias do Claude Code trabalhando em paralelo. Diferentemente dos subagentes tradicionais -- que operam em modelo hub-and-spoke reportando resultados apenas ao agente principal -- os agent teams implementam comunicacao peer-to-peer entre teammates, com lista de tarefas compartilhada e auto-coordenacao. A arquitetura consiste em um team lead (sessao principal), teammates (instancias independentes), task list (lista compartilhada com estados pending/in-progress/completed e dependencias) e mailbox (sistema de mensagens entre agentes).
+The document on agent team orchestration (Agent Teams) describes an experimental Claude Code mechanism (v2.1.32+) that enables coordinating multiple Claude Code instances working in parallel. Unlike traditional subagents — which operate in a hub-and-spoke model reporting results only to the main agent — agent teams implement peer-to-peer communication between teammates, with a shared task list and self-coordination. The architecture consists of a team lead (main session), teammates (independent instances), task list (shared list with pending/in-progress/completed states and dependencies), and mailbox (inter-agent messaging system).
 
-O custo de tokens escala linearmente com o numero de teammates, pois cada um possui sua propria janela de contexto. A Anthropic recomenda iniciar com 3-5 teammates e 5-6 tarefas por teammate. Os melhores casos de uso incluem pesquisa paralela, features independentes, debugging com hipoteses concorrentes e coordenacao cross-layer (frontend/backend/testes). O mecanismo introduz hooks especificos (`TeammateIdle`, `TaskCompleted`) que permitem quality gates automatizados.
+Token cost scales linearly with the number of teammates, as each one has its own context window. Anthropic recommends starting with 3-5 teammates and 5-6 tasks per teammate. Best use cases include parallel research, independent features, debugging with competing hypotheses, and cross-layer coordination (frontend/backend/tests). The mechanism introduces specific hooks (`TeammateIdle`, `TaskCompleted`) that enable automated quality gates.
 
-A principal implicacao arquitetural e que agent teams resolvem o problema de comunicacao entre workers que subagentes nao conseguem resolver, ao custo de maior complexidade e consumo de tokens. A decisao entre subagentes e agent teams deve ser guiada pela necessidade de comunicacao inter-worker: se os workers precisam apenas reportar resultados, subagentes bastam; se precisam debater, desafiar e coordenar entre si, agent teams sao a escolha correta.
+The main architectural implication is that agent teams solve the inter-worker communication problem that subagents cannot solve, at the cost of greater complexity and token consumption. The decision between subagents and agent teams should be guided by the need for inter-worker communication: if workers only need to report results, subagents suffice; if they need to debate, challenge, and coordinate with each other, agent teams are the right choice.
 
 ---
 
-## 2. Conceitos e Mecanismos Chave
+## 2. Key Concepts and Mechanisms
 
-### 2.1 Arquitetura do Time
+### 2.1 Team Architecture
 
-| Componente | Funcao | Analogia |
-|------------|--------|----------|
-| **Team Lead** | Sessao principal que cria o time, spawna teammates e coordena trabalho | Gerente de projeto |
-| **Teammates** | Instancias independentes do Claude Code com contexto proprio | Desenvolvedores especializados |
-| **Task List** | Lista compartilhada com estados e dependencias | Board do Kanban |
-| **Mailbox** | Sistema de mensagens inter-agentes | Slack do time |
+| Component | Function | Analogy |
+|-----------|----------|---------|
+| **Team Lead** | Main session that creates the team, spawns teammates, and coordinates work | Project manager |
+| **Teammates** | Independent Claude Code instances with their own context | Specialized developers |
+| **Task List** | Shared list with states and dependencies | Kanban board |
+| **Mailbox** | Inter-agent messaging system | Team Slack |
 
-### 2.2 Ciclo de Vida do Time
+### 2.2 Team Lifecycle
 
 ```
-1. Usuario solicita criacao do time com descricao da tarefa
-2. Lead analisa e cria task list com dependencias
-3. Lead spawna teammates com prompts especificos
-4. Teammates auto-claimam tarefas (file locking previne race conditions)
-5. Teammates comunicam-se diretamente via mensagens
-6. Lead sintetiza resultados
-7. Lead solicita shutdown dos teammates
-8. Lead executa cleanup dos recursos compartilhados
+1. User requests team creation with task description
+2. Lead analyzes and creates task list with dependencies
+3. Lead spawns teammates with specific prompts
+4. Teammates auto-claim tasks (file locking prevents race conditions)
+5. Teammates communicate directly via messages
+6. Lead synthesizes results
+7. Lead requests teammate shutdown
+8. Lead performs cleanup of shared resources
 ```
 
-### 2.3 Modos de Exibicao
+### 2.3 Display Modes
 
-- **In-process**: todos os teammates rodam no mesmo terminal; `Shift+Down` para navegar
-- **Split panes**: cada teammate em painel separado via tmux ou iTerm2
+- **In-process**: all teammates run in the same terminal; `Shift+Down` to navigate
+- **Split panes**: each teammate in a separate pane via tmux or iTerm2
 
-### 2.4 Coordenacao de Tarefas
+### 2.4 Task Coordination
 
-As tarefas possuem tres estados (pending, in progress, completed) e suportam dependencias. O sistema desbloqueia tarefas automaticamente quando dependencias sao completadas. O file locking previne que multiplos teammates tentem clamar a mesma tarefa simultaneamente.
+Tasks have three states (pending, in progress, completed) and support dependencies. The system automatically unblocks tasks when dependencies are completed. File locking prevents multiple teammates from attempting to claim the same task simultaneously.
 
-### 2.5 Controle de Qualidade via Hooks
+### 2.5 Quality Control via Hooks
 
 ```json
 {
@@ -68,232 +73,232 @@ As tarefas possuem tres estados (pending, in progress, completed) e suportam dep
 }
 ```
 
-- `TeammateIdle`: executa quando teammate vai ficar idle; exit code 2 envia feedback e mantem o teammate trabalhando
-- `TaskCompleted`: executa quando tarefa sera marcada como completa; exit code 2 previne a conclusao
+- `TeammateIdle`: executes when a teammate is about to become idle; exit code 2 sends feedback and keeps the teammate working
+- `TaskCompleted`: executes when a task is to be marked as complete; exit code 2 prevents completion
 
 ### 2.6 Plan Approval
 
-Para tarefas criticas, e possivel exigir que teammates planejem antes de implementar:
+For critical tasks, it is possible to require teammates to plan before implementing:
 
 ```text
 Spawn an architect teammate to refactor the authentication module.
 Require plan approval before they make any changes.
 ```
 
-O lead aprova ou rejeita o plano autonomamente com base em criterios fornecidos pelo usuario.
+The lead approves or rejects the plan autonomously based on criteria provided by the user.
 
 ---
 
-## 3. Pontos de Atencao
+## 3. Points of Attention
 
-### 3.1 Custo de Tokens
+### 3.1 Token Cost
 
-**O maior risco operacional.** Cada teammate consome tokens independentemente. Com 5 teammates, o custo pode ser 5-6x maior que uma sessao unica (overhead de coordenacao incluso). Nao ha mecanismo de compactacao inter-times -- cada janela e independente.
+**The greatest operational risk.** Each teammate consumes tokens independently. With 5 teammates, the cost can be 5-6x higher than a single session (coordination overhead included). There is no inter-team compaction mechanism — each window is independent.
 
-### 3.2 Conflitos de Arquivo
+### 3.2 File Conflicts
 
-Dois teammates editando o mesmo arquivo gera sobrescrita. A documentacao e explicita: "Break the work so each teammate owns a different set of files." Nao ha merge automatico ou deteccao de conflitos.
+Two teammates editing the same file causes overwriting. The documentation is explicit: "Break the work so each teammate owns a different set of files." There is no automatic merge or conflict detection.
 
-### 3.3 Limitacoes Experimentais Criticas
+### 3.3 Critical Experimental Limitations
 
-- **Sem resumo de sessao**: `/resume` e `/rewind` nao restauram teammates in-process
-- **Status de tarefas pode ficar desatualizado**: teammates as vezes nao marcam tarefas como completas
-- **Um time por sessao**: nao e possivel gerenciar multiplos times simultaneamente
-- **Sem times aninhados**: teammates nao podem spawnar seus proprios times
-- **Lead e fixo**: nao e possivel transferir lideranca
-- **Shutdown pode ser lento**: teammates terminam a requisicao atual antes de parar
-- **Split panes nao funcionam no VS Code terminal, Windows Terminal ou Ghostty**
+- **No session resume**: `/resume` and `/rewind` do not restore in-process teammates
+- **Task status can become stale**: teammates sometimes do not mark tasks as completed
+- **One team per session**: it is not possible to manage multiple teams simultaneously
+- **No nested teams**: teammates cannot spawn their own teams
+- **Lead is fixed**: leadership cannot be transferred
+- **Shutdown can be slow**: teammates finish the current request before stopping
+- **Split panes do not work in VS Code terminal, Windows Terminal, or Ghostty**
 
-### 3.4 Armadilha do Lead que Implementa
+### 3.4 The Lead-That-Implements Trap
 
-O lead pode comecar a implementar tarefas ao inves de delegar. Mitigacao: "Wait for your teammates to complete their tasks before proceeding."
+The lead may start implementing tasks instead of delegating. Mitigation: "Wait for your teammates to complete their tasks before proceeding."
 
-### 3.5 Orcamento de Contexto
+### 3.5 Context Budget
 
-Cada teammate carrega CLAUDE.md, MCP servers e skills no startup -- mas NAO herda o historico de conversacao do lead. O spawn prompt deve conter todo o contexto necessario para a tarefa.
+Each teammate loads CLAUDE.md, MCP servers, and skills on startup — but does NOT inherit the lead's conversation history. The spawn prompt must contain all necessary context for the task.
 
 ---
 
-## 4. Casos de Uso e Escopo
+## 4. Use Cases and Scope
 
-### 4.1 Quando Usar Agent Teams
+### 4.1 When to Use Agent Teams
 
-| Cenario | Adequacao | Justificativa |
-|---------|-----------|---------------|
-| Code review paralelo (seguranca + performance + testes) | Alta | Lentes independentes, sintese valiosa |
-| Debugging com hipoteses concorrentes | Alta | Debate ativo previne anchoring bias |
-| Features independentes em modulos distintos | Alta | Cada teammate possui arquivos distintos |
-| Coordenacao frontend/backend/testes | Alta | Cross-layer com dependencias gerenciaveis |
-| Tarefas sequenciais com dependencias fortes | Baixa | Overhead de coordenacao supera beneficio |
-| Edicoes no mesmo arquivo | Baixa | Conflitos de sobrescrita |
-| Tarefas simples e rapidas | Baixa | Custo de tokens desproporcional |
+| Scenario | Suitability | Justification |
+|----------|-------------|---------------|
+| Parallel code review (security + performance + tests) | High | Independent lenses, valuable synthesis |
+| Debugging with competing hypotheses | High | Active debate prevents anchoring bias |
+| Independent features in distinct modules | High | Each teammate owns distinct files |
+| Frontend/backend/tests coordination | High | Cross-layer with manageable dependencies |
+| Sequential tasks with strong dependencies | Low | Coordination overhead outweighs benefit |
+| Edits to the same file | Low | Overwrite conflicts |
+| Simple and quick tasks | Low | Disproportionate token cost |
 
-### 4.2 Criterios de Decisao: Subagentes vs Agent Teams
+### 4.2 Decision Criteria: Subagents vs Agent Teams
 
 ```
-Pergunta 1: Os workers precisam se comunicar entre si?
-  NAO -> Subagentes
-  SIM -> Pergunta 2
+Question 1: Do the workers need to communicate with each other?
+  NO → Subagents
+  YES → Question 2
 
-Pergunta 2: O trabalho envolve debater/desafiar descobertas?
-  NAO -> Subagentes com sintese pelo main agent
-  SIM -> Agent Teams
+Question 2: Does the work involve debating/challenging findings?
+  NO → Subagents with synthesis by the main agent
+  YES → Agent Teams
 
-Pergunta 3: O custo de tokens e aceitavel (5-6x)?
-  NAO -> Subagentes com execucao sequencial
-  SIM -> Agent Teams
+Question 3: Is the token cost acceptable (5-6x)?
+  NO → Subagents with sequential execution
+  YES → Agent Teams
 ```
 
 ---
 
-## 5. Aplicabilidade a Infraestrutura de Agentes
+## 5. Applicability to Agent Infrastructure
 
 ### 5.1 Skills
 
-- **Skills que delegam a subagentes**: Agent teams sao uma alternativa quando a skill requer multiplas perspectivas coordenadas (ex: skill de design review que spawna architect + UX + devil's advocate)
-- **Plugin-provided skills**: Skills de plugins podem iniciar agent teams se o plugin for habilitado e a flag experimental estiver ativa
-- **Memory-informed skills**: Cada teammate carrega CLAUDE.md e auto memory independentemente, permitindo que skills baseadas em memoria funcionem em cada contexto separadamente
+- **Skills that delegate to subagents**: Agent teams are an alternative when the skill requires multiple coordinated perspectives (e.g., a design review skill that spawns architect + UX + devil's advocate)
+- **Plugin-provided skills**: Plugin skills can initiate agent teams if the plugin is enabled and the experimental flag is active
+- **Memory-informed skills**: Each teammate loads CLAUDE.md and auto memory independently, allowing memory-based skills to function in each context separately
 
 ### 5.2 Hooks
 
-- **Hooks em contexto de agent teams**: `TeammateIdle` e `TaskCompleted` sao hooks exclusivos de agent teams, sem equivalente em subagentes
-- **Memory-triggered hooks**: Nao ha suporte direto, mas `PostToolUse` pode ser usado para acionar atualizacoes de memoria quando teammates completam tarefas
-- **Plugin lifecycle hooks**: Hooks de plugins sao carregados por cada teammate da mesma forma que em sessoes normais
+- **Hooks in agent team context**: `TeammateIdle` and `TaskCompleted` are hooks exclusive to agent teams, with no equivalent in subagents
+- **Memory-triggered hooks**: No direct support, but `PostToolUse` can be used to trigger memory updates when teammates complete tasks
+- **Plugin lifecycle hooks**: Plugin hooks are loaded by each teammate in the same way as in normal sessions
 
-### 5.3 Subagentes
+### 5.3 Subagents
 
-- **Padrao de orquestracao**: Agent teams implementam o padrao Orchestrator-Workers da Anthropic com comunicacao peer-to-peer adicionada
-- **Delegacao**: O lead delega via task list (nao via Agent tool como subagentes); teammates auto-claimam
-- **Sintese de resultados**: O lead sintetiza findings de multiplos teammates -- diferente de subagentes onde cada resultado volta individualmente
-- **Execucao paralela**: Agent teams sao nativamente paralelos com coordenacao; subagentes podem rodar em paralelo mas sem comunicacao
-- **Isolamento via worktree**: Cada teammate pode operar em worktree separada, mas a feature nao e explicitamente documentada para teams (apenas subagentes possuem `isolation: worktree`)
+- **Orchestration pattern**: Agent teams implement the Anthropic Orchestrator-Workers pattern with added peer-to-peer communication
+- **Delegation**: The lead delegates via task list (not via Agent tool as with subagents); teammates auto-claim
+- **Result synthesis**: The lead synthesizes findings from multiple teammates — different from subagents where each result returns individually
+- **Parallel execution**: Agent teams are natively parallel with coordination; subagents can run in parallel but without communication
+- **Worktree isolation**: Each teammate can operate in a separate worktree, but the feature is not explicitly documented for teams (only subagents have `isolation: worktree`)
 
 ### 5.4 Rules
 
-- **Rules em contexto de teammates**: Cada teammate carrega `.claude/rules/` como uma sessao normal
-- **Plugin-scoped rules**: Rules de plugins sao carregadas normalmente por cada teammate
-- **Memory-informed rules**: Rules path-scoped sao ativadas independentemente por cada teammate conforme trabalham em arquivos diferentes
+- **Rules in teammate context**: Each teammate loads `.claude/rules/` like a normal session
+- **Plugin-scoped rules**: Plugin rules are loaded normally by each teammate
+- **Memory-informed rules**: Path-scoped rules are activated independently by each teammate as they work on different files
 
-### 5.5 Memoria
+### 5.5 Memory
 
-- **Arquitetura de memoria**: Cada teammate possui sua propria janela de contexto e carrega auto memory independentemente
-- **Indexacao**: MEMORY.md (primeiras 200 linhas) e carregado no startup de cada teammate
-- **On-demand loading**: Topic files de memoria sao carregados sob demanda por cada teammate
-- **Persistencia cross-session**: Limitada -- `/resume` nao restaura teammates; porem, auto memory persiste entre sessoes
-- **Higiene de memoria**: Com multiplos teammates escrevendo em auto memory simultaneamente, ha risco de conflitos ou redundancia
+- **Memory architecture**: Each teammate has its own context window and loads auto memory independently
+- **Indexing**: MEMORY.md (first 200 lines) is loaded at startup of each teammate
+- **On-demand loading**: Memory topic files are loaded on-demand by each teammate
+- **Cross-session persistence**: Limited — `/resume` does not restore teammates; however, auto memory persists between sessions
+- **Memory hygiene**: With multiple teammates writing to auto memory simultaneously, there is risk of conflicts or redundancy
 
 ---
 
-## 6. Aplicabilidade do Guia de Engenharia de Prompts
+## 6. Applicability of the Prompt Engineering Guide
 
-### 6.1 CoT para Cadeias de Raciocinio de Subagentes
+### 6.1 CoT for Subagent Reasoning Chains
 
-Agent teams beneficiam-se de CoT no spawn prompt de cada teammate: "Caminhe pelo problema passo a passo antes de propor solucoes." O CoT ajuda teammates a fundamentar seu raciocinio antes de comunicar findings ao time, reduzindo ruido na comunicacao inter-agentes.
+Agent teams benefit from CoT in each teammate's spawn prompt: "Walk through the problem step by step before proposing solutions." CoT helps teammates ground their reasoning before communicating findings to the team, reducing noise in inter-agent communication.
 
-### 6.2 ReAct para Subagentes com Acesso a Ferramentas
+### 6.2 ReAct for Subagents with Tool Access
 
-Cada teammate opera num loop ReAct nativo (Pensamento -> Acao -> Observacao). O spawn prompt deve encorajar o ciclo explicito: "Primeiro explore os arquivos relevantes, analise os padroes, e so entao proponha mudancas." Isso e especialmente importante porque teammates nao herdam contexto do lead.
+Each teammate operates in a native ReAct loop (Thought → Action → Observation). The spawn prompt should encourage the explicit cycle: "First explore the relevant files, analyze the patterns, and only then propose changes." This is especially important because teammates do not inherit context from the lead.
 
-### 6.3 Tree of Thoughts para Subagentes de Exploracao
+### 6.3 Tree of Thoughts for Exploration Subagents
 
-O caso de uso "debugging com hipoteses concorrentes" e uma implementacao natural de Tree of Thoughts distribuida: cada teammate explora um ramo da arvore de hipoteses. O debate entre teammates funciona como o mecanismo de avaliacao e backtracking do ToT.
+The "debugging with competing hypotheses" use case is a natural implementation of distributed Tree of Thoughts: each teammate explores a branch of the hypothesis tree. The debate between teammates functions as the evaluation and backtracking mechanism of ToT.
 
-**Exemplo pratico**:
+**Practical example**:
 
 ```text
 Spawn 5 teammates to investigate different hypotheses about the crash.
 Have them talk to each other to try to disprove each other's theories.
 ```
 
-Cada teammate e um no da arvore; a comunicacao peer-to-peer implementa a avaliacao cruzada.
+Each teammate is a node in the tree; peer-to-peer communication implements cross-evaluation.
 
-### 6.4 Self-Consistency para Validacao entre Multiplos Subagentes
+### 6.4 Self-Consistency for Validation Across Multiple Subagents
 
-Agent teams implementam Self-Consistency de forma natural quando multiplos teammates investigam o mesmo problema e convergem (ou divergem). O lead pode sintetizar via votacao majoritaria: se 3 de 5 teammates apontam a mesma causa raiz, a confianca na conclusao aumenta.
+Agent teams implement Self-Consistency naturally when multiple teammates investigate the same problem and converge (or diverge). The lead can synthesize via majority voting: if 3 out of 5 teammates point to the same root cause, confidence in the conclusion increases.
 
-### 6.5 Reflexion para Melhoria Iterativa de Subagentes
+### 6.5 Reflexion for Iterative Subagent Improvement
 
-Os hooks `TaskCompleted` e `TeammateIdle` implementam parcialmente Reflexion: o hook pode rejeitar a conclusao (exit code 2), forcando o teammate a refletir e iterar. Combinado com plan approval, cria um loop gerar -> avaliar -> refinar.
+The `TaskCompleted` and `TeammateIdle` hooks partially implement Reflexion: the hook can reject the conclusion (exit code 2), forcing the teammate to reflect and iterate. Combined with plan approval, this creates a generate → evaluate → refine loop.
 
-### 6.6 Least-to-Most para Decomposicao de Tarefas entre Subagentes
+### 6.6 Least-to-Most for Task Decomposition Across Subagents
 
-A task list com dependencias implementa Least-to-Most naturalmente: tarefas simples sao completadas primeiro, desbloqueando tarefas mais complexas que dependem delas. O lead pode decompor um problema complexo em subtarefas ordenadas por dependencia.
-
----
-
-## 7. Correlacoes com os Documentos Principais
-
-### Com "Creating Custom Subagents"
-
-A relacao e de complementaridade direta. Subagentes sao para tarefas focadas com resultado reportado ao caller; agent teams sao para trabalho complexo com comunicacao. A tabela comparativa do documento e essencial para a tomada de decisao. Subagentes individuais dentro de agent teams herdam o mesmo modelo de contexto isolado dos subagentes customizados.
-
-### Com "Research: Subagent Best Practices"
-
-O documento de best practices enfatiza que subagentes nao podem spawnar outros subagentes. Agent teams superam essa limitacao permitindo comunicacao direta entre teammates, mas com custo maior. Os anti-patterns documentados (god agents, descricoes vagas) aplicam-se igualmente ao spawn de teammates.
-
-### Com "How Claude Remembers a Project"
-
-Agent teams carregam CLAUDE.md e auto memory da mesma forma que sessoes normais. A limitacao critica e que teammates nao herdam o historico do lead, exigindo que o spawn prompt contenha todo o contexto necessario. A auto memory pode ser atualizada por multiplos teammates, criando risco de conflito.
-
-### Com "Create Plugins"
-
-Plugins sao carregados normalmente por cada teammate. Skills de plugins podem ser invocadas em contexto de teams. Hooks de plugins (`TeammateIdle`, `TaskCompleted`) oferecem extensibilidade especifica para agent teams.
-
-### Com "Research: LLM Context Optimization"
-
-A relacao mais critica e com o conceito de "context rot". Cada teammate inicia com contexto limpo (prevenindo context rot), mas o custo e linear. O conceito de "attention budget" da Anthropic implica que o custo de atencao total de um time e a soma dos orcamentos individuais, sem compartilhamento eficiente.
+The task list with dependencies naturally implements Least-to-Most: simple tasks are completed first, unblocking more complex tasks that depend on them. The lead can decompose a complex problem into subtasks ordered by dependency.
 
 ---
 
-## 8. Forcas e Limitacoes
+## 7. Correlations with Core Documents
 
-### Forcas
+### With "Creating Custom Subagents"
 
-1. **Comunicacao peer-to-peer** resolve problemas que subagentes hub-and-spoke nao conseguem
-2. **Task list compartilhada** com dependencias e auto-claiming oferece coordenacao robusta
-3. **File locking** previne race conditions no claiming de tarefas
-4. **Hooks dedicados** (TeammateIdle, TaskCompleted) permitem quality gates automatizados
-5. **Plan approval** oferece checkpoint humano-no-loop antes de implementacao
-6. **Contexto limpo por teammate** previne context rot
-7. **Debate adversarial** entre teammates combate anchoring bias em debugging
+The relationship is one of direct complementarity. Subagents are for focused tasks with results reported to the caller; agent teams are for complex work with communication. The comparison table in the document is essential for decision-making. Individual subagents within agent teams inherit the same isolated context model as custom subagents.
 
-### Limitacoes
+### With "Research: Subagent Best Practices"
 
-1. **Status experimental** com limitacoes significativas (sem resume, um time por sessao)
-2. **Custo de tokens linear** com numero de teammates (5x para 5 teammates)
-3. **Sem merge automatico** de conflitos de arquivo
-4. **Lead fixo** sem possibilidade de transferencia
-5. **Sem teams aninhados** (teammates nao podem criar sub-times)
-6. **Compatibilidade limitada** de split panes (nao funciona em VS Code, Windows Terminal)
-7. **Risco de task status desatualizado** quando teammates nao marcam tarefas como completas
+The best practices document emphasizes that subagents cannot spawn other subagents. Agent teams overcome this limitation by allowing direct communication between teammates, but at a higher cost. The documented anti-patterns (god agents, vague descriptions) apply equally to teammate spawning.
+
+### With "How Claude Remembers a Project"
+
+Agent teams load CLAUDE.md and auto memory in the same way as normal sessions. The critical limitation is that teammates do not inherit the lead's history, requiring the spawn prompt to contain all necessary context. Auto memory can be updated by multiple teammates, creating a risk of conflict.
+
+### With "Create Plugins"
+
+Plugins are loaded normally by each teammate. Plugin skills can be invoked in a team context. Plugin hooks (`TeammateIdle`, `TaskCompleted`) offer extensibility specific to agent teams.
+
+### With "Research: LLM Context Optimization"
+
+The most critical relationship is with the concept of "context rot." Each teammate starts with a clean context (preventing context rot), but the cost is linear. The Anthropic "attention budget" concept implies that the total attention cost of a team is the sum of individual budgets, with no efficient sharing.
 
 ---
 
-## 9. Recomendacoes Praticas
+## 8. Strengths and Limitations
 
-### 9.1 Para Iniciar com Agent Teams
+### Strengths
 
-1. **Comece com pesquisa e review** (sem escrita de codigo) para entender a dinamica
-2. **Use 3 teammates** na primeira experiencia; escale apenas quando o valor for demonstrado
-3. **Defina spawn prompts detalhados** incluindo arquivos relevantes, criterios e formato esperado
-4. **Monitore ativamente** -- cheque progresso dos teammates regularmente
+1. **Peer-to-peer communication** solves problems that hub-and-spoke subagents cannot
+2. **Shared task list** with dependencies and auto-claiming offers robust coordination
+3. **File locking** prevents race conditions in task claiming
+4. **Dedicated hooks** (TeammateIdle, TaskCompleted) enable automated quality gates
+5. **Plan approval** provides a human-in-the-loop checkpoint before implementation
+6. **Clean context per teammate** prevents context rot
+7. **Adversarial debate** between teammates combats anchoring bias in debugging
 
-### 9.2 Para Prevenir Conflitos
+### Limitations
+
+1. **Experimental status** with significant limitations (no resume, one team per session)
+2. **Linear token cost** with number of teammates (5x for 5 teammates)
+3. **No automatic merge** for file conflicts
+4. **Fixed lead** with no possibility of transfer
+5. **No nested teams** (teammates cannot create sub-teams)
+6. **Limited compatibility** for split panes (does not work in VS Code, Windows Terminal)
+7. **Risk of stale task status** when teammates do not mark tasks as complete
+
+---
+
+## 9. Practical Recommendations
+
+### 9.1 Getting Started with Agent Teams
+
+1. **Start with research and review** (no code writing) to understand the dynamics
+2. **Use 3 teammates** on the first experience; scale only when value is demonstrated
+3. **Define detailed spawn prompts** including relevant files, criteria, and expected format
+4. **Monitor actively** — check teammate progress regularly
+
+### 9.2 Preventing Conflicts
 
 ```text
-# Bom: cada teammate possui modulos distintos
-Teammate A: src/auth/ (todos os arquivos)
-Teammate B: src/api/ (todos os arquivos)
-Teammate C: tests/ (todos os arquivos)
+# Good: each teammate owns distinct modules
+Teammate A: src/auth/ (all files)
+Teammate B: src/api/ (all files)
+Teammate C: tests/ (all files)
 
-# Ruim: multiplos teammates no mesmo diretorio
+# Bad: multiple teammates in the same directory
 Teammate A: src/auth/login.ts
-Teammate B: src/auth/session.ts  # risco se tocarem no mesmo arquivo
+Teammate B: src/auth/session.ts  # risk if they touch the same file
 ```
 
-### 9.3 Para Controle de Qualidade
+### 9.3 Quality Control
 
-Implemente hooks `TaskCompleted` com scripts de validacao:
+Implement `TaskCompleted` hooks with validation scripts:
 
 ```bash
 #!/bin/bash
@@ -301,25 +306,25 @@ Implemente hooks `TaskCompleted` com scripts de validacao:
 INPUT=$(cat)
 TASK_NAME=$(echo "$INPUT" | jq -r '.task_name // empty')
 
-# Executar testes relevantes
+# Run relevant tests
 npm test -- --related 2>&1
 if [ $? -ne 0 ]; then
-  echo "Testes falharam para a tarefa: $TASK_NAME" >&2
-  exit 2  # Bloqueia conclusao da tarefa
+  echo "Tests failed for task: $TASK_NAME" >&2
+  exit 2  # Block task completion
 fi
 exit 0
 ```
 
-### 9.4 Para Otimizacao de Custos
+### 9.4 Cost Optimization
 
-- Use `sonnet` como modelo padrao para teammates (nao `opus`)
-- Limite o numero de tarefas por teammate a 5-6
-- Prefira subagentes quando comunicacao inter-worker nao e necessaria
-- Considere agent teams apenas quando o beneficio de paralelismo + debate justifica o custo
+- Use `sonnet` as the default model for teammates (not `opus`)
+- Limit the number of tasks per teammate to 5-6
+- Prefer subagents when inter-worker communication is not necessary
+- Consider agent teams only when the benefit of parallelism + debate justifies the cost
 
-### 9.5 Para Integracao com a Infraestrutura Existente
+### 9.5 Integration with Existing Infrastructure
 
-- Adicione instrucoes especificas para teams no `CLAUDE.md` do projeto
-- Crie skills que encapsulam padroes comuns de criacao de times
-- Use hooks `SubagentStart`/`SubagentStop` no `settings.json` para logging e metricas
-- Documente na auto memory os padroes de team que funcionaram bem para o projeto
+- Add team-specific instructions to the project's `CLAUDE.md`
+- Create skills that encapsulate common team creation patterns
+- Use `SubagentStart`/`SubagentStop` hooks in `settings.json` for logging and metrics
+- Document in auto memory the team patterns that worked well for the project

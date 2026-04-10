@@ -1,324 +1,329 @@
-# Analise: A Complete Guide To AGENTS.md
+# Analysis: A Complete Guide To AGENTS.md
 
-## 1. Sumario Executivo
+> **Status**: Current
+> **Source document**: [A Complete Guide To AGENTS.md](https://www.octomind.dev/blog/a-complete-guide-to-agents-md)
+> **Analysis date**: 2026-03
+> **Scope**: Minimalist configuration philosophy for AI agent context files in code repositories
 
-O guia "A Complete Guide To AGENTS.md" apresenta uma filosofia de configuracao minimalista para arquivos de contexto de agentes de IA em repositorios de codigo. O documento parte de uma premissa central: arquivos AGENTS.md massivos sao contraproducentes. Em vez de melhorar o comportamento do agente, eles criam um "ball of mud" que confunde o modelo, desperdicam tokens e se tornam pesadelos de manutencao. A solucao proposta e radical em sua simplicidade: manter o AGENTS.md raiz com o minimo absoluto (descricao de uma frase, gerenciador de pacotes, comandos de build) e delegar todo o restante para progressive disclosure.
+## 1. Executive Summary
 
-O aspecto mais distintivo deste guia e sua perspectiva de **padrao aberto e cross-tool**. O AGENTS.md nao esta vinculado a nenhuma ferramenta especifica -- e suportado por multiplas plataformas de codificacao assistida por IA (Codex, Qwen Code, Aider, entre outros). Isso traz implicacoes profundas para projetos que precisam ser compativeis com diversos agentes simultaneamente. O guia reconhece explicitamente que o Claude Code nao usa AGENTS.md, sugerindo symlinks como ponte entre os dois mundos.
+The guide "A Complete Guide To AGENTS.md" presents a minimalist configuration philosophy for AI agent context files in code repositories. The document starts from a central premise: massive AGENTS.md files are counterproductive. Instead of improving agent behavior, they create a "ball of mud" that confuses the model, wastes tokens, and becomes a maintenance nightmare. The proposed solution is radical in its simplicity: keep the root AGENTS.md at the absolute minimum (one-sentence description, package manager, build commands) and delegate everything else to progressive disclosure.
 
-A articulacao entre o conceito de "instruction budget" (150-200 instrucoes maximas) e a pratica de progressive disclosure constitui a espinha dorsal do documento. Cada instrucao adicionada ao AGENTS.md consome parte de um orcamento finito de atencao, e esse orcamento e carregado em **cada requisicao**, independentemente de relevancia. O guia transforma essa restricao tecnica em principio de design: a configuracao ideal e aquela que carrega o minimo necessario e aponta para onde encontrar o restante.
+The most distinctive aspect of this guide is its **open standard and cross-tool** perspective. AGENTS.md is not tied to any specific tool — it is supported by multiple AI-assisted coding platforms (Codex, Qwen Code, Aider, among others). This has profound implications for projects that need to be compatible with multiple agents simultaneously. The guide explicitly acknowledges that Claude Code does not use AGENTS.md, suggesting symlinks as a bridge between the two worlds.
+
+The articulation between the concept of "instruction budget" (150-200 maximum instructions) and the practice of progressive disclosure constitutes the backbone of the document. Each instruction added to AGENTS.md consumes part of a finite attention budget, and this budget is loaded on **every request**, regardless of relevance. The guide transforms this technical constraint into a design principle: the ideal configuration is one that loads the minimum necessary and points to where to find the rest.
 
 ---
 
-## 2. Principais Achados e Principios
+## 2. Key Findings and Principles
 
-### 2.1 O Anti-Padrao do "Ball of Mud"
+### 2.1 The "Ball of Mud" Anti-Pattern
 
-O guia identifica um ciclo de feedback natural que leva ao crescimento descontrolado:
+The guide identifies a natural feedback cycle that leads to uncontrolled growth:
 
 > "1. The agent does something you don't like / 2. You add a rule to prevent it / 3. Repeat hundreds of times over months / 4. File becomes a 'ball of mud'"
 
-Este padrao e agravado por dois fatores: (a) diferentes desenvolvedores adicionam opinioes conflitantes sem revisao global, e (b) scripts de auto-geracao, que o guia condena explicitamente:
+This pattern is aggravated by two factors: (a) different developers add conflicting opinions without global review, and (b) auto-generation scripts, which the guide explicitly condemns:
 
 > "Never use initialization scripts to auto-generate your AGENTS.md. They flood the file with things that are 'useful for most scenarios' but would be better progressively disclosed."
 
-### 2.2 O Orcamento de Instrucoes
+### 2.2 The Instruction Budget
 
-Referenciando o artigo de Kyle da Humanlayer, o guia estabelece:
+Referencing Kyle's article from Humanlayer, the guide establishes:
 
 > "Frontier thinking LLMs can follow ~ 150-200 instructions with reasonable consistency."
 
-E acrescenta a implicacao critica: cada token no AGENTS.md e carregado em **cada requisicao**, criando um problema de orcamento rigido. O guia sintetiza isso na afirmacao: **"the ideal AGENTS.md file should be as small as possible."**
+And adds the critical implication: every token in AGENTS.md is loaded on **every request**, creating a rigid budget problem. The guide synthesizes this in the statement: **"the ideal AGENTS.md file should be as small as possible."**
 
-### 2.3 Documentacao Obsoleta Envenena o Contexto
+### 2.3 Stale Documentation Poisons the Context
 
-O guia distingue entre o impacto de documentacao obsoleta em humanos versus agentes:
+The guide distinguishes between the impact of stale documentation on humans versus agents:
 
 > "For human developers, stale docs are annoying, but the human usually has enough built-in memory to be skeptical about bad docs. For AI agents that read documentation on every request, stale information actively _poisons_ the context."
 
-A recomendacao especifica e: **descrever capacidades, nao estruturas**. Em vez de mapear caminhos de arquivos (que mudam constantemente), descrever o que o projeto faz e dar dicas sobre onde as coisas podem estar. Conceitos de dominio ("organization" vs "group" vs "workspace") sao mais estaveis que caminhos de arquivo.
+The specific recommendation is: **describe capabilities, not structures**. Instead of mapping file paths (which change constantly), describe what the project does and provide hints about where things might be. Domain concepts ("organization" vs "group" vs "workspace") are more stable than file paths.
 
-### 2.4 O Minimo Absoluto
+### 2.4 The Absolute Minimum
 
-O guia define tres itens como o conteudo essencial:
+The guide defines three items as essential content:
 
-1. **Descricao do projeto em uma frase** -- funciona como um role-based prompt
-2. **Gerenciador de pacotes** -- apenas se nao for npm
-3. **Comandos de build/typecheck** -- apenas se nao forem padrao
+1. **One-sentence project description** — functions as a role-based prompt
+2. **Package manager** — only if not npm
+3. **Build/typecheck commands** — only if non-standard
 
 > "That's honestly it. Everything else should go elsewhere."
 
-### 2.5 Progressive Disclosure como Principio Arquitetural
+### 2.5 Progressive Disclosure as an Architectural Principle
 
-O guia apresenta progressive disclosure em tres niveis:
+The guide presents progressive disclosure at three levels:
 
-1. **Referencias a arquivos separados**: `"For TypeScript conventions, see docs/TYPESCRIPT.md"` -- com "light touch", sem linguagem imperativa
-2. **Aninhamento de referencias**: docs/TYPESCRIPT.md referencia docs/TESTING.md, criando uma arvore de recursos descobrivel
-3. **Skills de agentes**: comandos ou workflows que o agente pode invocar para aprender algo especifico
+1. **References to separate files**: `"For TypeScript conventions, see docs/TYPESCRIPT.md"` — with a "light touch", no imperative language
+2. **Nested references**: docs/TYPESCRIPT.md references docs/TESTING.md, creating a discoverable resource tree
+3. **Agent skills**: commands or workflows the agent can invoke to learn something specific
 
-### 2.6 AGENTS.md em Monorepos
+### 2.6 AGENTS.md in Monorepos
 
-O guia apresenta uma hierarquia de dois niveis:
+The guide presents a two-level hierarchy:
 
-| Nivel | Conteudo |
-|-------|----------|
-| **Root** | Proposito do monorepo, navegacao entre pacotes, ferramentas compartilhadas |
-| **Package** | Proposito do pacote, tech stack especifica, convencoes do pacote |
+| Level | Content |
+|-------|---------|
+| **Root** | Monorepo purpose, navigation between packages, shared tooling |
+| **Package** | Package purpose, specific tech stack, package conventions |
 
-Com a advertencia critica: **"Don't overload any level."**
+With the critical caveat: **"Don't overload any level."**
 
 ---
 
-## 3. Pontos de Atencao
+## 3. Points of Attention
 
-### 3.1 O Perigo da Linguagem Imperativa
+### 3.1 The Danger of Imperative Language
 
-O guia faz uma observacao sutil mas fundamental sobre tom. O exemplo de referencia a arquivo separado usa:
+The guide makes a subtle but fundamental observation about tone. The example of referencing a separate file uses:
 
 > "Notice the light touch, no 'always,' no all-caps forcing. Just a conversational reference."
 
-Isso contradiz a intuicao de muitos desenvolvedores que acreditam que instrucoes em maiusculas ou com "NEVER"/"ALWAYS" sao mais efetivas. Pesquisa documentada no guia de prompt engineering confirma que formatacao agressiva (ALL-CAPS, "NUNCA", "JAMAIS") produz resultados piores em modelos Claude recentes.
+This contradicts the intuition of many developers who believe that uppercase instructions or those with "NEVER"/"ALWAYS" are more effective. Research documented in the prompt engineering guide confirms that aggressive formatting (ALL-CAPS, "NEVER", "DON'T EVER") produces worse results in recent Claude models.
 
-### 3.2 A Armadilha da Auto-Geracao
+### 3.2 The Auto-Generation Trap
 
-O guia e enfatico contra auto-geracao, mas a pratica e comum. Codex, Qwen Code e Claude Code oferecem comandos `/init` integrados. O fato de que os proprios providers recomendam auto-geracao cria uma tensao direta com o principio deste guia. O paper "Evaluating AGENTS.md" confirma empiricamente que arquivos gerados por LLM **reduzem** a taxa de sucesso em 3% na media.
+The guide is emphatic against auto-generation, but the practice is common. Codex, Qwen Code, and Claude Code offer built-in `/init` commands. The fact that the providers themselves recommend auto-generation creates a direct tension with this guide's principle. The "Evaluating AGENTS.md" paper empirically confirms that LLM-generated files **reduce** the success rate by 3% on average.
 
-### 3.3 Conceitos Estaveis vs Instancia de Codigo
+### 3.3 Stable Concepts vs Code Instances
 
-A distincao entre conceitos de dominio (mais estaveis) e caminhos de arquivo (instáveis) e facil de ignorar na pratica. Muitos AGENTS.md incluem mapeamentos detalhados de diretórios como:
+The distinction between domain concepts (more stable) and file paths (unstable) is easy to overlook in practice. Many AGENTS.md files include detailed directory mappings such as:
 
 > "authentication logic lives in `src/auth/handlers.ts`"
 
-O guia alerta que isso cria vulnerabilidade a renomeacoes. A alternativa proposta -- descrever capacidades e "shape of the project" -- exige mais reflexao do autor mas produz documentacao mais resiliente.
+The guide warns that this creates vulnerability to renames. The proposed alternative — describing capabilities and "shape of the project" — requires more reflection from the author but produces more resilient documentation.
 
-### 3.4 Quando Progressive Disclosure Falha
+### 3.4 When Progressive Disclosure Fails
 
-O guia nao aborda explicitamente cenarios onde progressive disclosure pode ser problematica: (a) agentes que nao conseguem navegar hierarquias de documentacao eficientemente, (b) projetos com modelos menores que tem capacidade limitada de navegacao, (c) tarefas que exigem contexto holístico desde o inicio.
+The guide does not explicitly address scenarios where progressive disclosure can be problematic: (a) agents that cannot navigate documentation hierarchies efficiently, (b) projects with smaller models that have limited navigation capability, (c) tasks that require holistic context from the start.
 
-### 3.5 O Problema da Compatibilidade Cross-Tool
+### 3.5 The Cross-Tool Compatibility Problem
 
-O AGENTS.md e descrito como "open standard supported by many - though not all - tools." Porem, cada ferramenta interpreta o arquivo de maneira ligeiramente diferente. A necessidade de symlinks entre AGENTS.md e CLAUDE.md revela que a padronizacao ainda e incompleta. Instrucoes que funcionam bem com uma ferramenta podem nao ter o mesmo efeito em outra.
+AGENTS.md is described as an "open standard supported by many - though not all - tools." However, each tool interprets the file in a slightly different way. The need for symlinks between AGENTS.md and CLAUDE.md reveals that standardization is still incomplete. Instructions that work well with one tool may not have the same effect on another.
 
 ---
 
-## 4. Casos de Uso e Escopo
+## 4. Use Cases and Scope
 
-### 4.1 Projetos Multi-Ferramenta
+### 4.1 Multi-Tool Projects
 
-O AGENTS.md e especialmente valioso quando a equipe usa multiplas ferramentas de codificacao assistida por IA. Um unico arquivo de configuracao que funciona com Codex, Qwen Code, Aider e outros reduce duplicacao e garante consistencia. A recomendacao de symlinks (`ln -s AGENTS.md CLAUDE.md`) permite estender a compatibilidade para o Claude Code.
+AGENTS.md is especially valuable when the team uses multiple AI-assisted coding tools. A single configuration file that works with Codex, Qwen Code, Aider, and others reduces duplication and ensures consistency. The symlink recommendation (`ln -s AGENTS.md CLAUDE.md`) allows extending compatibility to Claude Code.
 
-### 4.2 Projetos Open Source
+### 4.2 Open Source Projects
 
-Repositorios open source frequentemente recebem contribuicoes de desenvolvedores usando ferramentas diferentes. O AGENTS.md como padrao aberto permite que qualquer contribuidor, independentemente da ferramenta, receba orientacao consistente.
+Open source repositories frequently receive contributions from developers using different tools. AGENTS.md as an open standard allows any contributor, regardless of tool, to receive consistent guidance.
 
 ### 4.3 Monorepos
 
-O guia apresenta suporte explicito para monorepos com AGENTS.md hierarquico. Isso e particularmente relevante para organizacoes com multiplos times trabalhando em pacotes distintos, onde cada pacote pode ter convencoes proprias.
+The guide provides explicit support for monorepos with hierarchical AGENTS.md. This is particularly relevant for organizations with multiple teams working on distinct packages, where each package may have its own conventions.
 
-### 4.4 Equipes em Transicao
+### 4.4 Teams in Transition
 
-Equipes que estao migrando entre ferramentas de codificacao assistida ou que ainda nao definiram uma ferramenta padrao se beneficiam da natureza agnóstica do AGENTS.md.
+Teams that are migrating between AI-assisted coding tools or that have not yet defined a standard tool benefit from the tool-agnostic nature of AGENTS.md.
 
-### 4.5 Cenarios Menos Apropriados
+### 4.5 Less Appropriate Scenarios
 
-- Projetos exclusivamente vinculados ao Claude Code (onde CLAUDE.md oferece funcionalidades superiores)
-- Projetos que exigem enforcement deterministico (hooks sao mais adequados)
-- Equipes com necessidade de configuracao granular por desenvolvedor (AGENTS.md e focado em escopo de projeto)
+- Projects exclusively tied to Claude Code (where CLAUDE.md offers superior functionality)
+- Projects that require deterministic enforcement (hooks are more suitable)
+- Teams with the need for granular per-developer configuration (AGENTS.md is focused on project scope)
 
 ---
 
-## 5. Aplicabilidade a Infraestrutura de Agentes
+## 5. Applicability to Agent Infrastructure
 
 ### 5.1 Skills
 
-O guia menciona agent skills como forma de progressive disclosure:
+The guide mentions agent skills as a form of progressive disclosure:
 
 > "Many tools support 'agent skills' - commands or workflows the agent can invoke to learn how to do something specific."
 
-**Implicacoes para design de skills:**
+**Implications for skill design:**
 
-- Skills devem ser projetadas como unidades autocontidas de conhecimento que o agente carrega sob demanda
-- A descricao da skill (visivel no inicio da sessao) funciona como o "pointer" do progressive disclosure -- deve ser concisa o suficiente para nao inflar o orcamento de instrucoes
-- O conteudo completo da skill so deve ser carregado quando invocado, alinhando-se ao principio de carregar "only what it needs right now"
-- Skills em contexto cross-tool devem ser projetadas com linguagem neutra, evitando dependencias de funcionalidades especificas de uma ferramenta
+- Skills should be designed as self-contained units of knowledge that the agent loads on demand
+- The skill description (visible at session start) functions as the progressive disclosure "pointer" — it must be concise enough not to inflate the instruction budget
+- The full skill content should only be loaded when invoked, aligning with the principle of loading "only what it needs right now"
+- Skills in a cross-tool context should be designed with neutral language, avoiding dependencies on tool-specific features
 
 ### 5.2 Hooks
 
-O guia nao menciona hooks diretamente, mas a logica de minimalismo no AGENTS.md implica uma estrategia de conversao:
+The guide does not mention hooks directly, but the minimalism logic for AGENTS.md implies a conversion strategy:
 
-- Instrucoes que **devem** ser seguidas sem excecao (como "sempre executar testes antes de commit") sao candidatas a conversao para hooks
-- Hooks removem essas instrucoes do orcamento de contexto -- a instrucao e enforced programaticamente, sem consumir tokens
-- Para projetos cross-tool, hooks precisam ser implementados de forma ferramenta-especifica, mas o AGENTS.md pode referenciar a existencia deles: "Pre-commit hooks enforce test execution and linting"
-- O principio do guia de que "everything else should go elsewhere" se aplica fortemente: o que pode ser um hook nao deve ser uma instrucao textual
+- Instructions that **must** be followed without exception (such as "always run tests before commit") are candidates for conversion to hooks
+- Hooks remove these instructions from the context budget — the instruction is enforced programmatically, without consuming tokens
+- For cross-tool projects, hooks need to be implemented in a tool-specific way, but AGENTS.md can reference their existence: "Pre-commit hooks enforce test execution and linting"
+- The guide's principle that "everything else should go elsewhere" applies strongly: what can be a hook should not be a textual instruction
 
-### 5.3 Subagentes
+### 5.3 Subagents
 
-O principio de minimalismo do AGENTS.md se aplica diretamente ao design de contexto de subagentes:
+The minimalism principle of AGENTS.md applies directly to subagent context design:
 
-- Subagentes tem janelas de contexto menores e mais focadas -- o orcamento de instrucoes e ainda mais critico
-- A recomendacao de "one-sentence project description" se traduz em: cada subagente deve receber apenas o contexto minimo necessario para sua tarefa especifica
-- A estrategia de isolamento de contexto (cada subagente com contexto proprio) espelha a hierarquia de AGENTS.md em monorepos -- cada "pacote" de contexto e independente
-- Progressive disclosure para subagentes significa: o subagente recebe instrucoes iniciais minimas e pode buscar mais contexto conforme necessario
+- Subagents have smaller and more focused context windows — the instruction budget is even more critical
+- The "one-sentence project description" recommendation translates to: each subagent should receive only the minimum context necessary for its specific task
+- The context isolation strategy (each subagent with its own context) mirrors the AGENTS.md hierarchy in monorepos — each context "package" is independent
+- Progressive disclosure for subagents means: the subagent receives minimal initial instructions and can fetch more context as needed
 
 ### 5.4 Rules
 
-O conceito de `.claude/rules/` (especifico do Claude Code) pode ser mapeado para o padrao cross-tool de AGENTS.md em monorepos:
+The `.claude/rules/` concept (Claude Code-specific) can be mapped to the cross-tool AGENTS.md pattern in monorepos:
 
-- Rules com paths-scope sao a implementacao tecnica do principio "relevant to one domain" do guia
-- Para projetos cross-tool, a mesma logica pode ser implementada via AGENTS.md em subdiretorios, que e o mecanismo nativo de progressive disclosure do padrao aberto
-- A diferenca fundamental: rules sao path-triggered (carregam automaticamente quando arquivos correspondentes sao lidos), enquanto AGENTS.md em subdiretorios depende do agente navegar ate aquele diretorio
-- Em projetos cross-tool, subdirectory AGENTS.md e a alternativa universal mais proxima de rules
+- Path-scoped rules are the technical implementation of the guide's "relevant to one domain" principle
+- For cross-tool projects, the same logic can be implemented via AGENTS.md in subdirectories, which is the native progressive disclosure mechanism of the open standard
+- The fundamental difference: rules are path-triggered (loaded automatically when corresponding files are read), while subdirectory AGENTS.md depends on the agent navigating to that directory
+- In cross-tool projects, subdirectory AGENTS.md is the closest universal alternative to rules
 
-### 5.5 Memoria
+### 5.5 Memory
 
-A relacao entre AGENTS.md e sistemas de memoria e de complementaridade:
+The relationship between AGENTS.md and memory systems is one of complementarity:
 
-- **AGENTS.md**: informacao estatica, versionada, compartilhada pela equipe -- convencoes, stack tecnica, comandos
-- **Memoria**: informacao dinamica, pessoal ou emergente -- padroes descobertos durante uso, preferencias individuais, decisoes especificas de sessao
-- O principio do guia de que "the agent can generate its own just-in-time documentation during planning" conecta-se diretamente ao conceito de auto-memoria
-- Evitar documentar estrutura no AGENTS.md se complementa com a capacidade de memoria de gerar mapeamentos ad-hoc conforme necessario
+- **AGENTS.md**: static, versioned information shared by the team — conventions, tech stack, commands
+- **Memory**: dynamic, personal, or emergent information — patterns discovered during usage, individual preferences, session-specific decisions
+- The guide's principle that "the agent can generate its own just-in-time documentation during planning" connects directly to the concept of auto-memory
+- Avoiding documenting structure in AGENTS.md complements the memory capability of generating ad-hoc mappings as needed
 
 ---
 
-## 6. Aplicabilidade do Guia de Engenharia de Prompts
+## 6. Applicability of the Prompt Engineering Guide
 
-### 6.1 Role Prompting na Descricao do Projeto
+### 6.1 Role Prompting in the Project Description
 
-A "one-sentence project description" do guia funciona como role prompting:
+The "one-sentence project description" from the guide functions as role prompting:
 
 > "This single sentence gives the agent context about _why_ they're working in this repository. It anchors every decision they make."
 
-O guia de engenharia de prompts confirma que role prompting e o mecanismo fundamental de especializacao em arquiteturas multi-agentes. A descricao no AGENTS.md atua como um role prompt persistente -- definindo o "papel" do agente no contexto daquele repositorio. O custo e minimo (10-30 tokens adicionais) com alta relacao custo-beneficio para controle de estilo e escopo.
+The prompt engineering guide confirms that role prompting is the fundamental specialization mechanism in multi-agent architectures. The description in AGENTS.md acts as a persistent role prompt — defining the agent's "role" within the context of that repository. The cost is minimal (10-30 additional tokens) with a high cost-benefit ratio for style and scope control.
 
-### 6.2 Zero-Shot vs Few-Shot na Redacao de Instrucoes
+### 6.2 Zero-Shot vs Few-Shot in Instruction Writing
 
-O guia de engenharia de prompts mostra que modelos modernos tem capacidades zero-shot robustas (~85% de acuracia em tarefas simples). Isso reforça a recomendacao do guia de AGENTS.md de nao documentar o que o agente ja sabe -- muitas instrucoes sao redundantes com o conhecimento parametrico do modelo.
+The prompt engineering guide shows that modern models have robust zero-shot capabilities (~85% accuracy on simple tasks). This reinforces the AGENTS.md guide's recommendation of not documenting what the agent already knows — many instructions are redundant with the model's parametric knowledge.
 
-A recomendacao de few-shot (3-5 exemplos) do guia de prompts se aplica quando o AGENTS.md precisa demonstrar padroes especificos. Porem, os exemplos devem ir em arquivos separados (progressive disclosure), nao no AGENTS.md raiz, para nao inflar o orcamento.
+The few-shot recommendation (3-5 examples) from the prompt guide applies when AGENTS.md needs to demonstrate specific patterns. However, the examples should go in separate files (progressive disclosure), not in the root AGENTS.md, to avoid inflating the budget.
 
-### 6.3 Chain-of-Thought e Planejamento
+### 6.3 Chain-of-Thought and Planning
 
-O guia de prompts mostra que CoT melhora raciocinio multi-passo, mas com custo de 35-600% mais tokens. Para AGENTS.md, isso significa:
+The prompt guide shows that CoT improves multi-step reasoning, but at a cost of 35-600% more tokens. For AGENTS.md, this means:
 
-- Instrucoes no AGENTS.md devem ser diretas (zero-shot), nao procedurais
-- Se o agente precisa "pensar passo a passo" sobre algo, isso deve ser parte de uma skill invocada sob demanda, nao de uma instrucao permanente
-- A tecnica de "Thread of Thought" (caminhar pelo contexto em partes gerenciaveis) e particularmente relevante para agentes navegando arvores de progressive disclosure
+- Instructions in AGENTS.md should be direct (zero-shot), not procedural
+- If the agent needs to "think step by step" about something, it should be part of a skill invoked on demand, not a permanent instruction
+- The "Thread of Thought" technique (walking through context in manageable parts) is particularly relevant for agents navigating progressive disclosure trees
 
-### 6.4 ReAct e Navegacao de Documentacao
+### 6.4 ReAct and Documentation Navigation
 
-O padrao ReAct (Pensamento -> Acao -> Observacao) e exatamente o que acontece quando um agente navega a arvore de progressive disclosure:
+The ReAct pattern (Thought -> Action -> Observation) is exactly what happens when an agent navigates the progressive disclosure tree:
 
-1. **Pensamento**: "Preciso entender as convencoes de TypeScript deste projeto"
-2. **Acao**: Leitura de `docs/TYPESCRIPT.md` (referenciado no AGENTS.md)
-3. **Observacao**: Obtem as convencoes e pode agir
+1. **Thought**: "I need to understand this project's TypeScript conventions"
+2. **Action**: Reading `docs/TYPESCRIPT.md` (referenced in AGENTS.md)
+3. **Observation**: Obtains the conventions and can act
 
-Isso valida a eficacia do progressive disclosure -- agentes modernos sao naturalmente equipados para esse padrao de navegacao.
+This validates the effectiveness of progressive disclosure — modern agents are naturally equipped for this navigation pattern.
 
-### 6.5 Structured Output e Formato do AGENTS.md
+### 6.5 Structured Output and AGENTS.md Format
 
-O guia de prompts recomenda tags XML para Claude e markdown estruturado como formato eficiente. O AGENTS.md como arquivo markdown se alinha bem com esses principios. Porem, para projetos cross-tool, evitar XML tags especificas de Claude garante compatibilidade -- markdown headers e tabelas sao mais universais.
+The prompt guide recommends XML tags for Claude and structured markdown as an efficient format. AGENTS.md as a markdown file aligns well with these principles. However, for cross-tool projects, avoiding Claude-specific XML tags ensures compatibility — markdown headers and tables are more universal.
 
 ### 6.6 Context Engineering vs Prompt Engineering
 
-O guia de prompts identifica a transicao de prompt engineering para context engineering:
+The prompt guide identifies the transition from prompt engineering to context engineering:
 
-> "O LLM e uma CPU, a janela de contexto e RAM, e voce e o sistema operacional." (Andrej Karpathy)
+> "The LLM is a CPU, the context window is RAM, and you are the operating system." (Andrej Karpathy)
 
-O AGENTS.md e um artefato de context engineering -- nao e um prompt individual, mas parte de um sistema de contexto que inclui memoria, ferramentas, documentacao progressiva e orquestracao. O principio de "encontrar a solucao mais simples possivel" se aplica diretamente ao design do AGENTS.md.
+AGENTS.md is a context engineering artifact — it is not an individual prompt, but part of a context system that includes memory, tools, progressive documentation, and orchestration. The principle of "finding the simplest possible solution" applies directly to AGENTS.md design.
 
 ---
 
-## 7. Correlacoes com Outros Documentos Principais
+## 7. Correlations with Other Key Documents
 
 ### 7.1 Evaluating-AGENTS-paper.md
 
-O paper da ETH Zurich oferece **validacao empirica direta** dos principios deste guia:
+The ETH Zurich paper offers **direct empirical validation** of this guide's principles:
 
-- **Arquivos gerados por LLM reduzem performance**: reducao de 3% na media na taxa de sucesso + aumento de 20% no custo. Isso confirma a advertencia do guia contra auto-geracao.
-- **Arquivos escritos por humanos tem ganho marginal**: apenas +4% na media. Isso reforça que ate arquivos bem escritos tem impacto limitado, justificando o minimalismo extremo.
-- **Instrucoes sao seguidas mas tornam a tarefa mais dificil**: o paper mostra que agentes seguem as instrucoes do AGENTS.md (ex: uso de `uv` quando mencionado), mas isso aumenta passos e custo. O guia esta correto ao dizer que "unnecessary requirements from context files make tasks harder."
-- **Overviews de codebase nao sao eficazes**: 100% dos arquivos gerados pelo Sonnet-4.5 incluem overviews, mas eles nao reduzem o tempo para encontrar arquivos relevantes. Isso valida a recomendacao do guia de descrever capacidades, nao estrutura.
-- **Redundancia com documentacao existente**: quando toda documentacao e removida, arquivos de contexto gerados por LLM passam a melhorar performance em 2.7%. Isso sugere que AGENTS.md e mais util em projetos com pouca documentacao.
+- **LLM-generated files reduce performance**: 3% average reduction in success rate + 20% cost increase. This confirms the guide's warning against auto-generation.
+- **Human-written files have marginal gains**: only +4% on average. This reinforces that even well-written files have limited impact, justifying extreme minimalism.
+- **Instructions are followed but make the task harder**: the paper shows that agents follow AGENTS.md instructions (e.g., use of `uv` when mentioned), but this increases steps and cost. The guide is correct in stating that "unnecessary requirements from context files make tasks harder."
+- **Codebase overviews are not effective**: 100% of files generated by Sonnet-4.5 include overviews, but they do not reduce the time to find relevant files. This validates the guide's recommendation to describe capabilities, not structure.
+- **Redundancy with existing documentation**: when all documentation is removed, LLM-generated context files improve performance by 2.7%. This suggests that AGENTS.md is more useful in projects with sparse documentation.
 
-### 7.2 research-llm-context-optimization.md
+### 7.2 research-context-engineering-comprehensive.md
 
-Este documento fornece a **base cientifica** para varias recomendacoes do guia:
+This document provides the **scientific foundation** for several of the guide's recommendations:
 
-- **Context rot**: a degradacao de performance com aumento de contexto (n^2 relacoes de atencao) fundamenta a recomendacao de manter o AGENTS.md pequeno.
-- **Lost-in-the-middle effect**: informacoes no meio de contextos longos sao as mais ignoradas. Isso implica que, se o AGENTS.md for longo, as instrucoes do meio serao as primeiras a serem ignoradas.
-- **Instruction budget de ~200 linhas**: o guia do AGENTS.md cita o artigo de Kyle da Humanlayer; a pesquisa aprofunda com recomendacao explicita da Anthropic de "target under 200 lines per CLAUDE.md file."
-- **Hybrid strategy (pre-loaded + on-demand)**: exatamente o padrao que o guia propoe -- AGENTS.md carregado upfront como minimo essencial, documentacao detalhada carregada sob demanda.
-- **Just-in-time documentation**: o conceito formal da Anthropic de manter "lightweight identifiers" e carregar dados dinamicamente mapeia diretamente para o progressive disclosure do guia.
+- **Context rot**: performance degradation with increased context (n^2 attention relationships) underpins the recommendation to keep AGENTS.md small.
+- **Lost-in-the-middle effect**: information in the middle of long contexts is the most ignored. This implies that if AGENTS.md is long, the instructions in the middle will be the first to be ignored.
+- **Instruction budget of ~200 lines**: the AGENTS.md guide cites Kyle's article from Humanlayer; the research deepens with Anthropic's explicit recommendation to "target under 200 lines per CLAUDE.md file."
+- **Hybrid strategy (pre-loaded + on-demand)**: exactly the pattern the guide proposes — AGENTS.md loaded upfront as the essential minimum, detailed documentation loaded on demand.
+- **Just-in-time documentation**: Anthropic's formal concept of maintaining "lightweight identifiers" and loading data dynamically maps directly to the guide's progressive disclosure.
 
 ### 7.3 claude-prompting-best-practices.md
 
-O guia oficial de prompting da Anthropic se correlaciona em varios pontos:
+Anthropic's official prompting guide correlates on several points:
 
-- **"Be clear and direct"**: reforça a recomendacao de instrucoes concisas no AGENTS.md, nao vagas
-- **"Add context to improve performance"**: a descricao de uma frase do projeto e exatamente isso -- contexto motivacional
-- **"Put longform data at the top, queries at the end"**: para AGENTS.md, as instrucoes mais criticas devem estar no inicio do arquivo
-- **Sobre formatacao agressiva**: Claude Opus 4.5/4.6 responde pior a linguagem coercitiva -- "Where you might have said 'CRITICAL: You MUST use this tool when...', you can use more normal prompting like 'Use this tool when...'" -- validando o "light touch" recomendado pelo guia
-- **Subagent orchestration**: Claude Opus 4.6 orquestra subagentes proativamente. Para projetos cross-tool, o AGENTS.md deve conter instrucoes que sejam eficazes independentemente de se um agente monolitico ou um orquestrador de subagentes as processa
-
----
-
-## 8. Forcas e Limitacoes
-
-### 8.1 Forcas
-
-1. **Principio universal**: o minimalismo e aplicavel independentemente de ferramenta, modelo ou linguagem de programacao
-2. **Base empirica**: o conceito de instruction budget tem fundamentacao em pesquisa (Humanlayer, Anthropic)
-3. **Praticabilidade**: o guia oferece um prompt concreto para refatorar AGENTS.md existentes (secao "Fix A Broken AGENTS.md")
-4. **Compatibilidade cross-tool**: como padrao aberto, funciona com multiplos agentes
-5. **Escalabilidade**: o padrao de progressive disclosure escala naturalmente com a complexidade do projeto
-6. **Decision matrix clara**: a tabela "When to use" (Root / Separate file / Nested documentation) oferece orientacao acionavel
-
-### 8.2 Limitacoes
-
-1. **Ausencia de metricas**: o guia nao oferece metricas quantitativas sobre o impacto do tamanho do AGENTS.md na performance. O paper da ETH Zurich preenche essa lacuna parcialmente.
-2. **Foco em JavaScript/TypeScript**: os exemplos sao predominantemente do ecossistema Node.js (pnpm, npm, corepack). Projetos Python, Go, Rust etc. tem idiomas diferentes.
-3. **Nao aborda enforcement deterministico**: hooks, linters, CI checks nao sao mencionados como alternativas para instrucoes criticas.
-4. **Simplificacao excessiva do minimo**: projetos com arquiteturas complexas (microsservicos, event-driven, CQRS) podem precisar de mais contexto no raiz do que tres itens.
-5. **Dependencia de capacidade de navegacao do agente**: o progressive disclosure assume que o agente e "fast at navigating documentation hierarchies", o que varia entre ferramentas e modelos.
-6. **Nao aborda versionamento**: como o AGENTS.md deve evoluir ao longo do tempo, quem deve revisá-lo, com que frequencia.
-7. **Lacuna sobre conflitos cross-tool**: nao discute como lidar quando diferentes ferramentas interpretam o mesmo AGENTS.md de formas distintas.
+- **"Be clear and direct"**: reinforces the recommendation for concise instructions in AGENTS.md, not vague ones
+- **"Add context to improve performance"**: the one-sentence project description is exactly that — motivational context
+- **"Put longform data at the top, queries at the end"**: for AGENTS.md, the most critical instructions should be at the beginning of the file
+- **On aggressive formatting**: Claude Opus 4.5/4.6 responds worse to coercive language — "Where you might have said 'CRITICAL: You MUST use this tool when...', you can use more normal prompting like 'Use this tool when...'" — validating the "light touch" recommended by the guide
+- **Subagent orchestration**: Claude Opus 4.6 orchestrates subagents proactively. For cross-tool projects, AGENTS.md should contain instructions that are effective regardless of whether a monolithic agent or a subagent orchestrator processes them
 
 ---
 
-## 9. Recomendacoes Praticas
+## 8. Strengths and Limitations
 
-### 9.1 Para Projetos Novos
+### 8.1 Strengths
 
-1. **Comece com tres linhas**: descricao do projeto, gerenciador de pacotes (se nao npm), comandos de build (se nao padrao)
-2. **Crie a arvore de progressive disclosure desde o inicio**: mesmo que os arquivos referenciados estejam vazios, a estrutura (`docs/CONVENTIONS.md`, `docs/TESTING.md`) sinaliza intencao
-3. **Use symlinks para Claude Code**: `ln -s AGENTS.md CLAUDE.md` garante compatibilidade
-4. **Adicione ao .gitignore**: nao ignore o AGENTS.md -- ele deve ser compartilhado pela equipe
+1. **Universal principle**: minimalism is applicable regardless of tool, model, or programming language
+2. **Empirical basis**: the instruction budget concept has research-backed foundations (Humanlayer, Anthropic)
+3. **Practicality**: the guide offers a concrete prompt to refactor existing AGENTS.md files (section "Fix A Broken AGENTS.md")
+4. **Cross-tool compatibility**: as an open standard, it works with multiple agents
+5. **Scalability**: the progressive disclosure pattern scales naturally with project complexity
+6. **Clear decision matrix**: the "When to use" table (Root / Separate file / Nested documentation) offers actionable guidance
 
-### 9.2 Para Projetos Existentes com AGENTS.md Inflado
+### 8.2 Limitations
 
-1. **Use o prompt de refatoracao do guia**: copie o prompt da secao "Fix A Broken AGENTS.md" diretamente no agente
-2. **Identifique contradicoes primeiro**: instrucoes conflitantes causam comportamento arbitrario
-3. **Converta instrucoes deterministicas em hooks**: tudo que e "ALWAYS" ou "NEVER" provavelmente deve ser um hook, nao uma instrucao
-4. **Remova o obvio**: instrucoes como "write clean code" ou "follow best practices" sao desperdiço de tokens
-5. **Teste a remocao**: remova instrucoes uma por vez e observe se o comportamento muda -- se nao mudar, a instrucao era redundante
+1. **Absence of metrics**: the guide does not offer quantitative metrics on the impact of AGENTS.md size on performance. The ETH Zurich paper partially fills this gap.
+2. **JavaScript/TypeScript focus**: the examples are predominantly from the Node.js ecosystem (pnpm, npm, corepack). Python, Go, Rust, etc. projects have different idioms.
+3. **Does not address deterministic enforcement**: hooks, linters, CI checks are not mentioned as alternatives for critical instructions.
+4. **Excessive simplification of the minimum**: projects with complex architectures (microservices, event-driven, CQRS) may need more context at the root than three items.
+5. **Dependency on agent navigation capability**: progressive disclosure assumes the agent is "fast at navigating documentation hierarchies", which varies across tools and models.
+6. **Does not address versioning**: how AGENTS.md should evolve over time, who should review it, how often.
+7. **Gap on cross-tool conflicts**: does not discuss how to handle when different tools interpret the same AGENTS.md in different ways.
 
-### 9.3 Para Monorepos
+---
 
-1. **Root AGENTS.md**: apenas proposito do monorepo, navegacao entre pacotes e ferramentas compartilhadas
-2. **Package AGENTS.md**: proposito do pacote, stack especifica, referencia a convencoes detalhadas
-3. **Nao duplique**: se uma instrucao se aplica a todos os pacotes, ela fica no root -- se e especifica, no pacote
-4. **Use `claudeMdExcludes`** (em projetos Claude Code) para evitar que CLAUDE.md de outros times carregue desnecessariamente
+## 9. Practical Recommendations
 
-### 9.4 Para Projetos Cross-Tool
+### 9.1 For New Projects
 
-1. **Mantenha o AGENTS.md como fonte primaria**: use-o como ponto de referencia para todas as ferramentas
-2. **Evite features tool-specific no AGENTS.md**: nao use XML tags, `@imports`, ou path-scoped rules no AGENTS.md -- essas sao extensoes de ferramentas especificas
-3. **Documente a equivalencia**: mantenha uma nota no repositorio explicando como AGENTS.md se relaciona com CLAUDE.md, .codex/configuration.md, etc.
-4. **Teste com multiplos agentes**: valide que as instrucoes produzem comportamento consistente em diferentes ferramentas
+1. **Start with three lines**: project description, package manager (if not npm), build commands (if non-standard)
+2. **Create the progressive disclosure tree from the start**: even if the referenced files are empty, the structure (`docs/CONVENTIONS.md`, `docs/TESTING.md`) signals intent
+3. **Use symlinks for Claude Code**: `ln -s AGENTS.md CLAUDE.md` ensures compatibility
+4. **Add to .gitignore**: do not ignore AGENTS.md — it should be shared by the team
 
-### 9.5 Para Manutencao Continua
+### 9.2 For Existing Projects with Bloated AGENTS.md
 
-1. **Revise o AGENTS.md junto com code reviews**: trate-o como codigo -- ele merece o mesmo nivel de scrutinio
-2. **Pode periodicamente**: a cada sprint ou ciclo de release, revise se as instrucoes ainda sao relevantes
-3. **Meça o impacto**: se possivel, compare a taxa de sucesso do agente com e sem o AGENTS.md em tarefas representativas
-4. **Documente decisoes de exclusao**: quando remover algo do AGENTS.md, registre o motivo (em commit message ou ADR) para evitar que alguem adicione de volta
+1. **Use the guide's refactoring prompt**: copy the prompt from the "Fix A Broken AGENTS.md" section directly into the agent
+2. **Identify contradictions first**: conflicting instructions cause arbitrary behavior
+3. **Convert deterministic instructions to hooks**: anything that is "ALWAYS" or "NEVER" should probably be a hook, not an instruction
+4. **Remove the obvious**: instructions like "write clean code" or "follow best practices" are token waste
+5. **Test removal**: remove instructions one at a time and observe whether behavior changes — if it doesn't, the instruction was redundant
+
+### 9.3 For Monorepos
+
+1. **Root AGENTS.md**: only monorepo purpose, navigation between packages, and shared tooling
+2. **Package AGENTS.md**: package purpose, specific stack, reference to detailed conventions
+3. **Don't duplicate**: if an instruction applies to all packages, it goes in root — if it's specific, in the package
+4. **Use `claudeMdExcludes`** (in Claude Code projects) to prevent other teams' CLAUDE.md from loading unnecessarily
+
+### 9.4 For Cross-Tool Projects
+
+1. **Keep AGENTS.md as the primary source**: use it as the reference point for all tools
+2. **Avoid tool-specific features in AGENTS.md**: do not use XML tags, `@imports`, or path-scoped rules in AGENTS.md — these are tool-specific extensions
+3. **Document equivalence**: maintain a note in the repository explaining how AGENTS.md relates to CLAUDE.md, .codex/configuration.md, etc.
+4. **Test with multiple agents**: validate that instructions produce consistent behavior across different tools
+
+### 9.5 For Ongoing Maintenance
+
+1. **Review AGENTS.md alongside code reviews**: treat it as code — it deserves the same level of scrutiny
+2. **Prune periodically**: at every sprint or release cycle, review whether instructions are still relevant
+3. **Measure impact**: if possible, compare the agent's success rate with and without AGENTS.md on representative tasks
+4. **Document exclusion decisions**: when removing something from AGENTS.md, record the reason (in a commit message or ADR) to prevent someone from adding it back

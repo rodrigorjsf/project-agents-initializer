@@ -4,7 +4,7 @@ Every design decision in this plugin traces to published research or official do
 
 ## Core Principle: Minimal Files Outperform Comprehensive Ones
 
-The ETH Zurich study ["Evaluating AGENTS.md"](docs/Evaluating-AGENTS-paper.pdf) (February 2026) tested 138 benchmark instances across multiple coding agents and found:
+The ETH Zurich study ["Evaluating AGENTS.md"](docs/general-llm/Evaluating-AGENTS-paper.pdf) (February 2026) tested 138 benchmark instances across multiple coding agents and found:
 
 | Configuration                    | Success Impact | Cost Impact |
 | -------------------------------- | -------------- | ----------- |
@@ -22,7 +22,7 @@ Auto-generated files hurt performance because agents follow every instruction �
 
 ## Guideline 1: Progressive Disclosure
 
-**Source**: [Anthropic — Memory & CLAUDE.md](https://docs.anthropic.com/en/docs/claude-code/memory) | [A Guide to CLAUDE.md](docs/a-guide-to-claude.md) | [A Guide to AGENTS.md](docs/a-guide-to-agents.md)
+**Source**: [Anthropic — Memory & CLAUDE.md](https://docs.anthropic.com/en/docs/claude-code/memory) | [A Guide to AGENTS.md](docs/general-llm/a-guide-to-agents.md)
 
 Organize configuration files in a hierarchy that loads content only when relevant:
 
@@ -42,7 +42,7 @@ The root file carries a per-session token cost regardless of task relevance. Eve
 
 ## Guideline 2: The 200-Line Budget
 
-**Source**: [Anthropic — Best Practices](https://docs.anthropic.com/en/docs/claude-code/best-practices) | [Context Engineering](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents) | [docs/research-llm-context-optimization.md](docs/research-llm-context-optimization.md)
+**Source**: [Anthropic — Best Practices](https://docs.anthropic.com/en/docs/claude-code/best-practices) | [Context Engineering](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents) | [docs/research-context-engineering-comprehensive.md](docs/general-llm/research-context-engineering-comprehensive.md)
 
 Frontier LLMs follow ~150-200 instructions with reasonable consistency. Beyond that, adherence drops as instructions compete for attention. This budget is shared across all always-loaded sources: root CLAUDE.md, unconditional rules, and skill descriptions.
 
@@ -58,7 +58,7 @@ Frontier LLMs follow ~150-200 instructions with reasonable consistency. Beyond t
 
 ## Guideline 3: Lost-in-the-Middle Effect
 
-**Source**: [Liu et al., "Lost in the Middle" (TACL 2023)](https://arxiv.org/abs/2307.03172) | [docs/research-llm-context-optimization.md](docs/research-llm-context-optimization.md)
+**Source**: [Liu et al., "Lost in the Middle" (TACL 2023)](https://arxiv.org/abs/2307.03172) | [docs/research-context-engineering-comprehensive.md](docs/general-llm/research-context-engineering-comprehensive.md)
 
 Models retrieve information best from the beginning and end of context, worst from the middle. Critical instructions must appear at the top of configuration files; secondary information at the bottom. Never bury key rules in the middle of a long file.
 
@@ -70,7 +70,7 @@ Models retrieve information best from the beginning and end of context, worst fr
 
 ## Guideline 4: Agent Inference Capabilities
 
-**Source**: [ETH Zurich study](docs/Evaluating-AGENTS-paper.pdf) | [Anthropic — Best Practices](https://docs.anthropic.com/en/docs/claude-code/best-practices) | [docs/analysis/analysis-evaluating-agents-paper.md](docs/analysis/analysis-evaluating-agents-paper.md)
+**Source**: [ETH Zurich study](docs/general-llm/Evaluating-AGENTS-paper.pdf) | [Anthropic — Best Practices](https://docs.anthropic.com/en/docs/claude-code/best-practices) | [docs/analysis/analysis-evaluating-agents-paper.md](docs/analysis/analysis-evaluating-agents-paper.md)
 
 Agents discover codebase structure through tools (`glob`, `grep`, `read`) as efficiently as from documentation. Codebase overviews and directory listings add tokens without improving navigation performance.
 
@@ -96,7 +96,7 @@ Agents discover codebase structure through tools (`glob`, `grep`, `read`) as eff
 
 ## Guideline 5: Context Poisoning Prevention
 
-**Source**: [docs/research-llm-context-optimization.md](docs/research-llm-context-optimization.md) | [A Guide to CLAUDE.md](docs/a-guide-to-claude.md) | [docs/analysis/analysis-research-llm-context-optimization.md](docs/analysis/analysis-research-llm-context-optimization.md)
+**Source**: [docs/general-llm/research-context-engineering-comprehensive.md](docs/general-llm/research-context-engineering-comprehensive.md) | [A Guide to AGENTS.md](docs/general-llm/a-guide-to-agents.md) | [docs/analysis/analysis-research-llm-context-optimization.md](docs/analysis/analysis-research-llm-context-optimization.md)
 
 Stale information in config files is worse than no information. When a documented file path changes, agents look in the wrong place with high confidence. When contradictory instructions exist across files, agents pick one arbitrarily without warning.
 
@@ -116,7 +116,7 @@ Stale information in config files is worse than no information. When a documente
 
 ## Guideline 6: Subagent Isolation for Context Integrity
 
-**Source**: [Anthropic — Sub-agents](https://docs.anthropic.com/en/docs/claude-code/sub-agents) | [docs/subagents/research-subagent-best-practices.md](docs/subagents/research-subagent-best-practices.md) | [docs/subagents/creating-custom-subagents.md](docs/subagents/creating-custom-subagents.md)
+**Source**: [Anthropic — Sub-agents](https://docs.anthropic.com/en/docs/claude-code/sub-agents) | [docs/subagents/research-subagent-best-practices.md](docs/general-llm/subagents/research-subagent-best-practices.md) | [docs/subagents/creating-custom-subagents.md](docs/claude-code/subagents/creating-custom-subagents.md)
 
 Subagents run in isolated context windows. Each receives only its system prompt plus basic environment details — not the parent conversation history. This isolation preserves the orchestrator's context budget for high-quality file generation.
 
@@ -125,8 +125,8 @@ Subagents run in isolated context windows. Each receives only its system prompt 
 | Rule                                                  | Rationale                               | Source                                                                                                                   |
 | ----------------------------------------------------- | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
 | Read-only tools only (`Read`, `Grep`, `Glob`, `Bash`) | Prevents unintended modifications       | [Sub-agent docs](https://docs.anthropic.com/en/docs/claude-code/sub-agents)                                              |
-| Sonnet model                                          | Cost-efficient for analysis tasks       | [docs/subagents/research-subagent-best-practices.md](docs/subagents/research-subagent-best-practices.md)                 |
-| maxTurns: 15-20                                       | Prevents runaway execution              | [docs/subagents/creating-custom-subagents.md](docs/subagents/creating-custom-subagents.md)                               |
+| Sonnet model                                          | Cost-efficient for analysis tasks       | [docs/subagents/research-subagent-best-practices.md](docs/general-llm/subagents/research-subagent-best-practices.md)                 |
+| maxTurns: 15-20                                       | Prevents runaway execution              | [docs/subagents/creating-custom-subagents.md](docs/claude-code/subagents/creating-custom-subagents.md)                               |
 | Structured output format                              | High signal, low noise for orchestrator | [docs/analysis/analysis-research-subagent-best-practices.md](docs/analysis/analysis-research-subagent-best-practices.md) |
 | Confidence-based filtering (>80%)                     | Reduces noise in evaluation output      | [docs/analysis/analysis-research-subagent-best-practices.md](docs/analysis/analysis-research-subagent-best-practices.md) |
 
@@ -136,7 +136,7 @@ Subagents run in isolated context windows. Each receives only its system prompt 
 
 ## Guideline 7: Skill Authoring Standards
 
-**Source**: [Anthropic — Skills](https://docs.anthropic.com/en/docs/claude-code/skills) | [Skill Authoring Best Practices](docs/skills/skill-authoring-best-practices.md) | [docs/analysis/analysis-skill-authoring-best-practices.md](docs/analysis/analysis-skill-authoring-best-practices.md)
+**Source**: [Anthropic — Skills](https://docs.anthropic.com/en/docs/claude-code/skills) | [Skill Authoring Best Practices](docs/shared/skill-authoring-best-practices.md) | [docs/analysis/analysis-skill-authoring-best-practices.md](docs/analysis/analysis-skill-authoring-best-practices.md)
 
 Skills are the primary progressive disclosure mechanism. Descriptions consume ~100 tokens at startup; full content loads only when invoked.
 
@@ -144,10 +144,10 @@ Skills are the primary progressive disclosure mechanism. Descriptions consume ~1
 
 | Constraint          | Limit                     | Source                                                                          |
 | ------------------- | ------------------------- | ------------------------------------------------------------------------------- |
-| Skill name          | ≤64 characters            | [Skill Authoring Best Practices](docs/skills/skill-authoring-best-practices.md) |
-| Description         | ≤1024 characters          | [Skill Authoring Best Practices](docs/skills/skill-authoring-best-practices.md) |
-| SKILL.md body       | <500 lines                | [Skill Authoring Best Practices](docs/skills/skill-authoring-best-practices.md) |
-| Reference depth     | Max 1 level from SKILL.md | [Skill Authoring Best Practices](docs/skills/skill-authoring-best-practices.md) |
+| Skill name          | ≤64 characters            | [Skill Authoring Best Practices](docs/shared/skill-authoring-best-practices.md) |
+| Description         | ≤1024 characters          | [Skill Authoring Best Practices](docs/shared/skill-authoring-best-practices.md) |
+| SKILL.md body       | <500 lines                | [Skill Authoring Best Practices](docs/shared/skill-authoring-best-practices.md) |
+| Reference depth     | Max 1 level from SKILL.md | [Skill Authoring Best Practices](docs/shared/skill-authoring-best-practices.md) |
 | Reference file size | ≤200 lines                | [Anthropic — Memory](https://docs.anthropic.com/en/docs/claude-code/memory)     |
 
 **Degrees of freedom** match task fragility: high freedom for judgment-based tasks (code review), low freedom for destructive operations (file deletion, database migrations).
@@ -158,7 +158,7 @@ Skills are the primary progressive disclosure mechanism. Descriptions consume ~1
 
 ## Guideline 8: Self-Validation Loop
 
-**Source**: [Anthropic — Prompting Best Practices](docs/claude-prompting-best-practices.md) | [docs/analysis/analysis-claude-prompting-best-practices.md](docs/analysis/analysis-claude-prompting-best-practices.md)
+**Source**: [Anthropic — Prompting Best Practices](docs/claude-code/claude-prompting-best-practices.md) | [docs/analysis/analysis-claude-prompting-best-practices.md](docs/analysis/analysis-claude-prompting-best-practices.md)
 
 The generate-review-refine pattern catches errors before they reach the user. Every skill runs a validation loop (max 3 iterations) that checks all generated files against hard limits and quality criteria before presenting them.
 
@@ -177,7 +177,7 @@ The generate-review-refine pattern catches errors before they reach the user. Ev
 
 ## Guideline 9: Prompt Engineering by Context
 
-**Source**: [Prompt Engineering Guide](docs/prompt-engineering-guide.md) | [docs/analysis/analysis-prompt-engineering-guide.md](docs/analysis/analysis-prompt-engineering-guide.md)
+**Source**: [Prompt Engineering Guide](docs/general-llm/prompt-engineering-guide.md) | [docs/analysis/analysis-prompt-engineering-guide.md](docs/analysis/analysis-prompt-engineering-guide.md)
 
 Different artifact types require different prompting strategies. Advanced reasoning models (Opus 4.6) perform worse with explicit chain-of-thought and few-shot examples — their internal reasoning already handles these steps.
 
@@ -215,7 +215,7 @@ Converting a behavioral instruction from CLAUDE.md to a hook removes it from the
 
 ## Guideline 11: Distribution Parity with Platform Awareness
 
-**Source**: [Agent Skills Open Standard](docs/skills/research-claude-code-skills-format.md) | Project architecture decision
+**Source**: [Agent Skills Open Standard](docs/claude-code/skills/research-claude-code-skills-format.md) | Project architecture decision
 
 The plugin ships two distributions with identical skill names but different analysis mechanisms:
 
@@ -236,7 +236,7 @@ Shared references are copied (not symlinked) into each skill directory. When upd
 
 ## Guideline 12: Mandatory User Approval for Destructive Changes
 
-**Source**: Project design decision backed by [ETH Zurich study](docs/Evaluating-AGENTS-paper.pdf) | [A Guide to CLAUDE.md](docs/a-guide-to-claude.md)
+**Source**: Project design decision backed by [ETH Zurich study](docs/general-llm/Evaluating-AGENTS-paper.pdf) | [A Guide to AGENTS.md](docs/general-llm/a-guide-to-agents.md)
 
 The plugin never removes, migrates, or restructures information without explicit user consent. Every improvement is presented with:
 
@@ -253,13 +253,13 @@ Rejected suggestions preserve the original content in its current location. No i
 
 ## Guideline 13: Automation Migration Decision Framework
 
-**Source**: [Anthropic — Hooks](https://docs.anthropic.com/en/docs/claude-code/hooks) | [Anthropic — Skills](https://docs.anthropic.com/en/docs/claude-code/skills) | [ETH Zurich Study](docs/Evaluating-AGENTS-paper.pdf) | [docs/analysis/analysis-automate-workflow-with-hooks.md](docs/analysis/analysis-automate-workflow-with-hooks.md)
+**Source**: [Anthropic — Hooks](https://docs.anthropic.com/en/docs/claude-code/hooks) | [Anthropic — Skills](https://docs.anthropic.com/en/docs/claude-code/skills) | [ETH Zurich Study](docs/general-llm/Evaluating-AGENTS-paper.pdf) | [docs/analysis/analysis-automate-workflow-with-hooks.md](docs/analysis/analysis-automate-workflow-with-hooks.md)
 
 Instructions in CLAUDE.md/AGENTS.md that are infrequently relevant to the current task should migrate to on-demand mechanisms. The decision criteria map each content type to the most appropriate mechanism based on context cost, enforcement guarantee, and platform compatibility.
 
 | Content Type                                         | Best Mechanism                             | Context Cost           | Evidence                                   |
 | ---------------------------------------------------- | ------------------------------------------ | ---------------------- | ------------------------------------------ |
-| Always-applicable universal rules (<5 lines)         | CLAUDE.md root                             | Per-session            | research-llm-context-optimization.md       |
+| Always-applicable universal rules (<5 lines)         | CLAUDE.md root                             | Per-session            | research-context-engineering-comprehensive.md |
 | Path-specific conventions (5-50 lines)               | `.claude/rules/` with `paths:`             | On-demand              | analysis-how-claude-remembers-a-project.md |
 | Infrequent workflows/domain knowledge (50-500 lines) | Skill (`user-invocable: false`)            | ~100 tokens at startup | extend-claude-with-skills.md               |
 | Heavy/rare workflows with side effects               | Skill (`disable-model-invocation: true`)   | Zero                   | extend-claude-with-skills.md               |
@@ -275,7 +275,7 @@ Distribution awareness: Plugin suggests all mechanisms; standalone suggests skil
 
 ## Guideline 14: Init Preflight Redirect
 
-**Source**: [ETH Zurich Study](docs/Evaluating-AGENTS-paper.pdf) | Project design decision | PRD Phase 2
+**Source**: [ETH Zurich Study](docs/general-llm/Evaluating-AGENTS-paper.pdf) | Project design decision | PRD Phase 2
 
 Init skills must check for existing target files before proceeding with generation. Running init on a project that already has configuration files wastes subagent runs and risks overwriting user customizations.
 
@@ -334,8 +334,8 @@ All design decisions trace to these sources:
 
 | Document                                                                    | Key Finding                                                     | Location                                                  |
 | --------------------------------------------------------------------------- | --------------------------------------------------------------- | --------------------------------------------------------- |
-| [Evaluating AGENTS.md](docs/Evaluating-AGENTS-paper.pdf) (ETH Zurich, 2026) | Auto-generated files reduce success by 3%, increase cost by 20% | `docs/Evaluating-AGENTS-paper.md`                         |
-| [Lost in the Middle](https://arxiv.org/abs/2307.03172) (TACL 2023)          | Models perform worst on mid-context information                 | Referenced in `docs/research-llm-context-optimization.md` |
+| [Evaluating AGENTS.md](docs/general-llm/Evaluating-AGENTS-paper.pdf) (ETH Zurich, 2026) | Auto-generated files reduce success by 3%, increase cost by 20% | `docs/general-llm/Evaluating-AGENTS-paper.md`                         |
+| [Lost in the Middle](https://arxiv.org/abs/2307.03172) (TACL 2023)          | Models perform worst on mid-context information                 | Referenced in `docs/general-llm/research-context-engineering-comprehensive.md` |
 
 ### Anthropic Official Documentation
 
@@ -352,10 +352,10 @@ All design decisions trace to these sources:
 
 | Document                                                                        | Key Contribution                                | Location       |
 | ------------------------------------------------------------------------------- | ----------------------------------------------- | -------------- |
-| [A Guide to AGENTS.md](docs/a-guide-to-agents.md)                               | Progressive disclosure patterns, domain files   | `docs/`        |
-| [A Guide to CLAUDE.md](docs/a-guide-to-claude.md)                               | CLAUDE.md hierarchy, instruction budget         | `docs/`        |
-| [Prompt Engineering Guide](docs/prompt-engineering-guide.md)                    | Context engineering strategies by artifact type | `docs/`        |
-| [Skill Authoring Best Practices](docs/skills/skill-authoring-best-practices.md) | Skill size limits, degrees of freedom           | `docs/skills/` |
+| [A Guide to AGENTS.md](docs/general-llm/a-guide-to-agents.md)                               | Progressive disclosure patterns, domain files   | `docs/`        |
+| [A Guide to AGENTS.md](docs/general-llm/a-guide-to-agents.md)                               | CLAUDE.md hierarchy, instruction budget (merged) | `docs/general-llm/` |
+| [Prompt Engineering Guide](docs/general-llm/prompt-engineering-guide.md)                    | Context engineering strategies by artifact type | `docs/`        |
+| [Skill Authoring Best Practices](docs/shared/skill-authoring-best-practices.md) | Skill size limits, degrees of freedom           | `docs/shared/` & `docs/claude-code/skills/` |
 
 ### Analysis Corpus
 

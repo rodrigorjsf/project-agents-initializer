@@ -1,57 +1,62 @@
-# Analise: Como o Claude Lembra de um Projeto
+# Analysis: How Claude Remembers a Project
+
+> **Status**: Current
+> **Source document**: [Anthropic — How Claude Code Remembers Your Project](https://docs.anthropic.com/en/docs/claude-code/memory)
+> **Analysis date**: 2026-03-27
+> **Scope**: Claude Code memory persistence mechanisms — CLAUDE.md and auto memory
 
 ---
 
-## 1. Resumo Executivo
+## 1. Executive Summary
 
-O documento "How Claude Remembers Your Project" descreve os dois mecanismos complementares de persistencia de conhecimento cross-session do Claude Code: **CLAUDE.md files** (instrucoes escritas pelo usuario) e **Auto Memory** (notas escritas pelo Claude automaticamente). Ambos sao carregados no inicio de cada sessao como contexto -- nao como configuracao forcada -- e sua eficacia depende diretamente da especificidade, concisao e estruturacao das instrucoes.
+The document "How Claude Remembers Your Project" describes two complementary cross-session knowledge persistence mechanisms in Claude Code: **CLAUDE.md files** (instructions written by the user) and **Auto Memory** (notes written by Claude automatically). Both are loaded at the beginning of each session as context — not as enforced configuration — and their effectiveness depends directly on the specificity, conciseness, and structure of the instructions.
 
-O sistema de memoria implementa uma arquitetura hibrida de duas camadas: **always-loaded** (CLAUDE.md, primeiras 200 linhas de MEMORY.md) e **on-demand** (subdirectory CLAUDE.md, topic files de memoria, path-scoped rules). Essa arquitetura e uma implementacao direta do principio de Just-In-Time documentation descrito pela Anthropic: manter identificadores leves e carregar dados sob demanda em runtime. A hierarquia de escopo (managed policy > project > user > subdirectory) permite configuracao granular desde nivel organizacional ate area especifica do codebase.
+The memory system implements a hybrid two-tier architecture: **always-loaded** (CLAUDE.md, first 200 lines of MEMORY.md) and **on-demand** (subdirectory CLAUDE.md, memory topic files, path-scoped rules). This architecture is a direct implementation of the Just-In-Time documentation principle described by Anthropic: maintain lightweight identifiers and load data on demand at runtime. The scope hierarchy (managed policy > project > user > subdirectory) enables granular configuration from organizational level down to specific codebase areas.
 
-A auto memory introduz um mecanismo elegante de documentacao emergente: o Claude decide o que vale lembrar com base em valor cross-session, armazena em MEMORY.md (index) + topic files (detalhes), e curadoria automaticamente para manter o index sob 200 linhas. Cada projeto git compartilha um unico diretorio de auto memory (todos os worktrees e subdiretorios). O sistema e machine-local, plain markdown, editavel por humanos a qualquer momento.
+Auto memory introduces an elegant emergent documentation mechanism: Claude decides what is worth remembering based on cross-session value, stores it in MEMORY.md (index) + topic files (details), and automatically curates to keep the index under 200 lines. Each git project shares a single auto memory directory (all worktrees and subdirectories). The system is machine-local, plain markdown, and editable by humans at any time.
 
 ---
 
-## 2. Conceitos e Mecanismos Chave
+## 2. Key Concepts and Mechanisms
 
-### 2.1 Dois Sistemas Complementares
+### 2.1 Two Complementary Systems
 
 | | CLAUDE.md | Auto Memory |
 |---|-----------|-------------|
-| **Quem escreve** | Usuario | Claude |
-| **Conteudo** | Instrucoes e regras | Aprendizados e padroes |
-| **Escopo** | Projeto, usuario, ou organizacao | Por working tree |
-| **Carregado em** | Toda sessao (completo) | Toda sessao (primeiras 200 linhas) |
-| **Usar para** | Padroes de codigo, workflows, arquitetura | Comandos de build, insights de debug, preferencias |
+| **Who writes** | User | Claude |
+| **Content** | Instructions and rules | Learnings and patterns |
+| **Scope** | Project, user, or organization | Per working tree |
+| **Loaded at** | Every session (complete) | Every session (first 200 lines) |
+| **Use for** | Code patterns, workflows, architecture | Build commands, debug insights, preferences |
 
-### 2.2 Hierarquia de CLAUDE.md
+### 2.2 CLAUDE.md Hierarchy
 
-| Escopo | Localizacao | Proposito | Compartilhado com |
-|--------|-------------|-----------|-------------------|
-| **Managed policy** | `/etc/claude-code/CLAUDE.md` (Linux/WSL) | Instrucoes organizacionais (IT/DevOps) | Todos os usuarios |
-| **Project** | `./CLAUDE.md` ou `./.claude/CLAUDE.md` | Instrucoes compartilhadas do projeto | Time via VCS |
-| **User** | `~/.claude/CLAUDE.md` | Preferencias pessoais | Apenas voce |
-| **Subdirectory** | `./subdir/CLAUDE.md` | Area-especifica, on-demand | Time via VCS |
+| Scope | Location | Purpose | Shared with |
+|-------|----------|---------|-------------|
+| **Managed policy** | `/etc/claude-code/CLAUDE.md` (Linux/WSL) | Organizational instructions (IT/DevOps) | All users |
+| **Project** | `./CLAUDE.md` or `./.claude/CLAUDE.md` | Shared project instructions | Team via VCS |
+| **User** | `~/.claude/CLAUDE.md` | Personal preferences | Only you |
+| **Subdirectory** | `./subdir/CLAUDE.md` | Area-specific, on-demand | Team via VCS |
 
-- CLAUDE.md na hierarquia de diretorios acima do working directory: carregados em full no launch
-- CLAUDE.md em subdiretorios: carregados on-demand quando Claude le arquivos nessas pastas
-- Managed policy: NAO pode ser excluido via `claudeMdExcludes`
+- CLAUDE.md in the directory hierarchy above the working directory: loaded in full at launch
+- CLAUDE.md in subdirectories: loaded on-demand when Claude reads files in those folders
+- Managed policy: CANNOT be excluded via `claudeMdExcludes`
 
-### 2.3 Sistema de Rules
+### 2.3 Rules System
 
 ```
 .claude/
-├── CLAUDE.md           # Instrucoes principais do projeto
+├── CLAUDE.md           # Main project instructions
 └── rules/
-    ├── code-style.md   # Diretrizes de estilo
-    ├── testing.md       # Convencoes de teste
-    ├── security.md      # Requisitos de seguranca
+    ├── code-style.md   # Style guidelines
+    ├── testing.md       # Testing conventions
+    ├── security.md      # Security requirements
     └── frontend/
-        └── react.md     # Rules especificas de frontend
+        └── react.md     # Frontend-specific rules
 ```
 
-**Rules sem `paths` frontmatter**: carregadas incondicionalmente no launch
-**Rules com `paths` frontmatter**: carregadas quando Claude le arquivos correspondentes
+**Rules without `paths` frontmatter**: loaded unconditionally at launch
+**Rules with `paths` frontmatter**: loaded when Claude reads matching files
 
 ```yaml
 ---
@@ -62,23 +67,23 @@ paths:
 - All API endpoints must include input validation
 ```
 
-Patterns suportados:
+Supported patterns:
 
 | Pattern | Match |
 |---------|-------|
-| `**/*.ts` | Todos os TypeScript em qualquer diretorio |
-| `src/**/*` | Todos os arquivos sob `src/` |
-| `*.md` | Markdown no root do projeto |
-| `src/components/*.tsx` | Components React em diretorio especifico |
+| `**/*.ts` | All TypeScript in any directory |
+| `src/**/*` | All files under `src/` |
+| `*.md` | Markdown in the project root |
+| `src/components/*.tsx` | React components in a specific directory |
 
-### 2.4 Sistema de Imports
+### 2.4 Import System
 
-CLAUDE.md suporta `@path/to/import`:
+CLAUDE.md supports `@path/to/import`:
 
-- Paths relativos (relativo ao arquivo que contem o import)
-- Paths absolutos
-- Imports recursivos (max 5 hops)
-- Imports pessoais: `@~/.claude/my-project-instructions.md`
+- Relative paths (relative to the file containing the import)
+- Absolute paths
+- Recursive imports (max 5 hops)
+- Personal imports: `@~/.claude/my-project-instructions.md`
 
 ```markdown
 See @README for project overview and @package.json for available npm commands.
@@ -89,28 +94,28 @@ See @README for project overview and @package.json for available npm commands.
 
 ### 2.5 Auto Memory
 
-**Localizacao**: `~/.claude/projects/<project>/memory/`
-**Estrutura**:
+**Location**: `~/.claude/projects/<project>/memory/`
+**Structure**:
 
 ```
 ~/.claude/projects/<project>/memory/
-├── MEMORY.md          # Index conciso, carregado toda sessao
-├── debugging.md       # Notas detalhadas sobre debugging
-├── api-conventions.md # Decisoes de design de API
-└── ...                # Outros topic files
+├── MEMORY.md          # Concise index, loaded every session
+├── debugging.md       # Detailed debugging notes
+├── api-conventions.md # API design decisions
+└── ...                # Other topic files
 ```
 
-- `MEMORY.md` (primeiras 200 linhas): carregado no startup
-- Topic files: carregados sob demanda pelo Claude
-- Compartilhado entre worktrees e subdiretorios do mesmo repo git
-- Machine-local (nao compartilhado entre maquinas)
-- Plain markdown editavel a qualquer momento
+- `MEMORY.md` (first 200 lines): loaded at startup
+- Topic files: loaded on demand by Claude
+- Shared across worktrees and subdirectories of the same git repo
+- Machine-local (not shared across machines)
+- Plain markdown editable at any time
 
-### 2.6 Compactacao e CLAUDE.md
+### 2.6 Compaction and CLAUDE.md
 
-CLAUDE.md **sobrevive integralmente a compactacao**. Apos `/compact`, o Claude rele CLAUDE.md do disco e re-injeta fresco na sessao. Instrucoes dadas apenas em conversacao (nao escritas em CLAUDE.md) sao perdidas apos compactacao.
+CLAUDE.md **fully survives compaction**. After `/compact`, Claude re-reads CLAUDE.md from disk and re-injects it fresh into the session. Instructions given only in conversation (not written in CLAUDE.md) are lost after compaction.
 
-### 2.7 Exclusoes para Monorepos
+### 2.7 Exclusions for Monorepos
 
 ```json
 {
@@ -121,265 +126,265 @@ CLAUDE.md **sobrevive integralmente a compactacao**. Apos `/compact`, o Claude r
 }
 ```
 
-Configuravel em qualquer camada de settings. Arrays mergeiam entre camadas. Managed policy CLAUDE.md NAO pode ser excluido.
+Configurable in any settings layer. Arrays merge across layers. Managed policy CLAUDE.md CANNOT be excluded.
 
-### 2.8 Diretrizes de Escrita Eficaz
+### 2.8 Effective Writing Guidelines
 
-- **Tamanho**: maximo 200 linhas por arquivo CLAUDE.md
-- **Estrutura**: headers e bullets Markdown
-- **Especificidade**: "Use 2-space indentation" ao inves de "Format code properly"
-- **Consistencia**: eliminar instrucoes contraditorias entre arquivos
-- **Verificabilidade**: cada instrucao deve ser concreta o suficiente para verificar
+- **Size**: maximum 200 lines per CLAUDE.md file
+- **Structure**: Markdown headers and bullets
+- **Specificity**: "Use 2-space indentation" instead of "Format code properly"
+- **Consistency**: eliminate contradictory instructions across files
+- **Verifiability**: each instruction must be concrete enough to verify
 
 ---
 
-## 3. Pontos de Atencao
+## 3. Points of Attention
 
-### 3.1 CLAUDE.md NAO e Configuracao Forcada
+### 3.1 CLAUDE.md is NOT Enforced Configuration
 
-O ponto mais critico: CLAUDE.md e entregue como user message apos o system prompt, nao como parte do system prompt. O Claude le e tenta seguir, mas NAO ha garantia de compliance estrito, especialmente para instrucoes vagas ou conflitantes.
+The most critical point: CLAUDE.md is delivered as a user message after the system prompt, not as part of the system prompt. Claude reads and attempts to follow it, but there is NO guarantee of strict compliance, especially for vague or conflicting instructions.
 
 > "CLAUDE.md instructions shape Claude's behavior but are not a hard enforcement layer."
 
-Para enforcement deterministic, use **hooks** (que executam fora do modelo) ou **permissions** (em settings.json).
+For deterministic enforcement, use **hooks** (which execute outside the model) or **permissions** (in settings.json).
 
-### 3.2 O Limite de 200 Linhas
+### 3.2 The 200-Line Limit
 
-CLAUDE.md e carregado integralmente independentemente do tamanho. Porem, arquivos maiores que 200 linhas:
+CLAUDE.md is loaded in full regardless of size. However, files longer than 200 lines:
 
-- Consomem mais contexto
-- Reduzem aderencia as instrucoes
-- Instrucoes importantes se perdem no ruido
+- Consume more context
+- Reduce adherence to instructions
+- Important instructions get lost in the noise
 
-O limite de 200 linhas se aplica APENAS ao MEMORY.md de auto memory (conteudo alem da linha 200 nao e carregado no startup).
+The 200-line limit applies ONLY to auto memory's MEMORY.md (content beyond line 200 is not loaded at startup).
 
-### 3.3 Contradices entre Arquivos
+### 3.3 Contradictions Across Files
 
-Se dois arquivos CLAUDE.md, rules, ou combinacoes deles dao instrucoes contraditorias, o Claude pode escolher arbitrariamente. Revisao periodica e obrigatoria.
+If two CLAUDE.md files, rules, or combinations thereof give contradictory instructions, Claude may choose arbitrarily. Periodic review is mandatory.
 
-### 3.4 Auto Memory Nao e Compartilhada
+### 3.4 Auto Memory is Not Shared
 
-Auto memory e machine-local. Worktrees do mesmo repo compartilham, mas maquinas diferentes nao. Para conhecimento compartilhado, use CLAUDE.md commitado no VCS.
+Auto memory is machine-local. Worktrees of the same repo share it, but different machines do not. For shared knowledge, use CLAUDE.md committed to VCS.
 
-### 3.5 Ordem de Carregamento Importa
+### 3.5 Loading Order Matters
 
-CLAUDE.md na hierarquia acima do working directory: carregados no launch (completos).
-Subdirectory CLAUDE.md: carregados on-demand (quando Claude le arquivos naquela pasta).
-Rules sem paths: carregados no launch.
-Rules com paths: carregados quando Claude trabalha com arquivos correspondentes.
+CLAUDE.md in the hierarchy above the working directory: loaded at launch (complete).
+Subdirectory CLAUDE.md: loaded on-demand (when Claude reads files in that folder).
+Rules without paths: loaded at launch.
+Rules with paths: loaded when Claude works with matching files.
 
-O efeito "lost in the middle" implica que instrucoes no meio de arquivos longos tem menor probabilidade de serem seguidas.
+The "lost in the middle" effect implies that instructions in the middle of long files have a lower probability of being followed.
 
-### 3.6 Compactacao Preserva CLAUDE.md mas Perde Conversacao
+### 3.6 Compaction Preserves CLAUDE.md but Loses Conversation
 
-CLAUDE.md sobrevive `/compact`. Instrucoes dadas apenas em conversacao NAO sobrevivem. Se uma instrucao e importante o suficiente para persistir, deve ser escrita em CLAUDE.md.
+CLAUDE.md survives `/compact`. Instructions given only in conversation do NOT survive. If an instruction is important enough to persist, it should be written in CLAUDE.md.
 
-### 3.7 `/init` e o Modo Interativo
+### 3.7 `/init` and Interactive Mode
 
-O comando `/init` gera um CLAUDE.md inicial analisando o codebase. Com `CLAUDE_CODE_NEW_INIT=true`, ativa um fluxo multi-fase interativo que tambem configura skills e hooks. Se CLAUDE.md ja existe, `/init` sugere melhorias ao inves de sobrescrever.
-
----
-
-## 4. Casos de Uso e Escopo
-
-### 4.1 Quando Usar CLAUDE.md vs Auto Memory vs Rules
-
-| Cenario | Mecanismo | Justificativa |
-|---------|-----------|---------------|
-| Padroes de codigo do projeto | CLAUDE.md (project) | Compartilhavel via VCS, aplica-se a todos |
-| Comando de build especifico | Auto Memory | Claude descobre e lembra automaticamente |
-| Rules de API por diretorio | `.claude/rules/` com `paths` | Carregado apenas quando relevante |
-| Preferencias pessoais de estilo | `~/.claude/CLAUDE.md` | Pessoal, cross-projeto |
-| Politica de seguranca organizacional | Managed policy | Nao pode ser excluido, aplica-se a todos |
-| Insights de debugging recorrentes | Auto Memory topic file | Claude carrega quando relevante |
-
-### 4.2 Quando Converter Instrucoes em Hooks
-
-Criterio: se enforcement deterministic e necessario e a instrucao pode ser verificada programaticamente, converta para hook.
-
-| Instrucao em CLAUDE.md | Hook Equivalente |
-|------------------------|------------------|
-| "Run linter after editing" | `PostToolUse` com matcher `Edit\|Write` |
-| "Never commit .env files" | `PreToolUse` com matcher `Bash` + validacao |
-| "Run tests before pushing" | `PreToolUse` com matcher `Bash` + deteccao de push |
-
-Hooks removem a instrucao do orcamento de contexto e garantem enforcement independente do modelo.
-
-### 4.3 Organizacao para Times Grandes
-
-1. **Managed policy**: padroes organizacionais (seguranca, compliance)
-2. **Project CLAUDE.md**: arquitetura, convencoes, workflows do projeto
-3. **`.claude/rules/`**: rules modulares por topico e path-scoped
-4. **User CLAUDE.md**: preferencias pessoais
-5. **`claudeMdExcludes`**: filtrar rules de outros times em monorepos
+The `/init` command generates an initial CLAUDE.md by analyzing the codebase. With `CLAUDE_CODE_NEW_INIT=true`, it activates a multi-phase interactive flow that also configures skills and hooks. If CLAUDE.md already exists, `/init` suggests improvements instead of overwriting.
 
 ---
 
-## 5. Aplicabilidade a Infraestrutura de Agentes
+## 4. Use Cases and Scope
+
+### 4.1 When to Use CLAUDE.md vs Auto Memory vs Rules
+
+| Scenario | Mechanism | Justification |
+|----------|-----------|---------------|
+| Project code patterns | CLAUDE.md (project) | Shareable via VCS, applies to everyone |
+| Specific build command | Auto Memory | Claude discovers and remembers automatically |
+| Per-directory API rules | `.claude/rules/` with `paths` | Loaded only when relevant |
+| Personal style preferences | `~/.claude/CLAUDE.md` | Personal, cross-project |
+| Organizational security policy | Managed policy | Cannot be excluded, applies to everyone |
+| Recurring debugging insights | Auto Memory topic file | Claude loads when relevant |
+
+### 4.2 When to Convert Instructions to Hooks
+
+Criterion: if deterministic enforcement is needed and the instruction can be verified programmatically, convert to a hook.
+
+| Instruction in CLAUDE.md | Equivalent Hook |
+|--------------------------|-----------------|
+| "Run linter after editing" | `PostToolUse` with matcher `Edit\|Write` |
+| "Never commit .env files" | `PreToolUse` with matcher `Bash` + validation |
+| "Run tests before pushing" | `PreToolUse` with matcher `Bash` + push detection |
+
+Hooks remove the instruction from the context budget and guarantee enforcement independent of the model.
+
+### 4.3 Organization for Large Teams
+
+1. **Managed policy**: organizational standards (security, compliance)
+2. **Project CLAUDE.md**: architecture, conventions, project workflows
+3. **`.claude/rules/`**: modular rules by topic and path-scoped
+4. **User CLAUDE.md**: personal preferences
+5. **`claudeMdExcludes`**: filter out other teams' rules in monorepos
+
+---
+
+## 5. Applicability to Agent Infrastructure
 
 ### 5.1 Skills
 
-- **Skills como progressive disclosure**: Descricoes de skills sao vistas no startup; conteudo completo so carrega quando invocadas. Isso e coerente com a filosofia JIT do sistema de memoria.
-- **Skills com `disable-model-invocation: true`**: Descricoes ficam completamente fora do contexto ate invocacao manual -- complementa a estrategia de manter CLAUDE.md conciso.
-- **Skills vs rules**: Rules carregam toda sessao ou quando path faz match; skills carregam quando invocadas ou quando Claude determina relevancia. Para instrucoes que nao precisam estar sempre em contexto, skills sao prefereis a rules.
-- **Dynamic injection em skills**: `` !`command` `` carrega dados em tempo real, implementando JIT puro.
+- **Skills as progressive disclosure**: Skill descriptions are visible at startup; full content only loads when invoked. This is consistent with the JIT philosophy of the memory system.
+- **Skills with `disable-model-invocation: true`**: Descriptions stay completely out of context until manual invocation — complements the strategy of keeping CLAUDE.md concise.
+- **Skills vs rules**: Rules load every session or when a path matches; skills load when invoked or when Claude determines relevance. For instructions that don't need to always be in context, skills are preferable to rules.
+- **Dynamic injection in skills**: `` !`command` `` loads data in real time, implementing pure JIT.
 
 ### 5.2 Hooks
 
-- **Hooks como alternativa a CLAUDE.md**: Instrucoes que podem ser verificadas programaticamente devem ser convertidas de CLAUDE.md para hooks. Isso remove a instrucao do orcamento de contexto e garante enforcement.
-- **`InstructionsLoaded` hook**: Permite logar quais arquivos de instrucoes foram carregados, quando, e por que. Util para debugging de rules path-scoped ou lazy-loaded.
-- **Hooks para higiene de memoria**: `PostToolUse` pode ser usado para atualizar auto memory apos operacoes significativas.
-- **Plugin lifecycle hooks**: Hooks de plugins sao carregados na sessao normalmente e interagem com o sistema de memoria da mesma forma.
+- **Hooks as an alternative to CLAUDE.md**: Instructions that can be verified programmatically should be converted from CLAUDE.md to hooks. This removes the instruction from the context budget and guarantees enforcement.
+- **`InstructionsLoaded` hook**: Allows logging which instruction files were loaded, when, and why. Useful for debugging path-scoped or lazy-loaded rules.
+- **Hooks for memory hygiene**: `PostToolUse` can be used to update auto memory after significant operations.
+- **Plugin lifecycle hooks**: Plugin hooks are loaded into the session normally and interact with the memory system in the same way.
 
-### 5.3 Subagentes
+### 5.3 Sub-agents
 
-- **Memoria de subagentes**: Tres escopos (user, project, local) com mesmo mecanismo MEMORY.md + topic files
-- **Subagentes e CLAUDE.md**: Subagentes carregam CLAUDE.md e project memory via fluxo normal de mensagens (NAO herdam historico de conversa)
-- **Auto memory de subagentes**: Habilitavel via `memory` field no frontmatter. Cada subagente pode ter seu proprio diretorio de memoria.
-- **Subagentes e rules**: Path-scoped rules sao ativadas quando o subagente le arquivos correspondentes
+- **Sub-agent memory**: Three scopes (user, project, local) with the same MEMORY.md + topic files mechanism
+- **Sub-agents and CLAUDE.md**: Sub-agents load CLAUDE.md and project memory via the normal message flow (they do NOT inherit conversation history)
+- **Sub-agent auto memory**: Enabled via the `memory` field in frontmatter. Each sub-agent can have its own memory directory.
+- **Sub-agents and rules**: Path-scoped rules are activated when the sub-agent reads matching files
 
 ### 5.4 Rules
 
-- **Rules como modularidade de CLAUDE.md**: Quando CLAUDE.md fica grande, rules permitem extrair instrucoes topicas
-- **Path-scoped rules**: Implementam progressive disclosure nativo -- so carregam quando relevantes
-- **Symlinks para compartilhamento**: Rules suportam symlinks, permitindo rules compartilhadas entre projetos
-- **User-level rules**: `~/.claude/rules/` para preferencias pessoais cross-projeto
-- **Prioridade**: user rules < project rules (project tem prioridade maior)
-- **Discovery recursivo**: Rules em subdiretorios de `.claude/rules/` sao descobertas automaticamente
+- **Rules as CLAUDE.md modularity**: When CLAUDE.md grows large, rules allow extracting topical instructions
+- **Path-scoped rules**: Implement native progressive disclosure — only loaded when relevant
+- **Symlinks for sharing**: Rules support symlinks, enabling shared rules across projects
+- **User-level rules**: `~/.claude/rules/` for personal cross-project preferences
+- **Priority**: user rules < project rules (project takes higher priority)
+- **Recursive discovery**: Rules in subdirectories of `.claude/rules/` are discovered automatically
 
-### 5.5 Memoria
+### 5.5 Memory
 
-- **Arquitetura two-tier**: MEMORY.md (index, always-loaded, 200 lines) + topic files (on-demand)
-- **JIT documentation**: Implementacao direta do padrao descrito pela Anthropic em "Effective Context Engineering"
-- **Auto-curadoria**: Claude move detalhes para topic files e mantem MEMORY.md conciso
-- **Scope hierarquico**: Auto memory e machine-local; CLAUDE.md e compartilhavel via VCS
-- **Compactacao**: CLAUDE.md sobrevive integralmente; auto memory nao e afetada (armazenada separadamente)
-- **Higiene**: `/memory` para inspecionar e editar; revisao periodica recomendada
-- **Worktrees**: Todos os worktrees do mesmo repo git compartilham auto memory
-
----
-
-## 6. Aplicabilidade do Guia de Engenharia de Prompts
-
-### 6.1 CoT para Cadeias de Raciocinio de Subagentes
-
-CLAUDE.md pode incluir instrucoes de CoT que serao carregadas em toda sessao: "Antes de fazer mudancas, pense passo a passo sobre o impacto." Auto memory pode armazenar cadeias de raciocinio que funcionaram bem em sessoes anteriores, servindo como few-shot CoT emergente.
-
-### 6.2 ReAct para Subagentes com Acesso a Ferramentas
-
-O sistema de memoria suporta o loop ReAct indiretamente: CLAUDE.md pode definir o workflow esperado (Pensamento -> Acao -> Observacao) e auto memory pode lembrar quais ferramentas foram eficazes para quais tarefas. Path-scoped rules podem injetar instrucoes ReAct-especificas quando o Claude trabalha em areas que requerem interacao com ferramentas.
-
-### 6.3 Tree of Thoughts para Subagentes de Exploracao
-
-CLAUDE.md pode instruir o Claude a considerar multiplas abordagens antes de escolher. Auto memory pode armazenar hipoteses exploradas em sessoes anteriores, prevenindo re-exploracao de caminhos ja descartados.
-
-### 6.4 Self-Consistency para Validacao entre Multiplos Subagentes
-
-A auto memory serve como registro historico que pode ser usado para validacao de consistencia: se uma decisao em uma sessao contradiz uma decisao anterior armazenada em memoria, o Claude pode identificar e resolver a inconsistencia.
-
-### 6.5 Reflexion para Melhoria Iterativa de Subagentes
-
-Auto memory e o mecanismo nativo de Reflexion cross-session:
-
-1. Claude comete um erro -> usuario corrige -> Claude armazena aprendizado em auto memory
-2. Proxima sessao -> Claude consulta auto memory -> evita o mesmo erro
-
-O `/memory` permite ao usuario auditar e refinar esse processo de reflexion.
-
-### 6.6 Least-to-Most para Decomposicao de Tarefas entre Subagentes
-
-CLAUDE.md pode definir a decomposicao padrao de tarefas para o projeto. Rules path-scoped podem fornecer instrucoes especificas de decomposicao por area do codebase. Auto memory pode lembrar decomposicoes que funcionaram bem anteriormente.
+- **Two-tier architecture**: MEMORY.md (index, always-loaded, 200 lines) + topic files (on-demand)
+- **JIT documentation**: Direct implementation of the pattern described by Anthropic in "Effective Context Engineering"
+- **Auto-curation**: Claude moves details to topic files and keeps MEMORY.md concise
+- **Hierarchical scope**: Auto memory is machine-local; CLAUDE.md is shareable via VCS
+- **Compaction**: CLAUDE.md fully survives; auto memory is unaffected (stored separately)
+- **Hygiene**: `/memory` to inspect and edit; periodic review recommended
+- **Worktrees**: All worktrees of the same git repo share auto memory
 
 ---
 
-## 7. Correlacoes com os Documentos Principais
+## 6. Applicability of the Prompt Engineering Guide
 
-### Com "Creating Custom Subagents"
+### 6.1 CoT for Sub-agent Reasoning Chains
 
-A memoria de subagentes (campo `memory` no frontmatter) e um caso especial do sistema de auto memory. Mecanismo identico (MEMORY.md + topic files, 200 linhas), mas com escopos diferentes (user/project/local no subagente vs per-working-tree na auto memory principal). CLAUDE.md e rules sao carregados normalmente por subagentes via fluxo de mensagens.
+CLAUDE.md can include CoT instructions that will be loaded in every session: "Before making changes, think step by step about the impact." Auto memory can store reasoning chains that worked well in previous sessions, serving as emergent few-shot CoT.
 
-### Com "Orchestrate Teams of Claude Code Sessions"
+### 6.2 ReAct for Sub-agents with Tool Access
 
-Cada teammate em agent teams carrega CLAUDE.md e auto memory independentemente. O spawn prompt do team lead NAO e armazenado em memoria -- apenas em CLAUDE.md que os teammates carregam. Multiplos teammates escrevendo auto memory podem criar redundancia.
+The memory system supports the ReAct loop indirectly: CLAUDE.md can define the expected workflow (Thought → Action → Observation) and auto memory can remember which tools were effective for which tasks. Path-scoped rules can inject ReAct-specific instructions when Claude works in areas that require tool interaction.
 
-### Com "Research: Subagent Best Practices"
+### 6.3 Tree of Thoughts for Exploration Sub-agents
 
-O research enfatiza que o system prompt do subagente e TUDO que ele tem (NAO recebe historico). CLAUDE.md mitiga parcialmente esse gap, fornecendo contexto persistente do projeto. A recomendacao de "Consult memory before starting" no prompt do subagente complementa o mecanismo de auto memory de subagentes.
+CLAUDE.md can instruct Claude to consider multiple approaches before choosing. Auto memory can store hypotheses explored in previous sessions, preventing re-exploration of already-discarded paths.
 
-### Com "Create Plugins"
+### 6.4 Self-Consistency for Validation Across Multiple Sub-agents
 
-Plugins possuem `settings.json` que pode configurar `autoMemoryEnabled` e `autoMemoryDirectory`. Skills de plugins sao progressive disclosure (descricao no startup, conteudo on-demand), alinhando com a filosofia JIT da auto memory.
+Auto memory serves as a historical record that can be used for consistency validation: if a decision in one session contradicts a previous decision stored in memory, Claude can identify and resolve the inconsistency.
 
-### Com "Research: LLM Context Optimization"
+### 6.5 Reflexion for Iterative Sub-agent Improvement
 
-Correlacoes mais diretas:
+Auto memory is the native cross-session Reflexion mechanism:
 
-- **200 linhas de CLAUDE.md**: alinha com o "instruction budget" de ~2.000-4.000 tokens
-- **Path-scoped rules**: implementam "progressive disclosure" formal
-- **Auto memory MEMORY.md + topic files**: implementam "just-in-time documentation"
-- **Compactacao**: implementa "context recycling"
-- **`claudeMdExcludes`**: previne "context poisoning" por instrucoes irrelevantes
-- **Lost in the middle**: justifica headers e bullets (estrutura facilita atencao)
-- **Quality over quantity**: "para cada linha, pergunte se remover causaria erros"
+1. Claude makes a mistake → user corrects → Claude stores the learning in auto memory
+2. Next session → Claude consults auto memory → avoids the same mistake
 
----
+`/memory` allows the user to audit and refine this reflexion process.
 
-## 8. Forcas e Limitacoes
+### 6.6 Least-to-Most for Task Decomposition Across Sub-agents
 
-### Forcas
-
-1. **Simplicidade elegante**: Arquivos markdown editaveis, sem banco de dados ou formato proprietario
-2. **Hierarquia de escopo**: Managed > project > user > subdirectory cobre todos os cenarios
-3. **Progressive disclosure nativo**: Path-scoped rules + subdirectory CLAUDE.md
-4. **Auto-curadoria**: Claude gerencia MEMORY.md autonomamente
-5. **Sobrevive a compactacao**: CLAUDE.md e relido do disco apos compact
-6. **Sistema de imports**: `@path` permite composicao flexivel
-7. **Symlinks para compartilhamento**: Rules podem ser compartilhadas entre projetos
-8. **`/memory` command**: Interface integrada para inspecao e edicao
-
-### Limitacoes
-
-1. **Nao e enforcement**: CLAUDE.md e advisory, nao deterministic -- modelo pode ignorar instrucoes
-2. **Machine-local**: Auto memory nao sincroniza entre maquinas
-3. **Limite de 200 linhas**: MEMORY.md alem de 200 linhas nao e carregado automaticamente
-4. **Sem merge de conflitos**: Multiplos agents/worktrees escrevendo auto memory simultaneamente podem conflitar
-5. **Sem versionamento**: Auto memory nao tem historico de mudancas (exceto se commitada via project scope)
-6. **Contradices silenciosas**: Instrucoes conflitantes sao resolvidas arbitrariamente sem aviso
-7. **Custo de contexto**: CLAUDE.md longo consome tokens do orcamento de atencao
+CLAUDE.md can define the default task decomposition for the project. Path-scoped rules can provide specific decomposition instructions per codebase area. Auto memory can remember decompositions that worked well previously.
 
 ---
 
-## 9. Recomendacoes Praticas
+## 7. Correlations with Core Documents
 
-### 9.1 Estrutura Recomendada de CLAUDE.md
+### With "Creating Custom Subagents"
+
+Sub-agent memory (the `memory` field in frontmatter) is a special case of the auto memory system. Identical mechanism (MEMORY.md + topic files, 200 lines), but with different scopes (user/project/local in the sub-agent vs per-working-tree in the main auto memory). CLAUDE.md and rules are loaded normally by sub-agents via the message flow.
+
+### With "Orchestrate Teams of Claude Code Sessions"
+
+Each teammate in agent teams loads CLAUDE.md and auto memory independently. The team lead's spawn prompt is NOT stored in memory — only in CLAUDE.md that teammates load. Multiple teammates writing auto memory simultaneously can create redundancy.
+
+### With "Research: Subagent Best Practices"
+
+The research emphasizes that the sub-agent's system prompt is EVERYTHING it has (it does NOT receive history). CLAUDE.md partially mitigates this gap by providing persistent project context. The recommendation of "Consult memory before starting" in the sub-agent's prompt complements the sub-agent auto memory mechanism.
+
+### With "Create Plugins"
+
+Plugins have `settings.json` that can configure `autoMemoryEnabled` and `autoMemoryDirectory`. Plugin skills are progressive disclosure (description at startup, content on-demand), aligning with the JIT philosophy of auto memory.
+
+### With "Research: LLM Context Optimization"
+
+Most direct correlations:
+
+- **200 lines of CLAUDE.md**: aligns with the "instruction budget" of ~2,000–4,000 tokens
+- **Path-scoped rules**: implement formal "progressive disclosure"
+- **Auto memory MEMORY.md + topic files**: implement "just-in-time documentation"
+- **Compaction**: implements "context recycling"
+- **`claudeMdExcludes`**: prevents "context poisoning" from irrelevant instructions
+- **Lost in the middle**: justifies headers and bullets (structure facilitates attention)
+- **Quality over quantity**: "for each line, ask whether removing it would cause errors"
+
+---
+
+## 8. Strengths and Limitations
+
+### Strengths
+
+1. **Elegant simplicity**: Editable markdown files, no database or proprietary format
+2. **Scope hierarchy**: Managed > project > user > subdirectory covers all scenarios
+3. **Native progressive disclosure**: Path-scoped rules + subdirectory CLAUDE.md
+4. **Auto-curation**: Claude manages MEMORY.md autonomously
+5. **Survives compaction**: CLAUDE.md is re-read from disk after compact
+6. **Import system**: `@path` enables flexible composition
+7. **Symlinks for sharing**: Rules can be shared across projects
+8. **`/memory` command**: Integrated interface for inspection and editing
+
+### Limitations
+
+1. **Not enforcement**: CLAUDE.md is advisory, not deterministic — the model may ignore instructions
+2. **Machine-local**: Auto memory does not sync across machines
+3. **200-line limit**: MEMORY.md beyond 200 lines is not loaded automatically
+4. **No merge conflict handling**: Multiple agents/worktrees writing auto memory simultaneously may conflict
+5. **No versioning**: Auto memory has no change history (unless committed via project scope)
+6. **Silent contradictions**: Conflicting instructions are resolved arbitrarily without warning
+7. **Context cost**: Long CLAUDE.md consumes tokens from the attention budget
+
+---
+
+## 9. Practical Recommendations
+
+### 9.1 Recommended CLAUDE.md Structure
 
 ```markdown
 # Project Name
 
 ## Build & Test
-- `npm install` para dependencias
-- `npm test` para rodar testes
-- `npm run lint` para linting
+- `npm install` for dependencies
+- `npm test` to run tests
+- `npm run lint` for linting
 
 ## Architecture
 - API handlers: `src/api/handlers/`
 - Components: `src/components/`
-- Testes: `tests/`
+- Tests: `tests/`
 
 ## Code Style
 - 2-space indentation
-- Named exports (nao default exports)
-- Async/await (nao .then chains)
+- Named exports (not default exports)
+- Async/await (not .then chains)
 
 ## Conventions
-- Commits atomicos com conventional commit format
-- PRs devem ter testes para novas features
-- Reviews requeridas antes de merge
+- Atomic commits with conventional commit format
+- PRs must have tests for new features
+- Reviews required before merge
 ```
 
-Mantenha sob 200 linhas. Para detalhes, use `@path` imports ou `.claude/rules/`.
+Keep under 200 lines. For details, use `@path` imports or `.claude/rules/`.
 
-### 9.2 Padrao de Rules Path-Scoped
+### 9.2 Path-Scoped Rules Pattern
 
 ```markdown
 <!-- .claude/rules/api-validation.md -->
@@ -407,28 +412,28 @@ paths:
 - Extract custom hooks to src/hooks/
 ```
 
-### 9.3 Estrategia de Conversao CLAUDE.md -> Hooks
+### 9.3 CLAUDE.md → Hooks Conversion Strategy
 
-Auditoria periodica:
+Periodic audit:
 
-1. Listar todas as instrucoes no CLAUDE.md
-2. Para cada instrucao, perguntar: "Isso pode ser verificado programaticamente?"
-3. Se SIM: converter para hook `PreToolUse` ou `PostToolUse`
-4. Se NAO: manter em CLAUDE.md
-5. Resultado: CLAUDE.md menor, hooks deterministic, orcamento de contexto otimizado
+1. List all instructions in CLAUDE.md
+2. For each instruction, ask: "Can this be verified programmatically?"
+3. If YES: convert to `PreToolUse` or `PostToolUse` hook
+4. If NO: keep in CLAUDE.md
+5. Result: smaller CLAUDE.md, deterministic hooks, optimized context budget
 
-### 9.4 Higiene de Auto Memory
+### 9.4 Auto Memory Hygiene
 
-1. Executar `/memory` periodicamente para revisar o que Claude armazenou
-2. Remover entradas desatualizadas ou incorretas
-3. Consolidar entradas redundantes
-4. Verificar que MEMORY.md esta sob 200 linhas
-5. Considerar mover conhecimento valioso para CLAUDE.md (onde sera carregado integralmente)
+1. Run `/memory` periodically to review what Claude has stored
+2. Remove outdated or incorrect entries
+3. Consolidate redundant entries
+4. Verify that MEMORY.md is under 200 lines
+5. Consider moving valuable knowledge to CLAUDE.md (where it will be loaded in full)
 
-### 9.5 Monorepo: Isolamento de Contexto
+### 9.5 Monorepo: Context Isolation
 
 ```json
-// .claude/settings.local.json (nao commitado)
+// .claude/settings.local.json (not committed)
 {
   "claudeMdExcludes": [
     "**/other-team/CLAUDE.md",
@@ -438,4 +443,4 @@ Auditoria periodica:
 }
 ```
 
-Combine com path-scoped rules para garantir que apenas instrucoes relevantes a sua area de trabalho sejam carregadas.
+Combine with path-scoped rules to ensure only instructions relevant to your work area are loaded.

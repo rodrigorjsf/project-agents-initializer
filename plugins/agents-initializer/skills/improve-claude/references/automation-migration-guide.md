@@ -41,7 +41,7 @@ Classify each instruction block by content type, then recommend the correspondin
 
 | Content Type | Best Mechanism | Evidence Source |
 |---|---|---|
-| Always-applicable universal rules (<5 lines) | CLAUDE.md root or rule without `paths:` | research-llm-context-optimization.md |
+| Always-applicable universal rules (<5 lines) | CLAUDE.md root or rule without `paths:` | research-context-engineering-comprehensive.md |
 | Path-specific conventions (5-50 lines) | `.claude/rules/` with `paths:` frontmatter | analysis-how-claude-remembers-a-project.md |
 | Domain knowledge or workflows (50-500 lines) | Skill (`user-invocable: false`) | extend-claude-with-skills.md |
 | Heavy workflows with side effects | Skill (`disable-model-invocation: true`) | extend-claude-with-skills.md |
@@ -133,7 +133,7 @@ Estimate savings when recommending each migration type:
 
 Present token impact estimates alongside migration recommendations to help users prioritize high-impact changes first.
 
-*Source: research-llm-context-optimization.md, analysis-skill-authoring-best-practices.md lines 19-46*
+*Source: research-context-engineering-comprehensive.md, analysis-skill-authoring-best-practices.md lines 19-46*
 
 ---
 
@@ -150,5 +150,5 @@ Present token impact estimates alongside migration recommendations to help users
 | Skill startup cost: ~100 tokens for name + description only | analysis-skill-authoring-best-practices.md lines 19-23 |
 | Reference depth: max 1 level from SKILL.md | analysis-skill-authoring-best-practices.md lines 131-143 |
 | Path-scoped rules: on-demand loading via `paths:` frontmatter | analysis-how-claude-remembers-a-project.md lines 53-64 |
-| ≤200 lines per config file; ~150-200 instruction limit | research-llm-context-optimization.md |
+| ≤200 lines per config file; ~150-200 instruction limit | research-context-engineering-comprehensive.md |
 | Each converted rule saves ~20-50 tokens from always-loaded context | DESIGN-GUIDELINES.md Guideline 10 |

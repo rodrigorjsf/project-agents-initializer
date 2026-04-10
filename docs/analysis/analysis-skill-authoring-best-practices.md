@@ -1,126 +1,133 @@
-# Análise Completa: Skill Authoring Best Practices
+# Complete Analysis: Skill Authoring Best Practices
 
-## 1. Sumário Executivo
+> **Status**: Current
+> **Source document**: [`docs/skills/skill-authoring-best-practices.md`](../skills/skill-authoring-best-practices.md)
+> **Analysis date**: 2026-03-27
+> **Scope**: Comprehensive analysis of the official Anthropic guide on writing effective Claude Code skills, covering design principles, content patterns, testing strategies, and anti-patterns
 
-O documento **skill-authoring-best-practices.md** é o guia oficial da Anthropic para autoria de skills eficazes no Claude Code. Enquanto o `extend-claude-with-skills.md` define a arquitetura e o `research-claude-code-skills-format.md` detalha o formato técnico, este documento foca no **como escrever bem** — os princípios de design, padrões de conteúdo, estratégias de teste e anti-padrões que determinam se um skill será eficaz ou desperdiçará tokens.
+---
 
-O documento está profundamente alinhado com os princípios de otimização de contexto identificados no `research-llm-context-optimization.md`: concisão como princípio fundamental (a janela de contexto é um "bem público"), progressive disclosure como arquitetura central (SKILL.md como índice, arquivos de referência carregados sob demanda), e graus de liberdade calibrados à fragilidade da tarefa. O mantra central é: **"Claude já é muito inteligente — adicione apenas o contexto que ele não possui."**
+## 1. Executive Summary
 
-A contribuição mais significativa deste documento é a metodologia de **desenvolvimento iterativo com dois Claudes** (Claude A como expert que refina o skill, Claude B como agente que o utiliza), combinada com a abordagem de **evaluation-driven development** que prioriza a criação de avaliações antes da escrita de documentação extensiva. Este ciclo observe-refine-test é a implementação prática do princípio de Reflexion aplicado ao design de infraestrutura de agentes.
+The document **skill-authoring-best-practices.md** is Anthropic's official guide for authoring effective skills in Claude Code. While `extend-claude-with-skills.md` defines the architecture and `research-claude-code-skills-format.md` details the technical format, this document focuses on **how to write well** — the design principles, content patterns, testing strategies, and anti-patterns that determine whether a skill will be effective or waste tokens.
 
-## 2. Conceitos e Mecanismos-Chave
+The document is deeply aligned with the context optimization principles identified in `research-context-engineering-comprehensive.md`: conciseness as a fundamental principle (the context window is a "public good"), progressive disclosure as the central architecture (SKILL.md as index, reference files loaded on demand), and degrees of freedom calibrated to task fragility. The central mantra is: **"Claude is already very smart — only add context it doesn't have."**
 
-### 2.1 Princípios Fundamentais
+The most significant contribution of this document is the methodology of **iterative development with two Claudes** (Claude A as the expert refining the skill, Claude B as the agent using it), combined with the **evaluation-driven development** approach that prioritizes creating evaluations before writing extensive documentation. This observe-refine-test cycle is the practical implementation of the Reflexion principle applied to agent infrastructure design.
 
-#### Concisão como Princípio Central
+## 2. Key Concepts and Mechanisms
 
-O documento estabelece uma hierarquia clara de custo de tokens:
+### 2.1 Fundamental Principles
 
-| Momento | O que é carregado | Custo |
-|---------|-------------------|-------|
-| Startup | Apenas `name` + `description` de todos os skills | Mínimo |
-| Trigger | `SKILL.md` completo do skill relevante | Moderado |
-| Sob demanda | Arquivos referenciados (reference/, examples/) | Variável |
+#### Conciseness as a Central Principle
 
-**Teste decisivo para cada informação:**
+The document establishes a clear hierarchy of token cost:
 
-- "Claude realmente precisa desta explicação?"
-- "Posso assumir que Claude já sabe isso?"
-- "Este parágrafo justifica seu custo em tokens?"
+| Moment | What is Loaded | Cost |
+|--------|---------------|------|
+| Startup | Only `name` + `description` from all skills | Minimal |
+| Trigger | Complete `SKILL.md` of the relevant skill | Moderate |
+| On demand | Referenced files (reference/, examples/) | Variable |
 
-**Exemplo concreto do documento:**
+**Decisive test for each piece of information:**
 
-- Bom (~50 tokens): Código direto com `pdfplumber` sem explicação
-- Ruim (~150 tokens): Explicação do que é PDF, por que usar pdfplumber, como instalar
+- "Does Claude actually need this explanation?"
+- "Can I assume Claude already knows this?"
+- "Does this paragraph justify its token cost?"
 
-#### Graus de Liberdade Calibrados
+**Concrete example from the document:**
 
-O documento introduz uma metáfora poderosa — Claude como robô explorando um caminho:
+- Good (~50 tokens): Direct code with `pdfplumber` without explanation
+- Bad (~150 tokens): Explanation of what PDF is, why use pdfplumber, how to install
 
-| Grau | Metáfora | Quando Usar | Exemplo |
-|------|----------|-------------|---------|
-| **Alto** | Campo aberto sem perigos | Múltiplas abordagens válidas, decisões dependem de contexto | Code review |
-| **Médio** | Caminho com marcações | Padrão preferido existe mas variação é aceitável | Templates com parâmetros |
-| **Baixo** | Ponte estreita com penhascos | Operações frágeis, consistência crítica | Database migrations |
+#### Calibrated Degrees of Freedom
 
-**Princípio derivado:** A especificidade das instruções deve ser proporcional ao risco de erro. Quanto mais destrutiva ou irreversível a operação, mais prescritivo o skill deve ser.
+The document introduces a powerful metaphor — Claude as a robot exploring a path:
 
-#### Teste Multi-Modelo
+| Degree | Metaphor | When to Use | Example |
+|--------|----------|-------------|---------|
+| **High** | Open field with no dangers | Multiple valid approaches, decisions depend on context | Code review |
+| **Medium** | Path with markers | Preferred pattern exists but variation is acceptable | Templates with parameters |
+| **Low** | Narrow bridge with cliffs | Fragile operations, critical consistency | Database migrations |
 
-Skills devem ser testados com todos os modelos pretendidos:
+**Derived principle:** The specificity of instructions should be proportional to error risk. The more destructive or irreversible the operation, the more prescriptive the skill should be.
 
-| Modelo | Consideração de Teste |
-|--------|----------------------|
-| **Haiku** | O skill fornece guidance suficiente? (precisa mais detalhe) |
-| **Sonnet** | O skill é claro e eficiente? (equilíbrio) |
-| **Opus** | O skill evita over-explaining? (pode precisar menos) |
+#### Multi-Model Testing
 
-### 2.2 Estrutura do Skill
+Skills should be tested with all intended models:
 
-#### Frontmatter YAML
+| Model | Testing Consideration |
+|-------|-----------------------|
+| **Haiku** | Does the skill provide sufficient guidance? (needs more detail) |
+| **Sonnet** | Is the skill clear and efficient? (balance) |
+| **Opus** | Does the skill avoid over-explaining? (may need less) |
 
-| Campo | Requisitos | Limite |
-|-------|-----------|--------|
-| `name` | Lowercase, números, hífens apenas. Sem XML tags, sem palavras reservadas ("anthropic", "claude") | 64 caracteres |
-| `description` | Não-vazio, sem XML tags. Deve descrever O QUE faz E QUANDO usar | 1024 caracteres |
+### 2.2 Skill Structure
 
-#### Convenções de Nomenclatura
+#### YAML Frontmatter
 
-**Forma preferida — gerúndio (verb + -ing):**
+| Field | Requirements | Limit |
+|-------|-------------|-------|
+| `name` | Lowercase, numbers, hyphens only. No XML tags, no reserved words ("anthropic", "claude") | 64 characters |
+| `description` | Non-empty, no XML tags. Must describe WHAT it does AND WHEN to use it | 1024 characters |
+
+#### Naming Conventions
+
+**Preferred form — gerund (verb + -ing):**
 
 - `processing-pdfs`, `analyzing-spreadsheets`, `managing-databases`
 
-**Aceitável — frases nominais ou orientadas a ação:**
+**Acceptable — noun phrases or action-oriented:**
 
 - `pdf-processing`, `process-pdfs`
 
-**Evitar:**
+**Avoid:**
 
-- Nomes vagos: `helper`, `utils`, `tools`
-- Genéricos: `documents`, `data`, `files`
+- Vague names: `helper`, `utils`, `tools`
+- Generic: `documents`, `data`, `files`
 
-#### Descrições Eficazes
+#### Effective Descriptions
 
-**Regra crítica:** Sempre em terceira pessoa. A descrição é injetada no system prompt — POV inconsistente causa problemas de discovery.
+**Critical rule:** Always in third person. The description is injected into the system prompt — inconsistent POV causes discovery problems.
 
-- Bom: "Processes Excel files and generates reports"
-- Ruim: "I can help you process Excel files"
-- Ruim: "You can use this to process Excel files"
+- Good: "Processes Excel files and generates reports"
+- Bad: "I can help you process Excel files"
+- Bad: "You can use this to process Excel files"
 
-**Elementos de uma boa descrição:**
+**Elements of a good description:**
 
-1. O que o skill faz (capacidades)
-2. Quando usá-lo (triggers/contextos)
-3. Termos-chave específicos (para matching)
+1. What the skill does (capabilities)
+2. When to use it (triggers/contexts)
+3. Specific key terms (for matching)
 
-### 2.3 Progressive Disclosure — Padrões
+### 2.3 Progressive Disclosure — Patterns
 
-#### Padrão 1: Guia de Alto Nível com Referências
+#### Pattern 1: High-Level Guide with References
 
 ```
 SKILL.md (overview + quick start)
-  ├── FORMS.md (carregado se form filling necessário)
-  ├── REFERENCE.md (carregado se API details necessários)
-  └── EXAMPLES.md (carregado se exemplos necessários)
+  ├── FORMS.md (loaded if form filling needed)
+  ├── REFERENCE.md (loaded if API details needed)
+  └── EXAMPLES.md (loaded if examples needed)
 ```
 
-Claude carrega arquivos sob demanda. Zero custo de contexto para arquivos não acessados.
+Claude loads files on demand. Zero context cost for unaccessed files.
 
-#### Padrão 2: Organização por Domínio
+#### Pattern 2: Domain-Based Organization
 
 ```
 bigquery-skill/
-├── SKILL.md (overview e navegação)
+├── SKILL.md (overview and navigation)
 └── reference/
-    ├── finance.md (métricas de receita)
-    ├── sales.md (pipeline, oportunidades)
-    ├── product.md (uso de API)
-    └── marketing.md (campanhas)
+    ├── finance.md (revenue metrics)
+    ├── sales.md (pipeline, opportunities)
+    ├── product.md (API usage)
+    └── marketing.md (campaigns)
 ```
 
-Quando o usuário pergunta sobre vendas, Claude carrega apenas `sales.md`.
+When the user asks about sales, Claude loads only `sales.md`.
 
-#### Padrão 3: Detalhes Condicionais
+#### Pattern 3: Conditional Details
 
 ```markdown
 ## Creating documents
@@ -131,22 +138,22 @@ For simple edits, modify XML directly.
 **For tracked changes**: See [REDLINING.md](REDLINING.md)
 ```
 
-#### Regra de Profundidade: Máximo 1 Nível
+#### Depth Rule: Maximum 1 Level
 
-**Crítico:** Referências devem ser de no máximo 1 nível de profundidade a partir de SKILL.md. Claude pode usar `head -100` para preview de arquivos referenciados por outros arquivos referenciados, resultando em informação incompleta.
+**Critical:** References must be at most 1 level deep from SKILL.md. Claude may use `head -100` to preview files referenced by other referenced files, resulting in incomplete information.
 
-- Ruim: `SKILL.md → advanced.md → details.md` (2 níveis)
-- Bom: `SKILL.md → advanced.md`, `SKILL.md → reference.md` (1 nível cada)
+- Bad: `SKILL.md → advanced.md → details.md` (2 levels)
+- Good: `SKILL.md → advanced.md`, `SKILL.md → reference.md` (1 level each)
 
-#### Arquivos de Referência Longos: Table of Contents
+#### Long Reference Files: Table of Contents
 
-Para arquivos com mais de 100 linhas, incluir TOC no topo para que Claude veja o escopo completo mesmo em leituras parciais.
+For files with more than 100 lines, include a TOC at the top so Claude can see the complete scope even in partial reads.
 
-### 2.4 Workflows e Feedback Loops
+### 2.4 Workflows and Feedback Loops
 
-#### Checklists para Tarefas Complexas
+#### Checklists for Complex Tasks
 
-O documento recomenda fornecer checklists copiáveis que Claude pode marcar durante a execução:
+The document recommends providing copyable checklists that Claude can mark during execution:
 
 ```markdown
 Task Progress:
@@ -159,210 +166,210 @@ Task Progress:
 
 #### Feedback Loops (Validate → Fix → Repeat)
 
-Padrão que melhora significativamente a qualidade:
+Pattern that significantly improves quality:
 
-1. Executar validador/script
-2. Corrigir erros encontrados
-3. Re-validar
-4. Só proceder quando validação passar
+1. Run validator/script
+2. Fix errors found
+3. Re-validate
+4. Only proceed when validation passes
 
-Aplica-se tanto a skills com código (scripts de validação) quanto sem código (verificação contra style guides).
+Applies to both skills with code (validation scripts) and without code (verification against style guides).
 
-### 2.5 Guidelines de Conteúdo
+### 2.5 Content Guidelines
 
-**Evitar informação time-sensitive:**
+**Avoid time-sensitive information:**
 
-- Ruim: "Se antes de agosto 2025, use a API antiga"
-- Bom: Seção "Current method" + seção colapsável "Old patterns"
+- Bad: "If before August 2025, use the old API"
+- Good: "Current method" section + collapsible "Old patterns" section
 
-**Terminologia consistente:**
+**Consistent terminology:**
 
-- Escolher UM termo e usar em todo o skill
-- "API endpoint" sempre, não misturar com "URL", "route", "path"
+- Choose ONE term and use it throughout the skill
+- "API endpoint" always, don't mix with "URL", "route", "path"
 
-### 2.6 Skills com Código Executável
+### 2.6 Skills with Executable Code
 
-#### Princípio: Solve, Don't Punt
+#### Principle: Solve, Don't Punt
 
-Scripts devem tratar erros em vez de deixar Claude resolver:
+Scripts should handle errors instead of leaving Claude to resolve them:
 
-- Bom: `except FileNotFoundError: create default`
-- Ruim: `return open(path).read()` (falha silenciosa)
+- Good: `except FileNotFoundError: create default`
+- Bad: `return open(path).read()` (silent failure)
 
-#### Constantes Documentadas (Lei de Ousterhout)
+#### Documented Constants (Ousterhout's Law)
 
 ```python
-# Bom: auto-documentado
+# Good: self-documenting
 REQUEST_TIMEOUT = 30  # HTTP requests typically complete within 30s
 MAX_RETRIES = 3       # Most intermittent failures resolve by 2nd retry
 
-# Ruim: magic numbers
-TIMEOUT = 47  # Por quê 47?
+# Bad: magic numbers
+TIMEOUT = 47  # Why 47?
 ```
 
-#### Scripts Utilitários vs Código Gerado
+#### Utility Scripts vs Generated Code
 
-| Aspecto | Script Pré-feito | Código Gerado por Claude |
-|---------|-----------------|-------------------------|
-| Confiabilidade | Maior (testado) | Variável |
-| Custo de tokens | Baixo (apenas output) | Alto (código no contexto) |
-| Tempo | Rápido (executa direto) | Lento (gera + executa) |
-| Consistência | Alta | Variável |
+| Aspect | Pre-made Script | Code Generated by Claude |
+|--------|----------------|-------------------------|
+| Reliability | Higher (tested) | Variable |
+| Token cost | Low (output only) | High (code in context) |
+| Time | Fast (executes directly) | Slow (generates + executes) |
+| Consistency | High | Variable |
 
-**Distinção crítica nas instruções:**
+**Critical distinction in instructions:**
 
-- "Run `analyze_form.py` to extract fields" → **executar**
-- "See `analyze_form.py` for the extraction algorithm" → **ler como referência**
+- "Run `analyze_form.py` to extract fields" → **execute**
+- "See `analyze_form.py` for the extraction algorithm" → **read as reference**
 
 #### Plan-Validate-Execute Pattern
 
-Para operações complexas e destrutivas:
+For complex and destructive operations:
 
 1. Analyze → Create plan file (`changes.json`)
-2. **Validate plan** com script
+2. **Validate plan** with script
 3. Execute changes
 4. Verify output
 
-Quando usar: batch operations, destructive changes, complex validation, high-stakes.
+When to use: batch operations, destructive changes, complex validation, high-stakes.
 
-### 2.7 Avaliação e Iteração
+### 2.7 Evaluation and Iteration
 
 #### Evaluation-Driven Development
 
-**Sequência recomendada:**
+**Recommended sequence:**
 
-1. Identificar gaps (rodar Claude sem skill e documentar falhas)
-2. Criar avaliações (3 cenários mínimos)
-3. Estabelecer baseline (performance sem o skill)
-4. Escrever instruções mínimas
-5. Iterar (executar avaliações, comparar, refinar)
+1. Identify gaps (run Claude without skill and document failures)
+2. Create evaluations (3 minimum scenarios)
+3. Establish baseline (performance without the skill)
+4. Write minimal instructions
+5. Iterate (run evaluations, compare, refine)
 
-#### Desenvolvimento Iterativo com Dois Claudes
+#### Iterative Development with Two Claudes
 
-| Papel | Função |
-|-------|--------|
-| **Claude A** | Expert que ajuda a refinar o skill (design, estrutura, conteúdo) |
-| **Claude B** | Agente que testa o skill em tarefas reais |
-| **Você** | Observador que identifica gaps e fornece domain expertise |
+| Role | Function |
+|------|----------|
+| **Claude A** | Expert that helps refine the skill (design, structure, content) |
+| **Claude B** | Agent that tests the skill on real tasks |
+| **You** | Observer who identifies gaps and provides domain expertise |
 
-**Ciclo:** Observar Claude B → Identificar problemas → Refinar com Claude A → Testar com Claude B → Repetir
+**Cycle:** Observe Claude B → Identify problems → Refine with Claude A → Test with Claude B → Repeat
 
-#### Observar Navegação de Skills
+#### Observing Skill Navigation
 
-Padrões a monitorar:
+Patterns to monitor:
 
-- **Caminhos inesperados**: Claude lê arquivos em ordem não antecipada → estrutura não intuitiva
-- **Conexões perdidas**: Claude não segue referências → links precisam ser mais explícitos
-- **Dependência excessiva**: Claude relê o mesmo arquivo repetidamente → conteúdo deveria estar no SKILL.md principal
-- **Conteúdo ignorado**: Claude nunca acessa um arquivo bundled → possivelmente desnecessário
+- **Unexpected paths**: Claude reads files in unanticipated order → non-intuitive structure
+- **Missed connections**: Claude doesn't follow references → links need to be more explicit
+- **Excessive dependency**: Claude re-reads the same file repeatedly → content should be in the main SKILL.md
+- **Ignored content**: Claude never accesses a bundled file → possibly unnecessary
 
-## 3. Pontos de Atenção
+## 3. Points of Attention
 
-### 3.1 Armadilhas Comuns
+### 3.1 Common Pitfalls
 
-| Armadilha | Problema | Solução |
-|-----------|----------|---------|
-| **Over-explaining para Opus** | Desperdiça tokens com informação que Opus já sabe | Testar com cada modelo; usar "escape hatches" para detalhes |
-| **Under-explaining para Haiku** | Haiku precisa mais guidance que Opus | Mirar em instruções que funcionem para todos os modelos |
-| **Referências de 2+ níveis** | Claude pode fazer `head -100` em vez de ler completo | Manter referências a 1 nível de SKILL.md |
-| **Descrição em primeira pessoa** | Causa problemas de discovery quando injetada no system prompt | Sempre terceira pessoa |
-| **SKILL.md acima de 500 linhas** | Performance degradada, competição excessiva por tokens | Split em arquivos de referência |
-| **Informação time-sensitive** | Torna-se incorreta sem aviso | Usar seção "Old patterns" colapsável |
-| **Múltiplas opções sem default** | Claude fica indeciso | Fornecer default claro + escape hatch |
-| **Paths Windows-style** | Erros em sistemas Unix | Sempre forward slashes |
-| **Assumir packages instalados** | Falha silenciosa em ambientes limpos | Listar dependências explicitamente |
-| **Voodoo constants** | Claude não sabe como ajustar | Documentar justificativa de cada constante |
+| Pitfall | Problem | Solution |
+|---------|---------|----------|
+| **Over-explaining for Opus** | Wastes tokens with information Opus already knows | Test with each model; use "escape hatches" for details |
+| **Under-explaining for Haiku** | Haiku needs more guidance than Opus | Aim for instructions that work for all models |
+| **2+ level references** | Claude may do `head -100` instead of reading completely | Keep references at 1 level from SKILL.md |
+| **First-person description** | Causes discovery problems when injected into system prompt | Always third person |
+| **SKILL.md over 500 lines** | Degraded performance, excessive token competition | Split into reference files |
+| **Time-sensitive information** | Becomes incorrect without warning | Use collapsible "Old patterns" section |
+| **Multiple options without default** | Claude becomes indecisive | Provide clear default + escape hatch |
+| **Windows-style paths** | Errors on Unix systems | Always forward slashes |
+| **Assuming packages installed** | Silent failure in clean environments | List dependencies explicitly |
+| **Voodoo constants** | Claude doesn't know how to adjust | Document justification for each constant |
 
-### 3.2 O Paradoxo da Completude
+### 3.2 The Completeness Paradox
 
-O documento revela uma tensão fundamental: skills devem ser **suficientemente completos** para guiar o Claude, mas **suficientemente concisos** para não desperdiçar o budget de contexto. A resolução está no progressive disclosure — o SKILL.md é um índice conciso, e os detalhes vivem em arquivos separados carregados sob demanda.
+The document reveals a fundamental tension: skills must be **sufficiently complete** to guide Claude, but **sufficiently concise** to not waste the context budget. The resolution lies in progressive disclosure — SKILL.md is a concise index, and details live in separate files loaded on demand.
 
 ### 3.3 Discovery vs Execution
 
-A `description` serve para **discovery** (Claude decidindo qual skill usar entre 100+), enquanto o corpo do SKILL.md serve para **execution** (como realizar a tarefa). Otimizar para um sem considerar o outro leva a problemas:
+The `description` serves for **discovery** (Claude deciding which skill to use among 100+), while the SKILL.md body serves for **execution** (how to perform the task). Optimizing for one without considering the other leads to problems:
 
-- Descrição vaga → skill nunca é selecionado
-- Descrição boa + corpo ruim → skill é selecionado mas falha na execução
+- Vague description → skill is never selected
+- Good description + bad body → skill is selected but fails in execution
 
-## 4. Casos de Uso e Escopo
+## 4. Use Cases and Scope
 
-### 4.1 Quando Criar um Skill
+### 4.1 When to Create a Skill
 
-| Situação | Criar Skill? | Alternativa |
-|----------|-------------|-------------|
-| Workflow repetitivo com múltiplos passos | **Sim** | — |
-| Conhecimento de domínio que Claude não tem | **Sim** | — |
-| Validação/formatação com scripts específicos | **Sim** | — |
-| Regra simples que deve ser sempre seguida | Não | Rule (`.claude/rules/`) |
-| Enforcement determinístico de uma restrição | Não | Hook |
-| Informação geral sobre o projeto | Não | CLAUDE.md |
-| Contexto dinâmico de sessão | Não | Hook `SessionStart` |
+| Situation | Create Skill? | Alternative |
+|-----------|--------------|-------------|
+| Repetitive workflow with multiple steps | **Yes** | — |
+| Domain knowledge that Claude doesn't have | **Yes** | — |
+| Validation/formatting with specific scripts | **Yes** | — |
+| Simple rule that should always be followed | No | Rule (`.claude/rules/`) |
+| Deterministic enforcement of a constraint | No | Hook |
+| General information about the project | No | CLAUDE.md |
+| Dynamic session context | No | Hook `SessionStart` |
 
-### 4.2 Decisão: Grau de Liberdade
+### 4.2 Decision: Degree of Freedom
 
 ```
-A operação é destrutiva ou irreversível?
-├── SIM → Baixa liberdade (scripts exatos, sem variação)
-│   Exemplos: migrations, deploys, file deletions
-└── NÃO → Múltiplas abordagens são válidas?
-    ├── SIM → Alta liberdade (instruções textuais, heurísticas)
-    │   Exemplos: code review, research, documentation
-    └── NÃO → Média liberdade (pseudocode/templates com parâmetros)
-        Exemplos: report generation, API calls, data processing
+Is the operation destructive or irreversible?
+├── YES → Low freedom (exact scripts, no variation)
+│   Examples: migrations, deploys, file deletions
+└── NO → Are multiple approaches valid?
+    ├── YES → High freedom (textual instructions, heuristics)
+    │   Examples: code review, research, documentation
+    └── NO → Medium freedom (pseudocode/templates with parameters)
+        Examples: report generation, API calls, data processing
 ```
 
-### 4.3 Escopo de Aplicação por Tipo de Tarefa
+### 4.3 Application Scope by Task Type
 
-| Tipo de Tarefa | Padrão Recomendado | Referências Necessárias |
-|----------------|-------------------|------------------------|
-| Análise de dados | Domain-specific organization | Schemas por domínio |
-| Processamento de documentos | High-level guide + references | Format guides, scripts |
+| Task Type | Recommended Pattern | Required References |
+|-----------|--------------------|--------------------|
+| Data analysis | Domain-specific organization | Schemas per domain |
+| Document processing | High-level guide + references | Format guides, scripts |
 | Code generation | Template pattern + examples | API docs, examples |
-| DevOps/CI | Workflow com checklist | Scripts, configs |
-| Research/synthesis | Workflow sem código | Style guide, sources |
+| DevOps/CI | Workflow with checklist | Scripts, configs |
+| Research/synthesis | Code-free workflow | Style guide, sources |
 
-## 5. Aplicabilidade à Infraestrutura de Agentes
+## 5. Applicability to Agent Infrastructure
 
 ### 5.1 Skills (Design Patterns)
 
-**Padrão de Evolução de Skills:**
+**Skill Evolution Pattern:**
 
 ```
-v1: SKILL.md monolítico (< 200 linhas)
-  ↓ Crescimento natural
-v2: SKILL.md + 1-2 reference files (< 500 linhas total em SKILL.md)
-  ↓ Mais domínios/casos
+v1: Monolithic SKILL.md (< 200 lines)
+  ↓ Natural growth
+v2: SKILL.md + 1-2 reference files (< 500 lines total in SKILL.md)
+  ↓ More domains/cases
 v3: SKILL.md (index) + reference/ directory (domain-specific)
-  ↓ Complexidade operacional
-v4: SKILL.md + reference/ + scripts/ + hooks no frontmatter
+  ↓ Operational complexity
+v4: SKILL.md + reference/ + scripts/ + hooks in frontmatter
 ```
 
-**Composição de Skills:**
+**Skill Composition:**
 
-- Skills podem referenciar outros skills indiretamente (via instruções em SKILL.md)
-- Skills com `context: fork` executam em subagent isolado — zero impacto no contexto principal
-- Skills com `disable-model-invocation: true` mantêm descrições fora do contexto até trigger
+- Skills can reference other skills indirectly (via instructions in SKILL.md)
+- Skills with `context: fork` execute in an isolated subagent — zero impact on the main context
+- Skills with `disable-model-invocation: true` keep descriptions out of context until trigger
 
 **Refactoring Checklist:**
 
-1. SKILL.md acima de 500 linhas? → Split em references
-2. Referências com mais de 1 nível? → Flatten para 1 nível
-3. Claude ignora algum arquivo? → Remover ou melhorar sinalização
-4. Claude relê repetidamente? → Mover para SKILL.md principal
-5. Description suficientemente específica? → Adicionar termos-chave e triggers
+1. SKILL.md over 500 lines? → Split into references
+2. References with more than 1 level? → Flatten to 1 level
+3. Claude ignores a file? → Remove or improve signaling
+4. Claude re-reads repeatedly? → Move to main SKILL.md
+5. Description sufficiently specific? → Add key terms and triggers
 
 ### 5.2 Hooks
 
-**Como hooks complementam skills:**
+**How hooks complement skills:**
 
-| Hook Event | Complemento ao Skill |
+| Hook Event | Complement to Skill |
 |-----------|---------------------|
-| `PreToolUse` | Validação de segurança antes de scripts do skill executarem |
-| `PostToolUse` | Verificação pós-execução (lint, format, test) |
-| `Stop` (agent) | Verificação que o workflow do skill completou corretamente |
-| `SessionStart` | Carregamento de estado que o skill precisa |
+| `PreToolUse` | Security validation before skill scripts execute |
+| `PostToolUse` | Post-execution verification (lint, format, test) |
+| `Stop` (agent) | Verification that the skill workflow completed correctly |
+| `SessionStart` | Loading state that the skill needs |
 
-**Hooks no frontmatter do skill:**
+**Hooks in skill frontmatter:**
 
 ```yaml
 ---
@@ -381,35 +388,35 @@ hooks:
 ---
 ```
 
-**Flag `once: true`:** Para hooks de setup que devem rodar apenas uma vez na ativação do skill (ex: verificar dependências instaladas).
+**`once: true` flag:** For setup hooks that should run only once on skill activation (e.g., check installed dependencies).
 
 ### 5.3 Subagents
 
-**Skills que delegam para subagents:**
+**Skills that delegate to subagents:**
 
-- Skill principal define workflow e delega investigação para subagents
-- `context: fork` garante que o skill executa em subagent isolado
-- Subagents herdam hooks definidos no skill frontmatter
+- Main skill defines workflow and delegates investigation to subagents
+- `context: fork` ensures the skill executes in an isolated subagent
+- Subagents inherit hooks defined in the skill frontmatter
 
-**Padrão de Decomposição:**
+**Decomposition Pattern:**
 
 ```
 Skill "research-and-implement"
-  ├── Fase 1: Delega pesquisa para subagent Explore
-  ├── Fase 2: Analisa resultados no contexto principal
-  ├── Fase 3: Delega implementação para subagent com worktree
-  └── Fase 4: Verifica resultado via hook Stop (agent type)
+  ├── Phase 1: Delegate research to Explore subagent
+  ├── Phase 2: Analyze results in main context
+  ├── Phase 3: Delegate implementation to subagent with worktree
+  └── Phase 4: Verify result via Stop hook (agent type)
 ```
 
 ### 5.4 Rules
 
-**Quando rules substituem conteúdo do skill:**
+**When rules replace skill content:**
 
-- Regras que se aplicam a TODOS os skills (ex: "always use TypeScript") → Rule global
-- Regras específicas de paths que afetam a execução do skill → Rule com `paths:` frontmatter
-- Regras que precisam enforcement mais forte → Hook no frontmatter do skill
+- Rules that apply to ALL skills (e.g., "always use TypeScript") → Global rule
+- Path-specific rules that affect skill execution → Rule with `paths:` frontmatter
+- Rules that need stronger enforcement → Hook in skill frontmatter
 
-**Rules que referenciam skills:**
+**Rules that reference skills:**
 
 ```markdown
 # .claude/rules/api-development.md
@@ -421,15 +428,15 @@ When working with API endpoints, use the /api-development skill for patterns and
 
 ### 5.5 Memory
 
-**Skills e o sistema de memória:**
+**Skills and the memory system:**
 
-| Interação | Exemplo |
-|-----------|---------|
-| Skill que consulta memória | Skill de commit verifica `feedback_commit-style.md` para preferências do usuário |
-| Skill que gera memória | Skill de onboarding salva descobertas sobre o projeto em memory files |
-| Memória que informa trigger | MEMORY.md registra que "usuário prefere skill X para tarefas Y" |
+| Interaction | Example |
+|-------------|---------|
+| Skill that queries memory | Commit skill checks `feedback_commit-style.md` for user preferences |
+| Skill that generates memory | Onboarding skill saves project discoveries in memory files |
+| Memory that informs trigger | MEMORY.md records that "user prefers skill X for tasks Y" |
 
-**Padrão: Skill Memory-Aware**
+**Pattern: Memory-Aware Skill**
 
 ```markdown
 # SKILL.md
@@ -438,172 +445,172 @@ Check if there are relevant memory files in the project's memory directory
 that might inform this task (previous decisions, preferences, constraints).
 ```
 
-## 6. Aplicabilidade do Guia de Engenharia de Prompts
+## 6. Prompt Engineering Guide Applicability
 
-### 6.1 Mapeamento Técnica → Aspecto do Skill
+### 6.1 Technique → Skill Aspect Mapping
 
-| Técnica | Aplicação em Skill Authoring | Onde no Skill |
-|---------|------------------------------|---------------|
-| **Chain-of-Thought** | Workflows multi-passo com checklists | Seções de workflow em SKILL.md |
-| **Prompt Chaining** | Fases sequenciais do skill (analyze → plan → execute → verify) | Estrutura de fases do SKILL.md |
-| **ReAct** | Skills que usam ferramentas (Read → Analyze → Execute → Verify) | Scripts utilitários + instruções |
-| **Least-to-Most** | Decomposição de problemas complexos em sub-tarefas | Padrão de conditional workflow |
-| **Self-Consistency** | Validation loops (executar → validar → corrigir → re-validar) | Feedback loops |
-| **Tree of Thoughts** | Skills de decisão com múltiplos caminhos | Conditional workflow pattern |
-| **Reflexion** | Desenvolvimento iterativo com dois Claudes (observe-refine-test) | Processo de avaliação |
-| **Few-shot (Examples)** | Padrão de exemplos input/output no skill | Examples pattern |
-| **Structured Output** | Template pattern para formatos de saída | Template pattern |
-| **Zero-shot CoT** | "Analyze the code structure and organization" (alta liberdade) | Instruções textuais |
+| Technique | Application in Skill Authoring | Where in the Skill |
+|-----------|-------------------------------|-------------------|
+| **Chain-of-Thought** | Multi-step workflows with checklists | Workflow sections in SKILL.md |
+| **Prompt Chaining** | Sequential skill phases (analyze → plan → execute → verify) | SKILL.md phase structure |
+| **ReAct** | Skills that use tools (Read → Analyze → Execute → Verify) | Utility scripts + instructions |
+| **Least-to-Most** | Decomposition of complex problems into sub-tasks | Conditional workflow pattern |
+| **Self-Consistency** | Validation loops (execute → validate → fix → re-validate) | Feedback loops |
+| **Tree of Thoughts** | Decision skills with multiple paths | Conditional workflow pattern |
+| **Reflexion** | Iterative development with two Claudes (observe-refine-test) | Evaluation process |
+| **Few-shot (Examples)** | Input/output example patterns in the skill | Examples pattern |
+| **Structured Output** | Template pattern for output formats | Template pattern |
+| **Zero-shot CoT** | "Analyze the code structure and organization" (high freedom) | Textual instructions |
 
-### 6.2 Técnicas por Fase do Skill
+### 6.2 Techniques by Skill Phase
 
-**Fase de Discovery (description):**
+**Discovery phase (description):**
 
-- Role Prompting implícito: a description define o "papel" do skill
-- Zero-shot: description deve ser suficiente sem exemplos
+- Implicit Role Prompting: the description defines the skill's "role"
+- Zero-shot: description must be sufficient without examples
 
-**Fase de Execution (SKILL.md body):**
+**Execution phase (SKILL.md body):**
 
-- Prompt Chaining: fases sequenciais com gates de validação
-- ReAct: skills que alternam entre raciocínio e uso de ferramentas
-- Least-to-Most: decomposição de tarefas complexas
+- Prompt Chaining: sequential phases with validation gates
+- ReAct: skills that alternate between reasoning and tool use
+- Least-to-Most: decomposition of complex tasks
 
-**Fase de Validation (feedback loops):**
+**Validation phase (feedback loops):**
 
-- Self-Consistency: múltiplas execuções do validador
-- Reflexion: loop de melhoria iterativa
+- Self-Consistency: multiple validator runs
+- Reflexion: iterative improvement loop
 
-### 6.3 Quando NÃO Usar Técnicas Avançadas
+### 6.3 When NOT to Use Advanced Techniques
 
-| Técnica | Por que evitar em skills |
-|---------|------------------------|
-| Few-shot CoT extenso | Alto custo de tokens; usar referências externas |
-| Tree of Thoughts | Complexidade excessiva para maioria dos skills |
-| PAL | Skills já podem executar código diretamente |
-| Auto-CoT | Skills são escritos manualmente, não auto-gerados |
+| Technique | Why to Avoid in Skills |
+|-----------|----------------------|
+| Extensive Few-shot CoT | High token cost; use external references |
+| Tree of Thoughts | Excessive complexity for most skills |
+| PAL | Skills can already execute code directly |
+| Auto-CoT | Skills are manually written, not auto-generated |
 
-**Princípio do documento:** "Claude já é muito inteligente." Técnicas avançadas de prompting são frequentemente desnecessárias em skills — instruções claras e concisas geralmente bastam.
+**Document principle:** "Claude is already very smart." Advanced prompting techniques are often unnecessary in skills — clear and concise instructions usually suffice.
 
-## 7. Correlações com Documentos Principais
+## 7. Correlations with Main Documents
 
-### 7.1 research-llm-context-optimization.md
+### 7.1 research-context-engineering-comprehensive.md
 
-| Princípio de Contexto | Implementação no Skill Authoring |
-|----------------------|----------------------------------|
-| Context como recurso finito | "A janela de contexto é um bem público" — cada token compete |
-| Instruction budget ~150-200 | SKILL.md body < 500 linhas; split quando exceder |
-| Progressive disclosure | SKILL.md como índice → references carregados sob demanda |
-| Lost-in-the-middle | TOC no topo de arquivos longos garante Claude ver escopo completo |
-| Context poisoning | Terminologia consistente previne contradições; evitar info time-sensitive |
-| JIT documentation | Arquivos de referência carregados apenas quando relevantes |
-| Hybrid strategy | Metadata sempre carregada (description) + conteúdo on-demand (SKILL.md + refs) |
+| Context Principle | Implementation in Skill Authoring |
+|-------------------|----------------------------------|
+| Context as a finite resource | "The context window is a public good" — every token competes |
+| Instruction budget ~150-200 | SKILL.md body < 500 lines; split when exceeded |
+| Progressive disclosure | SKILL.md as index → references loaded on demand |
+| Lost-in-the-middle | TOC at top of long files ensures Claude sees complete scope |
+| Context poisoning | Consistent terminology prevents contradictions; avoid time-sensitive info |
+| JIT documentation | Reference files loaded only when relevant |
+| Hybrid strategy | Metadata always loaded (description) + content on-demand (SKILL.md + refs) |
 
 ### 7.2 Evaluating-AGENTS-paper.md
 
-| Achado do Paper | Alinhamento com Best Practices |
-|-----------------|-------------------------------|
-| LLM-generated configs reduzem performance | Evaluation-driven development previne over-documentation |
-| Mais contexto ≠ melhor performance | Concisão como princípio central; "Claude já é inteligente" |
-| Overviews genéricos são ineficazes | Descriptions devem ser específicas com termos-chave |
-| Instruções são seguidas literalmente | Graus de liberdade calibrados à fragilidade da tarefa |
-| Repositórios nicho se beneficiam mais | Skills mais valiosos para domínios que Claude não conhece |
+| Paper Finding | Alignment with Best Practices |
+|---------------|-------------------------------|
+| LLM-generated configs reduce performance | Evaluation-driven development prevents over-documentation |
+| More context ≠ better performance | Conciseness as a central principle; "Claude is already smart" |
+| Generic overviews are ineffective | Descriptions must be specific with key terms |
+| Instructions are followed literally | Degrees of freedom calibrated to task fragility |
+| Niche repositories benefit more | Skills most valuable for domains Claude doesn't know |
 
 ### 7.3 claude-prompting-best-practices.md
 
-| Best Practice | Implementação no Skill Authoring |
+| Best Practice | Implementation in Skill Authoring |
 |---------------|----------------------------------|
-| Ser direto e específico | Descriptions específicas, sem explicações óbvias |
-| Usar exemplos | Examples pattern com input/output pairs |
-| Structured output | Template pattern para formatos de saída |
-| Pensar passo-a-passo | Workflows com checklists sequenciais |
-| Dar ao Claude um papel | Description define o papel implicitamente |
+| Be direct and specific | Specific descriptions, no obvious explanations |
+| Use examples | Examples pattern with input/output pairs |
+| Structured output | Template pattern for output formats |
+| Think step by step | Workflows with sequential checklists |
+| Give Claude a role | Description implicitly defines the role |
 
-### 7.4 a-guide-to-agents.md / a-guide-to-claude.md
+### 7.4 a-guide-to-agents.md / a-guide-to-agents.md
 
-| Princípio dos Guides | Skill Authoring Equivalente |
-|---------------------|----------------------------|
-| Keep config minimal | SKILL.md < 500 linhas, split em refs |
-| Progressive disclosure | 3 padrões de progressive disclosure |
-| Don't auto-generate | Evaluation-driven development; iteração humana |
-| Stale docs poison context | Evitar info time-sensitive; manter skills atualizados |
-| Point elsewhere | SKILL.md como índice apontando para refs |
+| Guide Principle | Skill Authoring Equivalent |
+|-----------------|----------------------------|
+| Keep config minimal | SKILL.md < 500 lines, split into refs |
+| Progressive disclosure | 3 progressive disclosure patterns |
+| Don't auto-generate | Evaluation-driven development; human iteration |
+| Stale docs poison context | Avoid time-sensitive info; keep skills updated |
+| Point elsewhere | SKILL.md as index pointing to refs |
 
-## 8. Forças e Limitações
+## 8. Strengths and Limitations
 
-### 8.1 Forças
+### 8.1 Strengths
 
-| Força | Detalhe |
-|-------|---------|
-| **Prático e actionable** | Cada princípio acompanhado de exemplos bom/ruim concretos |
-| **Metáforas eficazes** | "Ponte estreita" vs "campo aberto" para graus de liberdade |
-| **Metodologia de teste** | Desenvolvimento iterativo com dois Claudes é inovador e prático |
-| **Checklist final** | Lista verificável de qualidade antes de compartilhar |
-| **Multi-modelo** | Reconhece que skills devem funcionar em Haiku, Sonnet e Opus |
-| **Progressive disclosure nativo** | 3 padrões claros com diagramas visuais |
+| Strength | Detail |
+|----------|--------|
+| **Practical and actionable** | Each principle accompanied by concrete good/bad examples |
+| **Effective metaphors** | "Narrow bridge" vs "open field" for degrees of freedom |
+| **Testing methodology** | Iterative development with two Claudes is innovative and practical |
+| **Final checklist** | Verifiable quality list before sharing |
+| **Multi-model** | Recognizes that skills should work on Haiku, Sonnet, and Opus |
+| **Native progressive disclosure** | 3 clear patterns with visual diagrams |
 
-### 8.2 Limitações
+### 8.2 Limitations
 
-| Limitação | Impacto |
-|-----------|---------|
-| **Sem métricas quantitativas** | "< 500 linhas" é regra empírica sem evidência quantitativa |
-| **Foco em skills individuais** | Pouca guidance sobre composição e orquestração de múltiplos skills |
-| **Avaliação manual** | "Não há forma built-in de rodar avaliações" — processo inteiramente manual |
-| **Sem guidance sobre versionamento** | Como evoluir skills sem quebrar usuários existentes |
-| **Coding-centric** | Exemplos majoritariamente de processamento de PDF/dados; pouca cobertura de skills de análise, research, ou criação |
-| **Sem integração com hooks** | Menciona hooks no frontmatter mas não explora padrões avançados |
-| **Sem métricas de discovery** | Como saber se a description está funcionando (taxa de trigger correto) |
+| Limitation | Impact |
+|------------|--------|
+| **No quantitative metrics** | "< 500 lines" is an empirical rule without quantitative evidence |
+| **Focus on individual skills** | Little guidance on composition and orchestration of multiple skills |
+| **Manual evaluation** | "There is no built-in way to run evaluations" — entirely manual process |
+| **No versioning guidance** | How to evolve skills without breaking existing users |
+| **Coding-centric** | Examples mostly about PDF/data processing; little coverage of analysis, research, or creation skills |
+| **No hook integration** | Mentions hooks in frontmatter but doesn't explore advanced patterns |
+| **No discovery metrics** | How to know if the description is working (correct trigger rate) |
 
-## 9. Recomendações Práticas
+## 9. Practical Recommendations
 
-### 9.1 Checklist Estendido para Criação de Skills
+### 9.1 Extended Checklist for Skill Creation
 
-**Pré-criação:**
+**Pre-creation:**
 
-- [ ] Executar a tarefa sem skill; documentar onde Claude falha
-- [ ] Criar 3+ cenários de avaliação
-- [ ] Medir baseline (performance sem skill)
-- [ ] Identificar se domínio requer knowledge que Claude não tem
+- [ ] Run the task without a skill; document where Claude fails
+- [ ] Create 3+ evaluation scenarios
+- [ ] Measure baseline (performance without skill)
+- [ ] Identify if the domain requires knowledge Claude doesn't have
 
-**Estrutura:**
+**Structure:**
 
-- [ ] `name` em gerúndio, lowercase com hífens, < 64 chars
-- [ ] `description` em terceira pessoa, específica, com triggers, < 1024 chars
-- [ ] SKILL.md body < 500 linhas
-- [ ] Referências a 1 nível de profundidade apenas
-- [ ] TOC em arquivos de referência > 100 linhas
-- [ ] Organização por domínio para skills multi-domínio
+- [ ] `name` in gerund, lowercase with hyphens, < 64 chars
+- [ ] `description` in third person, specific, with triggers, < 1024 chars
+- [ ] SKILL.md body < 500 lines
+- [ ] References at 1 level of depth only
+- [ ] TOC in reference files > 100 lines
+- [ ] Domain-based organization for multi-domain skills
 
-**Conteúdo:**
+**Content:**
 
-- [ ] Sem explicações que Claude já sabe
-- [ ] Grau de liberdade calibrado à fragilidade
-- [ ] Terminologia consistente em todo o skill
-- [ ] Sem informação time-sensitive (ou em seção "Old patterns")
-- [ ] Exemplos concretos (não abstratos)
-- [ ] Workflows com checklists copiáveis
-- [ ] Feedback loops para qualidade crítica
+- [ ] No explanations that Claude already knows
+- [ ] Degree of freedom calibrated to fragility
+- [ ] Consistent terminology throughout the skill
+- [ ] No time-sensitive information (or in "Old patterns" section)
+- [ ] Concrete examples (not abstract)
+- [ ] Workflows with copyable checklists
+- [ ] Feedback loops for critical quality
 
-**Código (se aplicável):**
+**Code (if applicable):**
 
-- [ ] Scripts que tratam erros (não "punt to Claude")
-- [ ] Constantes documentadas (sem magic numbers)
-- [ ] Dependências listadas explicitamente
-- [ ] Distinção clara entre executar vs ler como referência
-- [ ] Plan-validate-execute para operações destrutivas
-- [ ] Forward slashes em todos os paths
-- [ ] Scripts com mensagens de erro verbose e específicas
+- [ ] Scripts that handle errors (don't "punt to Claude")
+- [ ] Documented constants (no magic numbers)
+- [ ] Dependencies listed explicitly
+- [ ] Clear distinction between execute vs read as reference
+- [ ] Plan-validate-execute for destructive operations
+- [ ] Forward slashes in all paths
+- [ ] Scripts with verbose and specific error messages
 
-**Teste e Iteração:**
+**Testing and Iteration:**
 
-- [ ] Testado com Haiku, Sonnet E Opus
-- [ ] Testado com cenários reais (não apenas test cases)
-- [ ] Observado como Claude navega o skill
-- [ ] Iterado com base em observação (não suposições)
-- [ ] Feedback de equipe incorporado (se aplicável)
+- [ ] Tested with Haiku, Sonnet AND Opus
+- [ ] Tested with real scenarios (not just test cases)
+- [ ] Observed how Claude navigates the skill
+- [ ] Iterated based on observation (not assumptions)
+- [ ] Team feedback incorporated (if applicable)
 
-### 9.2 Templates Reutilizáveis
+### 9.2 Reusable Templates
 
-**Template: Skill Simples (sem código)**
+**Template: Simple Skill (no code)**
 
 ```markdown
 ---
@@ -627,7 +634,7 @@ See [conventions.md](conventions.md) for project-specific rules.
 See [common-issues.md](common-issues.md) for frequently caught problems.
 ```
 
-**Template: Skill com Scripts**
+**Template: Skill with Scripts**
 
 ```markdown
 ---
@@ -639,10 +646,13 @@ description: Processes and validates data exports from the analytics pipeline. U
 
 ## Quick start
 Run the validation script on any export file:
+```
+
 ```bash
 python scripts/validate_export.py input.csv
 ```
 
+```markdown
 ## Workflow
 
 - [ ] Step 1: Validate format (`validate_export.py`)
@@ -657,10 +667,9 @@ See [reference/schemas.md](reference/schemas.md) for expected data formats.
 ## Error handling
 
 See [reference/errors.md](reference/errors.md) for common validation errors and fixes.
-
 ```
 
-**Template: Skill com Hooks**
+**Template: Skill with Hooks**
 
 ```yaml
 ---
@@ -675,21 +684,21 @@ hooks:
   Stop:
     - hooks:
         - type: agent
-          prompt: "Verify deployment health. Check endpoints respond correctly. $ARGUMENTS"
+          prompt: "Verify deployment completed. Check health endpoints. $ARGUMENTS"
           timeout: 120
 ---
 ```
 
-### 9.3 Padrão de Evolução Recomendado
+### 9.3 Recommended Evolution Pattern
 
 ```
-Semana 1: Criar skill mínimo + 3 avaliações
-  ↓ Testar com Claude B, observar
-Semana 2: Refinar com Claude A baseado em observações
-  ↓ Adicionar referências onde Claude falhou
-Semana 3: Adicionar scripts para operações repetitivas
-  ↓ Adicionar feedback loops para qualidade
-Semana 4: Adicionar hooks no frontmatter para enforcement
-  ↓ Compartilhar com equipe, coletar feedback
-Semana 5+: Iteração contínua baseada em uso real
+Week 1: Create minimal skill + 3 evaluations
+  ↓ Test with Claude B, observe
+Week 2: Refine with Claude A based on observations
+  ↓ Add references where Claude failed
+Week 3: Add scripts for repetitive operations
+  ↓ Add feedback loops for quality
+Week 4: Add hooks in frontmatter for enforcement
+  ↓ Share with team, collect feedback
+Week 5+: Continuous iteration based on real usage
 ```

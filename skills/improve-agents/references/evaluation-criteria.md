@@ -1,7 +1,7 @@
 # Evaluation Criteria
 
 Scoring rubric for assessing existing AGENTS.md and CLAUDE.md files before improvement.
-Used by IMPROVE skills only. Source: file-evaluator.md, research-llm-context-optimization.md
+Used by IMPROVE skills only. Source: file-evaluator.md, research-context-engineering-comprehensive.md
 
 ---
 
@@ -41,7 +41,7 @@ Check each line of the file against these indicators:
 | Vague instructions ("write clean code") | Not actionable; wastes attention budget | a-guide-to-agents.md |
 | Codebase overview paragraphs | Increases steps without improving navigation | ETH Zurich: Evaluating AGENTS.md |
 | Obvious tool usage ("use git for version control") | Agent already knows this | Anthropic: "If Claude already does it, delete it" |
-| Duplicated content across files | Wastes tokens on every request | research-llm-context-optimization.md |
+| Duplicated content across files | Wastes tokens on every request | research-context-engineering-comprehensive.md |
 
 *Source: file-evaluator.md lines 30-41*
 
@@ -84,7 +84,7 @@ Every instruction should be in the Goldilocks zone:
 | ❌ Too vague | "Format code properly" | Cannot be verified or acted on |
 | ❌ Too specific | "File `src/auth/handlers.ts` handles JWT" | Over-specified file path, will go stale |
 
-*Source: research-llm-context-optimization.md lines 131-134*
+*Source: research-context-engineering-comprehensive.md lines 131-134*
 
 ---
 

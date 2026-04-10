@@ -161,6 +161,21 @@ Many tools support "agent skills" - commands or workflows the agent can invoke t
 
 We'll cover agent skills in-depth in a separate article.
 
+#### Use Path-Scoped Rules (Claude Code)
+
+Claude Code supports `.claude/rules/` — a directory of markdown files that load conditionally based on which files the agent is reading. Add YAML frontmatter with a `paths` array to scope rules to specific file patterns:
+
+```yaml
+---
+paths:
+  - "src/api/**/*.ts"
+---
+# API conventions
+- All endpoints must validate input with Zod schemas
+```
+
+Rules without `paths` frontmatter load unconditionally. Path-scoped rules trigger only when matching files are read, saving context budget.
+
 ## `AGENTS.md` in Monorepos
 
 You're not limited to a single `AGENTS.md` at the root. You can place `AGENTS.md` files in subdirectories, and they **merge with the root level**.

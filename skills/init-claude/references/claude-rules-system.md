@@ -2,7 +2,7 @@
 
 Instructions for generating and improving `.claude/rules/` and CLAUDE.md hierarchy.
 Claude Code-specific — not applicable to AGENTS.md skills.
-Sources: research-claude-code-skills-format.md, research-llm-context-optimization.md, init-claude/SKILL.md, memory/how-claude-remembers-a-project.md
+Sources: research-claude-code-skills-format.md, research-context-engineering-comprehensive.md, init-claude/SKILL.md, memory/how-claude-remembers-a-project.md
 
 ---
 
@@ -45,7 +45,7 @@ Patterns match absolute paths. Arrays merge across settings layers. Managed poli
 
 *Source: memory/how-claude-remembers-a-project.md lines 243-260*
 
-*Source: improve-claude/SKILL.md:130-141; research-llm-context-optimization.md:181-208*
+*Source: improve-claude/SKILL.md:130-141; research-context-engineering-comprehensive.md:181-208*
 
 ---
 
@@ -66,7 +66,7 @@ paths:
 
 Rules **without** `paths:` frontmatter load unconditionally at session start (always consumed).
 
-*Source: research-llm-context-optimization.md lines 181-196*
+*Source: research-context-engineering-comprehensive.md lines 181-196*
 
 ---
 
@@ -118,7 +118,7 @@ Create `.claude/rules/` files for exactly two categories:
 - Supports **symlinks** for sharing across projects; circular symlinks are detected and handled gracefully
 - User-level rules (`~/.claude/rules/`) apply to all projects; loaded **before** project rules (project rules take higher priority)
 
-*Source: research-llm-context-optimization.md lines 284-305*
+*Source: research-context-engineering-comprehensive.md lines 284-305*
 
 ---
 
@@ -147,7 +147,7 @@ Resolution order: more specific scopes take precedence.
 
 Subdirectory `CLAUDE.md` files load **on-demand** (not at startup).
 
-*Source: research-llm-context-optimization.md lines 259-282*
+*Source: research-context-engineering-comprehensive.md lines 259-282*
 
 ---
 

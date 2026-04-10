@@ -1,101 +1,102 @@
-# Análise: Engenharia de Prompts — Guia Técnico Completo (2022-2026)
+# Analysis: Prompt Engineering Guide
 
-**Documento analisado**: `docs/prompt-engineering-guide.md`
-**Data da análise**: 27 de março de 2026
-**Tipo**: Documento transversal — referenciado por todos os 5 documentos principais do projeto
-
----
-
-## 1. Sumário Executivo
-
-O `prompt-engineering-guide.md` é o documento mais extenso e denso do projeto, catalogando mais de 58 técnicas de engenharia de prompts com benchmarks quantitativos, custos de tokens e aplicabilidade em arquiteturas multi-agentes. Sua importância para a infraestrutura de agentes é direta: cada SKILL.md, cada prompt de subagente, cada regra em `.claude/rules/`, cada hook e cada entrada de memória é, em última instância, um prompt — e a eficácia desses artefatos depende da aplicação correta (ou incorreta) das técnicas catalogadas neste guia.
-
-A descoberta mais relevante para o projeto é a **inversão de paradigma**: modelos de raciocínio avançados (o1, R1, Claude com extended thinking) performam pior com técnicas clássicas como few-shot e CoT explícito. Isso impacta diretamente a escrita de skills e prompts de subagentes — técnicas que funcionam em prompts conversacionais podem ser contraproducentes em contextos agentic. O guia também documenta a transição de "prompt engineering" para "context engineering", alinhando-se perfeitamente com o `research-llm-context-optimization.md` e validando a abordagem de progressive disclosure defendida em `a-guide-to-agents.md`.
-
-Para o `agent-engineering-toolkit`, este documento serve como a **base técnica de referência** para todas as decisões de prompting nos dois conjuntos de skills (plugin e standalone). Cada técnica catalogada aqui tem aplicação direta em pelo menos um dos artefatos que as skills geram: AGENTS.md, CLAUDE.md, SKILL.md, rules, hooks ou prompts de subagentes.
+> **Status**: Current
+> **Source document**: [Prompt Engineering Guide](docs/prompt-engineering-guide.md)
+> **Analysis date**: 2026-03-27
+> **Scope**: Comprehensive prompt engineering techniques analysis for agent infrastructure
 
 ---
 
-## 2. Análise Técnica por Técnica
+## 1. Executive Summary
 
-### 2.1 Role Prompting (Atribuição de Papéis)
+The `prompt-engineering-guide.md` is the most extensive and dense document in the project, cataloging over 58 prompt engineering techniques with quantitative benchmarks, token costs, and applicability in multi-agent architectures. Its importance for agent infrastructure is direct: every SKILL.md, every sub-agent prompt, every rule in `.claude/rules/`, every hook, and every memory entry is ultimately a prompt — and the effectiveness of these artifacts depends on the correct (or incorrect) application of the techniques cataloged in this guide.
 
-**O que é e como funciona.** Instrui o modelo a adotar uma persona profissional antes de executar a tarefa. Ajusta distribuição de probabilidades para vocabulário, profundidade e estilo típicos da persona. Custo mínimo: 10-30 tokens. Melhor relação custo-benefício para controle de estilo entre todas as técnicas.
+The most relevant finding for the project is the **paradigm inversion**: advanced reasoning models (o1, R1, Claude with extended thinking) perform worse with classic techniques like few-shot and explicit CoT. This directly impacts the writing of skills and sub-agent prompts — techniques that work in conversational prompts can be counterproductive in agentic contexts. The guide also documents the transition from "prompt engineering" to "context engineering," aligning perfectly with `research-context-engineering-comprehensive.md` and validating the progressive disclosure approach advocated in `a-guide-to-agents.md`.
 
-**Quando usar.** Controle de tom e estilo; especialização de domínio; criação de agentes com identidade definida. Em multi-agentes, é o mecanismo fundamental de especialização — cada subagente recebe papel via system prompt.
+For the `agent-engineering-toolkit`, this document serves as the **technical reference base** for all prompting decisions across both skill sets (plugin and standalone). Every technique cataloged here has direct application in at least one of the artifacts that skills generate: AGENTS.md, CLAUDE.md, SKILL.md, rules, hooks, or sub-agent prompts.
 
-**Quando NÃO usar.** Role prompting não melhora acurácia factual em modelos de ponta. Para tarefas de raciocínio, 2-shot CoT supera role prompts consistentemente (Schulhoff et al., 2024). Não usar como substituto de instruções específicas.
+---
 
-**Aplicação em skills (SKILL.md).** Definir o papel do agente executor logo na primeira linha do SKILL.md. Exemplo: "Você é um analista de arquitetura de software especializado em repositórios TypeScript." Manter em 1-2 frases — brevidade é essencial dado o orçamento de atenção.
+## 2. Technique-by-Technique Analysis
+
+### 2.1 Role Prompting
+
+**What it is and how it works.** Instructs the model to adopt a professional persona before executing the task. Adjusts probability distribution toward vocabulary, depth, and style typical of the persona. Minimal cost: 10-30 tokens. Best cost-benefit ratio for style control among all techniques.
+
+**When to use.** Tone and style control; domain specialization; creating agents with a defined identity. In multi-agent systems, it is the fundamental specialization mechanism — each sub-agent receives a role via system prompt.
+
+**When NOT to use.** Role prompting does not improve factual accuracy in frontier models. For reasoning tasks, 2-shot CoT consistently outperforms role prompts (Schulhoff et al., 2024). Do not use as a substitute for specific instructions.
+
+**Application in skills (SKILL.md).** Define the executing agent's role on the very first line of SKILL.md. Example: "You are a software architecture analyst specializing in TypeScript repositories." Keep to 1-2 sentences — brevity is essential given the attention budget.
 
 ```markdown
-# Exemplo em SKILL.md — Role Prompting
-Você é um engenheiro de configuração especializado em infraestrutura de agentes de IA.
-Sua tarefa é analisar o repositório e gerar um AGENTS.md otimizado.
+# Example in SKILL.md — Role Prompting
+You are a configuration engineer specializing in AI agent infrastructure.
+Your task is to analyze the repository and generate an optimized AGENTS.md.
 ```
 
-**Aplicação em hooks (pre/post prompts).** Hooks são curtos por natureza. Role prompting em hooks deve ser implícito, não explícito — o contexto da ação já define o papel. Exemplo de hook de pre-commit: "Verifique se as alterações seguem as convenções do projeto" (papel de revisor está implícito). Evitar gastar tokens com "Você é um revisor de código experiente..." em hooks de 2-3 linhas.
+**Application in hooks (pre/post prompts).** Hooks are short by nature. Role prompting in hooks should be implicit, not explicit — the action context already defines the role. Example pre-commit hook: "Verify that changes follow project conventions" (reviewer role is implicit). Avoid spending tokens on "You are an experienced code reviewer..." in 2-3 line hooks.
 
-**Aplicação em subagentes.** Este é o caso de uso mais forte de role prompting. Cada subagente recebe uma persona especializada que direciona seu comportamento. Conforme o guia: "No sistema de pesquisa da Anthropic, cada subagente recebe um papel especializado via system prompt."
+**Application in sub-agents.** This is the strongest use case for role prompting. Each sub-agent receives a specialized persona that directs its behavior. Per the guide: "In Anthropic's research system, each sub-agent receives a specialized role via system prompt."
 
 ```markdown
-# Exemplo de delegação a subagente
-Delegue ao subagente com o seguinte papel:
-"Você é um analista de dependências. Examine package.json, go.mod ou
-Cargo.toml e retorne: linguagem principal, framework, gerenciador de pacotes,
-e dependências críticas em formato JSON."
+# Example of sub-agent delegation
+Delegate to the sub-agent with the following role:
+"You are a dependency analyst. Examine package.json, go.mod, or
+Cargo.toml and return: primary language, framework, package manager,
+and critical dependencies in JSON format."
 ```
 
-**Aplicação em rules (.claude/rules/).** Rules não devem usar role prompting. São instruções diretas e factuais — adicionar persona desperdiça tokens e não agrega valor em regras de escopo limitado.
+**Application in rules (.claude/rules/).** Rules should not use role prompting. They are direct, factual instructions — adding a persona wastes tokens and adds no value in limited-scope rules.
 
-**Aplicação em memória.** Entradas de memória são factuais e descritivas. Role prompting é irrelevante para memória — nunca usar.
+**Application in memory.** Memory entries are factual and descriptive. Role prompting is irrelevant for memory — never use.
 
 ---
 
 ### 2.2 Zero-Shot Prompting
 
-**O que é e como funciona.** O modelo recebe apenas a instrução, sem exemplos. Depende do conhecimento pré-treinado. Modelos modernos alcançam ~85% de acurácia em tarefas simples. Menor custo de tokens entre todas as técnicas.
+**What it is and how it works.** The model receives only the instruction, with no examples. Relies on pre-trained knowledge. Modern models achieve ~85% accuracy on simple tasks. Lowest token cost among all techniques.
 
-**Quando usar.** Tarefas que o modelo já faz bem nativamente: classificação simples, tradução, sumarização, brainstorming. Quando eficiência de tokens é prioridade (hooks, rules, memória).
+**When to use.** Tasks the model already does well natively: simple classification, translation, summarization, brainstorming. When token efficiency is a priority (hooks, rules, memory).
 
-**Quando NÃO usar.** Raciocínio multi-passo complexo; tarefas exigindo formato de saída muito específico; classificações ambíguas; tarefas fora dos padrões comuns de treinamento.
+**When NOT to use.** Complex multi-step reasoning; tasks requiring very specific output formats; ambiguous classifications; tasks outside common training patterns.
 
-**Aplicação em skills.** A maioria das instruções de fase em SKILL.md deve ser zero-shot. Skills bem escritas fornecem contexto suficiente para que o modelo execute sem exemplos. Reservar few-shot apenas para fases com formato de saída crítico.
+**Application in skills.** Most phase instructions in SKILL.md should be zero-shot. Well-written skills provide sufficient context for the model to execute without examples. Reserve few-shot only for phases with critical output formats.
 
 ```markdown
-# Exemplo zero-shot em fase de skill
-## Fase 2: Análise de Estrutura
-Examine a estrutura de diretórios do repositório.
-Identifique: linguagens usadas, frameworks, padrões arquiteturais.
-Retorne os achados em formato bullet list.
+# Zero-shot example in a skill phase
+## Phase 2: Structure Analysis
+Examine the repository's directory structure.
+Identify: languages used, frameworks, architectural patterns.
+Return findings in bullet list format.
 ```
 
-**Aplicação em hooks.** Hooks devem ser predominantemente zero-shot. São curtos, executam tarefas específicas, e tokens são preciosos. "Verifique se o commit message segue o formato conventional commits" é suficiente — não precisa de exemplos.
+**Application in hooks.** Hooks should be predominantly zero-shot. They are short, execute specific tasks, and tokens are precious. "Verify that the commit message follows conventional commits format" is sufficient — no examples needed.
 
-**Aplicação em subagentes.** Subagentes com tarefas simples e bem definidas podem operar em zero-shot. Para tarefas complexas ou com formato de saída específico, considerar few-shot.
+**Application in sub-agents.** Sub-agents with simple, well-defined tasks can operate in zero-shot. For complex tasks or those with specific output formats, consider few-shot.
 
-**Aplicação em rules.** Rules são zero-shot por definição. São instruções diretas: "Use 2-space indentation", "API handlers live in src/api/handlers/". Não incluir exemplos em rules — desperdiça tokens carregados em toda sessão.
+**Application in rules.** Rules are zero-shot by definition. They are direct instructions: "Use 2-space indentation", "API handlers live in src/api/handlers/". Do not include examples in rules — wastes tokens loaded in every session.
 
-**Aplicação em memória.** Entradas de memória são zero-shot — são fatos, não instruções com exemplos.
+**Application in memory.** Memory entries are zero-shot — they are facts, not instructions with examples.
 
 ---
 
 ### 2.3 Few-Shot Prompting
 
-**O que é e como funciona.** Fornece 2-5+ pares entrada-saída como "mini conjunto de treinamento". O modelo identifica o mapeamento e generaliza. A Anthropic recomenda 3-5 exemplos diversos encapsulados em tags XML. A ordem dos exemplos importa significativamente.
+**What it is and how it works.** Provides 2-5+ input-output pairs as a "mini training set." The model identifies the mapping and generalizes. Anthropic recommends 3-5 diverse examples encapsulated in XML tags. The order of examples matters significantly.
 
-**Quando usar.** Formato de saída específico e crítico; extração de dados estruturados; padrões que o modelo não infere corretamente em zero-shot; calibração de tom/estilo que role prompting sozinho não resolve.
+**When to use.** Specific and critical output formats; structured data extraction; patterns the model does not correctly infer in zero-shot; tone/style calibration that role prompting alone cannot resolve.
 
-**Quando NÃO usar.** Com modelos de raciocínio avançados (o1, R1) — exemplos prejudicam a performance. Após 5-10 exemplos, retornos são decrescentes. Em artefatos de contexto sempre-carregado (rules, CLAUDE.md root) — custo fixo em toda requisição.
+**When NOT to use.** With advanced reasoning models (o1, R1) — examples hurt performance. After 5-10 examples, returns are diminishing. In always-loaded context artifacts (rules, root CLAUDE.md) — fixed cost on every request.
 
-**Aplicação em skills.** Few-shot é valioso em fases que geram artefatos com formato específico. Usar na fase de geração de output, não nas fases de análise. Encapsular exemplos em tags XML conforme recomendação da Anthropic.
+**Application in skills.** Few-shot is valuable in phases that generate artifacts with specific formats. Use in the output generation phase, not in analysis phases. Encapsulate examples in XML tags per Anthropic's recommendation.
 
 ```markdown
-## Fase 4: Geração do AGENTS.md
-Gere o arquivo seguindo este formato. Exemplos:
+## Phase 4: AGENTS.md Generation
+Generate the file following this format. Examples:
 
 <example>
-<input>Projeto React com TypeScript, usando pnpm workspaces</input>
+<input>React project with TypeScript, using pnpm workspaces</input>
 <output>
 # Project
 React component library for accessible data visualization.
@@ -107,7 +108,7 @@ For TypeScript conventions, see docs/TYPESCRIPT.md
 </example>
 
 <example>
-<input>API Go com PostgreSQL, usando make</input>
+<input>Go API with PostgreSQL, using make</input>
 <output>
 # Project
 REST API for inventory management built with Go and PostgreSQL.
@@ -118,194 +119,194 @@ Run `make build` to compile. Run `make test` for all tests.
 </example>
 ```
 
-**Aplicação em hooks.** Raramente necessário. Se o hook precisa validar formato, um único exemplo pode ser mais eficiente que uma descrição textual longa. Manter no máximo 1 exemplo.
+**Application in hooks.** Rarely necessary. If the hook needs to validate a format, a single example may be more efficient than a long textual description. Keep to at most 1 example.
 
-**Aplicação em subagentes.** Útil quando o subagente precisa retornar dados em formato estruturado específico. Incluir 1-2 exemplos no prompt de delegação. Lembrar que exemplos competem com o orçamento limitado da janela de contexto de subagentes.
+**Application in sub-agents.** Useful when the sub-agent needs to return data in a specific structured format. Include 1-2 examples in the delegation prompt. Remember that examples compete with the limited context window budget of sub-agents.
 
-**Aplicação em rules.** Evitar. Rules são carregadas em toda sessão. Cada exemplo adiciona 50-200+ tokens de custo fixo. Se uma rule precisa de exemplo, considerar converter em skill (carregamento on-demand).
+**Application in rules.** Avoid. Rules are loaded in every session. Each example adds 50-200+ tokens of fixed cost. If a rule needs an example, consider converting it to a skill (on-demand loading).
 
-**Aplicação em memória.** Não aplicável. Memória armazena fatos, não exemplos demonstrativos.
+**Application in memory.** Not applicable. Memory stores facts, not demonstrative examples.
 
 ---
 
 ### 2.4 System Prompts vs User Prompts
 
-**O que é e como funciona.** System prompt define framework comportamental persistente (identidade, restrições, regras). User prompt carrega a tarefa dinâmica (dados, perguntas, exemplos contextuais). Queries ao final do prompt melhoram qualidade em até 30%.
+**What it is and how it works.** System prompt defines a persistent behavioral framework (identity, constraints, rules). User prompt carries the dynamic task (data, questions, contextual examples). Queries at the end of the prompt improve quality by up to 30%.
 
-**Quando usar.** Sempre — é a estrutura fundamental de todo prompt de produção.
+**When to use.** Always — it is the fundamental structure of every production prompt.
 
-**Quando NÃO usar.** Não é uma técnica opcional, mas sim uma decisão de arquitetura sobre onde colocar cada informação.
+**When NOT to use.** It is not an optional technique, but rather an architectural decision about where to place each piece of information.
 
-**Aplicação em skills.** SKILL.md funciona como system prompt para a execução da skill. As fases são o "user prompt" progressivo. Manter o papel e restrições no topo do SKILL.md, dados contextuais e instruções específicas nas fases.
+**Application in skills.** SKILL.md functions as the system prompt for skill execution. The phases are the progressive "user prompt." Keep the role and constraints at the top of SKILL.md, contextual data and specific instructions in the phases.
 
-**Aplicação em hooks.** Hooks são essencialmente user prompts curtos que operam sob o system prompt da sessão. Não tentar redefinir o system prompt dentro de um hook.
+**Application in hooks.** Hooks are essentially short user prompts that operate under the session's system prompt. Do not attempt to redefine the system prompt within a hook.
 
-**Aplicação em subagentes.** A separação system/user é crítica para subagentes. O prompt de delegação deve definir claramente: (1) papel e restrições (system-like), (2) tarefa específica e dados (user-like).
+**Application in sub-agents.** The system/user separation is critical for sub-agents. The delegation prompt must clearly define: (1) role and constraints (system-like), (2) specific task and data (user-like).
 
 ```markdown
-# Prompt de subagente com separação clara
-## Contexto (system-like)
-Você é um analista de testes. Examine apenas arquivos de teste.
-Nunca modifique código — apenas analise e reporte.
+# Sub-agent prompt with clear separation
+## Context (system-like)
+You are a test analyst. Examine only test files.
+Never modify code — only analyze and report.
 
-## Tarefa (user-like)
-Analise os padrões de teste em `tests/` e retorne:
-- Framework de testes usado
-- Padrão de nomeação de arquivos de teste
-- Cobertura aproximada por área do código
+## Task (user-like)
+Analyze the test patterns in `tests/` and return:
+- Testing framework used
+- Test file naming pattern
+- Approximate coverage by code area
 ```
 
-**Aplicação em rules.** Rules são injetadas no system prompt pelo Claude Code. Cada rule deve ser escrita como uma instrução de system prompt — direta, factual, sem conversação.
+**Application in rules.** Rules are injected into the system prompt by Claude Code. Each rule should be written as a system prompt instruction — direct, factual, no conversation.
 
-**Aplicação em memória.** Memória é injetada como contexto adicional no system prompt. Deve conter fatos e decisões, não instruções de tarefa.
+**Application in memory.** Memory is injected as additional context in the system prompt. It should contain facts and decisions, not task instructions.
 
 ---
 
 ### 2.5 Chain-of-Thought (CoT)
 
-**O que é e como funciona.** Encoraja o modelo a gerar passos intermediários de raciocínio antes da resposta final. Três variantes: Few-Shot CoT (exemplos com raciocínio), Zero-Shot CoT ("Vamos pensar passo a passo"), Auto-CoT. No GSM8K, PaLM 540B saltou de 17,9% para 58,1% com CoT.
+**What it is and how it works.** Encourages the model to generate intermediate reasoning steps before the final answer. Three variants: Few-Shot CoT (examples with reasoning), Zero-Shot CoT ("Let's think step by step"), Auto-CoT. On GSM8K, PaLM 540B jumped from 17.9% to 58.1% with CoT.
 
-**Quando usar.** Raciocínio multi-passo; análise complexa de código; decisões arquiteturais que requerem ponderação de trade-offs; depuração de problemas.
+**When to use.** Multi-step reasoning; complex code analysis; architectural decisions requiring trade-off evaluation; debugging problems.
 
-**Quando NÃO usar.** Modelos de raciocínio avançados (o1, R1) — apenas 2-3% de melhoria marginal com 20-80% mais tempo. Modelos pequenos (<100B) — cadeias "fluentes mas ilógicas". Tarefas simples de um passo. Em artefatos de contexto limitado (rules, hooks).
+**When NOT to use.** Advanced reasoning models (o1, R1) — only 2-3% marginal improvement with 20-80% more time. Small models (<100B) — "fluent but illogical" chains. Simple one-step tasks. In limited-context artifacts (rules, hooks).
 
-**Aplicação em skills.** Usar CoT implícito em fases de análise — instruir o modelo a "analisar cada aspecto antes de concluir". Usar tags XML `<thinking>` e `<answer>` para separação estruturada quando a fase requer raciocínio complexo.
+**Application in skills.** Use implicit CoT in analysis phases — instruct the model to "analyze each aspect before concluding." Use XML tags `<thinking>` and `<answer>` for structured separation when the phase requires complex reasoning.
 
 ```markdown
-## Fase 3: Análise de Convenções
-Para cada convenção encontrada no repositório:
+## Phase 3: Convention Analysis
+For each convention found in the repository:
 <thinking>
-1. Identifique a evidência (arquivo, padrão, configuração)
-2. Avalie se é uma convenção explícita ou inferida
-3. Determine se é relevante para o AGENTS.md ou melhor em progressive disclosure
+1. Identify the evidence (file, pattern, configuration)
+2. Assess whether it is an explicit or inferred convention
+3. Determine if it is relevant for AGENTS.md or better suited for progressive disclosure
 </thinking>
 <answer>
-Liste apenas as convenções que passaram no filtro de relevância.
+List only the conventions that passed the relevance filter.
 </answer>
 ```
 
-**Aplicação em hooks.** Não usar CoT em hooks. Hooks devem ser rápidos e diretos. Se um hook precisa de raciocínio complexo, ele deveria ser uma skill ou um subagente.
+**Application in hooks.** Do not use CoT in hooks. Hooks must be fast and direct. If a hook needs complex reasoning, it should be a skill or a sub-agent.
 
-**Aplicação em subagentes.** CoT é valioso em subagentes de análise. O subagente pode raciocinar extensivamente sem impactar o contexto principal (context: fork). Permitir que o subagente "pense" livremente antes de retornar o resultado sintetizado.
+**Application in sub-agents.** CoT is valuable in analysis sub-agents. The sub-agent can reason extensively without impacting the main context (context: fork). Allow the sub-agent to "think" freely before returning the synthesized result.
 
-**Aplicação em rules.** Nunca usar CoT em rules. Rules são instruções diretas, não prompts de raciocínio.
+**Application in rules.** Never use CoT in rules. Rules are direct instructions, not reasoning prompts.
 
-**Aplicação em memória.** A memória pode registrar a conclusão de um raciocínio CoT, mas não o processo. Armazenar "Decidimos usar PostgreSQL porque..." (resultado), não os passos de análise.
+**Application in memory.** Memory can record the conclusion of a CoT reasoning, but not the process. Store "We decided to use PostgreSQL because..." (result), not the analysis steps.
 
 ---
 
 ### 2.6 Tree of Thoughts (ToT)
 
-**O que é e como funciona.** Generaliza CoT permitindo exploração de múltiplos caminhos de raciocínio em árvore, com autoavaliação e backtracking. No Game of 24: 4% (CoT) vs 74% (ToT) — melhoria de 18,5x. Requer 5-20x mais chamadas de API.
+**What it is and how it works.** Generalizes CoT by allowing exploration of multiple reasoning paths in a tree structure, with self-evaluation and backtracking. On Game of 24: 4% (CoT) vs 74% (ToT) — 18.5x improvement. Requires 5-20x more API calls.
 
-**Quando usar.** Problemas de planejamento complexo; decisões arquiteturais com múltiplos caminhos viáveis; exploração de alternativas onde backtracking é valioso.
+**When to use.** Complex planning problems; architectural decisions with multiple viable paths; exploration of alternatives where backtracking is valuable.
 
-**Quando NÃO usar.** A grande maioria das tarefas de infraestrutura de agentes. Custo proibitivo para uso rotineiro. Problemas lineares onde CoT basta.
+**When NOT to use.** The vast majority of agent infrastructure tasks. Prohibitive cost for routine use. Linear problems where CoT suffices.
 
-**Aplicação em skills.** Raramente diretamente. Pode ser implementado indiretamente via skills multi-fase que exploram alternativas e depois convergem. Exemplo: Fase 3a gera opção A, Fase 3b gera opção B, Fase 4 avalia e escolhe.
+**Application in skills.** Rarely directly. Can be implemented indirectly via multi-phase skills that explore alternatives and then converge. Example: Phase 3a generates option A, Phase 3b generates option B, Phase 4 evaluates and chooses.
 
-**Aplicação em hooks.** Nunca. Custo e latência incompatíveis com hooks.
+**Application in hooks.** Never. Cost and latency incompatible with hooks.
 
-**Aplicação em subagentes.** Pode ser implementado como padrão orchestrator-workers: um agente orquestrador delega exploração de N caminhos a N subagentes, depois sintetiza. O custo é aceitável quando a decisão é de alto impacto.
+**Application in sub-agents.** Can be implemented as an orchestrator-workers pattern: an orchestrator agent delegates exploration of N paths to N sub-agents, then synthesizes. The cost is acceptable when the decision is high-impact.
 
-**Aplicação em rules.** Irrelevante para rules.
+**Application in rules.** Irrelevant for rules.
 
-**Aplicação em memória.** Irrelevante para memória.
+**Application in memory.** Irrelevant for memory.
 
 ---
 
-### 2.7 ReAct (Raciocínio + Ação)
+### 2.7 ReAct (Reasoning + Action)
 
-**O que é e como funciona.** Loop iterativo Pensamento-Acao-Observacao. O modelo raciocina sobre o estado, executa uma ferramenta, recebe o resultado, e repete. Superou métodos baseline por 34% absolutos em ALFWorld.
+**What it is and how it works.** Iterative Thought-Action-Observation loop. The model reasons about the state, executes a tool, receives the result, and repeats. Outperformed baseline methods by 34% absolute on ALFWorld.
 
-**Quando usar.** Tarefas com ferramentas e dados em tempo real; verificação de fatos; exploração de repositórios; qualquer tarefa que se beneficie de interação com o ambiente.
+**When to use.** Tasks with tools and real-time data; fact verification; repository exploration; any task that benefits from environment interaction.
 
-**Quando NÃO usar.** Raciocínio puro sem dados externos; quando nenhuma ferramenta está disponível; tarefas factuais simples.
+**When NOT to use.** Pure reasoning without external data; when no tools are available; simple factual tasks.
 
-**Aplicação em skills.** ReAct é o padrão natural para skills de análise de repositório. Cada fase de exploração é implicitamente um ciclo ReAct: ler arquivos, raciocinar sobre o conteúdo, decidir próxima ação. Skills devem facilitar isso fornecendo orientação sobre quais ferramentas usar e quais arquivos examinar.
+**Application in skills.** ReAct is the natural pattern for repository analysis skills. Each exploration phase is implicitly a ReAct cycle: read files, reason about the content, decide next action. Skills should facilitate this by providing guidance on which tools to use and which files to examine.
 
 ```markdown
-## Fase 2: Exploração do Repositório
-Use as seguintes ferramentas para investigar:
-- `glob` para encontrar arquivos por padrão
-- `grep` para buscar padrões de código
-- `read` para examinar conteúdo de arquivos
+## Phase 2: Repository Exploration
+Use the following tools to investigate:
+- `glob` to find files by pattern
+- `grep` to search for code patterns
+- `read` to examine file contents
 
-Para cada achado, raciocine sobre sua relevância antes de prosseguir.
+For each finding, reason about its relevance before proceeding.
 ```
 
-**Aplicação em hooks.** Hooks podem implementar mini-ciclos ReAct: verificar → avaliar → reportar. Exemplo: hook post-commit que verifica se testes passam, avalia resultado, reporta.
+**Application in hooks.** Hooks can implement mini ReAct cycles: check → evaluate → report. Example: post-commit hook that verifies if tests pass, evaluates the result, reports.
 
-**Aplicação em subagentes.** Subagentes de exploração são fundamentalmente agentes ReAct. O prompt de delegação deve listar as ferramentas disponíveis e orientar o ciclo de exploração.
+**Application in sub-agents.** Exploration sub-agents are fundamentally ReAct agents. The delegation prompt should list the available tools and guide the exploration cycle.
 
-**Aplicação em rules.** Irrelevante. Rules são estáticas, não interativas.
+**Application in rules.** Irrelevant. Rules are static, not interactive.
 
-**Aplicação em memória.** O resultado de ciclos ReAct pode ser armazenado em memória para evitar re-exploração. Exemplo: "O projeto usa Jest com configuração em jest.config.ts" — resultado de exploração prévia.
-
----
-
-### 2.8 Self-Consistency (Votação Majoritária)
-
-**O que é e como funciona.** Amostra N caminhos de raciocínio diversos para o mesmo problema e seleciona a resposta mais frequente por votação majoritária. +17,9% sobre CoT no GSM8K com tão poucas quanto 3 amostras.
-
-**Quando usar.** Decisões de alta confiabilidade onde erro é custoso; classificações ambíguas.
-
-**Quando NÃO usar.** Geração aberta/criativa; aplicações sensíveis a latência; custo restrito (5-30x o custo normal).
-
-**Aplicação em skills.** Pode ser implementado em fases críticas de decisão: gerar análise N vezes e convergir. Na prática, raramente justificável para geração de AGENTS.md/CLAUDE.md, mas pode ser valioso em skills de auditoria.
-
-**Aplicação em hooks.** Nunca. Custo proibitivo para hooks.
-
-**Aplicação em subagentes.** Pode ser implementado despachando o mesmo prompt a 3 subagentes e sintetizando as respostas. Útil para análise de segurança ou revisão de código de alta criticidade.
-
-**Aplicação em rules.** Irrelevante.
-
-**Aplicação em memória.** Irrelevante.
+**Application in memory.** The result of ReAct cycles can be stored in memory to avoid re-exploration. Example: "The project uses Jest with configuration in jest.config.ts" — result of prior exploration.
 
 ---
 
-### 2.9 Prompt Chaining (Decomposição em Pipeline)
+### 2.8 Self-Consistency (Majority Voting)
 
-**O que é e como funciona.** Quebra tarefas complexas em subtarefas sequenciais. Cada passo usa um prompt focado com objetivo único. Custo 2-5x maior que prompt único, mas com maior qualidade e debuggabilidade.
+**What it is and how it works.** Samples N diverse reasoning paths for the same problem and selects the most frequent answer by majority voting. +17.9% over CoT on GSM8K with as few as 3 samples.
 
-**Quando usar.** Workflows complexos multi-etapa; quando inspecionar saídas intermediárias é necessário; quando qualidade por etapa importa mais que velocidade.
+**When to use.** High-reliability decisions where error is costly; ambiguous classifications.
 
-**Quando NÃO usar.** Tarefas simples; quando latência aditiva é inaceitável; quando o modelo lida bem com a tarefa em um único prompt.
+**When NOT to use.** Open/creative generation; latency-sensitive applications; cost-constrained (5-30x normal cost).
 
-**Aplicação em skills.** Skills são fundamentalmente prompt chains. Cada fase é um elo da cadeia: Explorar → Analisar → Planejar → Gerar → Validar. A saída de cada fase alimenta a entrada da próxima. Este é o padrão mais importante para o projeto.
+**Application in skills.** Can be implemented in critical decision phases: generate analysis N times and converge. In practice, rarely justifiable for AGENTS.md/CLAUDE.md generation, but can be valuable in audit skills.
+
+**Application in hooks.** Never. Prohibitive cost for hooks.
+
+**Application in sub-agents.** Can be implemented by dispatching the same prompt to 3 sub-agents and synthesizing the responses. Useful for security analysis or high-criticality code review.
+
+**Application in rules.** Irrelevant.
+
+**Application in memory.** Irrelevant.
+
+---
+
+### 2.9 Prompt Chaining (Pipeline Decomposition)
+
+**What it is and how it works.** Breaks complex tasks into sequential subtasks. Each step uses a focused prompt with a single objective. 2-5x higher cost than a single prompt, but with higher quality and debuggability.
+
+**When to use.** Complex multi-step workflows; when inspecting intermediate outputs is necessary; when per-step quality matters more than speed.
+
+**When NOT to use.** Simple tasks; when additive latency is unacceptable; when the model handles the task well in a single prompt.
+
+**Application in skills.** Skills are fundamentally prompt chains. Each phase is a link in the chain: Explore → Analyze → Plan → Generate → Validate. The output of each phase feeds the input of the next. This is the most important pattern for the project.
 
 ```markdown
-# Estrutura de SKILL.md como Prompt Chain
-## Fase 1: Exploração (saída: inventário de arquivos relevantes)
-## Fase 2: Análise (entrada: inventário; saída: achados estruturados)
-## Fase 3: Planejamento (entrada: achados; saída: plano de conteúdo)
-## Fase 4: Geração (entrada: plano; saída: artefato final)
-## Fase 5: Validação (entrada: artefato; saída: relatório de conformidade)
+# SKILL.md structure as Prompt Chain
+## Phase 1: Exploration (output: inventory of relevant files)
+## Phase 2: Analysis (input: inventory; output: structured findings)
+## Phase 3: Planning (input: findings; output: content plan)
+## Phase 4: Generation (input: plan; output: final artifact)
+## Phase 5: Validation (input: artifact; output: compliance report)
 ```
 
-**Aplicação em hooks.** Hooks podem implementar mini-chains de 2-3 passos: verificar → decidir → agir.
+**Application in hooks.** Hooks can implement mini-chains of 2-3 steps: check → decide → act.
 
-**Aplicação em subagentes.** O padrão orchestrator-workers é prompt chaining distribuído. O orquestrador decompõe, delega aos workers, e sintetiza resultados.
+**Application in sub-agents.** The orchestrator-workers pattern is distributed prompt chaining. The orchestrator decomposes, delegates to workers, and synthesizes results.
 
-**Aplicação em rules.** Rules podem referenciar outras rules ou docs criando uma cadeia de resolução, mas não são chains no sentido técnico.
+**Application in rules.** Rules can reference other rules or docs creating a resolution chain, but they are not chains in the technical sense.
 
-**Aplicação em memória.** Irrelevante diretamente, mas memória pode armazenar resultados intermediários de chains longas para recuperação em sessões futuras.
+**Application in memory.** Irrelevant directly, but memory can store intermediate results from long chains for retrieval in future sessions.
 
 ---
 
 ### 2.10 Structured Output (JSON, XML, Schemas)
 
-**O que é e como funciona.** Técnicas para forçar saídas em formatos legíveis por máquina. Descoberta crítica: forçar JSON durante raciocínio degrada acurácia em 10-15%. A prática recomendada é raciocínio livre primeiro, formatação depois. XML tem 15-20% de boost de performance no Claude por treinamento específico.
+**What it is and how it works.** Techniques to force outputs into machine-readable formats. Critical finding: forcing JSON during reasoning degrades accuracy by 10-15%. The recommended practice is free reasoning first, formatting after. XML has a 15-20% performance boost in Claude due to specific training.
 
-**Quando usar.** Saídas consumidas por sistemas; comunicação entre agentes; extração de dados; quando conformidade de formato é obrigatória.
+**When to use.** Outputs consumed by systems; inter-agent communication; data extraction; when format compliance is mandatory.
 
-**Quando NÃO usar.** Durante raciocínio (degrada acurácia). Para saídas que humanos lerão diretamente (Markdown é melhor).
+**When NOT to use.** During reasoning (degrades accuracy). For outputs that humans will read directly (Markdown is better).
 
-**Aplicação em skills.** Usar structured output para comunicação entre fases e entre skills. Dentro da skill, separar raciocínio de formatação: primeiro analisar livremente, depois formatar em JSON/YAML.
+**Application in skills.** Use structured output for communication between phases and between skills. Within the skill, separate reasoning from formatting: first analyze freely, then format in JSON/YAML.
 
 ```markdown
-## Fase 2: Análise
-Analise livremente as convenções encontradas. Depois, estruture os achados:
+## Phase 2: Analysis
+Freely analyze the conventions found. Then, structure the findings:
 
 <analysis_output>
 {
@@ -319,324 +320,324 @@ Analise livremente as convenções encontradas. Depois, estruture os achados:
 </analysis_output>
 ```
 
-**Aplicação em hooks.** Hooks de validação podem exigir saída estruturada para processamento programático (ex: lista de violações em JSON).
+**Application in hooks.** Validation hooks can require structured output for programmatic processing (e.g., list of violations in JSON).
 
-**Aplicação em subagentes.** Crítico. Subagentes devem retornar resultados em formato estruturado para que o orquestrador possa sintetizar. JSON é preferido por ser menos propenso a modificação indevida pelo modelo. Conforme o guia de long-running agents: "Feature list em JSON (não Markdown) — modelo é menos propenso a modificar JSON inapropriadamente."
+**Application in sub-agents.** Critical. Sub-agents should return results in structured format so the orchestrator can synthesize. JSON is preferred because it is less prone to inappropriate modification by the model. Per the long-running agents guide: "Feature list in JSON (not Markdown) — model is less prone to modify JSON inappropriately."
 
-**Aplicação em rules.** Rules podem especificar formatos de saída esperados: "Sempre retorne erros de linting em formato JSON com campos: file, line, rule, message."
+**Application in rules.** Rules can specify expected output formats: "Always return linting errors in JSON format with fields: file, line, rule, message."
 
-**Aplicação em memória.** Memória usa Markdown por design (legibilidade humana). Não usar JSON para memória.
+**Application in memory.** Memory uses Markdown by design (human readability). Do not use JSON for memory.
 
 ---
 
 ### 2.11 RAG Prompting Patterns
 
-**O que é e como funciona.** Combina recuperação de documentos externos com geração. Padrões: context injection, dual prompt structure, N-shot RAG, CoT RAG, agentic RAG.
+**What it is and how it works.** Combines external document retrieval with generation. Patterns: context injection, dual prompt structure, N-shot RAG, CoT RAG, agentic RAG.
 
-**Quando usar.** Quando o modelo precisa de informação que não está no treinamento; fundamentação factual; documentação específica do projeto.
+**When to use.** When the model needs information not in its training data; factual grounding; project-specific documentation.
 
-**Quando NÃO usar.** Quando a informação é comum e o modelo já sabe; quando resultados de busca serão ruins; tarefas puramente generativas.
+**When NOT to use.** When the information is common and the model already knows it; when search results will be poor; purely generative tasks.
 
-**Aplicação em skills.** Skills implementam RAG implicitamente: as fases de exploração recuperam contexto (leem arquivos, buscam padrões) que alimentam as fases de geração. A seção `references/` de cada skill é essencialmente um corpus RAG pré-curado.
+**Application in skills.** Skills implement RAG implicitly: the exploration phases retrieve context (read files, search for patterns) that feed the generation phases. The `references/` section of each skill is essentially a pre-curated RAG corpus.
 
 ```markdown
-## Fase 1: Recuperação de Contexto
-Leia os seguintes arquivos de referência para orientar sua análise:
+## Phase 1: Context Retrieval
+Read the following reference files to guide your analysis:
 - references/evidence-based-conventions.md
 - references/progressive-disclosure-patterns.md
 
-Depois, examine o repositório para coletar evidências específicas.
+Then, examine the repository to collect specific evidence.
 ```
 
-**Aplicação em hooks.** Hooks podem implementar agentic RAG: decidir se precisam buscar contexto antes de agir.
+**Application in hooks.** Hooks can implement agentic RAG: decide whether they need to retrieve context before acting.
 
-**Aplicação em subagentes.** Subagentes de pesquisa são agentes RAG por natureza: recuperam, analisam, sintetizam.
+**Application in sub-agents.** Research sub-agents are RAG agents by nature: they retrieve, analyze, synthesize.
 
-**Aplicação em rules.** Rules podem orientar o modelo a buscar contexto antes de agir: "Antes de modificar arquivos em src/api/, leia docs/API_CONVENTIONS.md."
+**Application in rules.** Rules can guide the model to retrieve context before acting: "Before modifying files in src/api/, read docs/API_CONVENTIONS.md."
 
-**Aplicação em memória.** Auto memory do Claude Code é um sistema RAG: MEMORY.md como índice, topic files como corpus, carregamento on-demand como recuperação.
+**Application in memory.** Claude Code's auto memory is a RAG system: MEMORY.md as index, topic files as corpus, on-demand loading as retrieval.
 
 ---
 
 ### 2.12 Meta-Prompting
 
-**O que é e como funciona.** Prompts que geram prompts. Três acepções: scaffolding (LLM como condutor de especialistas), otimização prática (modelo forte gera prompts para modelo barato), estrutural (formalização via teoria de categorias). +17,1% vs prompting padrão.
+**What it is and how it works.** Prompts that generate prompts. Three meanings: scaffolding (LLM as conductor of specialists), practical optimization (strong model generates prompts for cheap model), structural (formalization via category theory). +17.1% vs standard prompting.
 
-**Quando usar.** Otimização de prompts existentes; geração de prompts especializados para múltiplos domínios; quando prompts manuais atingem plateau de qualidade.
+**When to use.** Optimization of existing prompts; generation of specialized prompts for multiple domains; when manual prompts reach a quality plateau.
 
-**Quando NÃO usar.** Para tarefas simples; quando custo de otimização não se justifica; prompts de uso único.
+**When NOT to use.** For simple tasks; when optimization cost is not justified; single-use prompts.
 
-**Aplicação em skills.** Meta-prompting é a essência de skills de inicialização. A skill que gera AGENTS.md é um meta-prompt: um prompt que analisa o repositório e gera instruções (prompts) para futuros agentes.
+**Application in skills.** Meta-prompting is the essence of initialization skills. The skill that generates AGENTS.md is a meta-prompt: a prompt that analyzes the repository and generates instructions (prompts) for future agents.
 
 ```markdown
-# A skill de inicialização é fundamentalmente meta-prompting:
-# Prompt (SKILL.md) → analisa repo → gera AGENTS.md → que será prompt para agentes futuros
+# The initialization skill is fundamentally meta-prompting:
+# Prompt (SKILL.md) → analyzes repo → generates AGENTS.md → which will be a prompt for future agents
 ```
 
-**Aplicação em hooks.** Hooks de otimização de prompts podem usar meta-prompting: hook que revisa e sugere melhorias em prompts antes de commit.
+**Application in hooks.** Prompt optimization hooks can use meta-prompting: a hook that reviews and suggests improvements to prompts before commit.
 
-**Aplicação em subagentes.** O padrão orchestrator-workers é meta-prompting: o orquestrador gera prompts específicos para cada worker dinamicamente.
+**Application in sub-agents.** The orchestrator-workers pattern is meta-prompting: the orchestrator generates specific prompts for each worker dynamically.
 
-**Aplicação em rules.** Irrelevante diretamente.
+**Application in rules.** Irrelevant directly.
 
-**Aplicação em memória.** Irrelevante diretamente.
+**Application in memory.** Irrelevant directly.
 
 ---
 
-### 2.13 Técnicas de Fronteira Relevantes
+### 2.13 Relevant Frontier Techniques
 
-#### Constitutional AI e Self-Critique
+#### Constitutional AI and Self-Critique
 
-**Aplicação em skills.** Fases de validação implementam self-critique: o modelo revisa sua própria saída contra princípios. Usar "constituição" explícita na fase de validação.
+**Application in skills.** Validation phases implement self-critique: the model reviews its own output against principles. Use an explicit "constitution" in the validation phase.
 
 ```markdown
-## Fase 5: Validação
-Revise o AGENTS.md gerado contra estes princípios:
-- Cada instrução é específica e verificável?
-- O arquivo está sob 200 linhas?
-- Informações voláteis foram excluídas?
-- Progressive disclosure foi aplicado corretamente?
-Se qualquer princípio foi violado, revise o artefato.
+## Phase 5: Validation
+Review the generated AGENTS.md against these principles:
+- Is each instruction specific and verifiable?
+- Is the file under 200 lines?
+- Were volatile information items excluded?
+- Was progressive disclosure applied correctly?
+If any principle was violated, revise the artifact.
 ```
 
 #### Step-Back Prompting
 
-**Aplicação em skills.** Útil em fases de análise: antes de examinar detalhes do repositório, fazer uma pergunta de abstração mais alta. "Qual é o propósito geral deste repositório?" antes de "Quais são as convenções de código?"
+**Application in skills.** Useful in analysis phases: before examining repository details, ask a higher-level abstraction question. "What is the general purpose of this repository?" before "What are the code conventions?"
 
 #### Rephrase and Respond (RaR)
 
-**Aplicação em skills.** Útil quando o prompt de fase é complexo: instruir o modelo a reformular a tarefa antes de executar garante compreensão correta.
+**Application in skills.** Useful when the phase prompt is complex: instructing the model to rephrase the task before executing ensures correct comprehension.
 
 #### Skeleton-of-Thought (SoT)
 
-**Aplicação em skills.** Adequado para fases de geração de documentos longos: gerar outline primeiro, expandir depois. Alinha-se naturalmente com o padrão Planejar → Gerar das skills.
+**Application in skills.** Suitable for long document generation phases: generate outline first, expand later. Aligns naturally with the Plan → Generate pattern of skills.
 
 ---
 
-## 3. Pontos de Atenção
+## 3. Points of Attention
 
-### 3.1 Misaplicações Comuns
+### 3.1 Common Misapplications
 
-| Erro | Consequência | Correção |
-|------|-------------|----------|
-| Few-shot em rules | Custo fixo de 50-200+ tokens por exemplo em toda sessão | Mover exemplos para skills ou docs de referência |
-| CoT explícito em hooks | Latência desnecessária em operações que devem ser rápidas | Hooks devem ser zero-shot e diretos |
-| Role prompting em rules | Tokens desperdiçados sem ganho de acurácia | Rules são instruções, não personas |
-| Structured output durante raciocínio | Degradação de 10-15% na acurácia | Separar raciocínio livre de formatação |
-| Técnicas complexas (ToT, SC) em tarefas simples | Custo 5-30x sem benefício proporcional | Começar com a técnica mais simples |
-| CoT explícito com modelos de raciocínio | Performance pior que zero-shot | Testar antes de assumir que CoT ajuda |
-| Formatação agressiva (ALL-CAPS, "NUNCA") | Resultados piores em modelos Claude recentes | Tom direto sem ênfase excessiva |
+| Error | Consequence | Correction |
+|-------|-------------|------------|
+| Few-shot in rules | Fixed cost of 50-200+ tokens per example in every session | Move examples to skills or reference docs |
+| Explicit CoT in hooks | Unnecessary latency in operations that should be fast | Hooks should be zero-shot and direct |
+| Role prompting in rules | Tokens wasted without accuracy gains | Rules are instructions, not personas |
+| Structured output during reasoning | 10-15% accuracy degradation | Separate free reasoning from formatting |
+| Complex techniques (ToT, SC) on simple tasks | 5-30x cost without proportional benefit | Start with the simplest technique |
+| Explicit CoT with reasoning models | Performance worse than zero-shot | Test before assuming CoT helps |
+| Aggressive formatting (ALL-CAPS, "NEVER") | Worse results in recent Claude models | Direct tone without excessive emphasis |
 
-### 3.2 Quando Mais Simples é Melhor
+### 3.2 When Simpler is Better
 
-O guia enfatiza repetidamente: **"Comece com a solução mais simples possível e só aumente a complexidade quando demonstravelmente necessário."** Para infraestrutura de agentes, isso significa:
+The guide repeatedly emphasizes: **"Start with the simplest possible solution and only increase complexity when demonstrably necessary."** For agent infrastructure, this means:
 
-1. **Rules**: sempre zero-shot, sempre diretas, sem exemplos
-2. **Hooks**: zero-shot, 1-3 frases, sem raciocínio elaborado
-3. **Memória**: fatos brutos, sem técnicas de prompting
-4. **Skills**: prompt chaining (multi-fase) com zero-shot por padrão, few-shot apenas quando formato é crítico
-5. **Subagentes**: role + zero-shot por padrão, few-shot para formato de retorno específico
+1. **Rules**: always zero-shot, always direct, no examples
+2. **Hooks**: zero-shot, 1-3 sentences, no elaborate reasoning
+3. **Memory**: raw facts, no prompting techniques
+4. **Skills**: prompt chaining (multi-phase) with zero-shot by default, few-shot only when format is critical
+5. **Sub-agents**: role + zero-shot by default, few-shot for specific return format
 
-### 3.3 O Paradoxo do Over-Engineering
+### 3.3 The Over-Engineering Paradox
 
-Quanto mais técnicas de prompting se empilham em um artefato de infraestrutura, mais tokens são consumidos, mais o orçamento de atenção é diluído, e mais o modelo tende a ignorar instruções. O `a-guide-to-agents.md` e o `research-llm-context-optimization.md` convergem neste ponto: o "ideal AGENTS.md é pequeno, focado, e aponta para outros recursos". Técnicas sofisticadas de prompting devem ser usadas cirurgicamente, não por padrão.
-
----
-
-## 4. Matriz de Aplicabilidade entre Documentos
-
-Esta matriz mapeia cada técnica principal do guia de engenharia de prompts aos princípios de cada um dos 5 documentos do projeto.
-
-### 4.1 Mapeamento Técnica → Documento
-
-| Técnica | Evaluating-AGENTS-paper | research-llm-context-optimization | claude-prompting-best-practices | a-guide-to-agents | a-guide-to-claude |
-|---------|------------------------|-----------------------------------|-------------------------------|-------------------|-------------------|
-| **Role Prompting** | Confirma que role prompting em AGENTS.md define escopo eficazmente | Consome mínimo do orçamento de atenção (10-30 tokens) | Recomendado no system prompt para persistência entre turnos | One-liner de projeto é role prompting implícito | CLAUDE.md pode definir persona do projeto |
-| **Zero-Shot** | Maioria das instruções eficazes em AGENTS.md são zero-shot | Maximiza eficiência do orçamento de atenção | Recomendado como ponto de partida antes de complexificar | "AGENTS.md ideal deve ser o menor possível" — zero-shot é o caminho | Rules e CLAUDE.md devem ser zero-shot |
-| **Few-Shot** | Exemplos em AGENTS.md custam tokens fixos; evitar | Cada exemplo consome 50-200+ tokens do orçamento limitado | Recomenda 3-5 exemplos em tags XML para tarefas de formato | "Mova rules específicas para arquivos separados" — evitar exemplos no root | Skills podem usar few-shot; CLAUDE.md não deve |
-| **System vs User** | AGENTS.md é fundamentalmente system prompt | Posicionamento de instruções afeta aderência (lost-in-middle) | Coloque role no system, exemplos no user, queries no final | Hierarquia root/package é hierarquia system/user | Hierarquia CLAUDE.md/rules/skills espelha system/user |
-| **Chain-of-Thought** | Não documentado em AGENTS.md configs | CoT consome tokens significativos; usar apenas quando necessário | Recomenda tags `<thinking>` e `<answer>` para Claude | Não relevante para AGENTS.md estático | Skills de análise podem usar CoT em fases de exploração |
-| **ReAct** | Loop de exploração é implícito na avaliação de AGENTS.md | Ciclos ReAct consomem contexto progressivamente | Base do loop agentic do Claude Code | Agentes "são rápidos em navegar hierarquias de documentação" — ReAct | Claude Code opera em loop ReAct nativo |
-| **Prompt Chaining** | Avaliação multi-critério é chain implícita | Cada elo da chain é uma oportunidade de compaction | "Chaining explícito útil quando precisa inspecionar intermediários" | Progressive disclosure é chain de resolução | Skills multi-fase são prompt chains |
-| **Structured Output** | Métricas em formato estruturado para avaliação | JSON é preferido para estado entre agentes (menos propenso a modificação) | XML tem 15-20% boost no Claude; JSON para inter-sistema | AGENTS.md é Markdown; saídas intermediárias podem ser JSON | Rules podem especificar formatos; memória usa Markdown |
-| **RAG Patterns** | AGENTS.md como "contexto pré-carregado" é RAG estático | Progressive disclosure + JIT = RAG agentic | "Agentic RAG: LLM decide quando recuperar" | "Deixe o agente gerar documentação JIT" — agentic RAG | Skills com `references/` são RAG pré-curado |
-| **Meta-Prompting** | Meta-análise de eficácia de AGENTS.md | Otimização automática supera manual significativamente | Prompt generator da Anthropic é meta-prompting | Prompt de refactoring de AGENTS.md é meta-prompt | Skill de inicialização gera prompts para agentes futuros |
-| **Self-Critique** | Validação de qualidade de AGENTS.md | Ciclos critique-revision custam 2-3x por resposta | Loop evaluate → revise é padrão recomendado | "Encontrar contradições" no prompt de refactoring | Fase de validação em skills é self-critique |
-| **Step-Back** | Perguntar "Para que serve este repo?" antes de analisar | Abstração reduz tokens gastos em exploração irrelevante | Melhoria de 7-27% sobre CoT | One-liner de projeto é um step-back implícito | Antes de gerar CLAUDE.md, entender o propósito do projeto |
-
-### 4.2 Princípios Convergentes
-
-Cinco princípios emergem da convergência entre todos os documentos:
-
-1. **Minimalismo agressivo**: Todos os documentos concordam que menos é mais. O guia de prompts confirma que técnicas simples são suficientes para a maioria das tarefas, e técnicas complexas têm retornos decrescentes.
-
-2. **Progressive disclosure como arquitetura**: O padrão de carregar contexto on-demand aparece como RAG agentic no guia de prompts, como JIT documentation no research, como skills no Claude Code, e como hierarquia de arquivos no AGENTS.md.
-
-3. **Separação de raciocínio e formatação**: O guia de prompts documenta a degradação de 10-15% ao forçar formato durante raciocínio. Isso valida a abordagem de fases em skills: explorar livremente, depois formatar.
-
-4. **Começar simples, complexificar com evidência**: O guia de prompts, a Anthropic, e o AGENTS.md guide convergem: zero-shot primeiro, técnicas avançadas apenas com evidência de necessidade.
-
-5. **Contexto é recurso finito**: O orçamento de atenção do research, o instruction budget do AGENTS.md guide, e o custo de tokens por técnica no guia de prompts são facetas do mesmo princípio.
+The more prompting techniques are stacked in an infrastructure artifact, the more tokens are consumed, the more the attention budget is diluted, and the more the model tends to ignore instructions. `a-guide-to-agents.md` and `research-context-engineering-comprehensive.md` converge on this point: the "ideal AGENTS.md is small, focused, and points to other resources." Sophisticated prompting techniques should be used surgically, not by default.
 
 ---
 
-## 5. Implicações de Context Engineering
+## 4. Applicability Matrix Across Documents
 
-### 5.1 Orçamento de Atenção e Técnicas de Prompting
+This matrix maps each main technique from the prompt engineering guide to the principles of each of the project's 5 documents.
 
-O `research-llm-context-optimization.md` estabelece que o orçamento prático de instrução por arquivo é ~200 linhas (~2.000-4.000 tokens). O guia de engenharia de prompts adiciona custos específicos por técnica:
+### 4.1 Technique → Document Mapping
 
-| Técnica | Custo de Tokens | Impacto no Orçamento |
-|---------|----------------|---------------------|
-| Role prompting | 10-30 tokens | Negligível — usar livremente |
-| Zero-shot | 0 tokens extras | Nenhum — preferir sempre |
-| Few-shot (3 exemplos) | 150-600 tokens | 4-15% do orçamento de um CLAUDE.md |
-| CoT explícito | 2-3x do prompt base | Significativo — usar apenas em skills |
-| Self-Consistency | 5-30x do custo base | Proibitivo para artefatos estáticos |
-| Structured output | +10-20% (JSON) | Moderado — aceitável para inter-agentes |
+| Technique | Evaluating-AGENTS-paper | research-context-engineering-comprehensive | claude-prompting-best-practices | a-guide-to-agents | a-guide-to-agents (CLAUDE.md) |
+|-----------|------------------------|---------------------------------------------|-------------------------------|-------------------|-------------------------------|
+| **Role Prompting** | Confirms that role prompting in AGENTS.md defines scope effectively | Consumes minimal attention budget (10-30 tokens) | Recommended in system prompt for persistence across turns | Project one-liner is implicit role prompting | CLAUDE.md can define project persona |
+| **Zero-Shot** | Most effective instructions in AGENTS.md are zero-shot | Maximizes attention budget efficiency | Recommended as starting point before adding complexity | "Ideal AGENTS.md should be as small as possible" — zero-shot is the path | Rules and CLAUDE.md should be zero-shot |
+| **Few-Shot** | Examples in AGENTS.md cost fixed tokens; avoid | Each example consumes 50-200+ tokens of limited budget | Recommends 3-5 examples in XML tags for format tasks | "Move specific rules to separate files" — avoid examples in root | Skills can use few-shot; CLAUDE.md should not |
+| **System vs User** | AGENTS.md is fundamentally a system prompt | Instruction positioning affects adherence (lost-in-middle) | Place role in system, examples in user, queries at end | Root/package hierarchy is system/user hierarchy | CLAUDE.md/rules/skills hierarchy mirrors system/user |
+| **Chain-of-Thought** | Not documented in AGENTS.md configs | CoT consumes significant tokens; use only when necessary | Recommends `<thinking>` and `<answer>` tags for Claude | Not relevant for static AGENTS.md | Analysis skills can use CoT in exploration phases |
+| **ReAct** | Exploration loop is implicit in AGENTS.md evaluation | ReAct cycles progressively consume context | Foundation of Claude Code's agentic loop | Agents "are fast at navigating documentation hierarchies" — ReAct | Claude Code operates in native ReAct loop |
+| **Prompt Chaining** | Multi-criteria evaluation is an implicit chain | Each chain link is a compaction opportunity | "Explicit chaining useful when you need to inspect intermediaries" | Progressive disclosure is a resolution chain | Multi-phase skills are prompt chains |
+| **Structured Output** | Metrics in structured format for evaluation | JSON preferred for inter-agent state (less prone to modification) | XML has 15-20% boost in Claude; JSON for inter-system | AGENTS.md is Markdown; intermediate outputs can be JSON | Rules can specify formats; memory uses Markdown |
+| **RAG Patterns** | AGENTS.md as "pre-loaded context" is static RAG | Progressive disclosure + JIT = agentic RAG | "Agentic RAG: LLM decides when to retrieve" | "Let the agent generate JIT documentation" — agentic RAG | Skills with `references/` are pre-curated RAG |
+| **Meta-Prompting** | Meta-analysis of AGENTS.md effectiveness | Automatic optimization significantly outperforms manual | Anthropic's prompt generator is meta-prompting | AGENTS.md refactoring prompt is a meta-prompt | Initialization skill generates prompts for future agents |
+| **Self-Critique** | AGENTS.md quality validation | Critique-revision cycles cost 2-3x per response | Evaluate → revise loop is recommended pattern | "Find contradictions" in refactoring prompt | Validation phase in skills is self-critique |
+| **Step-Back** | Ask "What is this repo for?" before analyzing | Abstraction reduces tokens spent on irrelevant exploration | 7-27% improvement over CoT | Project one-liner is an implicit step-back | Before generating CLAUDE.md, understand the project's purpose |
 
-**Implicação prática**: Em artefatos sempre-carregados (CLAUDE.md, rules sem path-scope), cada token importa. Técnicas que adicionam tokens (few-shot, CoT) devem ser reservadas para artefatos on-demand (skills, subagentes).
+### 4.2 Convergent Principles
 
-### 5.2 Lost-in-the-Middle e Posicionamento de Técnicas
+Five principles emerge from the convergence across all documents:
 
-O research documenta que performance é maior quando informação relevante está no início ou fim do contexto. O guia de prompts confirma que "queries ao final do prompt melhoram qualidade em até 30%".
+1. **Aggressive minimalism**: All documents agree that less is more. The prompts guide confirms that simple techniques are sufficient for most tasks, and complex techniques have diminishing returns.
 
-**Implicações para infraestrutura de agentes:**
+2. **Progressive disclosure as architecture**: The pattern of loading context on-demand appears as agentic RAG in the prompts guide, as JIT documentation in the research, as skills in Claude Code, and as file hierarchy in AGENTS.md.
 
-- **SKILL.md**: Papel e restrições no topo (início do contexto). Fase de geração final no fim. Fases intermediárias de análise no meio (menos críticas).
-- **Rules**: Instruções mais críticas primeiro. Se uma rule tem múltiplas instruções, a mais importante deve abrir o arquivo.
-- **CLAUDE.md**: Convenções fundamentais no topo. Instruções secundárias no meio. Instruções de ambiente/setup no final.
-- **Prompts de subagente**: Papel no topo, ferramentas no meio, tarefa específica no final.
+3. **Separation of reasoning and formatting**: The prompts guide documents the 10-15% degradation when forcing format during reasoning. This validates the phased approach in skills: explore freely, then format.
 
-### 5.3 Progressive Disclosure como Mitigação de Custo
+4. **Start simple, add complexity with evidence**: The prompts guide, Anthropic, and the AGENTS.md guide converge: zero-shot first, advanced techniques only with evidence of need.
 
-O guia de prompts documenta que técnicas avançadas custam 2-30x mais tokens. O research documenta que context rot degrada performance com mais tokens. A solução convergente é progressive disclosure:
+5. **Context is a finite resource**: The research's attention budget, the AGENTS.md guide's instruction budget, and the per-technique token cost in the prompts guide are facets of the same principle.
+
+---
+
+## 5. Context Engineering Implications
+
+### 5.1 Attention Budget and Prompting Techniques
+
+`research-context-engineering-comprehensive.md` establishes that the practical instruction budget per file is ~200 lines (~2,000-4,000 tokens). The prompt engineering guide adds specific per-technique costs:
+
+| Technique | Token Cost | Budget Impact |
+|-----------|-----------|---------------|
+| Role prompting | 10-30 tokens | Negligible — use freely |
+| Zero-shot | 0 extra tokens | None — always prefer |
+| Few-shot (3 examples) | 150-600 tokens | 4-15% of a CLAUDE.md budget |
+| Explicit CoT | 2-3x of base prompt | Significant — use only in skills |
+| Self-Consistency | 5-30x of base cost | Prohibitive for static artifacts |
+| Structured output | +10-20% (JSON) | Moderate — acceptable for inter-agent |
+
+**Practical implication**: In always-loaded artifacts (CLAUDE.md, rules without path-scope), every token matters. Techniques that add tokens (few-shot, CoT) should be reserved for on-demand artifacts (skills, sub-agents).
+
+### 5.2 Lost-in-the-Middle and Technique Positioning
+
+The research documents that performance is highest when relevant information is at the beginning or end of the context. The prompts guide confirms that "queries at the end of the prompt improve quality by up to 30%."
+
+**Implications for agent infrastructure:**
+
+- **SKILL.md**: Role and constraints at the top (beginning of context). Final generation phase at the end. Intermediate analysis phases in the middle (less critical).
+- **Rules**: Most critical instructions first. If a rule has multiple instructions, the most important one should open the file.
+- **CLAUDE.md**: Fundamental conventions at the top. Secondary instructions in the middle. Environment/setup instructions at the end.
+- **Sub-agent prompts**: Role at the top, tools in the middle, specific task at the end.
+
+### 5.3 Progressive Disclosure as Cost Mitigation
+
+The prompts guide documents that advanced techniques cost 2-30x more tokens. The research documents that context rot degrades performance with more tokens. The convergent solution is progressive disclosure:
 
 ```
-Sempre-carregado (CLAUDE.md, rules globais):
-→ Zero-shot, role implícito, sem exemplos
-→ Orçamento: ~200 linhas, ~3.000 tokens
+Always-loaded (CLAUDE.md, global rules):
+→ Zero-shot, implicit role, no examples
+→ Budget: ~200 lines, ~3,000 tokens
 
-On-demand (skills, rules com path-scope):
-→ Zero-shot + few-shot seletivo + CoT em fases de análise
-→ Orçamento: mais generoso (contexto isolado ou temporário)
+On-demand (skills, rules with path-scope):
+→ Zero-shot + selective few-shot + CoT in analysis phases
+→ Budget: more generous (isolated or temporary context)
 
-Isolado (subagentes com context: fork):
-→ Todas as técnicas disponíveis
-→ Orçamento: janela de contexto completa do subagente
-→ Nenhum impacto no contexto principal
+Isolated (sub-agents with context: fork):
+→ All techniques available
+→ Budget: full sub-agent context window
+→ No impact on main context
 ```
 
-### 5.4 Compaction e Técnicas de Prompting
+### 5.4 Compaction and Prompting Techniques
 
-Quando o contexto é compactado, detalhes de técnicas elaboradas (cadeias CoT, exemplos few-shot) são naturalmente descartados. Isso significa que:
+When context is compacted, details of elaborate techniques (CoT chains, few-shot examples) are naturally discarded. This means:
 
-- Informações críticas devem estar em artefatos estáticos (não dependentes de compaction)
-- Técnicas elaboradas devem ser usadas em contextos que não serão compactados (subagentes com context: fork)
-- Se uma instrução é importante o suficiente para sobreviver a compaction, deve ser um fato simples, não um exemplo elaborado
+- Critical information should be in static artifacts (not dependent on compaction)
+- Elaborate techniques should be used in contexts that will not be compacted (sub-agents with context: fork)
+- If an instruction is important enough to survive compaction, it should be a simple fact, not an elaborate example
 
 ---
 
-## 6. Receitas Práticas
+## 6. Practical Recipes
 
-### 6.1 Receita: Escrevendo uma Nova Skill
+### 6.1 Recipe: Writing a New Skill
 
 ```markdown
-# SKILL.md — Template Baseado em Técnicas de Prompting
+# SKILL.md — Template Based on Prompting Techniques
 
-# Nome da Skill
-[Role prompting: 1 frase definindo quem o agente é]
-[Step-back: 1 frase sobre o propósito geral]
+# Skill Name
+[Role prompting: 1 sentence defining who the agent is]
+[Step-back: 1 sentence about the general purpose]
 
-## Fase 1: Exploração [ReAct]
-[Zero-shot: instruções diretas sobre o que explorar]
-[Liste ferramentas disponíveis: glob, grep, read]
-[Orientação sobre ciclo: observar → raciocinar → próxima ação]
+## Phase 1: Exploration [ReAct]
+[Zero-shot: direct instructions on what to explore]
+[List available tools: glob, grep, read]
+[Guidance on the cycle: observe → reason → next action]
 
-## Fase 2: Análise [CoT implícito]
-[Zero-shot: instruções de análise]
-[Separação de raciocínio e formatação]
+## Phase 2: Analysis [Implicit CoT]
+[Zero-shot: analysis instructions]
+[Separation of reasoning and formatting]
 <thinking>
-[Orientação sobre aspectos a analisar]
+[Guidance on aspects to analyze]
 </thinking>
 <findings>
-[Formato estruturado para achados]
+[Structured format for findings]
 </findings>
 
-## Fase 3: Planejamento [Prompt chaining — recebe saída da Fase 2]
-[Zero-shot: instruções de planejamento]
-[Referência a docs/references/ para critérios — RAG]
+## Phase 3: Planning [Prompt chaining — receives Phase 2 output]
+[Zero-shot: planning instructions]
+[Reference to docs/references/ for criteria — RAG]
 
-## Fase 4: Geração [Few-shot se formato é crítico]
-[1-2 exemplos em tags XML se necessário]
-[Template de saída]
+## Phase 4: Generation [Few-shot if format is critical]
+[1-2 examples in XML tags if needed]
+[Output template]
 
-## Fase 5: Validação [Self-critique / Constitutional AI]
-[Lista de princípios para autoavaliação]
-[Instruções de revisão se princípios forem violados]
+## Phase 5: Validation [Self-critique / Constitutional AI]
+[List of principles for self-evaluation]
+[Revision instructions if principles were violated]
 ```
 
-**Técnicas usadas**: Role prompting (topo), ReAct (exploração), CoT (análise), Prompt chaining (multi-fase), Few-shot (geração, se necessário), Self-critique (validação), Step-back (contextualização), Structured output (entre fases).
+**Techniques used**: Role prompting (top), ReAct (exploration), CoT (analysis), Prompt chaining (multi-phase), Few-shot (generation, if needed), Self-critique (validation), Step-back (contextualization), Structured output (between phases).
 
-### 6.2 Receita: Prompt de Delegação a Subagente
+### 6.2 Recipe: Sub-Agent Delegation Prompt
 
 ```markdown
-# Template de Delegação a Subagente
+# Sub-Agent Delegation Template
 
-## Papel [Role prompting]
-Você é um [especialização]. Seu objetivo é [resultado esperado].
+## Role [Role prompting]
+You are a [specialization]. Your goal is [expected outcome].
 
-## Restrições [System prompt behavior]
-- Nunca modifique arquivos — apenas analise e reporte
-- Limite sua análise a [escopo]
-- Retorne resultados em formato JSON
+## Constraints [System prompt behavior]
+- Never modify files — only analyze and report
+- Limit your analysis to [scope]
+- Return results in JSON format
 
-## Ferramentas Disponíveis [ReAct enablement]
-- `glob`: encontrar arquivos por padrão
-- `grep`: buscar conteúdo em arquivos
-- `read`: ler conteúdo de arquivo
+## Available Tools [ReAct enablement]
+- `glob`: find files by pattern
+- `grep`: search content in files
+- `read`: read file contents
 
-## Tarefa [User prompt — no final para boost de 30%]
-Analise [alvo] e retorne:
-[Lista de campos esperados]
+## Task [User prompt — at the end for 30% boost]
+Analyze [target] and return:
+[List of expected fields]
 
-## Formato de Retorno [Structured output]
+## Return Format [Structured output]
 <result>
 {
-  "campo1": "...",
-  "campo2": ["..."],
+  "field1": "...",
+  "field2": ["..."],
   "confidence": "high|medium|low"
 }
 </result>
 ```
 
-**Princípios aplicados**: Papel no topo (role prompting no início do contexto), restrições como system prompt, ferramentas listadas para ReAct, tarefa no final (lost-in-the-middle), saída estruturada em JSON (inter-agente).
+**Principles applied**: Role at the top (role prompting at the beginning of context), constraints as system prompt, tools listed for ReAct, task at the end (lost-in-the-middle), structured output in JSON (inter-agent).
 
-### 6.3 Receita: Rule com Path-Scope
+### 6.3 Recipe: Rule with Path-Scope
 
 ```markdown
-# Template de Rule — .claude/rules/[topic].md
+# Rule Template — .claude/rules/[topic].md
 
 ---
 paths:
   - "[glob pattern]"
 ---
 
-# [Tópico] — Rules
+# [Topic] — Rules
 
-[Zero-shot: instruções diretas, sem exemplos]
+[Zero-shot: direct instructions, no examples]
 
-- [Instrução mais crítica primeiro — posicionamento primacy]
-- [Instrução secundária]
-- [Instrução terciária]
+- [Most critical instruction first — primacy positioning]
+- [Secondary instruction]
+- [Tertiary instruction]
 
-[Se referência externa é necessária — RAG pointer]
-Para detalhes, consulte docs/[reference].md
+[If external reference is needed — RAG pointer]
+For details, see docs/[reference].md
 ```
 
-**Princípios aplicados**: Zero-shot exclusivo (sem exemplos para economizar tokens), instrução mais importante primeiro (lost-in-the-middle), path-scope para progressive disclosure, referência a docs para JIT loading.
+**Principles applied**: Zero-shot exclusively (no examples to save tokens), most important instruction first (lost-in-the-middle), path-scope for progressive disclosure, reference to docs for JIT loading.
 
-**Exemplo concreto:**
+**Concrete example:**
 
 ```markdown
 ---
@@ -646,157 +647,157 @@ paths:
 
 # API Development Rules
 
-- Todos os endpoints devem incluir validação de input com Zod schemas
-- Respostas de erro seguem o formato RFC 7807 (Problem Details)
-- Handlers vivem em src/api/handlers/, validators em src/api/validators/
-- Para padrões de autenticação, consulte docs/auth-patterns.md
+- All endpoints must include input validation with Zod schemas
+- Error responses follow the RFC 7807 format (Problem Details)
+- Handlers live in src/api/handlers/, validators in src/api/validators/
+- For authentication patterns, see docs/auth-patterns.md
 ```
 
-### 6.4 Receita: Entrada de Memória
+### 6.4 Recipe: Memory Entry
 
 ```markdown
-# Template de Entrada de Memória
+# Memory Entry Template
 
-## [Tópico] — [Data]
+## [Topic] — [Date]
 
-[Fato direto, sem técnicas de prompting]
-[Decisão tomada + justificativa em 1 frase]
-[Referência a arquivo/doc se relevante]
+[Direct fact, no prompting techniques]
+[Decision made + justification in 1 sentence]
+[Reference to file/doc if relevant]
 ```
 
-**Princípios aplicados**: Zero-shot puro (memória é fato, não prompt), minimalismo agressivo (cada token conta no orçamento de 200 linhas do MEMORY.md), informação factual que sobrevive a compaction.
+**Principles applied**: Pure zero-shot (memory is fact, not prompt), aggressive minimalism (every token counts in the 200-line MEMORY.md budget), factual information that survives compaction.
 
-**Exemplo concreto:**
+**Concrete example:**
 
 ```markdown
-## Arquitetura de Testes — 2026-03-15
+## Test Architecture — 2026-03-15
 
-- Framework: Jest com ts-jest para TypeScript
-- Padrão de nomeação: `[module].test.ts` co-localizado com o código
-- Fixtures compartilhadas em `tests/fixtures/`
-- Comando principal: `pnpm test` (roda todos), `pnpm test:watch` (modo watch)
-- Decisão: mocks externos isolados em `tests/__mocks__/` por requisito de determinismo
+- Framework: Jest with ts-jest for TypeScript
+- Naming pattern: `[module].test.ts` co-located with the code
+- Shared fixtures in `tests/fixtures/`
+- Main command: `pnpm test` (runs all), `pnpm test:watch` (watch mode)
+- Decision: external mocks isolated in `tests/__mocks__/` per determinism requirement
 ```
 
-### 6.5 Receita: Prompt de Hook
+### 6.5 Recipe: Hook Prompt
 
 ```markdown
-# Template de Hook Prompt
+# Hook Prompt Template
 
-[Zero-shot: 1-3 frases descrevendo a verificação]
-[Critério de sucesso/falha]
-[Ação em caso de falha — se aplicável]
+[Zero-shot: 1-3 sentences describing the verification]
+[Success/failure criteria]
+[Action on failure — if applicable]
 ```
 
-**Princípios aplicados**: Zero-shot exclusivo (hooks devem ser rápidos), minimalismo extremo (cada token de hook é custo em toda execução), sem role prompting (papel é implícito no contexto da ação).
+**Principles applied**: Zero-shot exclusively (hooks must be fast), extreme minimalism (every hook token is a cost on every execution), no role prompting (role is implicit in the action context).
 
-**Exemplo concreto para hook pre-commit:**
+**Concrete example for pre-commit hook:**
 
 ```markdown
-Verifique se o commit message segue o formato conventional commits:
+Verify that the commit message follows conventional commits format:
 {type}({scope}): {description}
 
-Tipos válidos: feat, fix, docs, chore, refactor, test, perf, ci.
-Se o formato estiver incorreto, rejeite o commit e sugira correção.
+Valid types: feat, fix, docs, chore, refactor, test, perf, ci.
+If the format is incorrect, reject the commit and suggest a correction.
 ```
 
 ---
 
-## 7. Forças e Limitações
+## 7. Strengths and Limitations
 
-### 7.1 Forças do Guia
+### 7.1 Strengths of the Guide
 
-1. **Cobertura abrangente**: 58+ técnicas documentadas com benchmarks quantitativos, não apenas descrições qualitativas. Permite decisões informadas sobre custo-benefício de cada técnica.
+1. **Comprehensive coverage**: 58+ techniques documented with quantitative benchmarks, not just qualitative descriptions. Enables informed decisions on cost-benefit of each technique.
 
-2. **Descoberta contra-intuitiva documentada**: A inversão de paradigma com modelos de raciocínio (técnicas clássicas prejudicam) é essencial para evitar over-engineering em skills e subagentes. Sem essa informação, a tendência natural seria adicionar CoT e few-shot em todo lugar.
+2. **Counter-intuitive finding documented**: The paradigm inversion with reasoning models (classic techniques hurt performance) is essential to avoid over-engineering in skills and sub-agents. Without this information, the natural tendency would be to add CoT and few-shot everywhere.
 
-3. **Custos de tokens quantificados**: Saber que few-shot custa 50-200+ tokens por exemplo ou que Self-Consistency multiplica custo por 5-30x permite planejar o orçamento de atenção concretamente.
+3. **Quantified token costs**: Knowing that few-shot costs 50-200+ tokens per example or that Self-Consistency multiplies cost by 5-30x enables concrete attention budget planning.
 
-4. **Matrizes de decisão**: As tabelas comparativas por tipo de tarefa e por tier de modelo são ferramentas de referência práticas para escolha de técnicas.
+4. **Decision matrices**: The comparative tables by task type and model tier are practical reference tools for technique selection.
 
-5. **Seção de multi-agentes**: A análise de como técnicas se aplicam em arquiteturas multi-agentes é diretamente relevante para o projeto, que gera infraestrutura para agentes.
+5. **Multi-agent section**: The analysis of how techniques apply in multi-agent architectures is directly relevant to the project, which generates infrastructure for agents.
 
-6. **Combinações sinérgicas e conflitantes**: Saber que "Few-shot + modelos de raciocínio" prejudica ou que "CoT + Self-Consistency" amplifica é conhecimento crítico para design de prompts.
+6. **Synergistic and conflicting combinations**: Knowing that "Few-shot + reasoning models" hurts performance or that "CoT + Self-Consistency" amplifies is critical knowledge for prompt design.
 
-### 7.2 Limitações do Guia
+### 7.2 Limitations of the Guide
 
-1. **Foco em prompts de API, não em infraestrutura de agentes**: O guia cobre técnicas para prompts diretos ao modelo, mas não mapeia sistematicamente como cada técnica se traduz para artefatos de infraestrutura (AGENTS.md, rules, hooks, skills). Esta análise preenche essa lacuna.
+1. **Focus on API prompts, not agent infrastructure**: The guide covers techniques for direct model prompts, but does not systematically map how each technique translates to infrastructure artifacts (AGENTS.md, rules, hooks, skills). This analysis fills that gap.
 
-2. **Ausência de exemplos de infraestrutura de agentes**: Todos os exemplos são de prompts conversacionais ou de API. Faltam exemplos de como aplicar role prompting em um SKILL.md ou CoT em uma fase de skill.
+2. **Absence of agent infrastructure examples**: All examples are from conversational or API prompts. Missing are examples of how to apply role prompting in a SKILL.md or CoT in a skill phase.
 
-3. **Benchmarks de domínio acadêmico**: GSM8K, Game of 24, ALFWorld — benchmarks relevantes para validade acadêmica, mas distantes das tarefas práticas de geração de AGENTS.md ou análise de repositório.
+3. **Academic domain benchmarks**: GSM8K, Game of 24, ALFWorld — benchmarks relevant for academic validity, but distant from practical tasks of AGENTS.md generation or repository analysis.
 
-4. **Evolução rápida**: Muitos benchmarks são de 2022-2024. Modelos de 2026 podem ter características diferentes, especialmente modelos de raciocínio que mudam a dinâmica de técnicas clássicas.
+4. **Rapid evolution**: Many benchmarks are from 2022-2024. Models from 2026 may have different characteristics, especially reasoning models that change the dynamics of classic techniques.
 
-5. **Ausência de guidance sobre combinação para infraestrutura**: O guia lista combinações sinérgicas e conflitantes, mas não orienta sobre qual combinação usar para "gerar um AGENTS.md" ou "delegar análise a subagente".
+5. **Absence of infrastructure combination guidance**: The guide lists synergistic and conflicting combinations, but does not guide on which combination to use for "generating an AGENTS.md" or "delegating analysis to a sub-agent."
 
-6. **Custo computacional não mapeado para contexto de agentes**: Os custos de tokens são apresentados em termos absolutos, mas não em termos do orçamento de atenção de 200 linhas de um CLAUDE.md ou do contexto limitado de um subagente.
-
----
-
-## 8. Recomendações
-
-### 8.1 Técnicas Prioritárias para Infraestrutura de Agentes
-
-Ordenadas por impacto e relação custo-benefício para o projeto:
-
-**Tier 1 — Usar sempre:**
-
-| Técnica | Onde | Justificativa |
-|---------|------|---------------|
-| **Zero-shot** | Rules, hooks, memória, fases simples de skills | Custo mínimo, eficácia comprovada para instruções diretas |
-| **Role prompting** | Topo de SKILL.md, prompts de subagente | 10-30 tokens para especialização completa do agente |
-| **Prompt chaining** | Estrutura de skills multi-fase | Padrão fundamental de decomposição — a skill inteira é uma chain |
-| **System vs User separation** | Prompts de subagente, estrutura de SKILL.md | Organização básica que melhora aderência |
-
-**Tier 2 — Usar quando necessário:**
-
-| Técnica | Onde | Justificativa |
-|---------|------|---------------|
-| **Few-shot** (1-2 exemplos) | Fases de geração com formato crítico | Quando o formato de saída não pode ser inferido por zero-shot |
-| **CoT** (implícito) | Fases de análise em skills, subagentes de análise | Quando raciocínio multi-passo é necessário; nunca em rules/hooks |
-| **Structured output** | Comunicação entre fases, retorno de subagentes | JSON para inter-agente, XML para Claude, Markdown para humanos |
-| **ReAct** (orientação) | Fases de exploração em skills | Listar ferramentas disponíveis e orientar ciclo de exploração |
-| **Self-critique** | Fases de validação em skills | Loop de revisão contra princípios explícitos |
-| **Step-back** | Início de skills de análise | Contextualizar antes de detalhar — custo mínimo, ganho significativo |
-
-**Tier 3 — Usar excepcionalmente:**
-
-| Técnica | Onde | Justificativa |
-|---------|------|---------------|
-| **Meta-prompting** | Skills que geram prompts/configs para outros agentes | A skill de inicialização já é meta-prompting por natureza |
-| **Self-Consistency** | Decisões de alta criticidade via múltiplos subagentes | Custo 5-30x — justificável apenas para decisões irreversíveis |
-| **Tree of Thoughts** | Exploração de alternativas arquiteturais | Implementável via orchestrator-workers, não via prompt direto |
-| **RAG patterns** | Skills com `references/` como corpus | Já implementado implicitamente na estrutura de referências |
-
-**Tier 4 — Evitar em infraestrutura de agentes:**
-
-| Técnica | Razão |
-|---------|-------|
-| **Emotion prompting** | Irrelevante para artefatos técnicos de configuração |
-| **Multimodal CoT** | Infraestrutura de agentes é textual |
-| **Directional Stimulus** | Requer modelo de política treinado — overhead injustificado |
-| **Skeleton-of-Thought** | Otimização de latência irrelevante para geração de configs |
-
-### 8.2 Regras de Ouro Derivadas
-
-1. **Em artefatos sempre-carregados (CLAUDE.md root, rules globais), usar exclusivamente zero-shot.** Cada token extra é custo em toda requisição. Few-shot e CoT pertencem a artefatos on-demand.
-
-2. **Em skills, usar prompt chaining como estrutura e zero-shot como padrão de fase.** Adicionar few-shot apenas em fases de geração com formato crítico. Adicionar CoT apenas em fases de análise complexa.
-
-3. **Em subagentes, investir em role prompting e structured output de retorno.** O papel define o comportamento, o formato de retorno garante integração. Tarefa sempre no final do prompt.
-
-4. **Nunca usar técnicas que custem 5x+ em artefatos que não sejam isolados (context: fork).** Self-Consistency e ToT só fazem sentido em contextos isolados de subagentes.
-
-5. **Testar antes de assumir.** A descoberta de que modelos de raciocínio performam pior com técnicas clássicas invalida pressupostos. Medir, não presumir.
-
-6. **Tratar cada técnica como investimento de tokens.** Calcular o custo marginal (tokens extras) contra o benefício marginal (melhoria mensurável) antes de adicionar complexidade.
+6. **Computational cost not mapped to agent context**: Token costs are presented in absolute terms, but not in terms of the 200-line attention budget of a CLAUDE.md or the limited context of a sub-agent.
 
 ---
 
-## Referências Cruzadas
+## 8. Recommendations
 
-- `docs/prompt-engineering-guide.md` — Documento analisado
-- `docs/research-llm-context-optimization.md` — Context engineering, orçamento de atenção, progressive disclosure
-- `docs/a-guide-to-agents.md` — AGENTS.md minimalismo, progressive disclosure, instruction budget
-- `docs/analysis/` — Diretório de análises do projeto
+### 8.1 Priority Techniques for Agent Infrastructure
+
+Ordered by impact and cost-benefit ratio for the project:
+
+**Tier 1 — Always use:**
+
+| Technique | Where | Justification |
+|-----------|-------|---------------|
+| **Zero-shot** | Rules, hooks, memory, simple skill phases | Minimal cost, proven effectiveness for direct instructions |
+| **Role prompting** | Top of SKILL.md, sub-agent prompts | 10-30 tokens for complete agent specialization |
+| **Prompt chaining** | Multi-phase skill structure | Fundamental decomposition pattern — the entire skill is a chain |
+| **System vs User separation** | Sub-agent prompts, SKILL.md structure | Basic organization that improves adherence |
+
+**Tier 2 — Use when necessary:**
+
+| Technique | Where | Justification |
+|-----------|-------|---------------|
+| **Few-shot** (1-2 examples) | Generation phases with critical format | When output format cannot be inferred by zero-shot |
+| **CoT** (implicit) | Analysis phases in skills, analysis sub-agents | When multi-step reasoning is necessary; never in rules/hooks |
+| **Structured output** | Inter-phase communication, sub-agent returns | JSON for inter-agent, XML for Claude, Markdown for humans |
+| **ReAct** (guidance) | Exploration phases in skills | List available tools and guide exploration cycle |
+| **Self-critique** | Validation phases in skills | Review loop against explicit principles |
+| **Step-back** | Beginning of analysis skills | Contextualize before detailing — minimal cost, significant gain |
+
+**Tier 3 — Use exceptionally:**
+
+| Technique | Where | Justification |
+|-----------|-------|---------------|
+| **Meta-prompting** | Skills that generate prompts/configs for other agents | The initialization skill is already meta-prompting by nature |
+| **Self-Consistency** | High-criticality decisions via multiple sub-agents | 5-30x cost — justifiable only for irreversible decisions |
+| **Tree of Thoughts** | Exploration of architectural alternatives | Implementable via orchestrator-workers, not via direct prompt |
+| **RAG patterns** | Skills with `references/` as corpus | Already implemented implicitly in the references structure |
+
+**Tier 4 — Avoid in agent infrastructure:**
+
+| Technique | Reason |
+|-----------|--------|
+| **Emotion prompting** | Irrelevant for technical configuration artifacts |
+| **Multimodal CoT** | Agent infrastructure is textual |
+| **Directional Stimulus** | Requires a trained policy model — unjustified overhead |
+| **Skeleton-of-Thought** | Latency optimization irrelevant for config generation |
+
+### 8.2 Golden Rules Derived
+
+1. **In always-loaded artifacts (root CLAUDE.md, global rules), use exclusively zero-shot.** Every extra token is a cost on every request. Few-shot and CoT belong in on-demand artifacts.
+
+2. **In skills, use prompt chaining as structure and zero-shot as the phase default.** Add few-shot only in generation phases with critical format. Add CoT only in complex analysis phases.
+
+3. **In sub-agents, invest in role prompting and structured return output.** The role defines behavior, the return format ensures integration. Task always at the end of the prompt.
+
+4. **Never use techniques that cost 5x+ in artifacts that are not isolated (context: fork).** Self-Consistency and ToT only make sense in isolated sub-agent contexts.
+
+5. **Test before assuming.** The finding that reasoning models perform worse with classic techniques invalidates assumptions. Measure, don't presume.
+
+6. **Treat each technique as a token investment.** Calculate the marginal cost (extra tokens) against the marginal benefit (measurable improvement) before adding complexity.
+
+---
+
+## Cross-References
+
+- `docs/general-llm/prompt-engineering-guide.md` — Analyzed document
+- `docs/general-llm/research-context-engineering-comprehensive.md` — Context engineering, attention budget, progressive disclosure
+- `docs/general-llm/a-guide-to-agents.md` — AGENTS.md minimalism, progressive disclosure, instruction budget
+- `docs/analysis/` — Project analysis directory

@@ -2,6 +2,8 @@
 
 > Create, manage, and share skills to extend Claude's capabilities in Claude Code. Includes custom commands and bundled skills.
 
+**Related documentation**: [Skill Authoring Best Practices](../../shared/skill-authoring-best-practices.md) (universal guide) | [Agent Skills Standard](../../shared/skills-standard/README.md) (open standard spec) | [Research: Skills Format Comparison](research-claude-code-skills-format.md) | [`.claude/rules/`](../memory/how-claude-remembers-a-project.md) (path-scoped rules complement skills)
+
 Skills extend what Claude can do. Create a `SKILL.md` file with instructions, and Claude adds it to its toolkit. Claude uses skills when relevant, or you can invoke one directly with `/skill-name`.
 
 <Note>
@@ -243,7 +245,7 @@ Reference supporting files from `SKILL.md` so Claude knows what each file contai
 - For usage examples, see [examples.md](examples.md)
 ```
 
-<Tip>Keep `SKILL.md` under 500 lines. Move detailed reference material to separate files.</Tip>
+<Tip>Keep `SKILL.md` under 500 lines (~5,000 tokens). Move detailed reference material to separate files.</Tip>
 
 ### Control who invokes a skill
 

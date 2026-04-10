@@ -1,41 +1,46 @@
-# Analise: Criacao de Subagentes Customizados no Claude Code
+# Analysis: Creating Custom Subagents in Claude Code
+
+> **Status**: Current
+> **Source document**: [creating-custom-subagents.md](https://docs.anthropic.com/en/docs/claude-code/subagents)
+> **Analysis date**: 2025-06-01
+> **Scope**: Custom subagent creation, configuration, and usage — context isolation, tool control, memory, hooks, worktree isolation, and orchestration patterns
 
 ---
 
-## 1. Resumo Executivo
+## 1. Executive Summary
 
-O documento oficial da Anthropic sobre subagentes customizados e a referencia central para a criacao, configuracao e uso de assistentes de IA especializados dentro do Claude Code. Subagentes sao definidos como arquivos Markdown com YAML frontmatter, armazenados em diretorios `agents/` com escopo variavel (sessao via CLI, projeto, usuario, ou plugin). Cada subagente opera em sua propria janela de contexto com system prompt customizado, acesso restrito a ferramentas e permissoes independentes. Apenas dois campos sao obrigatorios: `name` e `description`.
+Anthropic's official document on custom subagents is the central reference for creating, configuring, and using specialized AI assistants within Claude Code. Subagents are defined as Markdown files with YAML frontmatter, stored in `agents/` directories with variable scope (session via CLI, project, user, or plugin). Each subagent operates in its own context window with a custom system prompt, restricted tool access, and independent permissions. Only two fields are required: `name` and `description`.
 
-O mecanismo fundamental e o isolamento de contexto: subagentes recebem APENAS seu system prompt (corpo do markdown) mais detalhes basicos do ambiente -- nao recebem o system prompt completo do Claude Code nem o historico da conversacao pai. Isso preserva o contexto principal enquanto permite trabalho especializado. O Claude decide automaticamente quando delegar com base no campo `description` e no contexto da conversa, mas pode ser forcado via @-mention (`@"code-reviewer (agent)"`) ou configurado como agente sessao-wide (`claude --agent code-reviewer`).
+The fundamental mechanism is context isolation: subagents receive ONLY their system prompt (the markdown body) plus basic environment details — they do not receive the full Claude Code system prompt or the parent conversation history. This preserves the main context while enabling specialized work. Claude automatically decides when to delegate based on the `description` field and conversation context, but can be forced via @-mention (`@"code-reviewer (agent)"`) or configured as a session-wide agent (`claude --agent code-reviewer`).
 
-As capacidades de configuracao sao extensas: selecao de modelo (`haiku`, `sonnet`, `opus`, `inherit`), preload de skills, servidores MCP escopados, hooks de ciclo de vida, memoria persistente (user/project/local), isolamento via git worktree, limite de turnos (`maxTurns`), nivel de esforco, e execucao em foreground ou background. A restricao mais importante e que subagentes nao podem spawnar outros subagentes, prevenindo aninhamento infinito.
+Configuration capabilities are extensive: model selection (`haiku`, `sonnet`, `opus`, `inherit`), skill preloading, scoped MCP servers, lifecycle hooks, persistent memory (user/project/local), git worktree isolation, turn limit (`maxTurns`), effort level, and foreground or background execution. The most important restriction is that subagents cannot spawn other subagents, preventing infinite nesting.
 
 ---
 
-## 2. Conceitos e Mecanismos Chave
+## 2. Key Concepts and Mechanisms
 
-### 2.1 Subagentes Built-in
+### 2.1 Built-in Subagents
 
-| Subagente | Modelo | Ferramentas | Proposito |
-|-----------|--------|-------------|-----------|
-| **Explore** | Haiku | Read-only (sem Write/Edit) | Busca e analise de codebase |
-| **Plan** | Herda | Read-only (sem Write/Edit) | Pesquisa para modo planejamento |
-| **general-purpose** | Herda | Todas | Pesquisa complexa, operacoes multi-passo |
-| **Bash** | Herda | Comandos de terminal | Comandos em contexto separado |
-| **Claude Code Guide** | Haiku | -- | Perguntas sobre features do Claude Code |
+| Subagent | Model | Tools | Purpose |
+|----------|-------|-------|---------|
+| **Explore** | Haiku | Read-only (no Write/Edit) | Codebase search and analysis |
+| **Plan** | Inherit | Read-only (no Write/Edit) | Research for planning mode |
+| **general-purpose** | Inherit | All | Complex research, multi-step operations |
+| **Bash** | Inherit | Terminal commands | Commands in separate context |
+| **Claude Code Guide** | Haiku | -- | Questions about Claude Code features |
 
-### 2.2 Hierarquia de Escopo
+### 2.2 Scope Hierarchy
 
 ```
-Prioridade 1 (mais alta): --agents CLI flag (sessao unica, JSON)
-Prioridade 2:             .claude/agents/ (projeto, versionavel)
-Prioridade 3:             ~/.claude/agents/ (usuario, todos os projetos)
-Prioridade 4 (mais baixa): Plugin agents/ (onde plugin esta habilitado)
+Priority 1 (highest):  --agents CLI flag (single session, JSON)
+Priority 2:            .claude/agents/ (project, versionable)
+Priority 3:            ~/.claude/agents/ (user, all projects)
+Priority 4 (lowest):   Plugin agents/ (where plugin is enabled)
 ```
 
-Quando multiplos subagentes compartilham o mesmo nome, o de maior prioridade vence.
+When multiple subagents share the same name, the highest priority one wins.
 
-### 2.3 Formato do Arquivo de Subagente
+### 2.3 Subagent File Format
 
 ```markdown
 ---
@@ -49,81 +54,81 @@ You are a code reviewer. When invoked, analyze the code and provide
 specific, actionable feedback on quality, security, and best practices.
 ```
 
-O frontmatter define metadados e configuracao. O corpo se torna o system prompt que guia o comportamento do subagente.
+The frontmatter defines metadata and configuration. The body becomes the system prompt that guides the subagent's behavior.
 
-### 2.4 Campos de Frontmatter Suportados
+### 2.4 Supported Frontmatter Fields
 
-| Campo | Obrigatorio | Descricao | Default |
-|-------|-------------|-----------|---------|
-| `name` | Sim | Identificador unico (letras minusculas e hifens) | -- |
-| `description` | Sim | Quando Claude deve delegar a este subagente | -- |
-| `tools` | Nao | Ferramentas permitidas (allowlist) | Herda todas |
-| `disallowedTools` | Nao | Ferramentas negadas (denylist) | -- |
-| `model` | Nao | Modelo: `sonnet`, `opus`, `haiku`, ID completo, ou `inherit` | `inherit` |
-| `permissionMode` | Nao | Modo de permissao | `default` |
-| `maxTurns` | Nao | Limite de turnos agenticos | -- |
-| `skills` | Nao | Skills pre-carregadas no contexto do subagente | -- |
-| `mcpServers` | Nao | Servidores MCP escopados ao subagente | -- |
-| `hooks` | Nao | Hooks de ciclo de vida escopados | -- |
-| `memory` | Nao | Memoria persistente: `user`, `project`, ou `local` | -- |
-| `background` | Nao | `true` para executar sempre em background | `false` |
-| `effort` | Nao | Nivel de esforco: `low`, `medium`, `high`, `max` | Herda da sessao |
-| `isolation` | Nao | `worktree` para git worktree isolada | -- |
+| Field | Required | Description | Default |
+|-------|----------|-------------|---------|
+| `name` | Yes | Unique identifier (lowercase letters and hyphens) | -- |
+| `description` | Yes | When Claude should delegate to this subagent | -- |
+| `tools` | No | Allowed tools (allowlist) | Inherits all |
+| `disallowedTools` | No | Denied tools (denylist) | -- |
+| `model` | No | Model: `sonnet`, `opus`, `haiku`, full ID, or `inherit` | `inherit` |
+| `permissionMode` | No | Permission mode | `default` |
+| `maxTurns` | No | Agentic turn limit | -- |
+| `skills` | No | Skills preloaded into the subagent's context | -- |
+| `mcpServers` | No | MCP servers scoped to the subagent | -- |
+| `hooks` | No | Scoped lifecycle hooks | -- |
+| `memory` | No | Persistent memory: `user`, `project`, or `local` | -- |
+| `background` | No | `true` to always run in background | `false` |
+| `effort` | No | Effort level: `low`, `medium`, `high`, `max` | Inherits from session |
+| `isolation` | No | `worktree` for isolated git worktree | -- |
 
-### 2.5 Controle de Ferramentas
+### 2.5 Tool Control
 
-**Allowlist** (apenas estas ferramentas):
+**Allowlist** (only these tools):
 
 ```yaml
 tools: Read, Grep, Glob, Bash
 ```
 
-**Denylist** (todas exceto estas):
+**Denylist** (all except these):
 
 ```yaml
 disallowedTools: Write, Edit
 ```
 
-**Restricao de subagentes spawnaveis** (apenas para `--agent` mode):
+**Spawnable subagent restriction** (only for `--agent` mode):
 
 ```yaml
 tools: Agent(worker, researcher), Read, Bash
 ```
 
-Regra de interacao: se ambos `tools` e `disallowedTools` estao definidos, `disallowedTools` e aplicado primeiro, depois `tools` e resolvido contra o pool restante.
+Interaction rule: if both `tools` and `disallowedTools` are defined, `disallowedTools` is applied first, then `tools` is resolved against the remaining pool.
 
-### 2.6 Servidores MCP Escopados
+### 2.6 Scoped MCP Servers
 
 ```yaml
 mcpServers:
-  # Definicao inline: escopada apenas a este subagente
+  # Inline definition: scoped only to this subagent
   - playwright:
       type: stdio
       command: npx
       args: ["-y", "@playwright/mcp@latest"]
-  # Referencia por nome: reutiliza servidor ja configurado
+  # Reference by name: reuses already configured server
   - github
 ```
 
-Definicoes inline conectam no start do subagente e desconectam no finish. Isso evita que descricoes de ferramentas MCP consumam contexto na conversacao principal.
+Inline definitions connect on subagent start and disconnect on finish. This prevents MCP tool descriptions from consuming context in the main conversation.
 
-### 2.7 Memoria Persistente
+### 2.7 Persistent Memory
 
 ```yaml
-memory: project  # Armazena em .claude/agent-memory/<name>/
+memory: project  # Stores in .claude/agent-memory/<name>/
 ```
 
-| Escopo | Localizacao | Quando Usar |
-|--------|-------------|-------------|
-| `user` | `~/.claude/agent-memory/<name>/` | Aprendizado cross-projeto |
-| `project` | `.claude/agent-memory/<name>/` | Conhecimento especifico, versionavel |
-| `local` | `.claude/agent-memory-local/<name>/` | Especifico mas nao commitavel |
+| Scope | Location | When to Use |
+|-------|----------|-------------|
+| `user` | `~/.claude/agent-memory/<name>/` | Cross-project learning |
+| `project` | `.claude/agent-memory/<name>/` | Specific knowledge, versionable |
+| `local` | `.claude/agent-memory-local/<name>/` | Specific but not committable |
 
-Quando habilitada: system prompt inclui instrucoes de leitura/escrita, primeiras 200 linhas do `MEMORY.md` sao incluidas, e ferramentas Read/Write/Edit sao automaticamente habilitadas.
+When enabled: the system prompt includes read/write instructions, the first 200 lines of `MEMORY.md` are included, and Read/Write/Edit tools are automatically enabled.
 
-### 2.8 Hooks de Ciclo de Vida
+### 2.8 Lifecycle Hooks
 
-**No frontmatter do subagente** (escopo local):
+**In the subagent's frontmatter** (local scope):
 
 ```yaml
 hooks:
@@ -139,7 +144,7 @@ hooks:
           command: "./scripts/run-linter.sh"
 ```
 
-**No settings.json** (escopo do projeto):
+**In settings.json** (project scope):
 
 ```json
 {
@@ -154,102 +159,102 @@ hooks:
 }
 ```
 
-### 2.9 Modos de Execucao
+### 2.9 Execution Modes
 
-| Modo | Comportamento | Permissoes |
-|------|---------------|------------|
-| **Foreground** | Bloqueia conversacao principal | Prompts passam para o usuario |
-| **Background** | Executa concorrentemente | Pre-aprovadas; auto-nega o resto |
+| Mode | Behavior | Permissions |
+|------|----------|------------|
+| **Foreground** | Blocks main conversation | Prompts passed to user |
+| **Background** | Runs concurrently | Pre-approved; auto-denies the rest |
 
-`Ctrl+B` para backgroundar uma tarefa em execucao.
-
----
-
-## 3. Pontos de Atencao
-
-### 3.1 O Gap de Contexto do Subagente
-
-**O ponto mais critico.** Subagentes NAO recebem:
-
-- O system prompt completo do Claude Code
-- O historico da conversacao pai
-- Skills da sessao pai (devem ser listadas explicitamente no campo `skills`)
-
-Eles recebem APENAS:
-
-- Seu system prompt (corpo do markdown)
-- Detalhes basicos do ambiente (diretorio de trabalho)
-- CLAUDE.md e memoria do projeto (via fluxo normal de mensagens)
-
-**Implicacao**: O system prompt deve ser auto-suficiente. Todo contexto necessario deve estar no prompt ou ser reunido via ferramentas.
-
-### 3.2 Restricao Anti-Aninhamento
-
-Subagentes NAO podem spawnar outros subagentes. Se um workflow requer delegacao aninhada, use Skills ou chain subagentes da conversacao principal.
-
-### 3.3 Custo de Tool Descriptions
-
-Mesmo ferramentas nao utilizadas consomem contexto via suas descricoes. Restringir ferramentas ao minimo necessario e uma otimizacao de orcamento de atencao.
-
-### 3.4 Permissoes de Seguranca em Plugins
-
-Subagentes de plugins NAO suportam `hooks`, `mcpServers` ou `permissionMode`. Esses campos sao ignorados no carregamento. Para usa-los, copie o arquivo do agente para `.claude/agents/` ou `~/.claude/agents/`.
-
-### 3.5 Auto-Compactacao
-
-Subagentes suportam auto-compactacao a ~95% de capacidade. Configuravel via `CLAUDE_AUTOCOMPACT_PCT_OVERRIDE`. Eventos de compactacao sao logados nos transcripts: `~/.claude/projects/{project}/{sessionId}/subagents/agent-{agentId}.jsonl`.
-
-### 3.6 Impacto do `description` na Delegacao
-
-O campo `description` e o unico sinal de roteamento que o Claude usa para decidir quando delegar. Descricoes vagas causam delegacao inconsistente ou excessiva. Descricoes com frases como "Use proactively after..." ou "Use when encountering..." melhoram significativamente a precisao de roteamento.
+`Ctrl+B` to background a running task.
 
 ---
 
-## 4. Casos de Uso e Escopo
+## 3. Points of Attention
 
-### 4.1 Quando Usar Subagentes
+### 3.1 The Subagent Context Gap
 
-| Cenario | Recomendacao |
-|---------|-------------|
-| Operacoes que geram output volumoso (testes, logs) | Subagente -- isola output do contexto principal |
-| Code review com restricoes de ferramenta | Subagente read-only |
-| Pesquisa paralela independente | Multiplos subagentes em paralelo |
-| Workflows multi-passo com validacao | Chain de subagentes |
-| Dominio especializado (SQL, seguranca) | Subagente com prompt focado |
-| Operacoes arriscadas (refactoring grande) | Subagente com `isolation: worktree` |
+**The most critical point.** Subagents do NOT receive:
 
-### 4.2 Quando NAO Usar Subagentes
+- The full Claude Code system prompt
+- The parent conversation history
+- Skills from the parent session (must be listed explicitly in the `skills` field)
 
-| Cenario | Alternativa |
-|---------|-------------|
-| Iteracao frequente com back-and-forth | Conversacao principal |
-| Fases que compartilham contexto extenso | Conversacao principal |
-| Mudanca rapida e direcionada | Conversacao principal |
-| Pergunta rapida sobre algo ja no contexto | `/btw` |
-| Prompts reutilizaveis no contexto principal | Skills |
-| Workers que precisam se comunicar | Agent Teams |
+They receive ONLY:
 
-### 4.3 Criterios de Decisao para Modelo
+- Their system prompt (markdown body)
+- Basic environment details (working directory)
+- CLAUDE.md and project memory (via normal message flow)
 
-| Tarefa | Modelo Recomendado | Justificativa |
-|--------|-------------------|---------------|
-| Exploracao/busca de codigo | `haiku` | Rapido, read-only, nao requer raciocinio profundo |
-| Code review | `sonnet` | Equilibrio qualidade/velocidade |
-| Decisoes de arquitetura | `opus` | Analise complexa de trade-offs |
-| Debugging | `sonnet` | Precisa de ferramentas + raciocinio, velocidade importa |
-| Operacoes de arquivo simples | `haiku` | Tarefas mecanicas e rotineiras |
+**Implication**: The system prompt must be self-sufficient. All necessary context must be in the prompt or gathered via tools.
+
+### 3.2 Anti-Nesting Restriction
+
+Subagents CANNOT spawn other subagents. If a workflow requires nested delegation, use Skills or chain subagents from the main conversation.
+
+### 3.3 Tool Description Cost
+
+Even unused tools consume context via their descriptions. Restricting tools to the minimum necessary is an attention budget optimization.
+
+### 3.4 Security Permissions in Plugins
+
+Plugin subagents do NOT support `hooks`, `mcpServers`, or `permissionMode`. These fields are ignored on loading. To use them, copy the agent file to `.claude/agents/` or `~/.claude/agents/`.
+
+### 3.5 Auto-Compaction
+
+Subagents support auto-compaction at ~95% capacity. Configurable via `CLAUDE_AUTOCOMPACT_PCT_OVERRIDE`. Compaction events are logged in transcripts: `~/.claude/projects/{project}/{sessionId}/subagents/agent-{agentId}.jsonl`.
+
+### 3.6 Impact of `description` on Delegation
+
+The `description` field is the only routing signal Claude uses to decide when to delegate. Vague descriptions cause inconsistent or excessive delegation. Descriptions with phrases like "Use proactively after..." or "Use when encountering..." significantly improve routing accuracy.
 
 ---
 
-## 5. Aplicabilidade a Infraestrutura de Agentes
+## 4. Use Cases and Scope
+
+### 4.1 When to Use Subagents
+
+| Scenario | Recommendation |
+|----------|---------------|
+| Operations that generate verbose output (tests, logs) | Subagent — isolates output from the main context |
+| Code review with tool restrictions | Read-only subagent |
+| Independent parallel research | Multiple subagents in parallel |
+| Multi-step workflows with validation | Subagent chaining |
+| Specialized domain (SQL, security) | Subagent with focused prompt |
+| Risky operations (large refactoring) | Subagent with `isolation: worktree` |
+
+### 4.2 When NOT to Use Subagents
+
+| Scenario | Alternative |
+|----------|------------|
+| Frequent iteration with back-and-forth | Main conversation |
+| Phases that share extensive context | Main conversation |
+| Quick, targeted changes | Main conversation |
+| Quick question about something already in context | `/btw` |
+| Reusable prompts in main context | Skills |
+| Workers that need to communicate | Agent Teams |
+
+### 4.3 Decision Criteria for Model
+
+| Task | Recommended Model | Justification |
+|------|-------------------|---------------|
+| Code exploration/search | `haiku` | Fast, read-only, does not require deep reasoning |
+| Code review | `sonnet` | Quality/speed balance |
+| Architecture decisions | `opus` | Complex trade-off analysis |
+| Debugging | `sonnet` | Needs tools + reasoning, speed matters |
+| Simple file operations | `haiku` | Mechanical, routine tasks |
+
+---
+
+## 5. Applicability to Agent Infrastructure
 
 ### 5.1 Skills
 
-- **Skills que delegam a subagentes**: O campo `context: fork` em skills cria um subagente isolado. O campo `agent` especifica qual configuracao de subagente usar (Explore, Plan, general-purpose, ou customizado). Isso e a ponte entre skills e subagentes.
-- **Preload de skills em subagentes**: O campo `skills` no frontmatter injeta conteudo completo de skills no contexto do subagente no startup. E o inverso de `context: fork` -- aqui o subagente controla o system prompt e carrega conteudo de skills.
-- **Plugin-provided skills**: Subagentes de plugins carregam skills normalmente, mas com restricoes de seguranca (sem hooks, mcpServers, permissionMode).
+- **Skills that delegate to subagents**: The `context: fork` field in skills creates an isolated subagent. The `agent` field specifies which subagent configuration to use (Explore, Plan, general-purpose, or custom). This is the bridge between skills and subagents.
+- **Skill preloading in subagents**: The `skills` field in frontmatter injects the full content of skills into the subagent's context at startup. It is the inverse of `context: fork` — here the subagent controls the system prompt and loads skill content.
+- **Plugin-provided skills**: Plugin subagents load skills normally, but with security restrictions (no hooks, mcpServers, permissionMode).
 
-**Exemplo de skill que delega a subagente**:
+**Example of a skill that delegates to a subagent**:
 
 ```yaml
 ---
@@ -265,7 +270,7 @@ Research $ARGUMENTS thoroughly:
 3. Summarize findings with specific file references
 ```
 
-**Exemplo de subagente que carrega skills**:
+**Example of a subagent that loads skills**:
 
 ```yaml
 ---
@@ -281,161 +286,161 @@ Implement API endpoints. Follow the conventions and patterns from the preloaded 
 
 ### 5.2 Hooks
 
-- **Hooks no frontmatter**: `PreToolUse`, `PostToolUse`, `Stop` (convertido para `SubagentStop` em runtime). Executam apenas enquanto o subagente esta ativo.
-- **Hooks no settings.json**: `SubagentStart` e `SubagentStop` com matchers por tipo de agente. Executam na sessao principal.
-- **Tipos de hook**: `command` (shell), `http` (POST), `prompt` (avaliacao Claude), `agent` (subagente verificador)
-- **Guardrails condicionais**: `PreToolUse` + scripts de validacao para controle fino (ex: permitir apenas queries SELECT)
-- **Memory-triggered hooks**: Nao ha suporte direto, mas hooks `PostToolUse` no matcher "Write|Edit" podem detectar escritas em diretorios de memoria
+- **Hooks in frontmatter**: `PreToolUse`, `PostToolUse`, `Stop` (converted to `SubagentStop` at runtime). Execute only while the subagent is active.
+- **Hooks in settings.json**: `SubagentStart` and `SubagentStop` with matchers by agent type. Execute in the main session.
+- **Hook types**: `command` (shell), `http` (POST), `prompt` (Claude evaluation), `agent` (verifier subagent)
+- **Conditional guardrails**: `PreToolUse` + validation scripts for fine control (e.g., allow only SELECT queries)
+- **Memory-triggered hooks**: No direct support, but `PostToolUse` hooks on the "Write|Edit" matcher can detect writes to memory directories
 
-### 5.3 Subagentes
+### 5.3 Subagents
 
-- **Orquestracao**: Modelo hub-and-spoke -- subagentes reportam ao caller, nao entre si
-- **Delegacao**: Automatica (via description) ou explicita (via @-mention ou `--agent`)
-- **Sintese de resultados**: Resultado retorna ao contexto principal; Claude sintetiza
-- **Execucao paralela**: Multiplos subagentes podem rodar em paralelo (foreground ou background)
-- **Isolamento via worktree**: `isolation: worktree` cria copia isolada do repositorio; cleanup automatico se nenhuma mudanca
-- **Retomada**: `SendMessage` com agent ID permite retomar subagentes com historico completo
-- **Chaining**: Subagentes em sequencia onde cada resultado alimenta o proximo
+- **Orchestration**: Hub-and-spoke model — subagents report to the caller, not to each other
+- **Delegation**: Automatic (via description) or explicit (via @-mention or `--agent`)
+- **Result synthesis**: Result returns to main context; Claude synthesizes
+- **Parallel execution**: Multiple subagents can run in parallel (foreground or background)
+- **Worktree isolation**: `isolation: worktree` creates an isolated repository copy; automatic cleanup if no changes
+- **Resumption**: `SendMessage` with agent ID allows resuming subagents with full history
+- **Chaining**: Subagents in sequence where each result feeds the next
 
 ### 5.4 Rules
 
-- **Rules em contexto de subagentes**: `.claude/rules/` sao carregadas normalmente via CLAUDE.md
-- **Path-scoped rules**: Ativadas quando o subagente le arquivos correspondentes ao pattern
-- **Plugin-scoped rules**: Rules de plugins sao carregadas pelo subagente normalmente
-- **Importacao `@path`**: Funciona normalmente dentro do contexto do subagente
+- **Rules in subagent context**: `.claude/rules/` are loaded normally via CLAUDE.md
+- **Path-scoped rules**: Activated when the subagent reads files matching the pattern
+- **Plugin-scoped rules**: Plugin rules are loaded by the subagent normally
+- **`@path` import**: Works normally within the subagent's context
 
-### 5.5 Memoria
+### 5.5 Memory
 
-- **Memoria persistente de subagente**: Tres escopos (user, project, local) com `MEMORY.md` como index
-- **Primeiras 200 linhas**: Carregadas no startup do subagente, assim como auto memory da sessao principal
-- **Curadoria**: Se `MEMORY.md` excede 200 linhas, o subagente recebe instrucoes para curar
-- **Cross-session**: A memoria persiste entre sessoes, construindo base de conhecimento incremental
-- **Dica pratica**: Incluir instrucoes no prompt como "Consulte sua memoria antes de comecar" e "Salve o que aprendeu ao terminar"
+- **Persistent subagent memory**: Three scopes (user, project, local) with `MEMORY.md` as index
+- **First 200 lines**: Loaded at subagent startup, just like auto memory from the main session
+- **Curation**: If `MEMORY.md` exceeds 200 lines, the subagent receives instructions to curate
+- **Cross-session**: Memory persists between sessions, building an incremental knowledge base
+- **Practical tip**: Include instructions in the prompt such as "Consult your memory before starting" and "Save what you learned when finishing"
 
 ---
 
-## 6. Aplicabilidade do Guia de Engenharia de Prompts
+## 6. Applicability of the Prompt Engineering Guide
 
-### 6.1 CoT para Cadeias de Raciocinio de Subagentes
+### 6.1 CoT for Subagent Reasoning Chains
 
-Subagentes beneficiam-se de CoT no system prompt, especialmente para tarefas de analise. O formato recomendado:
-
-```markdown
-Quando invocado:
-1. Reuna contexto -- execute git diff e explore o codebase
-2. Analise -- aplique o checklist de review
-3. Raciocine passo a passo sobre cada issue encontrada
-4. Verifique -- confirme que suas conclusoes sao suportadas por evidencia
-5. Reporte -- formate findings com prioridade e exemplos de fix
-```
-
-CoT e particularmente eficaz com modelo `sonnet` para reviews e debugging. Com `haiku`, mantenha CoT minimo para nao desperdicar tokens. Com `opus`, prefira instrucoes gerais ("think thoroughly") que produzem raciocinio superior a steps prescritivos.
-
-### 6.2 ReAct para Subagentes com Acesso a Ferramentas
-
-Subagentes com acesso a ferramentas (Bash, Read, Grep) operam naturalmente no padrao ReAct. O system prompt deve encorajar o ciclo:
+Subagents benefit from CoT in the system prompt, especially for analysis tasks. The recommended format:
 
 ```markdown
-## Processo
-1. **Pense** sobre o que precisa investigar
-2. **Aja** usando as ferramentas disponiveis (Read, Grep, Bash)
-3. **Observe** os resultados
-4. **Repita** ate ter informacao suficiente para uma conclusao fundamentada
+When invoked:
+1. Gather context — run git diff and explore the codebase
+2. Analyze — apply the review checklist
+3. Reason step by step about each issue found
+4. Verify — confirm that your conclusions are supported by evidence
+5. Report — format findings with priority and fix examples
 ```
 
-### 6.3 Tree of Thoughts para Subagentes de Exploracao
+CoT is particularly effective with the `sonnet` model for reviews and debugging. With `haiku`, keep CoT minimal to avoid wasting tokens. With `opus`, prefer general instructions ("think thoroughly") which produce superior reasoning compared to prescriptive steps.
 
-Para subagentes de exploracao (`Explore` ou customizados), ToT distribudo pode ser implementado via multiplos subagentes em paralelo, cada um explorando um caminho diferente:
+### 6.2 ReAct for Subagents with Tool Access
+
+Subagents with tool access (Bash, Read, Grep) naturally operate in the ReAct pattern. The system prompt should encourage the cycle:
+
+```markdown
+## Process
+1. **Think** about what you need to investigate
+2. **Act** using the available tools (Read, Grep, Bash)
+3. **Observe** the results
+4. **Repeat** until you have sufficient information for a grounded conclusion
+```
+
+### 6.3 Tree of Thoughts for Exploration Subagents
+
+For exploration subagents (`Explore` or custom), distributed ToT can be implemented via multiple parallel subagents, each exploring a different path:
 
 ```text
 Research the authentication, database, and API modules in parallel using separate subagents
 ```
 
-O agente principal sintetiza os resultados como a etapa de avaliacao do ToT.
+The main agent synthesizes the results as the evaluation step of ToT.
 
-### 6.4 Self-Consistency para Validacao entre Multiplos Subagentes
+### 6.4 Self-Consistency for Validation Across Multiple Subagents
 
-Executar o mesmo subagente de review multiplas vezes (com temperatura >0) e comparar resultados implementa Self-Consistency. Issues reportadas por multiplas execucoes tem maior confianca. Custo: multiplicado pelo numero de execucoes.
+Running the same review subagent multiple times (with temperature >0) and comparing results implements Self-Consistency. Issues reported by multiple runs have higher confidence. Cost: multiplied by the number of runs.
 
-### 6.5 Reflexion para Melhoria Iterativa de Subagentes
+### 6.5 Reflexion for Iterative Subagent Improvement
 
-A combinacao de subagentes chainados implementa Reflexion:
-
-```text
-1. Use code-reviewer para encontrar issues
-2. Use debugger para corrigir as issues encontradas
-3. Use code-reviewer novamente para validar as correcoes
-```
-
-Hooks `PostToolUse` podem automatizar a reflexao: apos cada edicao, executar linter ou testes.
-
-### 6.6 Least-to-Most para Decomposicao de Tarefas entre Subagentes
-
-Decompor uma tarefa complexa em subtarefas e delegar cada uma a um subagente:
+The combination of chained subagents implements Reflexion:
 
 ```text
-Primeiro use o Explore agent para mapear a arquitetura
-Depois use o planner agent para criar um plano baseado no mapeamento
-Por fim use o developer agent para implementar o plano
+1. Use code-reviewer to find issues
+2. Use debugger to fix the issues found
+3. Use code-reviewer again to validate the fixes
 ```
 
-Cada subagente recebe resultado do anterior, implementando decomposicao progressiva.
+`PostToolUse` hooks can automate the reflection: after each edit, run linter or tests.
+
+### 6.6 Least-to-Most for Task Decomposition Across Subagents
+
+Decompose a complex task into subtasks and delegate each to a subagent:
+
+```text
+First use the Explore agent to map the architecture
+Then use the planner agent to create a plan based on the mapping
+Finally use the developer agent to implement the plan
+```
+
+Each subagent receives the result from the previous one, implementing progressive decomposition.
 
 ---
 
-## 7. Correlacoes com os Documentos Principais
+## 7. Correlations with Core Documents
 
-### Com "Orchestrate Teams of Claude Code Sessions"
+### With "Orchestrate Teams of Claude Code Sessions"
 
-Complementaridade direta. Subagentes operam em modelo hub-and-spoke; agent teams em modelo peer-to-peer. Subagentes sao mais baratos (resultados sumarizados de volta) mas sem comunicacao inter-worker. A decisao entre ambos depende da necessidade de comunicacao entre workers.
+Direct complementarity. Subagents operate in a hub-and-spoke model; agent teams in a peer-to-peer model. Subagents are cheaper (summarized results returned) but without inter-worker communication. The decision between both depends on the need for communication between workers.
 
-### Com "Research: Subagent Best Practices"
+### With "Research: Subagent Best Practices"
 
-O documento de research aprofunda tudo que a documentacao oficial apresenta: patterns de ferramentas, exemplos da comunidade, anti-patterns, prompt engineering para system prompts. A informacao sobre Confidence-Based Filtering e a secao de anti-patterns sao contribuicoes unicas do research que complementam a documentacao oficial.
+The research document deepens everything the official documentation presents: tool patterns, community examples, anti-patterns, prompt engineering for system prompts. The information on Confidence-Based Filtering and the anti-patterns section are unique contributions from the research that complement the official documentation.
 
-### Com "How Claude Remembers a Project"
+### With "How Claude Remembers a Project"
 
-A memoria de subagentes e um caso especial da auto memory: mesmo mecanismo (MEMORY.md + topic files, primeiras 200 linhas), mas com escopos especificos (user/project/local). A hierarquia CLAUDE.md funciona normalmente dentro do contexto do subagente. Path-scoped rules em `.claude/rules/` sao ativadas conforme o subagente navega pelo codebase.
+Subagent memory is a special case of auto memory: same mechanism (MEMORY.md + topic files, first 200 lines), but with specific scopes (user/project/local). The CLAUDE.md hierarchy works normally within the subagent's context. Path-scoped rules in `.claude/rules/` are activated as the subagent navigates the codebase.
 
-### Com "Create Plugins"
+### With "Create Plugins"
 
-Plugins podem conter agentes em `agents/`. A principal restricao e que agentes de plugin NAO suportam `hooks`, `mcpServers` ou `permissionMode` por razoes de seguranca. Para usar esses campos, o agente deve ser copiado para `.claude/agents/`. O campo `agent` no `settings.json` de plugins ativa um agente como main thread.
+Plugins can contain agents in `agents/`. The main restriction is that plugin agents do NOT support `hooks`, `mcpServers`, or `permissionMode` for security reasons. To use these fields, the agent must be copied to `.claude/agents/`. The `agent` field in the plugin's `settings.json` activates an agent as the main thread.
 
-### Com "Research: LLM Context Optimization"
+### With "Research: LLM Context Optimization"
 
-O conceito de isolamento de contexto de subagentes e uma implementacao direta da estrategia "Isolate" do LangChain (separar contextos de diferentes agentes para evitar contaminacao cruzada). A recomendacao de restringir ferramentas ao minimo necessario e uma aplicacao do principio de "attention budget" -- tool descriptions consumem contexto mesmo quando nao utilizadas.
-
----
-
-## 8. Forcas e Limitacoes
-
-### Forcas
-
-1. **Flexibilidade de configuracao**: 14 campos de frontmatter cobrem a maioria dos cenarios
-2. **Isolamento de contexto**: Protege a conversacao principal de output volumoso
-3. **Hierarquia de escopo**: CLI > projeto > usuario > plugin permite override granular
-4. **MCP servers escopados**: Ferramentas de plugins ficam fora do contexto principal
-5. **Memoria persistente**: Conhecimento acumulado cross-session por subagente
-6. **Isolamento via worktree**: Seguranca para operacoes arriscadas
-7. **Multiplos metodos de invocacao**: Natural language, @-mention, --agent, settings
-8. **Retomada de subagentes**: SendMessage com agent ID preserva historico completo
-9. **Auto-compactacao**: Previne estouro de contexto em subagentes long-running
-
-### Limitacoes
-
-1. **Sem aninhamento**: Subagentes nao podem spawnar outros subagentes
-2. **Gap de contexto**: Nao recebem historico da conversacao pai
-3. **Skills nao herdadas**: Devem ser listadas explicitamente
-4. **Restricoes de plugin**: Sem hooks, mcpServers ou permissionMode em agentes de plugin
-5. **Resultado no contexto principal**: Muitos subagentes com resultados detalhados podem poluir o contexto
-6. **Background auto-deny**: Subagentes em background auto-negam permissoes nao pre-aprovadas
-7. **Custo de startup**: Subagentes comecam do zero, precisando tempo para reunir contexto
+The subagent context isolation concept is a direct implementation of LangChain's "Isolate" strategy (separate contexts of different agents to avoid cross-contamination). The recommendation to restrict tools to the minimum necessary is an application of the "attention budget" principle — tool descriptions consume context even when unused.
 
 ---
 
-## 9. Recomendacoes Praticas
+## 8. Strengths and Limitations
 
-### 9.1 Template de Subagente para Projeto
+### Strengths
+
+1. **Configuration flexibility**: 14 frontmatter fields cover most scenarios
+2. **Context isolation**: Protects the main conversation from verbose output
+3. **Scope hierarchy**: CLI > project > user > plugin allows granular override
+4. **Scoped MCP servers**: Plugin tools stay out of the main context
+5. **Persistent memory**: Cross-session accumulated knowledge per subagent
+6. **Worktree isolation**: Safety for risky operations
+7. **Multiple invocation methods**: Natural language, @-mention, --agent, settings
+8. **Subagent resumption**: SendMessage with agent ID preserves full history
+9. **Auto-compaction**: Prevents context overflow in long-running subagents
+
+### Limitations
+
+1. **No nesting**: Subagents cannot spawn other subagents
+2. **Context gap**: Do not receive the parent conversation history
+3. **Skills not inherited**: Must be listed explicitly
+4. **Plugin restrictions**: No hooks, mcpServers, or permissionMode in plugin agents
+5. **Result in main context**: Many subagents with detailed results can pollute the context
+6. **Background auto-deny**: Background subagents auto-deny non-pre-approved permissions
+7. **Startup cost**: Subagents start from scratch, needing time to gather context
+
+---
+
+## 9. Practical Recommendations
+
+### 9.1 Project Subagent Template
 
 ```markdown
 ---
@@ -454,7 +459,7 @@ You are a senior code reviewer for [project name].
 ## Your Role
 - Review code changes for quality, security, and maintainability
 - Check adherence to project conventions documented in CLAUDE.md
-- Consult your memory for patterns and issues discovered in reviews anteriores
+- Consult your memory for patterns and issues discovered in previous reviews
 
 ## Process
 1. **Gather context** -- Run `git diff --staged` and `git diff`
@@ -469,35 +474,35 @@ You are a senior code reviewer for [project name].
 - Consolidate similar issues
 ```
 
-### 9.2 Padrao de Chaining para Workflows Complexos
+### 9.2 Chaining Pattern for Complex Workflows
 
 ```text
-# Passo 1: Pesquisa
+# Step 1: Research
 Use the explore subagent to analyze the authentication module architecture
 
-# Passo 2: Planejamento
+# Step 2: Planning
 Based on the findings, use the planner subagent to create a refactoring plan
 
-# Passo 3: Implementacao
+# Step 3: Implementation
 Use the developer subagent to implement the first phase of the plan
 
-# Passo 4: Validacao
+# Step 4: Validation
 Use the code-reviewer subagent to review the implementation
 ```
 
-### 9.3 Otimizacao de Custos
+### 9.3 Cost Optimization
 
-1. Use `haiku` para exploracao e busca (built-in Explore ja faz isso)
-2. Use `sonnet` como default para trabalho geral
-3. Reserve `opus` apenas para decisoes de arquitetura complexas
-4. Restrinja ferramentas ao minimo necessario (reduz token de descricoes de ferramentas)
-5. Defina `maxTurns` para prevenir runaway agents
-6. Use MCP servers inline para evitar descricoes de ferramentas no contexto principal
+1. Use `haiku` for exploration and search (built-in Explore already does this)
+2. Use `sonnet` as default for general work
+3. Reserve `opus` only for complex architecture decisions
+4. Restrict tools to the minimum necessary (reduces tool description tokens)
+5. Set `maxTurns` to prevent runaway agents
+6. Use inline MCP servers to avoid tool descriptions in the main context
 
-### 9.4 Seguranca
+### 9.4 Security
 
-1. Use `permissionMode: plan` para subagentes que devem apenas observar
-2. Use `permissionMode: dontAsk` para subagentes que devem falhar graciosamente
-3. Implemente `PreToolUse` hooks para validacao de comandos arriscados
-4. Use `isolation: worktree` para refactorings grandes
-5. Nunca use `bypassPermissions` sem necessidade explicita e compreensao dos riscos
+1. Use `permissionMode: plan` for subagents that should only observe
+2. Use `permissionMode: dontAsk` for subagents that should fail gracefully
+3. Implement `PreToolUse` hooks for risky command validation
+4. Use `isolation: worktree` for large refactorings
+5. Never use `bypassPermissions` without explicit need and understanding of the risks

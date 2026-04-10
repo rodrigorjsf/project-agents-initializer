@@ -1,87 +1,88 @@
-# Analise: Extend Claude with Skills
+# Analysis: Extend Claude with Skills
 
-> Analise do documento oficial da Anthropic sobre o sistema de skills do Claude Code.
-> **Documento fonte**: `docs/skills/extend-claude-with-skills.md`
-> **Data da analise**: 2026-03-27
-
----
-
-## 1. Sumario Executivo
-
-O documento "Extend Claude with Skills" e a documentacao oficial da Anthropic que define o sistema de extensibilidade do Claude Code por meio de skills. Ele estabelece o formato SKILL.md como unidade fundamental de extensao, seguindo o padrao aberto Agent Skills (agentskills.io), e detalha toda a cadeia desde a criacao de uma skill simples ate padroes avancados como injecao dinamica de contexto e execucao em subagentes. O documento funciona como referencia canonica para qualquer pessoa que queira estender as capacidades do Claude Code.
-
-A importancia estrategica deste documento reside em posicionar skills como o mecanismo primario de progressive disclosure do Claude Code. Diferente de CLAUDE.md (que e carregado integralmente no startup), skills carregam apenas a descricao no inicio da sessao e o conteudo completo somente sob demanda. Isso resolve diretamente o problema de "context rot" documentado pela Anthropic -- a degradacao de performance conforme o contexto cresce. Skills sao, portanto, a solucao arquitetural para o dilema entre riqueza de instrucoes e eficiencia de contexto.
-
-O documento tambem revela a convergencia entre skills e o ecossistema mais amplo de plugins, subagentes e hooks, posicionando skills como a camada intermediaria entre instrucoes estaticas (CLAUDE.md/rules) e automacoes deterministicas (hooks). A integracao com `context: fork`, `allowed-tools` e `hooks` no frontmatter mostra que skills nao sao apenas documentos de instrucao, mas unidades de orquestracao completas.
+> **Status**: Current
+> **Source document**: [Anthropic — Extend Claude with Skills](docs/skills/extend-claude-with-skills.md)
+> **Analysis date**: 2026-03-27
+> **Scope**: Analysis of Claude Code skills extensibility system and SKILL.md specification
 
 ---
 
-## 2. Conceitos e Mecanismos Chave
+## 1. Executive Summary
 
-### 2.1 Formato SKILL.md e Frontmatter
+The document "Extend Claude with Skills" is the official Anthropic documentation that defines the Claude Code extensibility system through skills. It establishes the SKILL.md format as the fundamental unit of extension, following the open Agent Skills standard (agentskills.io), and details the entire chain from creating a simple skill to advanced patterns such as dynamic context injection and sub-agent execution. The document serves as the canonical reference for anyone looking to extend Claude Code's capabilities.
 
-O formato central e um arquivo Markdown com frontmatter YAML:
+The strategic importance of this document lies in positioning skills as the primary progressive disclosure mechanism of Claude Code. Unlike CLAUDE.md (which is loaded in its entirety at startup), skills load only the description at the beginning of the session and the full content only on demand. This directly solves the "context rot" problem documented by Anthropic — the performance degradation as context grows. Skills are, therefore, the architectural solution to the dilemma between instruction richness and context efficiency.
+
+The document also reveals the convergence between skills and the broader ecosystem of plugins, sub-agents, and hooks, positioning skills as the intermediate layer between static instructions (CLAUDE.md/rules) and deterministic automations (hooks). The integration with `context: fork`, `allowed-tools`, and `hooks` in the frontmatter shows that skills are not merely instruction documents, but complete orchestration units.
+
+---
+
+## 2. Key Concepts and Mechanisms
+
+### 2.1 SKILL.md Format and Frontmatter
+
+The core format is a Markdown file with YAML frontmatter:
 
 ```yaml
 ---
-name: minha-skill
-description: O que esta skill faz e quando usar
+name: my-skill
+description: What this skill does and when to use it
 disable-model-invocation: true
 allowed-tools: Read, Grep
 context: fork
 agent: Explore
 ---
 
-Instrucoes em Markdown aqui...
+Instructions in Markdown here...
 ```
 
-**Campos do frontmatter e suas implicacoes:**
+**Frontmatter fields and their implications:**
 
-| Campo | Impacto no Contexto | Impacto Comportamental |
-|-------|---------------------|------------------------|
-| `name` | Minimo (~10 tokens) | Define o comando `/nome` |
-| `description` | Carregado no startup (se model-invocable) | Determina auto-discovery pelo Claude |
-| `disable-model-invocation` | Remove descricao do contexto | Impede invocacao automatica |
-| `user-invocable` | Mantem descricao no contexto | Remove do menu `/` |
-| `allowed-tools` | Nenhum | Concede permissoes durante execucao |
-| `context` | Fork isola completamente | Cria subagente com contexto proprio |
-| `agent` | Determina system prompt do subagente | Define ferramentas e modelo disponiveis |
-| `model` | Nenhum direto | Override do modelo para a skill |
-| `effort` | Nenhum direto | Controla nivel de esforco (low a max) |
-| `hooks` | Nenhum | Automacoes no lifecycle da skill |
+| Field | Context Impact | Behavioral Impact |
+|-------|---------------|-------------------|
+| `name` | Minimal (~10 tokens) | Defines the `/name` command |
+| `description` | Loaded at startup (if model-invocable) | Determines auto-discovery by Claude |
+| `disable-model-invocation` | Removes description from context | Prevents automatic invocation |
+| `user-invocable` | Keeps description in context | Removes from `/` menu |
+| `allowed-tools` | None | Grants permissions during execution |
+| `context` | Fork isolates completely | Creates sub-agent with its own context |
+| `agent` | Determines sub-agent system prompt | Defines available tools and model |
+| `model` | No direct impact | Model override for the skill |
+| `effort` | No direct impact | Controls effort level (low to max) |
+| `hooks` | None | Automations in the skill lifecycle |
 
-### 2.2 Modelo de Carregamento em Tres Niveis
+### 2.2 Three-Level Loading Model
 
-O documento revela um modelo de progressive disclosure em tres niveis:
+The document reveals a three-level progressive disclosure model:
 
-1. **Metadados** (~100 tokens): `name` + `description` -- carregados no startup para TODAS as skills model-invocable
-2. **Instrucoes** (corpo do SKILL.md): Carregadas sob demanda quando a skill e invocada
-3. **Recursos** (arquivos de suporte): Carregados sob demanda pelo Claude quando necessario
+1. **Metadata** (~100 tokens): `name` + `description` — loaded at startup for ALL model-invocable skills
+2. **Instructions** (SKILL.md body): Loaded on demand when the skill is invoked
+3. **Resources** (supporting files): Loaded on demand by Claude when needed
 
-Este modelo e diretamente alinhado com o conceito de "just in time documentation" descrito no documento de context optimization.
+This model is directly aligned with the concept of "just in time documentation" described in the context optimization document.
 
-### 2.3 Hierarquia de Localizacao e Prioridade
+### 2.3 Location Hierarchy and Priority
 
 ```
-Enterprise (mais alta prioridade)
+Enterprise (highest priority)
   > Personal (~/.claude/skills/)
     > Project (.claude/skills/)
       > Plugin (namespace plugin-name:skill-name)
 ```
 
-**Ponto critico**: Plugins usam namespace prefixado, evitando conflitos. Porem, skills de enterprise, personal e project competem pelo mesmo namespace -- a de maior prioridade vence silenciosamente.
+**Critical point**: Plugins use a prefixed namespace, avoiding conflicts. However, enterprise, personal, and project skills compete for the same namespace — the highest priority one wins silently.
 
-### 2.4 Substituicao de Variaveis
+### 2.4 Variable Substitution
 
-O sistema suporta substituicoes dinamicas:
+The system supports dynamic substitutions:
 
-- `$ARGUMENTS` / `$ARGUMENTS[N]` / `$N` -- argumentos posicionais
-- `${CLAUDE_SESSION_ID}` -- identificador da sessao
-- `${CLAUDE_SKILL_DIR}` -- diretorio da skill (crucial para scripts bundled)
+- `$ARGUMENTS` / `$ARGUMENTS[N]` / `$N` — positional arguments
+- `${CLAUDE_SESSION_ID}` — session identifier
+- `${CLAUDE_SKILL_DIR}` — skill directory (crucial for bundled scripts)
 
-### 2.5 Injecao Dinamica de Contexto
+### 2.5 Dynamic Context Injection
 
-A sintaxe `` !`<command>` `` e um mecanismo de pre-processamento que executa comandos shell ANTES do envio ao Claude:
+The `` !`<command>` `` syntax is a preprocessing mechanism that executes shell commands BEFORE sending to Claude:
 
 ```yaml
 ---
@@ -94,219 +95,219 @@ agent: Explore
 - Changed files: !`gh pr diff --name-only`
 ```
 
-Isso transforma skills em pipelines de dados em tempo real, nao apenas documentos estaticos.
+This transforms skills into real-time data pipelines, not just static documents.
 
-### 2.6 Execucao em Subagente (context: fork)
+### 2.6 Sub-Agent Execution (context: fork)
 
-Quando `context: fork` esta ativo:
+When `context: fork` is active:
 
-1. Contexto isolado e criado (zero impacto no contexto principal)
-2. O corpo do SKILL.md se torna o prompt do subagente
-3. O campo `agent` define o ambiente de execucao (Explore, Plan, general-purpose, ou agente customizado)
-4. Resultados sao sumarizados e retornados ao contexto principal
+1. An isolated context is created (zero impact on the main context)
+2. The SKILL.md body becomes the sub-agent's prompt
+3. The `agent` field defines the execution environment (Explore, Plan, general-purpose, or custom agent)
+4. Results are summarized and returned to the main context
 
-**Diferenca critica entre as duas direcoes:**
+**Critical difference between the two directions:**
 
-| Abordagem | System Prompt | Tarefa | Tambem Carrega |
-|-----------|--------------|--------|----------------|
-| Skill com `context: fork` | Do tipo de agente | Corpo do SKILL.md | CLAUDE.md |
-| Subagente com campo `skills` | Corpo do markdown do subagente | Mensagem de delegacao | Skills pre-carregadas + CLAUDE.md |
+| Approach | System Prompt | Task | Also Loads |
+|----------|--------------|------|------------|
+| Skill with `context: fork` | From agent type | SKILL.md body | CLAUDE.md |
+| Sub-agent with `skills` field | Sub-agent's markdown body | Delegation message | Preloaded skills + CLAUDE.md |
 
-### 2.7 Orcamento de Caracteres para Descricoes
+### 2.7 Character Budget for Descriptions
 
-O documento revela uma limitacao critica: descricoes de skills compartilham um orcamento de caracteres que escala a 2% da janela de contexto, com fallback de 16.000 caracteres. Isso significa que com muitas skills, algumas podem ser excluidas do contexto. O comando `/context` permite verificar warnings sobre skills excluidas, e a variavel `SLASH_COMMAND_TOOL_CHAR_BUDGET` permite override.
-
----
-
-## 3. Pontos de Atencao
-
-### 3.1 Erros Comuns na Autoria de Skills
-
-1. **Descricoes vagas**: "Helps with files" nao ativa auto-discovery. A descricao precisa conter keywords que o usuario naturalmente diria.
-
-2. **Skills de referencia com `context: fork`**: O documento alerta explicitamente -- skills com `context: fork` precisam de instrucoes acionaveis. Se a skill contem apenas guidelines sem tarefa, o subagente recebe as guidelines mas nao tem prompt acionavel.
-
-3. **Confusao entre `disable-model-invocation` e `user-invocable`**: `user-invocable: false` NAO bloqueia acesso pela Skill tool -- apenas esconde do menu `/`. Para bloquear invocacao programatica, e necessario `disable-model-invocation: true`.
-
-4. **Excesso de skills model-invocable**: Cada skill model-invocable consome orcamento de descricao. Um projeto com 50+ skills pode ultrapassar o limite de 16K caracteres.
-
-5. **SKILL.md excessivamente longo**: O documento recomenda manter sob 500 linhas, movendo material de referencia para arquivos separados.
-
-### 3.2 Armadilhas de Contexto
-
-- **Descricoes sempre em contexto**: Para skills model-invocable, a descricao esta SEMPRE no contexto, consumindo budget de atencao mesmo quando a skill nao e usada.
-- **context: fork carrega CLAUDE.md**: Mesmo em execucao isolada, o subagente carrega CLAUDE.md -- instrucoes conflitantes em CLAUDE.md podem afetar comportamento da skill.
-- **Argumentos nao capturados**: Se `$ARGUMENTS` nao aparece no corpo, os argumentos sao ADICIONADOS ao final como `ARGUMENTS: <valor>` -- potencialmente desalinhando instrucoes.
-
-### 3.3 Lacunas de Teste
-
-- Nao ha mecanismo built-in de teste/validacao de skills
-- Nao ha como visualizar o prompt final renderizado (apos substituicoes e injecao dinamica)
-- Nao ha metricas de quantas vezes uma skill e invocada automaticamente vs manualmente
-- O comportamento de auto-discovery depende da qualidade da descricao, que so pode ser testada empiricamente
+The document reveals a critical limitation: skill descriptions share a character budget that scales to 2% of the context window, with a fallback of 16,000 characters. This means that with many skills, some may be excluded from context. The `/context` command allows checking for warnings about excluded skills, and the `SLASH_COMMAND_TOOL_CHAR_BUDGET` variable allows override.
 
 ---
 
-## 4. Casos de Uso e Escopo
+## 3. Points of Attention
 
-### 4.1 Quando Criar uma Skill vs Alternativas
+### 3.1 Common Errors in Skill Authoring
 
-| Necessidade | Mecanismo Ideal | Justificativa |
-|-------------|----------------|---------------|
-| Conhecimento persistente e curto (<5 linhas) | Rule (.claude/rules/) | Zero overhead, sempre no contexto |
-| Conhecimento persistente e medio (5-50 linhas) | CLAUDE.md | Carregado no startup, sem invocacao |
-| Conhecimento sob demanda (50-500 linhas) | **Skill** | Progressive disclosure, carregamento JIT |
-| Conhecimento extenso com sub-documentos | **Skill + supporting files** | Hierarquia de disclosure em dois niveis |
-| Workflow com side effects | **Skill com `disable-model-invocation`** | Controle manual de timing |
-| Tarefa isolada com ferramentas especificas | **Skill com `context: fork`** | Isolamento de contexto |
-| Automacao deterministica | Hook | Execucao garantida, sem LLM |
-| Validacao pos-acao | Hook (post-tool) | Nao depende de atencao do modelo |
+1. **Vague descriptions**: "Helps with files" does not trigger auto-discovery. The description must contain keywords that the user would naturally say.
 
-### 4.2 Exemplos de Categorias de Skills
+2. **Reference skills with `context: fork`**: The document explicitly warns — skills with `context: fork` require actionable instructions. If the skill contains only guidelines without a task, the sub-agent receives the guidelines but has no actionable prompt.
 
-**Skills de Referencia** (model-invocable, inline):
+3. **Confusion between `disable-model-invocation` and `user-invocable`**: `user-invocable: false` does NOT block access via the Skill tool — it only hides from the `/` menu. To block programmatic invocation, `disable-model-invocation: true` is required.
 
-- Convencoes de API do projeto
-- Padroes de estilo de codigo
-- Conhecimento de dominio especifico
+4. **Excess model-invocable skills**: Each model-invocable skill consumes description budget. A project with 50+ skills may exceed the 16K character limit.
 
-**Skills de Tarefa** (disable-model-invocation, inline ou fork):
+5. **Excessively long SKILL.md**: The document recommends keeping it under 500 lines, moving reference material to separate files.
+
+### 3.2 Context Pitfalls
+
+- **Descriptions always in context**: For model-invocable skills, the description is ALWAYS in context, consuming attention budget even when the skill is not used.
+- **context: fork loads CLAUDE.md**: Even in isolated execution, the sub-agent loads CLAUDE.md — conflicting instructions in CLAUDE.md can affect skill behavior.
+- **Uncaptured arguments**: If `$ARGUMENTS` does not appear in the body, arguments are APPENDED to the end as `ARGUMENTS: <value>` — potentially misaligning instructions.
+
+### 3.3 Testing Gaps
+
+- There is no built-in mechanism for testing/validating skills
+- There is no way to view the final rendered prompt (after substitutions and dynamic injection)
+- There are no metrics on how many times a skill is invoked automatically vs manually
+- Auto-discovery behavior depends on description quality, which can only be tested empirically
+
+---
+
+## 4. Use Cases and Scope
+
+### 4.1 When to Create a Skill vs Alternatives
+
+| Need | Ideal Mechanism | Justification |
+|------|----------------|---------------|
+| Short persistent knowledge (<5 lines) | Rule (.claude/rules/) | Zero overhead, always in context |
+| Medium persistent knowledge (5-50 lines) | CLAUDE.md | Loaded at startup, no invocation needed |
+| On-demand knowledge (50-500 lines) | **Skill** | Progressive disclosure, JIT loading |
+| Extensive knowledge with sub-documents | **Skill + supporting files** | Two-level disclosure hierarchy |
+| Workflow with side effects | **Skill with `disable-model-invocation`** | Manual timing control |
+| Isolated task with specific tools | **Skill with `context: fork`** | Context isolation |
+| Deterministic automation | Hook | Guaranteed execution, no LLM |
+| Post-action validation | Hook (post-tool) | Does not depend on model attention |
+
+### 4.2 Examples of Skill Categories
+
+**Reference Skills** (model-invocable, inline):
+
+- Project API conventions
+- Code style patterns
+- Domain-specific knowledge
+
+**Task Skills** (disable-model-invocation, inline or fork):
 
 - Deploy (`/deploy`)
-- Commit formatado (`/commit`)
-- Criacao de PR (`/create-pr`)
+- Formatted commit (`/commit`)
+- PR creation (`/create-pr`)
 
-**Skills de Pesquisa** (context: fork, agent: Explore):
+**Research Skills** (context: fork, agent: Explore):
 
-- Investigacao de codebase (`/deep-research`)
-- Analise de PR (`/pr-summary`)
-- Documentacao interativa
+- Codebase investigation (`/deep-research`)
+- PR analysis (`/pr-summary`)
+- Interactive documentation
 
-**Skills de Visualizacao** (inline, com scripts bundled):
+**Visualization Skills** (inline, with bundled scripts):
 
-- Visualizacao de codebase
-- Grafos de dependencia
-- Relatorios interativos em HTML
+- Codebase visualization
+- Dependency graphs
+- Interactive HTML reports
 
 ---
 
-## 5. Aplicabilidade a Infraestrutura de Agentes
+## 5. Applicability to Agent Infrastructure
 
-### 5.1 Skills (Design Patterns, Composicao e Evolucao)
+### 5.1 Skills (Design Patterns, Composition, and Evolution)
 
-**Padroes de design fundamentais identificados:**
+**Fundamental design patterns identified:**
 
-1. **Skill Simples**: SKILL.md com instrucoes diretas, sem supporting files
-2. **Skill com Referencia**: SKILL.md como indice + arquivos de referencia por dominio
-3. **Skill com Scripts**: SKILL.md com instrucoes + scripts executaveis bundled
-4. **Skill como Pipeline**: `context: fork` + injecao dinamica + agent type
-5. **Skill como Orquestrador**: Instrucoes que delegam para multiplos subagentes
+1. **Simple Skill**: SKILL.md with direct instructions, no supporting files
+2. **Skill with Reference**: SKILL.md as index + reference files per domain
+3. **Skill with Scripts**: SKILL.md with instructions + bundled executable scripts
+4. **Skill as Pipeline**: `context: fork` + dynamic injection + agent type
+5. **Skill as Orchestrator**: Instructions that delegate to multiple sub-agents
 
-**Estrategias de composicao:**
+**Composition strategies:**
 
-- **Encadeamento manual**: Uma skill instrui o usuario a invocar outra apos conclusao
-- **Delegacao a subagente com skills pre-carregadas**: Subagente definido em `.claude/agents/` com campo `skills` que pre-carrega skills relevantes
-- **Skills como building blocks de plugins**: Plugin agrupa skills relacionadas com namespace compartilhado
+- **Manual chaining**: A skill instructs the user to invoke another after completion
+- **Delegation to sub-agent with preloaded skills**: Sub-agent defined in `.claude/agents/` with a `skills` field that preloads relevant skills
+- **Skills as plugin building blocks**: Plugin groups related skills with a shared namespace
 
-**Estrategias de evolucao:**
+**Evolution strategies:**
 
-- Comece com SKILL.md simples e inline
-- Quando ultrapassar 200 linhas, extraia para supporting files
-- Quando side effects forem criticos, adicione `disable-model-invocation: true`
-- Quando contexto principal estiver saturado, migre para `context: fork`
-- Quando complexidade aumentar, crie plugin com multiplas skills
+- Start with a simple, inline SKILL.md
+- When exceeding 200 lines, extract into supporting files
+- When side effects are critical, add `disable-model-invocation: true`
+- When the main context is saturated, migrate to `context: fork`
+- When complexity increases, create a plugin with multiple skills
 
-**Template de skill de referencia:**
+**Reference skill template:**
 
 ```yaml
 ---
 name: api-conventions
-description: Convencoes de API REST para este projeto. Usar quando criar ou modificar endpoints, handlers HTTP, ou rotas de API.
+description: REST API conventions for this project. Use when creating or modifying endpoints, HTTP handlers, or API routes.
 ---
 
-# Convencoes de API
+# API Conventions
 
-## Padrao de resposta
+## Response Pattern
 
-Todos os endpoints retornam:
-- 200: Sucesso com corpo JSON
-- 400: Erro de validacao com `{ error: string, fields: Record<string, string> }`
-- 500: Erro interno com `{ error: "Internal server error" }`
+All endpoints return:
+- 200: Success with JSON body
+- 400: Validation error with `{ error: string, fields: Record<string, string> }`
+- 500: Internal error with `{ error: "Internal server error" }`
 
-## Recursos adicionais
+## Additional Resources
 
-- Schemas completos: [reference/schemas.md](reference/schemas.md)
-- Exemplos de endpoints: [reference/examples.md](reference/examples.md)
+- Complete schemas: [reference/schemas.md](reference/schemas.md)
+- Endpoint examples: [reference/examples.md](reference/examples.md)
 ```
 
-**Template de skill de tarefa com fork:**
+**Task skill template with fork:**
 
 ```yaml
 ---
 name: investigate-issue
-description: Investiga um issue do GitHub em profundidade
+description: Investigates a GitHub issue in depth
 context: fork
 agent: Explore
 disable-model-invocation: true
 allowed-tools: Bash(gh *), Read, Grep, Glob
 ---
 
-# Investigacao de Issue
+# Issue Investigation
 
-Investigue o issue GitHub #$ARGUMENTS:
+Investigate GitHub issue #$ARGUMENTS:
 
-1. Leia o issue completo: !`gh issue view $ARGUMENTS`
-2. Identifique os arquivos relevantes usando Grep e Glob
-3. Analise o codigo relacionado
-4. Produza um relatorio com:
-   - Causa raiz provavel
-   - Arquivos afetados (paths absolutos)
-   - Estrategia de correcao recomendada
+1. Read the complete issue: !`gh issue view $ARGUMENTS`
+2. Identify relevant files using Grep and Glob
+3. Analyze related code
+4. Produce a report with:
+   - Probable root cause
+   - Affected files (absolute paths)
+   - Recommended fix strategy
 ```
 
-### 5.2 Hooks (Complemento a Skills)
+### 5.2 Hooks (Complement to Skills)
 
-Skills e hooks sao complementares:
+Skills and hooks are complementary:
 
-- **Hooks pre-skill**: O campo `hooks` no frontmatter permite definir hooks que executam antes/depois do lifecycle da skill
-- **Hooks como enforcement**: Onde CLAUDE.md/skills sao "advisory" (o modelo pode ignorar), hooks sao deterministicos
-- **Conversao de instrucoes para hooks**: Conforme documentado no research de context optimization, "se Claude ja faz algo corretamente sem a instrucao, delete-a ou converta em hook"
+- **Pre-skill hooks**: The `hooks` field in the frontmatter allows defining hooks that execute before/after the skill lifecycle
+- **Hooks as enforcement**: Where CLAUDE.md/skills are "advisory" (the model can ignore them), hooks are deterministic
+- **Converting instructions to hooks**: As documented in the context optimization research, "if Claude already does something correctly without the instruction, delete it or convert to a hook"
 
-**Exemplo de hook scoped a skill:**
+**Example of hook scoped to a skill:**
 
 ```yaml
 ---
 name: deploy
-description: Deploy para producao
+description: Deploy to production
 disable-model-invocation: true
 hooks:
   PreToolExecution:
     - matcher: Bash
       hooks:
-        - command: "echo 'Deploy iniciado em $(date)' >> deploy.log"
+        - command: "echo 'Deploy started at $(date)' >> deploy.log"
 ---
 ```
 
-### 5.3 Subagentes (context: fork e Composicao)
+### 5.3 Sub-Agents (context: fork and Composition)
 
-O documento estabelece dois fluxos de integracao skill-subagente:
+The document establishes two skill–sub-agent integration flows:
 
-**Skill -> Subagente (context: fork):**
+**Skill → Sub-Agent (context: fork):**
 
-- A skill DEFINE a tarefa
-- O agent type DEFINE o ambiente
-- Ideal para tarefas auto-contidas com resultado definido
+- The skill DEFINES the task
+- The agent type DEFINES the environment
+- Ideal for self-contained tasks with a defined result
 
-**Subagente -> Skills (preloaded skills):**
+**Sub-Agent → Skills (preloaded skills):**
 
-- O subagente (`.claude/agents/`) DEFINE o system prompt
-- Skills pre-carregadas fornecem conhecimento de referencia
-- Ideal para agentes especializados que precisam de multiplas skills
+- The sub-agent (`.claude/agents/`) DEFINES the system prompt
+- Preloaded skills provide reference knowledge
+- Ideal for specialized agents that need multiple skills
 
-**Padroes de composicao com subagentes:**
+**Composition patterns with sub-agents:**
 
 ```yaml
-# Skill que usa subagente Explore para pesquisa
+# Skill that uses Explore sub-agent for research
 ---
 name: codebase-audit
 description: Auditoria completa do codebase
@@ -314,14 +315,14 @@ context: fork
 agent: Explore
 ---
 
-# Auditoria de Codebase
-1. Use Glob para mapear toda a estrutura
-2. Use Grep para identificar padroes problematicos
-3. Gere relatorio com achados priorizados
+# Codebase Audit
+1. Use Glob to map the entire structure
+2. Use Grep to identify problematic patterns
+3. Generate report with prioritized findings
 ```
 
 ```markdown
-# Subagente que pre-carrega skills (.claude/agents/security-reviewer.md)
+# Sub-agent that preloads skills (.claude/agents/security-reviewer.md)
 ---
 skills:
   - owasp-security
@@ -329,13 +330,13 @@ skills:
 allowed-tools: Read, Grep, Glob
 ---
 
-Voce e um revisor de seguranca especializado.
-Analise o codigo usando as convencoes carregadas.
+You are a specialized security reviewer.
+Analyze the code using the loaded conventions.
 ```
 
-### 5.4 Rules (Complemento e Substituicao de Skills)
+### 5.4 Rules (Complement and Substitute for Skills)
 
-**Rules que referenciam skills:**
+**Rules that reference skills:**
 
 ```markdown
 # .claude/rules/api-development.md
@@ -344,326 +345,326 @@ paths:
   - "src/api/**/*.ts"
 ---
 
-Ao criar endpoints de API, invoque a skill `api-conventions` para referencia de padroes.
+When creating API endpoints, invoke the `api-conventions` skill for pattern reference.
 ```
 
-**Quando rules substituem conteudo de skills:**
+**When rules substitute skill content:**
 
-- Instrucoes curtas e universais (<5 linhas) -> Rule
-- Instrucoes condicionais por path -> Rule com `paths`
-- Instrucoes que DEVEM ser seguidas sem excecao -> Rule (sempre no contexto quando path match)
+- Short, universal instructions (<5 lines) → Rule
+- Path-conditional instructions → Rule with `paths`
+- Instructions that MUST be followed without exception → Rule (always in context when path matches)
 
-**Quando skills substituem rules:**
+**When skills substitute rules:**
 
-- Conteudo extenso (>50 linhas) -> Skill (evita poluir contexto)
-- Conteudo sob demanda -> Skill (carregamento JIT)
-- Conteudo com workflows interativos -> Skill
+- Extensive content (>50 lines) → Skill (avoids polluting context)
+- On-demand content → Skill (JIT loading)
+- Content with interactive workflows → Skill
 
-### 5.5 Memory (Skills que Usam e Geram Memoria)
+### 5.5 Memory (Skills That Use and Generate Memory)
 
-**Skills informadas por memoria:**
+**Memory-informed skills:**
 
-- Uma skill pode instruir Claude a ler `~/.claude/projects/<project>/memory/` antes de agir
-- Auto-memory pode conter preferencias que influenciam comportamento de skills
+- A skill can instruct Claude to read `~/.claude/projects/<project>/memory/` before acting
+- Auto-memory may contain preferences that influence skill behavior
 
-**Skills que geram memoria:**
+**Skills that generate memory:**
 
-- Uma skill de workflow pode instruir Claude a registrar decisoes em auto-memory
-- Skills de auditoria podem gerar achados persistentes via memoria
+- A workflow skill can instruct Claude to record decisions in auto-memory
+- Audit skills can generate persistent findings via memory
 
-**Exemplo:**
+**Example:**
 
 ```yaml
 ---
 name: session-logger
-description: Registra atividades da sessao
+description: Records session activities
 ---
 
-Antes de executar qualquer acao, verifique as notas anteriores em memory/:
-- Se houver decisoes pendentes, liste-as para o usuario
-- Apos cada acao significativa, atualize as notas
+Before executing any action, check previous notes in memory/:
+- If there are pending decisions, list them for the user
+- After each significant action, update the notes
 
-Log da sessao ${CLAUDE_SESSION_ID}: $ARGUMENTS
+Session log ${CLAUDE_SESSION_ID}: $ARGUMENTS
 ```
 
 ---
 
-## 6. Aplicabilidade do Guia de Engenharia de Prompts
+## 6. Applicability of the Prompt Engineering Guide
 
-### 6.1 Chain-of-Thought (CoT) para Fases Multi-Step
+### 6.1 Chain-of-Thought (CoT) for Multi-Step Phases
 
-Skills com workflows multi-etapa se beneficiam de CoT explicito. Conforme o guia, CoT melhora de 17,9% para 58,1% em tarefas de raciocinio no GSM8K. Para skills de analise:
+Skills with multi-step workflows benefit from explicit CoT. According to the guide, CoT improves from 17.9% to 58.1% on reasoning tasks in GSM8K. For analysis skills:
 
 ```yaml
 ---
 name: code-analysis
-description: Analise profunda de qualidade de codigo
+description: Deep code quality analysis
 ---
 
-Analise o codigo em $ARGUMENTS seguindo esta cadeia de raciocinio:
+Analyze the code in $ARGUMENTS following this chain of reasoning:
 
-1. **Compreensao**: Leia o codigo e descreva o que ele faz em uma frase
-2. **Estrutura**: Identifique padroes de design e dependencias
-3. **Problemas**: Para cada potencial problema, explique:
-   - O que esta errado
-   - Por que e problematico
-   - Como corrigir
-4. **Priorizacao**: Ordene problemas por severidade
-5. **Recomendacao**: Sumarize as 3 acoes mais impactantes
+1. **Comprehension**: Read the code and describe what it does in one sentence
+2. **Structure**: Identify design patterns and dependencies
+3. **Problems**: For each potential problem, explain:
+   - What is wrong
+   - Why it is problematic
+   - How to fix it
+4. **Prioritization**: Order problems by severity
+5. **Recommendation**: Summarize the 3 most impactful actions
 ```
 
-### 6.2 ReAct para Skills com Ferramentas
+### 6.2 ReAct for Tool-Using Skills
 
-O padrao ReAct (Pensamento -> Acao -> Observacao) e natural para skills que usam ferramentas. O guia documenta +34% de taxa de sucesso em ALFWorld com ReAct:
+The ReAct pattern (Thought → Action → Observation) is natural for skills that use tools. The guide documents a +34% success rate improvement on ALFWorld with ReAct:
 
 ```yaml
 ---
 name: debug-issue
-description: Debug interativo de problemas
+description: Interactive problem debugging
 allowed-tools: Read, Grep, Glob, Bash(npm test *)
 ---
 
-Siga o loop ReAct para debugar $ARGUMENTS:
+Follow the ReAct loop to debug $ARGUMENTS:
 
-Para cada iteracao:
-1. **Pensamento**: Qual hipotese estou testando? Que evidencia preciso?
-2. **Acao**: Execute uma ferramenta para coletar evidencia
-3. **Observacao**: O que o resultado me diz?
+For each iteration:
+1. **Thought**: What hypothesis am I testing? What evidence do I need?
+2. **Action**: Execute a tool to collect evidence
+3. **Observation**: What does the result tell me?
 
-Repita ate:
-- Causa raiz identificada com evidencia concreta
-- Correcao proposta e verificada por teste
+Repeat until:
+- Root cause identified with concrete evidence
+- Proposed fix verified by test
 ```
 
-### 6.3 Tree of Thoughts (ToT) para Skills de Decisao Complexa
+### 6.3 Tree of Thoughts (ToT) for Complex Decision Skills
 
-Para skills que envolvem planejamento ou decisoes com multiplos caminhos validos, ToT oferece 18,5x de melhoria sobre CoT (Game of 24). Aplicavel a skills de arquitetura:
+For skills involving planning or decisions with multiple valid paths, ToT offers an 18.5x improvement over CoT (Game of 24). Applicable to architecture skills:
 
 ```yaml
 ---
 name: architecture-decision
-description: Avaliacao estruturada de decisoes arquiteturais
+description: Structured evaluation of architectural decisions
 context: fork
 ---
 
-Para a decisao arquitetural sobre $ARGUMENTS:
+For the architectural decision about $ARGUMENTS:
 
-1. **Gere 3 alternativas** viáveis (cada uma com trade-offs explicitos)
-2. **Avalie cada alternativa** nos eixos:
-   - Complexidade de implementacao (1-5)
-   - Manutenibilidade a longo prazo (1-5)
-   - Performance esperada (1-5)
-   - Alinhamento com stack atual (1-5)
-3. **Elimine** alternativas com score < 12
-4. **Aprofunde** nas alternativas restantes com analise de riscos
-5. **Recomende** com justificativa baseada nos scores
+1. **Generate 3 viable alternatives** (each with explicit trade-offs)
+2. **Evaluate each alternative** on the axes:
+   - Implementation complexity (1-5)
+   - Long-term maintainability (1-5)
+   - Expected performance (1-5)
+   - Alignment with current stack (1-5)
+3. **Eliminate** alternatives with score < 12
+4. **Deep-dive** into remaining alternatives with risk analysis
+5. **Recommend** with justification based on scores
 ```
 
-### 6.4 Least-to-Most para Skills de Decomposicao
+### 6.4 Least-to-Most for Decomposition Skills
 
-Para skills que decompoe problemas complexos em subproblemas:
+For skills that decompose complex problems into subproblems:
 
 ```yaml
 ---
 name: refactor-module
-description: Refatoracao guiada de modulos complexos
+description: Guided refactoring of complex modules
 ---
 
-Para refatorar $ARGUMENTS:
+To refactor $ARGUMENTS:
 
-1. **Identifique o problema mais simples**: Qual e a menor mudanca que melhora o codigo?
-2. **Resolva-o primeiro**: Implemente e verifique
-3. **Identifique o proximo problema**: Agora que o mais simples esta resolvido, qual e o proximo?
-4. **Repita** ate que o modulo esteja refatorado
-5. **Verifique** que todos os testes passam apos cada mudanca
+1. **Identify the simplest problem**: What is the smallest change that improves the code?
+2. **Solve it first**: Implement and verify
+3. **Identify the next problem**: Now that the simplest is solved, what's next?
+4. **Repeat** until the module is refactored
+5. **Verify** that all tests pass after each change
 ```
 
-### 6.5 Self-Consistency para Skills de Validacao
+### 6.5 Self-Consistency for Validation Skills
 
-Para skills que precisam de alta confiabilidade, Self-Consistency (+12-18% sobre CoT) pode ser simulada:
+For skills that require high reliability, Self-Consistency (+12-18% over CoT) can be simulated:
 
 ```yaml
 ---
 name: security-audit
-description: Auditoria de seguranca com validacao cruzada
+description: Security audit with cross-validation
 context: fork
 ---
 
-Para auditar $ARGUMENTS:
+To audit $ARGUMENTS:
 
-1. **Analise 1 (OWASP Top 10)**: Verifique cada categoria
-2. **Analise 2 (Attack surface)**: Identifique pontos de entrada e fluxos de dados
-3. **Analise 3 (Dependencias)**: Verifique vulnerabilidades conhecidas
+1. **Analysis 1 (OWASP Top 10)**: Check each category
+2. **Analysis 2 (Attack surface)**: Identify entry points and data flows
+3. **Analysis 3 (Dependencies)**: Check for known vulnerabilities
 
-4. **Consolidacao**: Compare os achados das tres analises
-   - Achados presentes em 2+ analises: CONFIRMADOS
-   - Achados em apenas 1 analise: REQUER INVESTIGACAO
-5. **Relatorio final**: Apenas achados confirmados como criticos/altos
+4. **Consolidation**: Compare findings from all three analyses
+   - Findings present in 2+ analyses: CONFIRMED
+   - Findings in only 1 analysis: REQUIRES INVESTIGATION
+5. **Final report**: Only confirmed critical/high findings
 ```
 
-### 6.6 Reflexion para Skills de Melhoria Iterativa
+### 6.6 Reflexion for Iterative Improvement Skills
 
-Para skills que melhoram output por iteracao:
+For skills that improve output through iteration:
 
 ```yaml
 ---
 name: improve-docs
-description: Melhoria iterativa de documentacao
+description: Iterative documentation improvement
 ---
 
-Para melhorar a documentacao em $ARGUMENTS:
+To improve the documentation in $ARGUMENTS:
 
-Ciclo de melhoria (maximo 3 iteracoes):
-1. **Gere**: Escreva/melhore a documentacao
-2. **Critique**: Avalie contra criterios:
-   - Completude (todos os parametros documentados?)
-   - Clareza (um novo dev entenderia?)
-   - Exemplos (ha exemplos praticos?)
-3. **Reflita**: O que pode ser melhorado?
-4. Se nota < 8/10, **repita** com foco nos pontos fracos
-5. Se nota >= 8/10, finalize
+Improvement cycle (maximum 3 iterations):
+1. **Generate**: Write/improve the documentation
+2. **Critique**: Evaluate against criteria:
+   - Completeness (are all parameters documented?)
+   - Clarity (would a new developer understand?)
+   - Examples (are there practical examples?)
+3. **Reflect**: What can be improved?
+4. If score < 8/10, **repeat** focusing on weak points
+5. If score >= 8/10, finalize
 ```
 
 ---
 
-## 7. Correlacoes com Documentos Principais
+## 7. Correlations with Core Documents
 
-### 7.1 Com research-llm-context-optimization.md
+### 7.1 With research-context-engineering-comprehensive.md
 
-| Conceito no Research | Implementacao em Skills |
+| Concept in Research | Implementation in Skills |
 |---------------------|------------------------|
-| "Context rot" -- degradacao com mais tokens | Skills carregam conteudo JIT, minimizando tokens no contexto |
-| "Attention budget" finito | `disable-model-invocation` remove descricoes do budget |
-| "Lost in the middle" effect | SKILL.md e lido do inicio ao fim como unidade focada |
-| Progressive disclosure em 3 niveis | Metadados -> SKILL.md -> supporting files |
-| "Just in time documentation" | Skills SAO a implementacao principal deste conceito |
-| Instrucoes sob 200 linhas | Recomendacao de SKILL.md sob 500 linhas (mais permissivo por ser JIT) |
-| Subagentes para isolamento de contexto | `context: fork` implementa subagente com contexto isolado |
-| Hooks como enforcement deterministico | Campo `hooks` no frontmatter permite hooks scoped a skills |
+| "Context rot" — degradation with more tokens | Skills load content JIT, minimizing tokens in context |
+| Finite "attention budget" | `disable-model-invocation` removes descriptions from the budget |
+| "Lost in the middle" effect | SKILL.md is read from start to finish as a focused unit |
+| Progressive disclosure in 3 levels | Metadata → SKILL.md → supporting files |
+| "Just in time documentation" | Skills ARE the primary implementation of this concept |
+| Instructions under 200 lines | Recommendation of SKILL.md under 500 lines (more permissive since it's JIT) |
+| Sub-agents for context isolation | `context: fork` implements sub-agent with isolated context |
+| Hooks as deterministic enforcement | `hooks` field in frontmatter enables hooks scoped to skills |
 
-### 7.2 Com skill-authoring-best-practices.md
+### 7.2 With skill-authoring-best-practices.md
 
-O documento de best practices detalha o "como" do que "extend-claude-with-skills" define no "o que":
+The best practices document details the "how" of what "extend-claude-with-skills" defines as the "what":
 
-- Nomenclatura: gerundio preferido (processing-pdfs vs pdf-processor)
-- Descricoes: terceira pessoa, especificas, com keywords de trigger
-- Progressive disclosure: SKILL.md como table of contents, referencias em um nivel de profundidade
-- Workflows com checklists para skills complexas
-- Feedback loops (validar -> corrigir -> repetir)
+- Naming: gerund preferred (processing-pdfs vs pdf-processor)
+- Descriptions: third person, specific, with trigger keywords
+- Progressive disclosure: SKILL.md as table of contents, references one level deep
+- Workflows with checklists for complex skills
+- Feedback loops (validate → fix → repeat)
 
-### 7.3 Com research-claude-code-skills-format.md
+### 7.3 With research-claude-code-skills-format.md
 
-O documento de research complementa com:
+The research document complements with:
 
-- Formato Agent Skills Open Standard vs extensoes Claude Code
-- Regras de validacao de nomes (1-64 chars, kebab-case, sem `--`)
-- Estrutura de plugins e marketplaces para distribuicao
-- Comparacao com VS Code/Copilot (`.agents/skills/` vs `.claude/skills/`)
-- Mecanismo de instalacao via `/plugin install` (nao `npx skills add`)
+- Agent Skills Open Standard format vs Claude Code extensions
+- Name validation rules (1-64 chars, kebab-case, no `--`)
+- Plugin and marketplace structure for distribution
+- Comparison with VS Code/Copilot (`.agents/skills/` vs `.claude/skills/`)
+- Installation mechanism via `/plugin install` (not `npx skills add`)
 
-### 7.4 Com prompt-engineering-guide.md
+### 7.4 With prompt-engineering-guide.md
 
-O guia de engenharia de prompts fornece o arsenal tecnico para escrita de skills eficazes:
+The prompt engineering guide provides the technical arsenal for writing effective skills:
 
-- CoT para workflows multi-step
-- ReAct para skills com ferramentas
-- Structured outputs para comunicacao entre skills e subagentes
-- Role prompting para especializacao de subagentes
-- A recomendacao de "comecar simples, aumentar complexidade quando necessario" se aplica diretamente a evolucao de skills
-
----
-
-## 8. Forcas e Limitacoes
-
-### 8.1 Forcas
-
-1. **Progressive disclosure nativo**: O modelo de 3 niveis (metadados -> corpo -> supporting files) e elegante e resolve o problema de context rot
-2. **Flexibilidade de invocacao**: O controle fino entre user-invocable, model-invocable e ambos cobre todos os cenarios
-3. **Isolamento de contexto**: `context: fork` permite skills pesadas sem impactar o contexto principal
-4. **Injecao dinamica**: `` !`command` `` transforma skills em pipelines de dados em tempo real
-5. **Compatibilidade cross-agent**: O padrao Agent Skills (agentskills.io) funciona em Claude Code, VS Code/Copilot e OpenAI Codex
-6. **Hierarquia de escopo**: Enterprise > Personal > Project > Plugin permite governanca organizacional
-7. **Bundled skills oficiais**: `/batch`, `/simplify`, `/debug` demonstram o potencial do sistema
-
-### 8.2 Limitacoes
-
-1. **Sem framework de testes**: Nao existe mecanismo built-in para testar skills antes do deploy. O ciclo "teste empirico" e insatisfatorio para producao.
-2. **Orcamento de descricoes opaco**: O limite de 2% da janela de contexto / 16K chars nao e visivel ate que skills sejam excluidas silenciosamente.
-3. **Sem versionamento**: Skills nao tem campo `version` no frontmatter Claude Code (apenas no Agent Skills spec). Nao ha mecanismo de rollback.
-4. **Sem metricas de uso**: Nao ha como saber quantas vezes uma skill foi invocada, automatica vs manualmente, ou se a descricao e eficaz para auto-discovery.
-5. **Dependencia de qualidade de descricao**: Auto-discovery e inteiramente dependente da descricao -- sem fallback se a descricao for inadequada.
-6. **CLAUDE.md carrega em fork**: Mesmo com `context: fork`, CLAUDE.md e carregado no subagente. Instrucoes conflitantes em CLAUDE.md podem afetar a skill.
-7. **Sem composicao nativa entre skills**: Nao existe mecanismo formal para uma skill invocar outra. A composicao e ad-hoc.
-8. **Limite de 500 linhas**: Embora seja boa pratica, nao ha validacao automatica deste limite.
+- CoT for multi-step workflows
+- ReAct for tool-using skills
+- Structured outputs for communication between skills and sub-agents
+- Role prompting for sub-agent specialization
+- The recommendation to "start simple, increase complexity when needed" applies directly to skill evolution
 
 ---
 
-## 9. Recomendacoes Praticas
+## 8. Strengths and Limitations
 
-### 9.1 Para Autoria de Skills Individuais
+### 8.1 Strengths
 
-1. **Comece com a descricao**: Escreva a descricao ANTES do corpo. Se nao conseguir descrever em 1024 chars quando e como usar, a skill esta mal definida.
+1. **Native progressive disclosure**: The 3-level model (metadata → body → supporting files) is elegant and solves the context rot problem
+2. **Invocation flexibility**: The fine-grained control between user-invocable, model-invocable, and both covers all scenarios
+3. **Context isolation**: `context: fork` allows heavy skills without impacting the main context
+4. **Dynamic injection**: `` !`command` `` transforms skills into real-time data pipelines
+5. **Cross-agent compatibility**: The Agent Skills standard (agentskills.io) works in Claude Code, VS Code/Copilot, and OpenAI Codex
+6. **Scope hierarchy**: Enterprise > Personal > Project > Plugin enables organizational governance
+7. **Official bundled skills**: `/batch`, `/simplify`, `/debug` demonstrate the system's potential
 
-2. **Use a regra dos 3 niveis**:
-   - Nivel 1 (sempre presente): Descricao clara com keywords (~100 tokens)
-   - Nivel 2 (sob demanda): SKILL.md focado, <500 linhas
-   - Nivel 3 (apenas quando necessario): Supporting files com material de referencia
+### 8.2 Limitations
 
-3. **Prefira `disable-model-invocation: true` para workflows com side effects**: Deploy, commit, envio de mensagens -- nunca deixe o Claude decidir quando executar.
+1. **No testing framework**: There is no built-in mechanism to test skills before deployment. The "empirical testing" cycle is unsatisfactory for production.
+2. **Opaque description budget**: The 2% of context window / 16K chars limit is not visible until skills are silently excluded.
+3. **No versioning**: Skills have no `version` field in Claude Code frontmatter (only in the Agent Skills spec). There is no rollback mechanism.
+4. **No usage metrics**: There is no way to know how many times a skill was invoked, automatic vs manual, or whether the description is effective for auto-discovery.
+5. **Dependency on description quality**: Auto-discovery is entirely dependent on the description — no fallback if the description is inadequate.
+6. **CLAUDE.md loads in fork**: Even with `context: fork`, CLAUDE.md is loaded in the sub-agent. Conflicting instructions in CLAUDE.md can affect the skill.
+7. **No native inter-skill composition**: There is no formal mechanism for one skill to invoke another. Composition is ad-hoc.
+8. **500-line limit**: Although it is good practice, there is no automatic validation of this limit.
 
-4. **Use `context: fork` para tarefas pesadas**: Qualquer skill que leia muitos arquivos, execute muitos comandos, ou produza output extenso deve rodar em subagente.
+---
 
-5. **Referencie `${CLAUDE_SKILL_DIR}` para scripts bundled**: Em vez de paths absolutos, use a variavel para portabilidade.
+## 9. Practical Recommendations
 
-### 9.2 Para Organizacao de Colecoes de Skills
+### 9.1 For Authoring Individual Skills
 
-1. **Monitore o orcamento de descricoes**: Use `/context` regularmente. Se skills estao sendo excluidas, considere:
-   - Marcar skills menos usadas como `disable-model-invocation: true`
-   - Encurtar descricoes
-   - Aumentar `SLASH_COMMAND_TOOL_CHAR_BUDGET`
+1. **Start with the description**: Write the description BEFORE the body. If you cannot describe in 1024 chars when and how to use it, the skill is poorly defined.
 
-2. **Agrupe skills relacionadas em plugins**: Skills que compartilham dominio devem estar em um plugin com namespace proprio.
+2. **Use the 3-level rule**:
+   - Level 1 (always present): Clear description with keywords (~100 tokens)
+   - Level 2 (on demand): Focused SKILL.md, <500 lines
+   - Level 3 (only when needed): Supporting files with reference material
 
-3. **Use hierarquia de prioridade conscientemente**: Skills pessoais (`~/.claude/skills/`) sobrescrevem skills de projeto. Use isso para personalizacao, nao para conflito.
+3. **Prefer `disable-model-invocation: true` for workflows with side effects**: Deploy, commit, sending messages — never let Claude decide when to execute.
 
-### 9.3 Para Integracao com Infraestrutura de Agentes
+4. **Use `context: fork` for heavy tasks**: Any skill that reads many files, executes many commands, or produces extensive output should run in a sub-agent.
 
-1. **Converta instrucoes CLAUDE.md > 50 linhas em skills**: Reduz contexto sempre-presente e melhora aderencia.
+5. **Reference `${CLAUDE_SKILL_DIR}` for bundled scripts**: Instead of absolute paths, use the variable for portability.
 
-2. **Use hooks para enforcement, skills para guidance**: Se uma regra DEVE ser seguida sem excecao, implemente como hook. Se e uma diretriz que admite excecoes, implemente como skill.
+### 9.2 For Organizing Skill Collections
 
-3. **Projete subagentes com skills pre-carregadas**: Para agentes especializados, defina em `.claude/agents/` com campo `skills` para carregar conhecimento relevante no startup do subagente.
+1. **Monitor the description budget**: Use `/context` regularly. If skills are being excluded, consider:
+   - Marking less-used skills as `disable-model-invocation: true`
+   - Shortening descriptions
+   - Increasing `SLASH_COMMAND_TOOL_CHAR_BUDGET`
 
-4. **Implemente feedback loops em skills criticas**: Skills de deploy, migracao ou operacoes destrutivas devem incluir etapas de validacao explicitas (validate -> fix -> repeat).
+2. **Group related skills in plugins**: Skills that share a domain should be in a plugin with its own namespace.
 
-### 9.4 Template de Skill Padrao Recomendado
+3. **Use the priority hierarchy consciously**: Personal skills (`~/.claude/skills/`) override project skills. Use this for personalization, not for conflict.
+
+### 9.3 For Integration with Agent Infrastructure
+
+1. **Convert CLAUDE.md instructions > 50 lines into skills**: Reduces always-present context and improves adherence.
+
+2. **Use hooks for enforcement, skills for guidance**: If a rule MUST be followed without exception, implement as a hook. If it is a guideline that admits exceptions, implement as a skill.
+
+3. **Design sub-agents with preloaded skills**: For specialized agents, define in `.claude/agents/` with a `skills` field to load relevant knowledge at sub-agent startup.
+
+4. **Implement feedback loops in critical skills**: Deploy, migration, or destructive operation skills should include explicit validation steps (validate → fix → repeat).
+
+### 9.4 Recommended Standard Skill Template
 
 ```yaml
 ---
-name: nome-da-skill
+name: skill-name
 description: >
-  [O que faz] e [quando usar]. Use quando [trigger keywords].
-  Exemplos: [cenarios concretos que ativam a skill].
-disable-model-invocation: false  # ou true para workflows com side effects
-# context: fork  # descomente para tarefas pesadas
-# agent: Explore  # descomente com context: fork
-# allowed-tools: Read, Grep, Glob  # descomente se necessario
+  [What it does] and [when to use it]. Use when [trigger keywords].
+  Examples: [concrete scenarios that activate the skill].
+disable-model-invocation: false  # or true for workflows with side effects
+# context: fork  # uncomment for heavy tasks
+# agent: Explore  # uncomment with context: fork
+# allowed-tools: Read, Grep, Glob  # uncomment if needed
 ---
 
-# [Nome da Skill]
+# [Skill Name]
 
-## Objetivo
-[Uma frase descrevendo o objetivo]
+## Objective
+[One sentence describing the objective]
 
-## Instrucoes
-1. [Passo 1]
-2. [Passo 2]
-3. [Passo 3]
+## Instructions
+1. [Step 1]
+2. [Step 2]
+3. [Step 3]
 
-## Validacao
-- [ ] [Criterio de sucesso 1]
-- [ ] [Criterio de sucesso 2]
+## Validation
+- [ ] [Success criterion 1]
+- [ ] [Success criterion 2]
 
-## Recursos adicionais
-- Para detalhes de [topico]: [reference/topico.md](reference/topico.md)
+## Additional Resources
+- For details on [topic]: [reference/topic.md](reference/topic.md)
 ```

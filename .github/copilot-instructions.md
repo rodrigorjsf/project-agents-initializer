@@ -29,3 +29,14 @@ Multi-plugin Claude Code marketplace for evidence-based agent artifact engineeri
 ## Research Foundation
 
 Design decisions trace to: ETH Zurich "Evaluating AGENTS.md" study (minimal files outperform comprehensive ones), Anthropic context engineering docs, Liu et al. "Lost in the Middle" (TACL 2023). See DESIGN-GUIDELINES.md for full evidence mapping.
+
+## Context Scope Guidance
+
+When assisting with this project, avoid loading the following directories — they contain historical planning artifacts whose information is already captured in `docs/` and the project artifacts:
+
+- `docs/plans/` — historical design documents (covered by DESIGN-GUIDELINES.md)
+- `.claude/PRPs/plans/` — completed implementation checklists (covered by the code)
+- `.claude/PRPs/prds/completed/` — completed product requirements (covered by docs/)
+- `next-steps.md` — personal session task tracking
+
+> **Note**: Copilot content exclusion (preventing Copilot from indexing these paths for suggestions) requires a GitHub Business or Enterprise plan and must be configured in the repository settings under *Code & automation → Copilot → Content exclusion*. The paths above are recommended exclusions.
