@@ -265,7 +265,7 @@ Model downloads (~67MB for bge-small, ~642MB for jina-code) happen once. Subsequ
 Embedding models load ~700MB total when both collections are indexed. Single-collection indexing uses less.
 
 ### Python version
-Requires Python ≥3.10. Tested with 3.13 and 3.14.
+Requires Python ≥3.11. Tested with 3.13 and 3.14.
 
 ### SQLite extension loading
 If `sqlite_vec.load()` fails, ensure your Python was built with extension loading enabled. Most distributions include this by default.

@@ -26,7 +26,16 @@ case "$FILE_PATH" in
   plugins/*.md|plugins/**/*.md)
     MATCHES=true
     ;;
+  plugins/*.yaml|plugins/**/*.yaml)
+    MATCHES=true
+    ;;
+  plugins/*.yml|plugins/**/*.yml)
+    MATCHES=true
+    ;;
   skills/*.md|skills/**/*.md)
+    MATCHES=true
+    ;;
+  skills/*.yaml|skills/**/*.yaml)
     MATCHES=true
     ;;
   .claude/hooks/*.sh)
