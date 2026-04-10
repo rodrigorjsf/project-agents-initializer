@@ -399,7 +399,7 @@ echo "$SUMMARY" >> ~/.claude/projects/my-project/compaction-history.log
 | Structured output with JSON | All hook↔Claude communication uses structured JSON |
 | Tool use patterns | `PreToolUse`/`PostToolUse` control exactly how tools are used |
 
-### 7.4 a-guide-to-agents.md / a-guide-to-agents.md
+### 7.4 a-guide-to-agents.md (merged guide)
 
 | Guide Principle | Hooks as Implementation |
 |-----------------|------------------------|

@@ -315,7 +315,7 @@ agent-engineering-toolkit/
 │   ├── cursor/                          # Cursor IDE specific docs
 │   ├── general-llm/                     # General LLM/agent research & guides
 │   ├── shared/                          # Cross-tool standards (Agent Skills)
-│   ├── analysis/                        # Deep extraction analysis (Portuguese)
+│   ├── analysis/                        # Deep extraction analysis
 │   └── plans/                           # Project design documents
 ├── README.md
 └── LICENSE

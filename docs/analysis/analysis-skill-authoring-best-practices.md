@@ -525,7 +525,7 @@ that might inform this task (previous decisions, preferences, constraints).
 | Think step by step | Workflows with sequential checklists |
 | Give Claude a role | Description implicitly defines the role |
 
-### 7.4 a-guide-to-agents.md / a-guide-to-agents.md
+### 7.4 a-guide-to-agents.md (merged guide)
 
 | Guide Principle | Skill Authoring Equivalent |
 |-----------------|----------------------------|
