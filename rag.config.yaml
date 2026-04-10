@@ -1,0 +1,70 @@
+# Project-specific RAG configuration
+# This is the ONLY file you need to edit when adopting RAG in a new project.
+
+project:
+  name: "agent-engineering-toolkit"
+
+# Collections define separate search contexts with independent embedding models,
+# chunking strategies, and vec0 tables. AI agents choose which collection to search.
+
+collections:
+  docs:
+    description: "Project documentation, guides, research, and design decisions"
+    embedding:
+      model: "BAAI/bge-small-en-v1.5"
+      dimensions: 384
+    sources:
+      - path: "docs/"
+        patterns: ["*.md"]
+        recursive: true
+    chunking:
+      strategy: "markdown_header"
+      max_tokens: 512
+      overlap_tokens: 256
+      split_headers: ["h1", "h2", "h3"]
+
+  code:
+    description: "Source code, skill definitions, templates, scripts, and config files"
+    embedding:
+      model: "jinaai/jina-embeddings-v2-base-code"
+      dimensions: 768
+    sources:
+      - path: "plugins/"
+        patterns: ["*.md", "*.sh", "*.yaml", "*.yml"]
+        recursive: true
+        chunking:
+          strategy: "markdown_header"
+          max_tokens: 512
+      - path: "skills/"
+        patterns: ["*.md"]
+        recursive: true
+      - path: ".claude/hooks/"
+        patterns: ["*.sh"]
+        recursive: false
+        chunking:
+          strategy: "tree_sitter"
+          language: "bash"
+          max_chars: 1500
+    chunking:
+      strategy: "tree_sitter"
+      max_chars: 1500
+      languages:
+        ".py": "python"
+        ".sh": "bash"
+        ".js": "javascript"
+        ".ts": "typescript"
+        ".yaml": "yaml"
+        ".yml": "yaml"
+
+shared:
+  cache_dir: ".rag/models"
+
+database:
+  path: ".rag/knowledge.db"
+
+search:
+  default_top_k: 5
+  max_top_k: 10
+  rrf_k: 60
+  vector_candidates: 20
+  fts_candidates: 20
