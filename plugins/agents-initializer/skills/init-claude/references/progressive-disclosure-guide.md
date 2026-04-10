@@ -1,7 +1,7 @@
 # Progressive Disclosure Guide
 
 Evidence-based instructions for structuring AGENTS.md and CLAUDE.md hierarchies.
-Sources: a-guide-to-agents.md, a-guide-to-agents.md, research-context-engineering-comprehensive.md, memory/how-claude-remembers-a-project.md
+Sources: a-guide-to-agents.md, research-context-engineering-comprehensive.md, memory/how-claude-remembers-a-project.md
 
 ---
 
@@ -44,7 +44,7 @@ Generate root files with **only** these elements:
 4. **Progressive disclosure pointers** — links to domain files, not inline content
 
 > "Consider this the absolute minimum... That's honestly it. Everything else should go elsewhere."
-> — a-guide-to-agents.md / a-guide-to-agents.md
+> — a-guide-to-agents.md
 
 ---
 

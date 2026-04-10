@@ -1,6 +1,6 @@
 # LLM Context Engineering: Comprehensive Research Synthesis
 
-**Date**: July 2025
+**Date**: April 2026
 **Scope**: Context rot, context poisoning, attention budget, whitespace & formatting, multilingual performance (English vs Portuguese), prompt compression, RAG quality — synthesized from 50+ academic papers and official documentation (2022–2026).
 
 ---
@@ -245,4 +245,4 @@ This synthesis is split into focused files for efficient context loading:
 
 ---
 
-*Report generated: July 2025. This hub contains the Executive Summary, cross-cutting recommendations, and Full Citation List. Detailed research content is split into scoped files: [Context Rot & Management](research-context-rot-and-management.md) (Parts 1–8), [Whitespace & Formatting](research-whitespace-and-formatting.md) (Part 9), [Multilingual Performance](research-multilingual-performance.md) (Parts 10–11), [Agent Workflows & Patterns](research-agent-workflows-and-patterns.md) (Section 13). Synthesized from 55+ sources including peer-reviewed papers from NeurIPS, ACL, EMNLP, EACL, TACL, NAACL, AACL, ICLR, ICML, BRACIS, official documentation from Anthropic, Google Research, Microsoft Research, Chroma, and practitioner workflows.*
+*Report generated: April 2026. This hub contains the Executive Summary, cross-cutting recommendations, and Full Citation List. Detailed research content is split into scoped files: [Context Rot & Management](research-context-rot-and-management.md) (Parts 1–8), [Whitespace & Formatting](research-whitespace-and-formatting.md) (Part 9), [Multilingual Performance](research-multilingual-performance.md) (Parts 10–11), [Agent Workflows & Patterns](research-agent-workflows-and-patterns.md) (Section 13). Synthesized from 55+ sources including peer-reviewed papers from NeurIPS, ACL, EMNLP, EACL, TACL, NAACL, AACL, ICLR, ICML, BRACIS, official documentation from Anthropic, Google Research, Microsoft Research, Chroma, and practitioner workflows.*
