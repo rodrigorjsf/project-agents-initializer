@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "rag-knowledge-base": {
+      "command": "uv",
+      "args": ["run", "--project", "rag", "python", "-m", "rag.server"],
+      "env": {
+        "RAG_CONFIG_PATH": "rag.config.yaml"
+      }
+    }
+  }
+}
