@@ -181,7 +181,11 @@ def _merge_splits(
 
 
 def _protect_atomic_blocks(text: str) -> tuple[str, dict[str, str]]:
-    """Replace fenced code blocks and tables with placeholders to prevent splitting them."""
+    """Replace fenced code blocks and tables with placeholders to prevent splitting them.
+
+    Placeholders preserve the original newline count so that line-based metadata
+    (line_start/line_end) remains accurate for content after the block.
+    """
     placeholders: dict[str, str] = {}
     counter = 0
 
@@ -191,7 +195,9 @@ def _protect_atomic_blocks(text: str) -> tuple[str, dict[str, str]]:
         key = f"__ATOMIC_BLOCK_{counter}__"
         placeholders[key] = match.group(0)
         counter += 1
-        return key
+        # Pad with the same number of newlines as the original block minus the key line
+        newline_count = match.group(0).count("\n")
+        return key + "\n" * newline_count
 
     text = re.sub(r"```[\s\S]*?```", replace_fence, text)
 
@@ -201,7 +207,8 @@ def _protect_atomic_blocks(text: str) -> tuple[str, dict[str, str]]:
         key = f"__ATOMIC_BLOCK_{counter}__"
         placeholders[key] = match.group(0)
         counter += 1
-        return key
+        newline_count = match.group(0).count("\n")
+        return key + "\n" * newline_count
 
     text = re.sub(r"(?:^\|.*\|$\n?){2,}", replace_table, text, flags=re.MULTILINE)
 
@@ -209,9 +216,10 @@ def _protect_atomic_blocks(text: str) -> tuple[str, dict[str, str]]:
 
 
 def _restore_atomic_blocks(text: str, placeholders: dict[str, str]) -> str:
-    """Restore atomic blocks from placeholders."""
+    """Restore atomic blocks from placeholders, stripping the newline padding."""
     for key, value in placeholders.items():
-        text = text.replace(key, value)
+        newline_count = value.count("\n")
+        text = text.replace(key + "\n" * newline_count, value)
     return text
 
 

@@ -285,8 +285,8 @@ class Store:
         ).fetchone()
         return row["file_hash"] if row else None
 
-    def delete_document_chunks(self, doc_id: int, collection: str) -> None:
-        """Delete all chunks, vec rows, and FTS entries for a document.
+    def _delete_document_chunks_in_tx(self, doc_id: int, collection: str) -> None:
+        """Delete all chunks and vec rows for a document — must be called within an active transaction.
 
         FTS cleanup is handled by triggers on chunk deletion.
         Vec0 tables do NOT support triggers — explicit deletion required.
@@ -308,7 +308,11 @@ class Store:
                 (doc_id,),
             )
             cur.execute("DELETE FROM code_chunks WHERE document_id = ?", (doc_id,))
-        self.db.commit()
+
+    def delete_document_chunks(self, doc_id: int, collection: str) -> None:
+        """Delete all chunks and vec rows for a document in a single atomic transaction."""
+        with self.db:
+            self._delete_document_chunks_in_tx(doc_id, collection)
 
     def delete_stale_documents(
         self, collection: str, current_file_paths: set[str]
@@ -319,15 +323,15 @@ class Store:
             (collection,),
         ).fetchall()
 
-        removed = 0
-        for row in rows:
-            if row["file_path"] not in current_file_paths:
-                self.delete_document_chunks(row["id"], collection)
+        stale = [row for row in rows if row["file_path"] not in current_file_paths]
+        if not stale:
+            return 0
+
+        with self.db:
+            for row in stale:
+                self._delete_document_chunks_in_tx(row["id"], collection)
                 self.db.execute("DELETE FROM documents WHERE id = ?", (row["id"],))
-                removed += 1
-        if removed:
-            self.db.commit()
-        return removed
+        return len(stale)
 
     def vector_search(
         self, collection: str, embedding: list[float], top_k: int
@@ -376,7 +380,7 @@ class Store:
         try:
             rows = self.db.execute(
                 f"""
-                SELECT c.*, rank
+                SELECT c.*, bm25({fts_table}) AS rank
                 FROM {fts_table} f
                 JOIN {chunk_table} c ON c.id = f.rowid
                 WHERE {fts_table} MATCH ?
@@ -385,9 +389,11 @@ class Store:
                 """,
                 (query, top_k),
             ).fetchall()
-        except sqlite3.OperationalError:
-            # Invalid FTS query syntax
-            return []
+        except sqlite3.OperationalError as e:
+            if "fts5: syntax error" in str(e).lower() or "no such column" in str(e).lower():
+                # Invalid FTS query syntax — return empty gracefully
+                return []
+            raise
 
         return [dict(r) for r in rows]
 
