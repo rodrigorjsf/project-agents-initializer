@@ -46,6 +46,17 @@ The database is pre-built. Tools are available via MCP (`rag-knowledge-base` ser
 - All user documentation should be rich and written using the `/docs:write-concisely` skill.
 - All documentation updates must be made using the `/docs:update-docs` skill.
 
+## RAG Knowledge Base
+
+This project has a semantic search system. Use it **before** reading files with `view`/`grep`.
+
+- `search_docs` — find documentation, guides, research, design decisions
+- `search_code` — find implementation examples, skill patterns, hook scripts
+- `search_all` — search both when unsure which collection to use
+- `get_doc_context` — get all chunks from a specific file
+
+The database is pre-built. Tools are available via MCP (`rag-knowledge-base` server).
+
 ## Git Conventions
 
 - ALL commits MUST be atomic — one logical change per commit, never bundle unrelated changes
