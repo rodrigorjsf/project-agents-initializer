@@ -37,6 +37,11 @@ This project has a semantic search system. Use it **before** reading files with 
 
 The database is pre-built. Tools are available via MCP (`rag-knowledge-base` server).
 
+## Documentation
+
+- All user documentation should be rich and written using the `/docs:write-concisely` skill.
+- All documentation updates must be made using the `/docs:update-docs` skill.
+
 ## Git Conventions
 
 - ALL commits MUST be atomic — one logical change per commit, never bundle unrelated changes

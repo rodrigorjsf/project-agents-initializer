@@ -569,16 +569,16 @@ async def list_documents() -> str:
 
 | # | Phase | Description | Status | Parallel | Depends | PRP Plan |
 |---|-------|-------------|--------|----------|---------|----------|
-| 1 | Python project setup | Initialize `rag/` package with uv, pyproject.toml, dependencies (incl. tree-sitter) | in-progress | - | - | [plan](../plans/local-rag-knowledge-base.plan.md) |
-| 2 | Document chunker | Markdown-aware chunking with header boundary detection | pending | - | 1 | - |
-| 3 | Code chunker | tree-sitter AST-based code chunking with symbol extraction | pending | with 2 | 1 | - |
-| 4 | Embedding pipeline | fastembed integration with multi-model support (bge-small + jina-code) | pending | with 2 | 1 | - |
-| 5 | SQLite storage layer | sqlite-vec + FTS5 schema with separate collections (vec_docs + vec_code) | pending | with 2 | 1 | - |
-| 6 | Indexing pipeline | Full pipeline: scan → route → chunk → embed → store with per-collection logic | pending | - | 2, 3, 4, 5 | - |
-| 7 | Hybrid search engine | Per-collection search + cross-collection merge via normalized RRF | pending | - | 5, 6 | - |
-| 8 | MCP server | FastMCP server with search_docs, search_code, search_all, get_doc_context, list_documents | pending | - | 7 | - |
-| 9 | Integration & config | MCP config, .gitignore, rag.config.yaml, CLI entry points, PostToolUse hook | pending | - | 8 | - |
-| 10 | Documentation & portability | README, architecture docs, config reference, setup guide, reuse instructions | pending | - | 9 | - |
+| 1 | Python project setup | Initialize `rag/` package with uv, pyproject.toml, dependencies (incl. tree-sitter) | complete | - | - | [plan](../plans/completed/local-rag-knowledge-base.plan.md) |
+| 2 | Document chunker | Markdown-aware chunking with header boundary detection | complete | - | 1 | [plan](../plans/completed/local-rag-knowledge-base.plan.md) |
+| 3 | Code chunker | tree-sitter AST-based code chunking with symbol extraction | complete | with 2 | 1 | [plan](../plans/completed/local-rag-knowledge-base.plan.md) |
+| 4 | Embedding pipeline | fastembed integration with multi-model support (bge-small + jina-code) | complete | with 2 | 1 | [plan](../plans/completed/local-rag-knowledge-base.plan.md) |
+| 5 | SQLite storage layer | sqlite-vec + FTS5 schema with separate collections (vec_docs + vec_code) | complete | with 2 | 1 | [plan](../plans/completed/local-rag-knowledge-base.plan.md) |
+| 6 | Indexing pipeline | Full pipeline: scan → route → chunk → embed → store with per-collection logic | complete | - | 2, 3, 4, 5 | [plan](../plans/completed/local-rag-knowledge-base.plan.md) |
+| 7 | Hybrid search engine | Per-collection search + cross-collection merge via normalized RRF | complete | - | 5, 6 | [plan](../plans/completed/local-rag-knowledge-base.plan.md) |
+| 8 | MCP server | FastMCP server with search_docs, search_code, search_all, get_doc_context, list_documents | complete | - | 7 | [plan](../plans/completed/local-rag-knowledge-base.plan.md) |
+| 9 | Integration & config | MCP config, .gitignore, rag.config.yaml, CLI entry points, PostToolUse hook | complete | - | 8 | [plan](../plans/completed/local-rag-knowledge-base.plan.md) |
+| 10 | Documentation & portability | README, architecture docs, config reference, setup guide, reuse instructions | complete | - | 9 | [plan](../plans/completed/local-rag-knowledge-base.plan.md) |
 
 ### Phase Details
 
@@ -714,5 +714,5 @@ Code-specific chunking and embedding research:
 ---
 
 *Generated: 2026-04-10T03:33Z*
-*Updated: 2026-04-10T14:30Z — Added code file indexing with dual-collection architecture*
-*Status: PLAN READY — [`.claude/PRPs/plans/local-rag-knowledge-base.plan.md`](../.claude/PRPs/plans/local-rag-knowledge-base.plan.md)*
+*Updated: 2026-04-11T02:50Z — All 10 phases complete, merged via PR #35*
+*Status: COMPLETE — [report](../reports/local-rag-knowledge-base-report.md)*
