@@ -37,7 +37,7 @@ Scan for all Claude Code artifact types:
 | Artifact Type | Location | What to Collect |
 |---------------|----------|-----------------|
 | Skills | `.claude/skills/*/SKILL.md`, `plugins/*/skills/*/SKILL.md` | names, descriptions |
-| Agents | `.claude/agents/*.md`, `plugins/*/agents/*.md` | names, tools, models |
+| Agents | `.claude/agents/**/*.md`, `plugins/*/agents/**/*.md` | names, tools, models |
 | Rules | `.claude/rules/*.md` | filenames, paths frontmatter |
 | Hooks | `.claude/settings.json` hooks key | event types, commands |
 
