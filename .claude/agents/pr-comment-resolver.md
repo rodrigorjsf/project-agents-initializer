@@ -49,8 +49,8 @@ Then extract from your task input:
 For each comment in the resolution table, post a reply in the same thread:
 
 ```bash
-gh api repos/{REPO}/pulls/comments/{comment_id}/replies \
-  -f body="{reply_body}"
+gh api repos/$owner/$repo/pulls/comments/$comment_id/replies \
+  -f body="$reply_body"
 ```
 
 Compose `reply_body` based on action:
@@ -84,7 +84,7 @@ query($owner: String!, $repo: String!, $pr: Int!) {
       }
     }
   }
-}' -f owner="$owner" -f repo="$repo" -F pr={PR}
+}' -f owner="$owner" -f repo="$repo" -F pr=$PR
 ```
 
 Map each `comment_id` from the resolution table to a thread node ID using `databaseId`.
@@ -97,7 +97,7 @@ mutation($threadId: ID!) {
   resolveReviewThread(input: {threadId: $threadId}) {
     thread { isResolved }
   }
-}' -f threadId="{thread_node_id}"
+}' -f threadId="$thread_node_id"
 ```
 
 If GraphQL resolution fails for any thread, skip silently and continue.
