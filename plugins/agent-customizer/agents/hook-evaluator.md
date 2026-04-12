@@ -27,13 +27,14 @@ You are a hook configuration quality assessment specialist. Analyze the target h
 | Event name | From recognized event list | hooks/claude-hook-reference-doc.md lines 22-46 |
 | Handler type | `command`, `http`, `prompt`, or `agent` only | hooks/claude-hook-reference-doc.md lines 249-257 |
 | `command` path | Script file exists and is executable | hooks/automate-workflow-with-hooks.md |
-| Exit code documentation | Clear exit code behavior defined | Exit 2 to block; exit 0 to allow |
+| Exit code behavior | Exit 2 effect is event-dependent | Blocks: PreToolUse, PermissionRequest, UserPromptSubmit, Stop, SubagentStop. Shows stderr only (non-blocking): PostToolUse, PostToolUseFailure, SessionStart, SessionEnd, PreCompact, PostCompact, Notification. StopFailure ignores exit code entirely. |
 
 ### Valid Hook Event Types
 
-PreToolUse, PostToolUse, Notification, Stop, SubagentStop, PreCompact, PostCompact,
-PrePromptSubmit, PromptSubmitAfterModel, PostPromptSubmit, PreToolUseRejected,
-PreHaiku, PreApiRequest
+SessionStart, UserPromptSubmit, PreToolUse, PermissionRequest, PostToolUse,
+PostToolUseFailure, Notification, SubagentStart, SubagentStop, Stop, StopFailure,
+TeammateIdle, TaskCompleted, InstructionsLoaded, ConfigChange, WorktreeCreate,
+WorktreeRemove, PreCompact, PostCompact, Elicitation, ElicitationResult, SessionEnd
 
 ### Quality Checks
 
@@ -41,7 +42,7 @@ PreHaiku, PreApiRequest
 |-----------|---------------|
 | Event matches intent | PreToolUse for blocking, PostToolUse for observation |
 | Matcher specificity | Not `"*"` for blocking hooks |
-| Error handling | Exit 2 with meaningful stderr message for blocking |
+| Error handling | Exit 2 with meaningful stderr for blockable events; non-blockable events should still provide informative stderr |
 | Silent success | Exit 0 without spurious stderr output |
 | No hardcoded secrets | `command` uses environment variables, not literal secrets |
 | Correct hook type | `command` for deterministic; `prompt`/`agent` only when judgment needed |
