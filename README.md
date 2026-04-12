@@ -201,8 +201,9 @@ Evaluate and improve existing `.cursor/rules/*.mdc` files.
 - Invalid frontmatter fields (only `description`, `alwaysApply`, `globs` are valid)
 - Activation mode optimization (e.g., converting `alwaysApply` rules to `globs`-based auto-attachment)
 - Rules that should be AGENTS.md content instead (portable, no metadata needed)
+- AGENTS.md evaluation is conditional: only included when the target project already uses AGENTS.md
 
-> **Note:** `init-agents` and `improve-agents` work identically in Cursor — AGENTS.md is natively supported by Cursor with nested directory hierarchy.
+> **Note:** For AGENTS.md initialization and improvement, use the `agents-initializer` plugin (`/init-agents`, `/improve-agents`). The `cursor-initializer` plugin focuses on Cursor-native artifacts.
 
 ## Installation
 
@@ -295,10 +296,8 @@ After installation, invoke skills by name:
 /improve-agents       # Improve existing AGENTS.md files
 
 # In Cursor IDE
-/init-cursor          # Initialize .cursor/rules/*.mdc hierarchy
-/init-agents          # Initialize AGENTS.md hierarchy (same as Claude)
-/improve-cursor       # Improve existing .cursor/rules/*.mdc files
-/improve-agents       # Improve existing AGENTS.md files (same as Claude)
+/init-cursor          # Initialize .cursor/rules/*.mdc + AGENTS.md hierarchy
+/improve-cursor       # Improve existing .cursor/rules/*.mdc files (and AGENTS.md if present)
 
 # If installed as a plugin (namespaced)
 /agents-initializer:init-claude
@@ -361,11 +360,10 @@ agent-engineering-toolkit/
 │   └── cursor-initializer/         # Cursor IDE plugin — Cursor-native artifact generation
 │       ├── .cursor-plugin/
 │       │   └── plugin.json          # Plugin manifest
+│       ├── AGENTS.md                # Cursor-native plugin config (for working in this directory)
 │       ├── skills/
-│       │   ├── init-agents/SKILL.md     # AGENTS.md generation (portable)
-│       │   ├── init-cursor/SKILL.md     # .cursor/rules/*.mdc generation
-│       │   ├── improve-agents/SKILL.md  # AGENTS.md evaluation/improvement
-│       │   └── improve-cursor/SKILL.md  # .cursor/rules/*.mdc evaluation/improvement
+│       │   ├── init-cursor/SKILL.md     # .cursor/rules/*.mdc + AGENTS.md generation
+│       │   └── improve-cursor/SKILL.md  # .cursor/rules/*.mdc evaluation/improvement (AGENTS.md conditional)
 │       └── agents/                  # Cursor subagents (readonly: true format)
 │           ├── codebase-analyzer.md # Subagent: tech stack detection
 │           ├── scope-detector.md    # Subagent: scope detection
