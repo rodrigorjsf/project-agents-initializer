@@ -191,3 +191,103 @@ The standalone distribution achieves parity with the plugin distribution because
 Plugin runs M1 (improve-agents bloated) required 2 loop iterations vs. M2's 1 iteration. This is because agent delegation introduces a context boundary — the agent evaluates in isolation, then hands off to the writer, creating a slightly higher risk of a single iteration not catching all issues. Standalone's single-context evaluation catches issues in one pass more consistently.
 
 This is an **implementation detail** (not a quality difference) because final output quality was identical. However, it's worth noting: standalone may be slightly more efficient for improve scenarios due to single-context evaluation. Plugin may be slightly more thorough for init scenarios (isolated analysis prevents context contamination). Neither difference materially affects output quality.
+
+---
+
+## Phase 8 — Distribution-Specific Migration Mechanism Parity (2026-04-05)
+
+**Date**: 2026-04-05
+**Purpose**: Verify plugin and standalone produce equivalent quality while correctly diverging in mechanism suggestions (plugin: 4 types, standalone: 2 types with HOOK_CANDIDATE reclassification)
+
+---
+
+### Pair P9: improve-agents, S3 bloated — Migration mechanism parity
+
+**Plugin Run**: M1 (re-run) | **Standalone Run**: M2 (re-run)
+
+| Dimension | M1 (plugin) | M2 (standalone) | Assessment |
+|-----------|------------|----------------|------------|
+| Candidates detected | 4/4 | 4/4 | EQUIVALENT |
+| Classification accuracy | PASS | PASS | EQUIVALENT |
+| 3-option presentation format | PASS | PASS | EQUIVALENT |
+| Mechanism types suggested | hooks+rules+skills+subagents | rules+skills | CORRECT DIVERGENCE |
+| HOOK_CANDIDATE handling | Suggested as hook | Reclassified to SKILL_CANDIDATE | CORRECT DIVERGENCE |
+| DELETE_CANDIDATE handling | Deletion suggested | Deletion suggested | EQUIVALENT |
+| Output quality after migration | PASS | PASS | EQUIVALENT |
+
+**Analysis**: Expected mechanism divergence. Plugin correctly suggests hooks for `make lint` (deterministic enforcement); standalone correctly reclassifies to SKILL_CANDIDATE since hooks are unavailable in the standalone distribution. Output quality is identical — divergence is mechanism-level only, not quality-level.
+
+**PARITY RATING: EQUIVALENT** (correct distribution-aware divergence on mechanism types)
+
+---
+
+### Pair P10: improve-claude, S3 bloated — Migration mechanism parity
+
+**Plugin Run**: M3 (re-run) | **Standalone Run**: M4 (re-run)
+
+| Dimension | M3 (plugin) | M4 (standalone) | Assessment |
+|-----------|------------|----------------|------------|
+| Candidates detected | 4/4 | 4/4 | EQUIVALENT |
+| Classification accuracy | PASS | PASS | EQUIVALENT |
+| 3-option presentation format | PASS | PASS | EQUIVALENT |
+| Mechanism types suggested | hooks+rules+skills+subagents | rules+skills | CORRECT DIVERGENCE |
+| HOOK_CANDIDATE (`make ci`) | Suggested as hook | Reclassified to SKILL_CANDIDATE | CORRECT DIVERGENCE |
+| Output quality after migration | PASS | PASS | EQUIVALENT |
+
+**Analysis**: Same pattern as P9. Standalone reclassification note present in output: "Hooks are not available outside the plugin distribution. This HOOK_CANDIDATE has been reclassified as SKILL_CANDIDATE."
+
+**PARITY RATING: EQUIVALENT**
+
+---
+
+### Pair P11: improve-agents, S4 reasonable — Restraint parity
+
+**Plugin Run**: M5 (re-run) | **Standalone Run**: M6 (re-run)
+
+| Dimension | M5 (plugin) | M6 (standalone) | Assessment |
+|-----------|------------|----------------|------------|
+| Migration candidates detected | 0–1 | 0–1 | EQUIVALENT |
+| Restraint correctly applied | PASS | PASS | EQUIVALENT |
+| No false-positive migrations | PASS | PASS | EQUIVALENT |
+| "Keep as-is" option present | PASS | PASS | EQUIVALENT |
+
+**Analysis**: Both distributions applied restraint equally. For an already-reasonable file, migration suggestions are minimal and accurate — no well-structured instructions were incorrectly flagged.
+
+**PARITY RATING: EQUIVALENT**
+
+---
+
+### Pair P12: improve-claude, S4 reasonable — Restraint parity
+
+**Plugin Run**: M7 (re-run) | **Standalone Run**: M8 (re-run)
+
+| Dimension | M7 (plugin) | M8 (standalone) | Assessment |
+|-----------|------------|----------------|------------|
+| Migration candidates detected | 0–1 | 0–1 | EQUIVALENT |
+| Restraint correctly applied | PASS | PASS | EQUIVALENT |
+| No false-positive migrations | PASS | PASS | EQUIVALENT |
+
+**PARITY RATING: EQUIVALENT**
+
+---
+
+### Phase 8 Parity Summary (P9–P12)
+
+| Pair | Skills | Scenario | Parity Rating |
+|------|--------|----------|---------------|
+| P9 | improve-agents | S3 bloated migration | EQUIVALENT |
+| P10 | improve-claude | S3 bloated migration | EQUIVALENT |
+| P11 | improve-agents | S4 reasonable restraint | EQUIVALENT |
+| P12 | improve-claude | S4 reasonable restraint | EQUIVALENT |
+
+**All 4 Phase 8 pairs: EQUIVALENT**
+
+### Overall Parity Finding (All 12 pairs, P1–P12)
+
+| Phase | Pairs | Result |
+|-------|-------|--------|
+| Original (2026-03-26) | P1–P8 | 8/8 EQUIVALENT |
+| Phase 8 re-run (2026-04-05) | P9–P12 | 4/4 EQUIVALENT |
+| **Total** | **P1–P12** | **12/12 EQUIVALENT** |
+
+**Key finding**: Plugin and standalone distributions correctly diverge on mechanism type suggestions (4 vs. 2 types) while producing equivalent output quality. The HOOK_CANDIDATE reclassification to SKILL_CANDIDATE in standalone is consistent across all 4 improve skills and both skill types (agents + claude).

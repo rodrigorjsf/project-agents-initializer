@@ -100,6 +100,34 @@ For **CLAUDE.md** runs:
 
 ---
 
+## Automation Migration Checks (M1–M8 only, Phase 3-7 features)
+
+| Check | Result | Notes |
+|-------|--------|-------|
+| Migration candidates correctly classified (HOOK/RULE/SKILL/DELETE) | [PASS/FAIL / N/A] | List classifications |
+| 3-option presentation format used (WHAT/WHY/TOKEN IMPACT/OPTIONS) | [PASS/FAIL / N/A] | |
+| Evidence-based justification with doc references | [PASS/FAIL / N/A] | |
+| Token impact estimation present | [PASS/FAIL / N/A] | |
+| Distribution-appropriate mechanisms suggested | [PASS/FAIL / N/A] | Plugin: 4 types; Standalone: 2 types |
+| HOOK_CANDIDATE reclassification (standalone only) | [PASS/FAIL / N/A] | Standalone must reclassify to RULE/SKILL |
+| Per-item approval gate enforced | [PASS/FAIL / N/A] | |
+| "Keep as-is" option present for every suggestion | [PASS/FAIL / N/A] | |
+| Generated artifacts follow templates | [PASS/FAIL / N/A] | Check skill.md/hook-config.md/claude-rule.md |
+
+---
+
+## Preflight Redirect Checks (R1–R4 only)
+
+| Check | Result | Notes |
+|-------|--------|-------|
+| Existing file detected by preflight check | [PASS/FAIL / N/A] | |
+| Correct notification string emitted | [PASS/FAIL / N/A] | |
+| Redirect to improve skill executed | [PASS/FAIL / N/A] | |
+| Init phases 1-5 NOT executed | [PASS/FAIL / N/A] | |
+| Improve flow completed successfully | [PASS/FAIL / N/A] | |
+
+---
+
 ## 5-Dimension Scoring (Improve runs M1–M8 only)
 
 Score each dimension 1–10 based on evaluation-criteria.md rubric:

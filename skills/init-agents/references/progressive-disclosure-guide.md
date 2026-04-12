@@ -1,7 +1,7 @@
 # Progressive Disclosure Guide
 
 Evidence-based instructions for structuring AGENTS.md and CLAUDE.md hierarchies.
-Sources: a-guide-to-agents.md, a-guide-to-claude.md, research-llm-context-optimization.md, memory/how-claude-remembers-a-project.md
+Sources: a-guide-to-agents.md, research-context-engineering-comprehensive.md, memory/how-claude-remembers-a-project.md
 
 ---
 
@@ -30,7 +30,7 @@ When deciding where to place content, use this table:
 | `.claude/rules/` (path-scoped) | Specific to certain file patterns | On-demand when files match |
 | Skill | A workflow the agent should invoke explicitly | On-demand when invoked |
 
-*Source: a-guide-to-agents.md lines 228-233; research-llm-context-optimization.md lines 257-305*
+*Source: a-guide-to-agents.md lines 228-233; research-context-engineering-comprehensive.md lines 257-305*
 
 ---
 
@@ -44,7 +44,7 @@ Generate root files with **only** these elements:
 4. **Progressive disclosure pointers** — links to domain files, not inline content
 
 > "Consider this the absolute minimum... That's honestly it. Everything else should go elsewhere."
-> — a-guide-to-agents.md / a-guide-to-claude.md
+> — a-guide-to-agents.md
 
 ---
 
@@ -81,6 +81,8 @@ Patterns match absolute paths with glob syntax. Arrays merge across settings lay
 ## Progressive Disclosure Patterns
 
 Apply these patterns when content exceeds root-file scope:
+
+**Extraction trigger**: Extract a section to a separate domain file when it has 3+ distinct rules AND spans 10+ lines, OR when the topic is irrelevant to most work sessions (e.g., database migration conventions in a project where most work is UI changes).
 
 **Move domain rules to separate files:**
 
@@ -123,7 +125,7 @@ docs/
 
 **Load order**: Claude Code walks up the directory tree from CWD, loading every ancestor CLAUDE.md at session start. Subdirectory CLAUDE.md files load on-demand only when Claude reads files in that directory — not at launch.
 
-*Source: research-llm-context-optimization.md lines 181-208, 257-305*
+*Source: research-context-engineering-comprehensive.md lines 181-208, 257-305*
 
 ---
 

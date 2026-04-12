@@ -1,0 +1,32 @@
+{
+  "permissions": {
+    "deny": [
+      "Read(/next-steps.md)",
+      "Read(/docs/plans/**)",
+      "Read(/.claude/PRPs/plans/**)",
+      "Read(/.claude/PRPs/prds/completed/**)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/check-docs-sync.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Create",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/check-rag-reindex.sh"
+          }
+        ]
+      }
+    ]
+  }
+}

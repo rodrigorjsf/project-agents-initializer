@@ -19,6 +19,7 @@ The system architecture follows a microservices pattern:
 Services communicate via gRPC (defined in `infra/proto/`) and async events via Kafka.
 
 ## Development Rules
+<!-- MIGRATION_TEST: SKILL_CANDIDATE — 30+ line domain block covering multi-language formatting, imports, and naming conventions -->
 
 When working on this project, always follow these rules:
 
@@ -112,7 +113,7 @@ When reviewing or writing code for review:
 
 ## Testing Requirements
 
-Unit test coverage must be at least 80% for all services. Integration tests are required for all API endpoints. Test file names must end with `_test.py` (Python) or `_test.go` (Go). Test functions must start with `test_` (Python) or `Test` (Go).
+Unit test coverage must be at least 80% for all services. <!-- MIGRATION_TEST: DELETE_CANDIDATE — coverage threshold already enforced by pytest-cov config in pyproject.toml --> Integration tests are required for all API endpoints. Test file names must end with `_test.py` (Python) or `_test.go` (Go). Test functions must start with `test_` (Python) or `Test` (Go).
 
 Do not use `unittest.mock.patch` as a decorator — use it as a context manager only.
 
@@ -164,6 +165,8 @@ make dev  # starts all services with docker-compose
 make dev-stop  # stops all services
 ```
 
+ALWAYS run `make ci` before pushing any branch to ensure all CI checks pass locally. <!-- MIGRATION_TEST: HOOK_CANDIDATE — pre-push enforceable, deterministic -->
+
 ## Environment Variables
 
 Required variables (see `services/auth/docs/env.md` for details) [STALE: file moved to infra/docs/environment.md]:
@@ -193,6 +196,7 @@ go mod tidy  # clean up unused dependencies
 ```
 
 ## Security Rules
+<!-- MIGRATION_TEST: RULE_CANDIDATE — inline rules that belong in .claude/rules/security.md -->
 
 These security rules are inline here but should really be in `.claude/rules/security.md`:
 

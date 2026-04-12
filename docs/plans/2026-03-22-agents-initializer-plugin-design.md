@@ -34,7 +34,7 @@ The plugin uses **subagent-driven development**: subagents (running on Claude So
 | Anthropic Engineering (Context Engineering) | "Context is a finite resource with diminishing marginal returns" | Minimal token footprint per scope |
 | Anthropic Engineering (Context Engineering) | Progressive disclosure via subdirectory CLAUDE.md, path-scoped rules, skills | Generate hierarchical file trees, not flat files |
 | Lost in the Middle (TACL 2023) | Information in the middle of long contexts gets lost | Keep files short; critical instructions at start |
-| a-guide-to-agents.md / a-guide-to-claude.md | Progressive disclosure patterns, monorepo support, domain files | Generate BUILD.md, TESTING.md, etc. as separate files |
+| a-guide-to-agents.md | Progressive disclosure patterns, monorepo support, domain files | Generate BUILD.md, TESTING.md, etc. as separate files |
 
 ## Architecture
 
@@ -42,8 +42,8 @@ The plugin uses **subagent-driven development**: subagents (running on Claude So
 
 This project supports **three distribution channels**:
 
-1. **Claude Code Plugin** (native): `.claude-plugin/marketplace.json` + `.claude-plugin/plugin.json` — install via `/plugin marketplace add owner/repo` then `/plugin install agents-initializer@project-agents-initializer`
-2. **`npx skills add`** (third-party skills CLI): SKILL.md files discoverable by the `skills` CLI — install via `npx skills add owner/project-agents-initializer`
+1. **Claude Code Plugin** (native): `.claude-plugin/marketplace.json` + `.claude-plugin/plugin.json` — install via `/plugin marketplace add owner/repo` then `/plugin install agents-initializer@agent-engineering-toolkit`
+2. **`npx skills add`** (third-party skills CLI): SKILL.md files discoverable by the `skills` CLI — install via `npx skills add owner/agent-engineering-toolkit`
 3. **Cross-agent** (VS Code Copilot, Codex, etc.): Same SKILL.md format works in `.agents/skills/` for VS Code and other tools
 
 ### Skills
@@ -212,36 +212,36 @@ Phase 3: Improvement Application (main skill context)
 
 ```bash
 # Add the marketplace (one-time)
-/plugin marketplace add <github-owner>/project-agents-initializer
+/plugin marketplace add <github-owner>/agent-engineering-toolkit
 
 # Install the plugin
-/plugin install agents-initializer@project-agents-initializer
+/plugin install agents-initializer@agent-engineering-toolkit
 
 # Or via CLI
-claude plugin install agents-initializer@project-agents-initializer
+claude plugin install agents-initializer@agent-engineering-toolkit
 ```
 
 ### npx skills add (third-party skills CLI)
 
 ```bash
 # Install all skills globally
-npx skills add <github-owner>/project-agents-initializer -g
+npx skills add <github-owner>/agent-engineering-toolkit -g
 
 # Install for a specific project
-npx skills add <github-owner>/project-agents-initializer
+npx skills add <github-owner>/agent-engineering-toolkit
 
 # Install with agent targeting
-npx skills add <github-owner>/project-agents-initializer --agent claude-code cursor
+npx skills add <github-owner>/agent-engineering-toolkit --agent claude-code cursor
 
 # Install specific skills only
-npx skills add <github-owner>/project-agents-initializer --skill init-claude improve-claude
+npx skills add <github-owner>/agent-engineering-toolkit --skill init-claude improve-claude
 ```
 
 ### Manual Installation
 
 ```bash
 # Clone into project's .claude/skills/
-git clone https://github.com/<owner>/project-agents-initializer.git /tmp/pai
+git clone https://github.com/<owner>/agent-engineering-toolkit.git /tmp/pai
 cp -r /tmp/pai/skills/* .claude/skills/
 
 # Or for VS Code Copilot
@@ -251,7 +251,7 @@ cp -r /tmp/pai/skills/* .agents/skills/
 ## Repository Structure
 
 ```
-project-agents-initializer/
+agent-engineering-toolkit/
 ├── .claude-plugin/
 │   ├── plugin.json              # Plugin manifest
 │   └── marketplace.json         # Marketplace catalog
@@ -271,11 +271,16 @@ project-agents-initializer/
 ├── README.md                    # Full documentation
 ├── LICENSE
 └── docs/
-    ├── a-guide-to-agents.md     # Reference: AGENTS.md guide
-    ├── a-guide-to-claude.md     # Reference: CLAUDE.md guide
-    ├── Evaluating-AGENTS-paper.pdf  # Research paper
-    ├── research-llm-context-optimization.md  # Context optimization research
-    ├── research-claude-code-skills-format.md  # Skills/plugin format research
+    ├── general-llm/
+    │   ├── a-guide-to-agents.md                        # Reference: AGENTS.md + CLAUDE.md guide (merged)
+    │   ├── Evaluating-AGENTS-paper.pdf                 # Research paper
+    │   └── research-context-engineering-comprehensive.md  # Context optimization research (hub)
+    ├── claude-code/
+    │   └── skills/
+    │       └── research-claude-code-skills-format.md   # Skills/plugin format research
+    ├── analysis/                                        # Deep-dive analysis extractions
+    ├── cursor/                                          # Cursor IDE docs
+    ├── shared/                                          # Cross-tool standards
     └── plans/
         └── 2026-03-22-agents-initializer-plugin-design.md  # This document
 ```

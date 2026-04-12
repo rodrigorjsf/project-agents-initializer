@@ -141,3 +141,49 @@ The loop demonstrates two modes of operation:
 Not executed. The monorepo scenario (S2) and bloated improve scenarios (S3) proved sufficient to trigger and validate loop behavior. The extreme 6+ scope test was not needed to confirm loop effectiveness.
 
 **Rationale**: The evidence from 8 loop-iterated runs (I5–I8, M1–M4) provides sufficient coverage of corrective loop behavior. An extreme trigger test would add marginal confidence at significant time cost.
+
+---
+
+## Phase 8 Re-Run — Additional Loop Evidence (2026-04-05)
+
+**Date**: 2026-04-05
+**New runs**: R1–R4 (S5 preflight redirect) evaluated for self-validation loop behavior
+
+### S5 Preflight Redirect Runs (R1–R4)
+
+| Run | Skill | Distribution | Loop Iterated? | Notes |
+|-----|-------|-------------|---------------|-------|
+| R1 | init-agents | plugin | NO | Deterministic file check; no draft produced |
+| R2 | init-agents | standalone | NO | Same |
+| R3 | init-claude | plugin | NO | Same |
+| R4 | init-claude | standalone | NO | Same |
+
+**Observation**: Preflight redirect runs require no self-validation loop iteration. The preflight check is a deterministic file existence check — it either finds the file or doesn't. If found, the hard STOP is immediate; no draft output is produced that would need validation. The self-validation loop is relevant only for generation phases (Phase 2+ in init and improve flows), which are never reached in the preflight redirect path.
+
+### Automation Migration Classification — Loop Applicability Note
+
+The automation migration classification phase (Phase 3 in improve skills) is a structured evaluation step producing a candidate list — not a generation step subject to line-limit violations. The self-validation loop applies specifically to the **output file generation** phase (root/scoped file writing). No additional loop iterations were triggered by automation migration criteria in the M1–M8 re-run.
+
+Classification accuracy was confirmed via test-prompt evaluation: all 4 MIGRATION_TEST markers correctly identified in first pass across all 8 improve skill runs.
+
+### Updated Evidence Table — Phase 8 Additions
+
+| Run | Skill | Distribution | Scenario | Loop Iterated? | Final Hard Limits | Expected Behavior |
+|-----|-------|-------------|----------|---------------|-------------------|--------------------|
+| R1 | init-agents | plugin | S5 preflight | NO | N/A (STOP before gen) | PASS |
+| R2 | init-agents | standalone | S5 preflight | NO | N/A (STOP before gen) | PASS |
+| R3 | init-claude | plugin | S5 preflight | NO | N/A (STOP before gen) | PASS |
+| R4 | init-claude | standalone | S5 preflight | NO | N/A (STOP before gen) | PASS |
+
+**Cumulative totals**: 16 original runs + 4 preflight = 20 total runs evaluated
+
+### Revised Loop Effectiveness Assessment
+
+| Criterion | Original (16 runs) | Phase 8 (20 runs) |
+|-----------|-------------------|-------------------|
+| All runs produce expected final state | 16/16 PASS | 20/20 PASS |
+| Bloated improve runs resolve ALL planted violations | 4/4 PASS | 4/4 PASS (unchanged) |
+| No run exceeds 3 loop iterations | Max: 2 PASS | Max: 2 PASS (unchanged) |
+| Preflight runs STOP before generation phase | N/A | 4/4 PASS |
+
+**Loop Effectiveness: EFFECTIVE** — Phase 8 additions confirm all expected behaviors. Preflight redirect correctly bypasses the generation loop.

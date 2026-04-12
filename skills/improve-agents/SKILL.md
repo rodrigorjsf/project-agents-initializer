@@ -63,6 +63,7 @@ Read these reference documents for improvement guidance:
 - `${CLAUDE_SKILL_DIR}/references/progressive-disclosure-guide.md` — hierarchy decisions
 - `${CLAUDE_SKILL_DIR}/references/what-not-to-include.md` — content exclusion criteria
 - `${CLAUDE_SKILL_DIR}/references/context-optimization.md` — token budget guidelines
+- `${CLAUDE_SKILL_DIR}/references/automation-migration-guide.md` — automation migration decision criteria
 
 Based on both analyses, create an improvement plan. Categorize actions:
 
@@ -79,6 +80,24 @@ Based on both analyses, create an improvement plan. Categorize actions:
 2. **Extract domain content** into docs/TESTING.md, docs/BUILD.md, etc.
 3. **Add progressive disclosure pointers** in root file to new split files
 4. **Consolidate fragmented files** that cover the same scope
+5. **Migrate automation candidates** — for each instruction flagged in Phase 1 as `HOOK_CANDIDATE`, `RULE_CANDIDATE`, or `SKILL_CANDIDATE`:
+   - Classify using the decision flowchart in automation-migration-guide.md
+   - Select target mechanism: path-scoped rule (file-pattern convention) or skill (domain knowledge/infrequent workflow)
+   - Reclassify `HOOK_CANDIDATE` items: if the behavior is path-specific and under 50 lines → `RULE_CANDIDATE`; if it is a workflow or domain block → `SKILL_CANDIDATE`
+   - Estimate token savings using the token impact estimation table in automation-migration-guide.md
+   - This is the standalone distribution — suggest only skills and path-scoped rules. Do not suggest hooks or subagents (these require Claude Code). When automation-migration-guide.md references hooks or subagents, substitute with the closest available mechanism.
+
+#### Redundancy Elimination (delete what agents already know)
+
+Apply the instruction test from what-not-to-include.md to each instruction in the evaluated files:
+
+> "Would removing this cause the agent to make mistakes? If not, cut it."
+
+1. **Delete agent-inferable content**: Standard conventions, obvious tooling, information discoverable from code — flagged as `DELETE_CANDIDATE` in Phase 1
+2. **Delete vague/generic advice**: Instructions that cannot be verified or acted on
+3. **Delete auto-enforced rules**: Formatting or linting rules already enforced by project tooling
+
+For each deletion, document: the specific content being removed, WHY the agent doesn't need it (inference capability or tool enforcement), and the evidence source from what-not-to-include.md.
 
 #### Addition Actions (lowest priority — only if genuinely missing)
 
@@ -91,6 +110,8 @@ When generating new or restructured files, use these templates for consistent st
 - Root AGENTS.md: Read `${CLAUDE_SKILL_DIR}/assets/templates/root-agents-md.md`
 - Scoped AGENTS.md: Read `${CLAUDE_SKILL_DIR}/assets/templates/scoped-agents-md.md`
 - Domain docs: Read `${CLAUDE_SKILL_DIR}/assets/templates/domain-doc.md`
+- .claude/rules/ files (from automation migration): Read `${CLAUDE_SKILL_DIR}/assets/templates/claude-rule.md`
+- Skills (from automation migration): Read `${CLAUDE_SKILL_DIR}/assets/templates/skill.md`
 
 ### Phase 4: Self-Validation
 
@@ -102,26 +123,35 @@ Maximum 3 iterations. Do not proceed to Phase 5 until ALL criteria pass.
 
 ### Phase 5: Present and Apply
 
-1. Show the user a summary of issues found with counts:
-   - Files over limit: X
-   - Bloat lines to remove: X
-   - Stale references: X
-   - Contradictions: X
-   - Files to split: X
-   - Scopes to add: X
+1. Show a summary overview of all improvements found, grouped by category:
+   - **Removals**: X items (bloat: X, stale: X, duplicates: X, contradictions: X)
+   - **Refactoring**: X items (scope extraction: X, domain extraction: X, consolidation: X)
+   - **Automation Migrations**: X items (rules: X, skills: X)
+   - **Redundancy Eliminations**: X items
+   - **Additions**: X items
 
-2. Show the specific changes for each file:
-   - Lines to remove (with content)
-   - Content to move to new files
-   - New files to create
+2. For each suggestion, present a structured card in priority order (Removals → Refactoring → Automation Migrations → Redundancy Eliminations → Additions):
 
-3. Ask for confirmation before applying
+   **WHAT**: The specific content and its current location (file:lines)
+   **WHY**: Evidence-based justification with source reference
+   **TOKEN IMPACT**: Estimated tokens saved from always-loaded context
+   **OPTIONS**:
+   - **Option A** (recommended): Primary action
+   - **Option B**: Alternative action
+   - **Option C**: Keep as-is — "Preserve in current location. Trade-off: continues consuming ~X tokens per session"
+   - *(Additional options when applicable)*
 
-4. Apply changes and verify:
-   - All files under 200 lines
-   - No orphaned references
+   Wait for the user to select an option for each suggestion before proceeding to the next.
+   If the user selects "Keep as-is", preserve the content in its exact current location — no modification.
 
-5. Report final metrics:
+3. Apply ONLY the approved changes (options A or B selections):
+   - Execute each approved change in dependency order
+   - Verify after each change:
+     - All files under 200 lines
+     - No orphaned references
+
+4. Report final metrics:
    - Total lines before → after
    - Files before → after
    - Estimated token savings
+   - Suggestions applied: X of Y (Z deferred)

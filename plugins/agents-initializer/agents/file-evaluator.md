@@ -58,11 +58,26 @@ Each of these wastes tokens without improving agent performance:
 | Do subdirectory files exist for distinct scopes? | packages/api/CLAUDE.md for API-specific rules | Everything in root |
 | Are pointers provided to detailed docs? | "See docs/TESTING.md" | No cross-references |
 
+### Automation Opportunity Indicators
+
+Flag instructions that are candidates for migration to on-demand mechanisms:
+
+| Indicator | Migration Type | Flag As |
+|-----------|---------------|---------|
+| Instructions with specific file patterns (globs) | Path-scoped rule | `RULE_CANDIDATE` |
+| Formatting/blocking/notification enforcement | Hook | `HOOK_CANDIDATE` |
+| "Always"/"never" deterministic enforcement semantics | Hook | `HOOK_CANDIDATE` |
+| Domain knowledge or workflow blocks >50 lines | Skill | `SKILL_CANDIDATE` |
+| Content agents can infer from code | Deletion | `DELETE_CANDIDATE` |
+| Instructions duplicated across multiple files | Consolidation | `CONSOLIDATE` |
+| Version numbers, team names, high-churn content | Deletion | `DELETE_CANDIDATE` |
+
 ## Process
 
 ### 1. Find All Configuration Files
 
 Search for:
+
 - `AGENTS.md` files at any depth
 - `CLAUDE.md` files at any depth
 - `.claude/rules/*.md` files (Claude Code path-scoped rules)
@@ -78,6 +93,7 @@ For each file found:
 4. Identify contradictions: compare instructions across all files for conflicts
 5. Assess progressive disclosure: is content at the right scope level?
 6. Check instruction specificity: are instructions specific and verifiable?
+7. Scan for automation opportunities: check each instruction against the automation opportunity indicators table above
 
 ### 3. Cross-File Analysis
 
@@ -122,6 +138,11 @@ Return your analysis in exactly this format:
 **Specificity Issues:**
 - Line 67: "Follow best practices for error handling" — not actionable
 
+**Automation Opportunity Issues:**
+- Lines 45-60: Formatting enforcement (HOOK_CANDIDATE — deterministic behavior)
+- Lines 102-130: Testing domain block, 28 lines (SKILL_CANDIDATE — domain knowledge)
+- Lines 200-210: Glob-based rule "*.test.ts" (RULE_CANDIDATE — path-specific)
+
 ### Cross-File Issues
 - [List any cross-file contradictions or duplications]
 
@@ -143,8 +164,10 @@ Return your analysis in exactly this format:
 ## Self-Verification
 
 Before returning results, verify:
+
 1. Every reported issue includes a specific line number or line range
 2. Bloat classifications match the criteria table — no false positives
 3. Staleness claims are verified (paths checked, commands checked)
 4. The quality score reflects the actual severity of issues found
 5. No improvement suggestions crept in — report only identifies problems
+6. Automation opportunity flags match the indicators table — no false classifications

@@ -1,7 +1,7 @@
 # Evaluation Criteria
 
 Scoring rubric for assessing existing AGENTS.md and CLAUDE.md files before improvement.
-Used by IMPROVE skills only. Source: file-evaluator.md, research-llm-context-optimization.md
+Used by IMPROVE skills only. Source: file-evaluator.md, research-context-engineering-comprehensive.md
 
 ---
 
@@ -12,7 +12,8 @@ Used by IMPROVE skills only. Source: file-evaluator.md, research-llm-context-opt
 - Staleness indicators table (stale paths, failing commands, outdated refs)
 - Progressive disclosure assessment (root focus, domain separation, pointers)
 - Instruction specificity assessment (goldilocks zone examples)
-- Quality score rubric (5-dimension scoring 1-10)
+- Automation opportunity assessment (migration candidate signals and classification)
+- Quality score rubric (6-dimension scoring 1-10)
 - Evaluation output template
 
 ---
@@ -40,7 +41,7 @@ Check each line of the file against these indicators:
 | Vague instructions ("write clean code") | Not actionable; wastes attention budget | a-guide-to-agents.md |
 | Codebase overview paragraphs | Increases steps without improving navigation | ETH Zurich: Evaluating AGENTS.md |
 | Obvious tool usage ("use git for version control") | Agent already knows this | Anthropic: "If Claude already does it, delete it" |
-| Duplicated content across files | Wastes tokens on every request | research-llm-context-optimization.md |
+| Duplicated content across files | Wastes tokens on every request | research-context-engineering-comprehensive.md |
 
 *Source: file-evaluator.md lines 30-41*
 
@@ -79,11 +80,29 @@ Every instruction should be in the Goldilocks zone:
 | Rating | Example | Problem |
 |--------|---------|---------|
 | ✅ Specific | "Use 2-space indentation" | None — clear and actionable |
-| ✅ Specific | "Run `npm test` before committing" | None — verifiable |
+| ✅ Specific | "Run `npm test` before committing" | None — verifiable *(format example only; standard commands should still be excluded per what-not-to-include.md)* |
 | ❌ Too vague | "Format code properly" | Cannot be verified or acted on |
 | ❌ Too specific | "File `src/auth/handlers.ts` handles JWT" | Over-specified file path, will go stale |
 
-*Source: research-llm-context-optimization.md lines 131-134*
+*Source: research-context-engineering-comprehensive.md lines 131-134*
+
+---
+
+## Automation Opportunity Assessment
+
+Check each instruction block for migration potential to on-demand mechanisms:
+
+| Signal | Classification | Priority |
+|--------|---------------|----------|
+| File pattern globs in instruction text | Path-scoped rule candidate (`RULE_CANDIDATE`) | HIGH — pure token savings |
+| "Always"/"never" deterministic enforcement | Hook candidate (`HOOK_CANDIDATE`) | HIGH — deterministic enforcement |
+| Domain knowledge or workflow block >50 lines | Skill candidate (`SKILL_CANDIDATE`) | MEDIUM — net savings = block − 100 tokens |
+| Standard conventions / agent-inferable content | DELETE candidate (`DELETE_CANDIDATE`) | HIGH — pure savings |
+| Content duplicated across multiple files | Consolidation candidate (`CONSOLIDATE`) | MEDIUM — saves (N−1) × content size |
+
+Flag each candidate in the Per-File Issues output under `**Automation Opportunity Issues:**`.
+
+*Source: automation-migration-guide.md lines 58-72*
 
 ---
 
@@ -98,6 +117,7 @@ Score each dimension 1-10 based on observed issues:
 | Specificity | All instructions actionable | Mix of specific/vague | Mostly vague |
 | Progressive Disclosure | Content at right scope level | Some misplaced content | All inlined in root |
 | Consistency | 0 contradictions | 1 contradiction | 2+ contradictions |
+| Automation Opportunity | 0 migration candidates missed | 1-3 potential migrations | 4+ missed migrations |
 
 *Source: file-evaluator.md lines 132-141*
 
@@ -131,6 +151,10 @@ Return findings in exactly this format:
 **Progressive Disclosure Issues:**
 - Lines 150-200: Testing conventions should be in separate `docs/TESTING.md`
 
+**Automation Opportunity Issues:**
+- Lines 45-60: Formatting enforcement (HOOK_CANDIDATE — deterministic behavior)
+- Lines 200-210: "*.test.ts" glob pattern (RULE_CANDIDATE — path-specific)
+
 ### Cross-File Issues
 - [List cross-file contradictions or duplications, or "None"]
 
@@ -142,5 +166,6 @@ Return findings in exactly this format:
 | Specificity | 5 | Mix of specific and vague |
 | Progressive Disclosure | 4 | Most content inlined |
 | Consistency | 7 | 1 contradiction |
+| Automation Opportunity | 8 | 0 migration candidates missed |
 | **Overall** | **4** | Needs significant refactoring |
 ```

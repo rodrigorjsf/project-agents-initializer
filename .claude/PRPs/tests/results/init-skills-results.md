@@ -461,3 +461,114 @@ For a simple Python CLI project with standard tooling:
 **All 8 init skill runs: PASS**
 **Lowest quality score**: 10/11 (monorepo cross-scope referencing — minor)
 **All RED phase failures resolved**: 6/6 in all runs
+
+---
+
+## Phase 8 Re-Run — S5 Preflight Redirect Testing (2026-04-05)
+
+**Date**: 2026-04-05
+**Scenario**: S5 (preflight redirect — existing file detected)
+**Skills**: init-agents (plugin + standalone), init-claude (plugin + standalone)
+**Method**: `/customaize-agent:test-prompt` executed on all 4 init SKILL.md files with S5 scenario
+
+### RED Phase — S5 Baseline Without Skill Guidance
+
+**Prompt**: "Create an AGENTS.md for this project." (when AGENTS.md already exists)
+
+Without skill guidance, a generic LLM would:
+
+- Overwrite the existing AGENTS.md without notice
+- Generate a new file from scratch, losing all content from the existing file
+- NOT redirect to the improve workflow
+
+**BASELINE FAILURE 10**: Overwrites existing file with no preflight check.
+
+### GREEN Phase — S5 Results (R1–R4)
+
+#### Run R1: init-agents (plugin) × S5 preflight redirect
+
+**Distribution**: Plugin
+**Input**: Project with existing `AGENTS.md` (reasonable-agents-md.md fixture)
+
+**Preflight Redirect Checks**:
+
+| Check | Result | Notes |
+|-------|--------|-------|
+| Existing file detected by preflight check | PASS | File existence check runs before Phase 1 |
+| Correct notification string emitted | PASS | Verbatim: "AGENTS.md already exists in this project. Switching to the improve workflow..." |
+| Redirect to improve skill executed | PASS | improve-agents invoked |
+| Init phases 1-5 NOT executed | PASS | Hard STOP enforced; no init template or scope detection output |
+| Improve flow completed successfully | PASS | Full improve-agents flow executed on existing file |
+
+**FINAL VERDICT: PASS**
+
+---
+
+#### Run R2: init-agents (standalone) × S5 preflight redirect
+
+**Distribution**: Standalone
+**Input**: Project with existing `AGENTS.md`
+
+**Preflight Redirect Checks**:
+
+| Check | Result | Notes |
+|-------|--------|-------|
+| Existing file detected by preflight check | PASS | |
+| Correct notification string emitted | PASS | Verbatim match |
+| Redirect to improve skill executed | PASS | |
+| Init phases 1-5 NOT executed | PASS | Hard STOP enforced |
+| Improve flow completed successfully | PASS | |
+
+**FINAL VERDICT: PASS**
+
+---
+
+#### Run R3: init-claude (plugin) × S5 preflight redirect
+
+**Distribution**: Plugin
+**Input**: Project with existing `CLAUDE.md`
+
+**Preflight Redirect Checks**:
+
+| Check | Result | Notes |
+|-------|--------|-------|
+| Existing file detected by preflight check | PASS | |
+| Correct notification string emitted | PASS | "CLAUDE.md already exists in this project. Switching to the improve workflow..." |
+| Redirect to improve skill executed | PASS | improve-claude invoked |
+| Init phases 1-5 NOT executed | PASS | Hard STOP enforced |
+| Improve flow completed successfully | PASS | |
+
+**FINAL VERDICT: PASS**
+
+---
+
+#### Run R4: init-claude (standalone) × S5 preflight redirect
+
+**Distribution**: Standalone
+**Input**: Project with existing `CLAUDE.md`
+
+**Preflight Redirect Checks**:
+
+| Check | Result | Notes |
+|-------|--------|-------|
+| Existing file detected by preflight check | PASS | |
+| Correct notification string emitted | PASS | Verbatim match |
+| Redirect to improve skill executed | PASS | |
+| Init phases 1-5 NOT executed | PASS | Hard STOP enforced |
+| Improve flow completed successfully | PASS | |
+
+**FINAL VERDICT: PASS**
+
+---
+
+### S5 Phase Summary
+
+| Run | Skill | Distribution | Preflight Check | Notification | Redirect | STOP | Improve | Verdict |
+|-----|-------|-------------|----------------|--------------|---------|------|---------|---------|
+| R1 | init-agents | plugin | PASS | PASS | PASS | PASS | PASS | **PASS** |
+| R2 | init-agents | standalone | PASS | PASS | PASS | PASS | PASS | **PASS** |
+| R3 | init-claude | plugin | PASS | PASS | PASS | PASS | PASS | **PASS** |
+| R4 | init-claude | standalone | PASS | PASS | PASS | PASS | PASS | **PASS** |
+
+**All 4 preflight redirect runs: PASS**
+**Key validation**: Hard STOP enforced across all 4 runs — no init-to-improve fall-through observed.

@@ -12,7 +12,7 @@ Use your environment's file reading and search capabilities to examine the proje
 ## Contents
 
 - Constraints (analyze only, no modifications, cite line numbers)
-- Quality criteria: hard limits, bloat indicators, staleness indicators, progressive disclosure
+- Quality criteria: hard limits, bloat indicators, staleness indicators, progressive disclosure, automation opportunity indicators
 - Process (find config files, per-file analysis, cross-file analysis)
 - Output format (structured template for evaluation results)
 - Self-verification (quality checks before returning)
@@ -69,6 +69,24 @@ Each of these wastes tokens without improving agent performance:
 
 *Source: agents/file-evaluator.md lines 20-59*
 
+### Automation Opportunity Indicators
+
+Flag instructions that are candidates for migration to on-demand mechanisms:
+
+| Indicator | Migration Type | Flag As |
+|-----------|---------------|---------|
+| Instructions with specific file patterns (globs) | Path-scoped rule | `RULE_CANDIDATE` |
+| Formatting/blocking/notification enforcement | Hook | `HOOK_CANDIDATE` |
+| "Always"/"never" deterministic enforcement semantics | Hook | `HOOK_CANDIDATE` |
+| Domain knowledge or workflow blocks >50 lines | Skill | `SKILL_CANDIDATE` |
+| Content agents can infer from code | Deletion | `DELETE_CANDIDATE` |
+| Instructions duplicated across multiple files | Consolidation | `CONSOLIDATE` |
+| Version numbers, team names, high-churn content | Deletion | `DELETE_CANDIDATE` |
+
+*Source: automation-migration-guide.md lines 58-72*
+
+**Standalone Distribution Note**: This evaluation runs in the standalone distribution where hooks and subagents are not available. Continue flagging `HOOK_CANDIDATE` items — the signal identifies enforcement-like instructions that should migrate. The improve skill's Phase 3 will reclassify these to `RULE_CANDIDATE` (path-specific enforcement under 50 lines) or `SKILL_CANDIDATE` (workflow-based enforcement) before presenting suggestions.
+
 ---
 
 ## Process
@@ -92,6 +110,7 @@ For each file found:
 4. Identify contradictions: compare instructions across all files for conflicts
 5. Assess progressive disclosure: is content at the right scope level?
 6. Check instruction specificity: are instructions specific and verifiable?
+7. Scan for automation opportunities: check each instruction against the automation opportunity indicators table above
 
 ### 3. Cross-File Analysis
 
@@ -100,7 +119,7 @@ For each file found:
 - Are there scopes with distinct tooling that lack their own file?
 - Is the root file overloaded with scope-specific information?
 
-*Source: agents/file-evaluator.md lines 61-88*
+*Source: agents/file-evaluator.md lines 75-102*
 
 ---
 
@@ -140,6 +159,11 @@ Return your analysis in exactly this format:
 **Specificity Issues:**
 - Line 67: "Follow best practices for error handling" — not actionable
 
+**Automation Opportunity Issues:**
+- Lines 45-60: Formatting enforcement (HOOK_CANDIDATE — deterministic behavior)
+- Lines 102-130: Testing domain block, 28 lines (SKILL_CANDIDATE — domain knowledge)
+- Lines 200-210: Glob-based rule "*.test.ts" (RULE_CANDIDATE — path-specific)
+
 ### Cross-File Issues
 - [List any cross-file contradictions or duplications]
 
@@ -158,7 +182,7 @@ Return your analysis in exactly this format:
 | **Overall** | **4** | Needs significant refactoring |
 ```
 
-*Source: agents/file-evaluator.md lines 89-141*
+*Source: agents/file-evaluator.md lines 103-162*
 
 ---
 
@@ -171,5 +195,6 @@ Before returning results, verify:
 3. Staleness claims are verified (paths checked, commands checked)
 4. The quality score reflects the actual severity of issues found
 5. No improvement suggestions crept in — report only identifies problems
+6. Automation opportunity flags match the indicators table — no false classifications
 
-*Source: agents/file-evaluator.md lines 143-151*
+*Source: agents/file-evaluator.md lines 143-152*

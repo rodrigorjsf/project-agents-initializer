@@ -72,6 +72,7 @@ Read these reference documents:
 - `${CLAUDE_SKILL_DIR}/references/what-not-to-include.md` — content exclusion criteria
 - `${CLAUDE_SKILL_DIR}/references/context-optimization.md` — token budget guidelines
 - `${CLAUDE_SKILL_DIR}/references/claude-rules-system.md` — .claude/rules/ conventions and path-scoping
+- `${CLAUDE_SKILL_DIR}/references/automation-migration-guide.md` — automation migration decision criteria (skill vs. hook vs. rule vs. subagent)
 
 Based on both subagent reports, create improvement plan:
 
@@ -90,6 +91,23 @@ Based on both subagent reports, create improvement plan:
 4. **Add progressive disclosure pointers** in root file to new split files
 5. **Add path-scoping** to `.claude/rules/` files that lack it (reduce always-loaded content)
 6. **Consolidate fragmented files** that cover the same scope
+7. **Migrate automation candidates** — for each instruction flagged in Phase 1 as `HOOK_CANDIDATE`, `RULE_CANDIDATE`, or `SKILL_CANDIDATE`:
+   - Classify using the decision flowchart in automation-migration-guide.md
+   - Select target mechanism: hook (deterministic enforcement), path-scoped `.claude/rules/` (file-pattern convention), skill (domain knowledge/infrequent workflow), or subagent (isolated analysis)
+   - Estimate token savings using the token impact estimation table in automation-migration-guide.md
+   - This is the plugin distribution — suggest all mechanisms: hooks (deterministic enforcement), path-scoped `.claude/rules/` (file-pattern convention), skills (domain knowledge/infrequent workflow), and subagents (isolated analysis). Use the decision flowchart in automation-migration-guide.md to select the best mechanism for each candidate.
+
+#### Redundancy Elimination (delete what agents already know)
+
+Apply the instruction test from what-not-to-include.md to each instruction in the evaluated files:
+
+> "Would removing this cause the agent to make mistakes? If not, cut it."
+
+1. **Delete agent-inferable content**: Standard conventions, obvious tooling, information discoverable from code — flagged as `DELETE_CANDIDATE` in Phase 1
+2. **Delete vague/generic advice**: Instructions that cannot be verified or acted on
+3. **Delete auto-enforced rules**: Formatting or linting rules already enforced by project tooling
+
+For each deletion, document: the specific content being removed, WHY the agent doesn't need it (inference capability or tool enforcement), and the evidence source from what-not-to-include.md.
 
 #### Addition Actions (lowest priority — only if genuinely missing)
 
@@ -103,6 +121,8 @@ When generating new or restructured files, use these templates:
 - Scoped CLAUDE.md: Read `${CLAUDE_SKILL_DIR}/assets/templates/scoped-claude-md.md`
 - .claude/rules/ files: Read `${CLAUDE_SKILL_DIR}/assets/templates/claude-rule.md`
 - Domain docs: Read `${CLAUDE_SKILL_DIR}/assets/templates/domain-doc.md`
+- Skills (from automation migration): Read `${CLAUDE_SKILL_DIR}/assets/templates/skill.md`
+- Hook configs (from automation migration): Read `${CLAUDE_SKILL_DIR}/assets/templates/hook-config.md`
 
 ### Phase 4: Self-Validation
 
@@ -112,36 +132,44 @@ For improve operations, also evaluate the **"If This Is an IMPROVE Operation"** 
 
 ### Phase 5: Present and Apply
 
-1. Show the user a summary of issues found with counts:
-   - Files over limit: X
-   - Bloat lines to remove: X
-   - Stale references: X
-   - Contradictions: X
-   - Content to move to on-demand files: X lines
-   - Rules to add path-scoping: X files
-   - Scopes to add: X
+1. Show a summary overview of all improvements found, grouped by category:
+   - **Removals**: X items (bloat: X, stale: X, duplicates: X, contradictions: X)
+   - **Refactoring**: X items (scope extraction: X, rule conversion: X, domain extraction: X, consolidation: X)
+   - **Automation Migrations**: X items (hooks: X, rules: X, skills: X, subagents: X)
+   - **Redundancy Eliminations**: X items
+   - **Additions**: X items
 
-2. Show the specific changes for each file:
-   - Lines to remove (with content)
-   - Content to move to subdirectory CLAUDE.md or .claude/rules/
-   - New files to create
-   - Path-scoping to add to existing rules
+2. For each suggestion, present a structured card in priority order (Removals → Refactoring → Automation Migrations → Redundancy Eliminations → Additions):
 
-3. Show token impact analysis:
+   **WHAT**: The specific content and its current location (file:lines)
+   **WHY**: Evidence-based justification with source reference (e.g., "Agents can infer directory structure from tools — source: analysis-evaluating-agents-paper.md lines 36-41")
+   **TOKEN IMPACT**: Estimated tokens saved from always-loaded context (from automation-migration-guide.md token impact table)
+   **OPTIONS**:
+   - **Option A** (recommended): Primary action — e.g., "Remove this content" / "Migrate to `.claude/rules/commit-conventions.md` with `paths: ['*.md']`" / "Convert to skill with `user-invocable: false`"
+   - **Option B**: Alternative action — e.g., "Move to scoped CLAUDE.md instead" / "Convert to path-scoped rule instead of hook"
+   - **Option C**: Keep as-is — "Preserve in current location. Trade-off: continues consuming ~X tokens per session"
+   - *(Additional options when applicable — e.g., for automation migrations, show each viable mechanism as a separate option)*
+
+   Wait for the user to select an option for each suggestion before proceeding to the next.
+   If the user selects "Keep as-is", preserve the content in its exact current location — no modification.
+
+3. After all suggestions are reviewed, show aggregate token impact analysis:
    - **Always-loaded tokens**: before → after
    - **On-demand tokens**: before → after
    - **Removed tokens**: total waste eliminated
+   - **Deferred suggestions**: X items kept as-is (user chose to preserve)
 
-4. Ask for confirmation before applying
+4. Apply ONLY the approved changes (options A or B selections):
+   - Execute each approved change in dependency order
+   - Verify after each change:
+     - All files under 200 lines
+     - No orphaned references
+     - Progressive disclosure tree is consistent
+     - Path-scoped rules have valid glob patterns
 
-5. Apply changes and verify:
-   - All files under 200 lines
-   - No orphaned references
-   - Progressive disclosure tree is consistent
-   - Path-scoped rules have valid glob patterns
-
-6. Report final metrics:
+5. Report final metrics:
    - Total lines before → after
    - Always-loaded lines before → after
    - Files before → after
    - Estimated token savings per session
+   - Suggestions applied: X of Y (Z deferred)

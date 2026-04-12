@@ -1,12 +1,12 @@
-# Project Agents Initializer
+# Agent Engineering Toolkit
 
-An evidence-based plugin for generating and optimizing AGENTS.md and CLAUDE.md configuration files for AI coding agents. Instead of auto-generating one bloated file, this plugin creates **minimal, scoped files** following progressive disclosure principles — proven by research to outperform comprehensive auto-generated configurations.
+A multi-plugin marketplace providing evidence-based Claude Code artifact engineering. The `agents-initializer` plugin generates and optimizes AGENTS.md and CLAUDE.md configuration files. Instead of auto-generating one bloated file, this toolkit creates **minimal, scoped files** following progressive disclosure principles — proven by research to outperform comprehensive auto-generated configurations.
 
 ## Why This Plugin Exists
 
 ### The Problem with Auto-Generated Config Files
 
-The ETH Zurich study ["Evaluating AGENTS.md: Are Repository-Level Context Files Helpful for Coding Agents?"](docs/Evaluating-AGENTS-paper.pdf) (February 2026) evaluated multiple coding agents across hundreds of real-world tasks and found:
+The ETH Zurich study ["Evaluating AGENTS.md: Are Repository-Level Context Files Helpful for Coding Agents?"](docs/general-llm/Evaluating-AGENTS-paper.pdf) (February 2026) evaluated multiple coding agents across hundreds of real-world tasks and found:
 
 | Setting | Task Success Impact | Cost Impact |
 |---------|-------------------|-------------|
@@ -95,6 +95,8 @@ Initialize an optimized AGENTS.md file hierarchy for your project.
 3. Generates minimal per-scope AGENTS.md files with progressive disclosure pointers
 4. Presents all files for review before writing
 
+**Preflight check:** If `AGENTS.md` already exists, the skill redirects to `improve-agents` to optimize your existing configuration instead of generating a new one.
+
 **What it generates:**
 
 - Root `AGENTS.md` — project essentials only
@@ -110,6 +112,8 @@ Initialize an optimized CLAUDE.md hierarchy with `.claude/rules/` for your proje
 - Generates `.claude/rules/*.md` path-scoped rules for file-pattern-specific conventions
 - Leverages Claude Code's on-demand loading for subdirectory CLAUDE.md files
 - Maximizes on-demand loading, minimizes always-loaded content
+
+**Preflight check:** If `CLAUDE.md` already exists, the skill redirects to `improve-claude` to optimize your existing configuration instead of generating a new one.
 
 ### `improve-agents`
 
@@ -131,6 +135,12 @@ Evaluate and improve existing AGENTS.md files.
 - Missing scope-specific files
 - Progressive disclosure opportunities
 
+**What it generates when migrations are approved:**
+
+- `.claude/skills/[name]/SKILL.md` — migrated workflow or domain knowledge blocks
+- `.claude/rules/[topic].md` — migrated path-scoped conventions (from any tool's config)
+- Hook config snippets for `.claude/settings.json` (plugin distribution only)
+
 ### `improve-claude`
 
 Evaluate and improve existing CLAUDE.md files and `.claude/rules/`.
@@ -142,6 +152,12 @@ Evaluate and improve existing CLAUDE.md files and `.claude/rules/`.
 - Reports always-loaded vs on-demand token distribution
 - Optimizes loading behavior across Claude Code's configuration hierarchy
 
+**What it generates when migrations are approved:**
+
+- `.claude/skills/[name]/SKILL.md` — migrated workflow or domain knowledge blocks
+- `.claude/rules/[topic].md` — migrated path-scoped conventions
+- Hook config snippets for `.claude/settings.json` (plugin distribution only)
+
 ## Installation
 
 ### Claude Code (Native Plugin System)
@@ -150,16 +166,16 @@ The recommended way to install for Claude Code users:
 
 ```bash
 # Step 1: Add the marketplace (one-time setup)
-/plugin marketplace add rodrigorjsf/project-agents-initializer
+/plugin marketplace add rodrigorjsf/agent-engineering-toolkit
 
 # Step 2: Install the plugin
-/plugin install agents-initializer@project-agents-initializer
+/plugin install agents-initializer@agent-engineering-toolkit
 ```
 
 Or via the Claude Code CLI:
 
 ```bash
-claude plugin install agents-initializer@project-agents-initializer
+claude plugin install agents-initializer@agent-engineering-toolkit
 ```
 
 **Scopes:**
@@ -170,10 +186,10 @@ claude plugin install agents-initializer@project-agents-initializer
 
 ```bash
 # Install for the whole team
-claude plugin install agents-initializer@project-agents-initializer --scope project
+claude plugin install agents-initializer@agent-engineering-toolkit --scope project
 
 # Install only for yourself in this project
-claude plugin install agents-initializer@project-agents-initializer --scope local
+claude plugin install agents-initializer@agent-engineering-toolkit --scope local
 ```
 
 ### npx skills add (Third-Party Skills CLI)
@@ -182,19 +198,19 @@ For users of the [skills CLI](https://skills.sh/) — works with VS Code Copilot
 
 ```bash
 # Install all skills globally (available in all projects)
-npx skills add rodrigorjsf/project-agents-initializer -g
+npx skills add rodrigorjsf/agent-engineering-toolkit -g
 
 # Install all skills for the current project only
-npx skills add rodrigorjsf/project-agents-initializer
+npx skills add rodrigorjsf/agent-engineering-toolkit
 
 # Install for specific AI tools
-npx skills add rodrigorjsf/project-agents-initializer --agent cursor copilot
+npx skills add rodrigorjsf/agent-engineering-toolkit --agent cursor copilot
 
 # Install only specific skills
-npx skills add rodrigorjsf/project-agents-initializer --skill init-claude improve-claude
+npx skills add rodrigorjsf/agent-engineering-toolkit --skill init-claude improve-claude
 
 # List available skills before installing
-npx skills add rodrigorjsf/project-agents-initializer --list
+npx skills add rodrigorjsf/agent-engineering-toolkit --list
 ```
 
 **These are standalone skills** — they perform all analysis inline without delegating to subagents. They work with any AI coding tool without requiring Claude Code's subagent system.
@@ -203,21 +219,21 @@ npx skills add rodrigorjsf/project-agents-initializer --list
 
 ```bash
 # Clone the repository
-git clone https://github.com/rodrigorjsf/project-agents-initializer.git /tmp/project-agents-initializer
+git clone https://github.com/rodrigorjsf/agent-engineering-toolkit.git /tmp/agent-engineering-toolkit
 
 # For Claude Code (project-level)
 mkdir -p .claude/skills
-cp -r /tmp/project-agents-initializer/plugins/agents-initializer/skills/* .claude/skills/
+cp -r /tmp/agent-engineering-toolkit/plugins/agents-initializer/skills/* .claude/skills/
 
 # For Claude Code (user-level, all projects)
-cp -r /tmp/project-agents-initializer/plugins/agents-initializer/skills/* ~/.claude/skills/
+cp -r /tmp/agent-engineering-toolkit/plugins/agents-initializer/skills/* ~/.claude/skills/
 
 # For VS Code / GitHub Copilot
 mkdir -p .agents/skills
-cp -r /tmp/project-agents-initializer/plugins/agents-initializer/skills/* .agents/skills/
+cp -r /tmp/agent-engineering-toolkit/plugins/agents-initializer/skills/* .agents/skills/
 
 # Clean up
-rm -rf /tmp/project-agents-initializer
+rm -rf /tmp/agent-engineering-toolkit
 ```
 
 ## Usage
@@ -242,7 +258,7 @@ This plugin's design is based on three categories of evidence:
 
 ### Academic Research
 
-- **[Evaluating AGENTS study](docs/Evaluating-AGENTS-paper.pdf)** (ETH Zurich, Feb 2026) — The first rigorous study of context file effectiveness across multiple coding agents. Found that LLM-generated files reduce performance while developer-written minimal files slightly improve it.
+- **[Evaluating AGENTS study](docs/general-llm/Evaluating-AGENTS-paper.pdf)** (ETH Zurich, Feb 2026) — The first rigorous study of context file effectiveness across multiple coding agents. Found that LLM-generated files reduce performance while developer-written minimal files slightly improve it.
 
 ### Anthropic Official Documentation
 
@@ -253,10 +269,11 @@ This plugin's design is based on three categories of evidence:
 
 ### Practitioner Guides
 
-- **[A Complete Guide to AGENTS.md](docs/a-guide-to-agents.md)** — Progressive disclosure patterns, monorepo support, domain files (BUILD.md, TESTING.md).
-- **[A Complete Guide to CLAUDE.md](docs/a-guide-to-claude.md)** — Same principles applied to Claude Code's configuration system.
+- **[A Complete Guide to AGENTS.md](docs/general-llm/a-guide-to-agents.md)** — Progressive disclosure patterns, monorepo support, domain files (covers both AGENTS.md and CLAUDE.md).
 
 All research documents are saved in the `docs/` directory for reference.
+
+For a comprehensive mapping of every design decision to its evidence source, see **[DESIGN-GUIDELINES.md](DESIGN-GUIDELINES.md)**.
 
 ## Anti-Patterns This Plugin Avoids
 
@@ -272,7 +289,7 @@ All research documents are saved in the `docs/` directory for reference.
 ## Repository Structure
 
 ```
-project-agents-initializer/
+agent-engineering-toolkit/
 ├── .claude-plugin/
 │   └── marketplace.json             # Marketplace catalog (Claude Code plugin system)
 ├── plugins/
@@ -294,12 +311,12 @@ project-agents-initializer/
 │   ├── improve-agents/SKILL.md      # Self-contained: inline analysis, no subagents required
 │   └── improve-claude/SKILL.md      # Self-contained: inline analysis, no subagents required
 ├── docs/
-│   ├── a-guide-to-agents.md         # Reference: AGENTS.md best practices
-│   ├── a-guide-to-claude.md         # Reference: CLAUDE.md best practices
-│   ├── Evaluating-AGENTS-paper.pdf  # ETH Zurich research paper
-│   ├── research-llm-context-optimization.md  # Context optimization research
-│   ├── research-claude-code-skills-format.md  # Skills/plugin format research
-│   └── research-subagent-best-practices.md    # Subagent definition best practices
+│   ├── claude-code/                     # Claude Code specific docs
+│   ├── cursor/                          # Cursor IDE specific docs
+│   ├── general-llm/                     # General LLM/agent research & guides
+│   ├── shared/                          # Cross-tool standards (Agent Skills)
+│   ├── analysis/                        # Deep extraction analysis
+│   └── plans/                           # Project design documents
 ├── README.md
 └── LICENSE
 ```
@@ -314,16 +331,14 @@ project-agents-initializer/
 
 ## Contributing
 
-Contributions welcome. When modifying skills or subagent definitions:
+Development conventions are enforced by `.claude/rules/` — path-scoped rules load automatically when editing matching files. Key rules:
 
-1. Ensure all claims are backed by evidence from the `docs/` directory
-2. Keep generated files under 200 lines (hard limit from Anthropic)
-3. Subagent definitions must include YAML frontmatter (`name`, `description`, `tools`, `model`, `maxTurns`)
-4. Subagent tools should be restricted to read-only unless write access is justified
-5. Subagent prompts should request structured output formats
-6. Keep skill files focused — one concern per skill
-7. Test with both simple (single-package) and complex (monorepo) projects
-8. Verify generated files pass all quality guardrails (under 200 lines, no bloat, etc.)
+- `plugin-skills.md` — plugin skill authoring constraints (delegation, validation, limits)
+- `standalone-skills.md` — standalone skill constraints (inline analysis, distribution awareness)
+- `agent-files.md` — subagent file requirements (frontmatter, model, tools)
+- `reference-files.md` — reference file format and size constraints
+
+See `DESIGN-GUIDELINES.md` for the evidence base behind each convention.
 
 ## License
 

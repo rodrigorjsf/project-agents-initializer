@@ -26,6 +26,19 @@ Research shows that auto-generated comprehensive AGENTS.md files **reduce** agen
 
 ## Process
 
+### Preflight Check
+
+Check if `AGENTS.md` exists in the current working directory.
+
+**If it already exists:**
+
+1. Inform the user: "AGENTS.md already exists in this project. Switching to the improve workflow to optimize your existing configuration."
+2. Invoke the `improve-agents` skill and follow its complete process.
+3. **STOP** — do not proceed to Phase 1 or any subsequent phase of this init skill.
+
+**If it does not exist:**
+Proceed to Phase 1 below.
+
 ### Phase 1: Codebase Analysis
 
 Read `${CLAUDE_SKILL_DIR}/references/codebase-analyzer.md` and follow its codebase analysis instructions to analyze the project at the current working directory.

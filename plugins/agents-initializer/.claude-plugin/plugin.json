@@ -1,10 +1,10 @@
 {
   "name": "agents-initializer",
-  "version": "2.0.0",
+  "version": "1.0.0",
   "description": "Evidence-based AGENTS.md and CLAUDE.md initializer and optimizer. Generates minimal, scoped configuration files following progressive disclosure principles — based on the ETH Zurich 'Evaluating AGENTS.md' study and Anthropic's context engineering best practices.",
   "author": {
     "name": "rodrigorjsf"
   },
-  "repository": "https://github.com/rodrigorjsf/project-agents-initializer",
+  "repository": "https://github.com/rodrigorjsf/agent-engineering-toolkit",
   "license": "MIT"
 }
