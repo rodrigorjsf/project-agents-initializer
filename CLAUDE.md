@@ -45,10 +45,10 @@ The database is pre-built. Tools are available via MCP (`rag-knowledge-base` ser
 
 ## PRP Workflow
 
-- Everytime a file `*.prd.md` is created, a detailed github issue releted to it must be created with follow up checks. The created issue must be attached in the created prd file.
-- Everytime a file `*.prd.md` is edited(content or progress), the related issue must be updated.
-- Always before initializing an implementation file `*.plan.md` a github sub-issue(of `*.prd.md` parent) releted to it must be created with follow up checks. The created sub-issue must be attached in the created plan file.
-- Always after finishing an implementation file `*.plan.md` the follow steps must be executed:  
+- Every time a file `*.prd.md` is created, a detailed github issue related to it must be created with follow up checks. The created issue must be attached in the created prd file.
+- Every time a file `*.prd.md` is edited(content or progress), the related issue must be updated.
+- Always before initializing an implementation file `*.plan.md` a github sub-issue(of `*.prd.md` parent) related to it must be created with follow up checks. The created sub-issue must be attached in the created plan file.
+- Always after finishing an implementation file `*.plan.md` the following steps must be executed:  
   - Execute skill `/prp-core:prp-commit` following Git Conventions
   - Push branch to origin
   - Execute skill `/prp-core:prp-pr --base development`
