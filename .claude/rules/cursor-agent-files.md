@@ -9,4 +9,4 @@ paths:
 - `readonly: true` — analysis agents MUST NOT write; Cursor uses boolean, not tool whitelists
 - Do NOT use `tools:` or `maxTurns:` — these are Claude Code specific
 - Prompt must request structured output format
-- Agents cannot spawn other agents
+- Agents MUST NOT spawn other agents

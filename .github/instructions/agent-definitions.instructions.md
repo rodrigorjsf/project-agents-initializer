@@ -28,7 +28,7 @@ Every agent file must have YAML frontmatter. Required fields depend on the plugi
 
 ## Isolation Rules
 
-- Agents cannot spawn other agents (Task tool unavailable in agent context)
+- Cursor agents MAY support nested launches, but this project's Cursor agents MUST NOT spawn other agents
 - Agents receive only their system prompt plus basic environment
 - Agent instructions must be self-contained with complete context
 
