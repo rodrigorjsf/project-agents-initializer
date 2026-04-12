@@ -18,9 +18,9 @@ applyTo: "**/references/**/*.md"
 
 ## Cross-Distribution Parity
 
-- Shared references (same filename used across `plugins/*/skills/*/references/` and `skills/*/references/`) MUST have identical content
-- When reviewing a change to a shared reference, verify the same change is applied to ALL copies
-- Flag any divergence between copies of the same reference file
+- Explicitly shared references MUST have identical content across their intended copies
+- Platform-specific references may reuse filenames when the target artifact system differs
+- When reviewing a change to an intentionally shared reference, verify the same change is applied to all intended copies
 
 ## Information Density
 

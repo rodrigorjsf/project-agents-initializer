@@ -217,7 +217,7 @@ Converting a behavioral instruction from CLAUDE.md to a hook removes it from the
 
 **Source**: [Agent Skills Open Standard](docs/claude-code/skills/research-claude-code-skills-format.md) | Project architecture decision
 
-The toolkit ships three distributions with identical skill names but different analysis mechanisms:
+The toolkit ships three distributions with aligned capabilities but platform-specific skill names and analysis mechanisms:
 
 | Aspect           | Plugin (Claude Code)                      | Plugin (Cursor IDE)                        | Standalone (npx skills add)               |
 | ---------------- | ----------------------------------------- | ------------------------------------------ | ----------------------------------------- |
@@ -228,7 +228,7 @@ The toolkit ships three distributions with identical skill names but different a
 | Skills support   | Full                                      | Full                                       | Full                                      |
 | Output quality   | Identical                                 | Identical                                  | Identical                                 |
 
-Shared references are copied (not symlinked) into each skill directory. When updating a shared reference, all copies across all distributions must stay in sync.
+Shared references are copied (not symlinked) into each skill directory. When a reference is intentionally shared, all copies of that shared reference must stay in sync; platform-specific references may diverge when the target artifact system differs.
 
 **Implemented in**: `.claude/rules/plugin-skills.md`, `.claude/rules/cursor-plugin-skills.md`, `.claude/rules/standalone-skills.md`, `.claude/rules/reference-files.md`, CLAUDE.md (sync convention)
 

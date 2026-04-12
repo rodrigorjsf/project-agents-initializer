@@ -1,6 +1,6 @@
 # Project: agent-engineering-toolkit
 
-Multi-plugin marketplace for evidence-based agent artifact engineering. Three distributions (Claude Code plugin, Cursor IDE plugin, and standalone) ship identical skill names with different analysis mechanisms.
+Multi-plugin marketplace for evidence-based agent artifact engineering. Three distributions (Claude Code plugin, Cursor IDE plugin, and standalone) ship aligned capabilities with platform-specific skill names and analysis mechanisms.
 
 ## Architecture
 
@@ -14,7 +14,7 @@ Multi-plugin marketplace for evidence-based agent artifact engineering. Three di
 ## Critical Conventions
 
 - Shared references are copied (not symlinked) into each skill directory — each skill is self-contained
-- When updating a shared reference, update ALL copies across all distributions in sync
+- When updating an intentionally shared reference, update all copies of that shared reference in sync
 - No generated file exceeds 200 lines; root files target 15-40 lines; scope files target 10-30 lines
 - Every instruction must pass: "Would removing this cause the agent to make mistakes?" If not, cut it
 - Plugin skills delegate to named agents; standalone skills use inline bash — never mix these patterns

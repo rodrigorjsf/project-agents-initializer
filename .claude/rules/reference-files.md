@@ -11,6 +11,6 @@ paths:
 - Maximum 200 lines per reference file
 - Content must be framed as "read as instructions" — not as executable scripts
 - Each file must have a clear source attribution (e.g., `Source: docs/research-*.md`)
-- Shared references (same filename across skills/distributions) must have identical content
-- When updating a shared reference, update ALL copies across all distributions
+- Identical-content parity applies only to explicitly shared references and same-platform copies
+- Platform-specific references may reuse filenames when their content is intentionally platform-native
 - No nested references — reference files must not import or reference other reference files
