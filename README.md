@@ -344,6 +344,8 @@ For a comprehensive mapping of every design decision to its evidence source, see
 agent-engineering-toolkit/
 ├── .claude-plugin/
 │   └── marketplace.json             # Marketplace catalog (Claude Code plugin system)
+├── .cursor-plugin/
+│   └── marketplace.json             # Marketplace catalog (Cursor plugin system)
 ├── plugins/
 │   ├── agents-initializer/          # Claude Code plugin — agent-delegating skills + proper agents
 │   │   ├── .claude-plugin/
