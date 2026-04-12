@@ -39,7 +39,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 40
     env:
-      GH_TOKEN: ${{ secrets.COPILOT_REVIEW_FIX_TOKEN }}
+      GH_TOKEN: ${{ vars.COPILOT_REVIEW_FIX_TOKEN }}
       WORKFLOW_PR_NUMBER: ${{ inputs.pr_number }}
       WORKFLOW_REVIEW_ID: ${{ inputs.review_id }}
       WORKFLOW_MAX_ITERATIONS: ${{ inputs.max_iterations }}
@@ -79,7 +79,7 @@ jobs:
           repository: ${{ steps.pr.outputs.repository }}
           ref: ${{ steps.pr.outputs.ref }}
           fetch-depth: 0
-          token: ${{ secrets.COPILOT_REVIEW_FIX_TOKEN }}
+          token: ${{ vars.COPILOT_REVIEW_FIX_TOKEN }}
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
