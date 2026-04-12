@@ -6,13 +6,13 @@ Maps project scopes to their `applyTo` patterns, convention sources, and instruc
 
 | Scope ID | Instruction File | applyTo Pattern | Convention Sources |
 |----------|-----------------|-----------------|-------------------|
-| skill-files | `skill-files.instructions.md` | `**/skills/*/SKILL.md` | `.claude/rules/plugin-skills.md`, `.claude/rules/standalone-skills.md`, DESIGN-GUIDELINES.md §7 |
+| skill-files | `skill-files.instructions.md` | `**/skills/*/SKILL.md` | `.claude/rules/plugin-skills.md`, `.claude/rules/cursor-plugin-skills.md`, `.claude/rules/standalone-skills.md`, DESIGN-GUIDELINES.md §7 |
 | reference-files | `reference-files.instructions.md` | `**/references/**/*.md` | `.claude/rules/reference-files.md`, DESIGN-GUIDELINES.md §2 |
-| agent-definitions | `agent-definitions.instructions.md` | `**/agents/**/*.md` | `.claude/rules/agent-files.md`, DESIGN-GUIDELINES.md §6 |
-| template-files | `template-files.instructions.md` | `**/assets/templates/**/*.md` | DESIGN-GUIDELINES.md §15 |
+| agent-definitions | `agent-definitions.instructions.md` | `**/agents/**/*.md` | `.claude/rules/agent-files.md`, `.claude/rules/cursor-agent-files.md`, DESIGN-GUIDELINES.md §6 |
+| template-files | `template-files.instructions.md` | `**/assets/templates/**/*.md,**/assets/templates/**/*.mdc` | DESIGN-GUIDELINES.md §15 |
 | rules | `rules.instructions.md` | `.claude/rules/**/*.md` | DESIGN-GUIDELINES.md §1, §10 |
 | documentation | `documentation.instructions.md` | `docs/**/*.md` | DESIGN-GUIDELINES.md §5, Research Foundation section |
-| plugin-config | `plugin-config.instructions.md` | `**/.claude-plugin,**/CLAUDE.md,DESIGN-GUIDELINES.md` | DESIGN-GUIDELINES.md §1-§4, plugins/agents-initializer/CLAUDE.md |
+| plugin-config | `plugin-config.instructions.md` | `**/.claude-plugin,**/.cursor-plugin,**/CLAUDE.md,DESIGN-GUIDELINES.md` | DESIGN-GUIDELINES.md §1-§4, plugins/*/CLAUDE.md |
 
 ## Adding New Scopes
 
@@ -30,5 +30,6 @@ Review these areas periodically for potential new scopes:
 - `.claude/PRPs/` — PRP artifacts (plans, PRDs, reports, tests)
 - `.claude/hooks/` — Hook configuration files (if hooks are added)
 - `.claude/settings*.json` — Settings files
+- `.cursor/rules/` — Generated Cursor rules (output of cursor-initializer skills)
 - `plugins/agent-customizer/` — When agent-customizer skills are implemented
 - Root config files — `README.md`, `LICENSE`, `.gitignore`, `next-steps.md`

@@ -1,0 +1,10 @@
+{
+  "name": "cursor-initializer",
+  "version": "1.0.0",
+  "description": "Evidence-based AGENTS.md and Cursor rules initializer and optimizer. Generates minimal, scoped configuration files following progressive disclosure principles — based on the ETH Zurich 'Evaluating AGENTS.md' study and Cursor's context engineering best practices.",
+  "author": {
+    "name": "rodrigorjsf"
+  },
+  "repository": "https://github.com/rodrigorjsf/agent-engineering-toolkit",
+  "license": "MIT"
+}
