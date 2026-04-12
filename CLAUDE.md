@@ -50,7 +50,7 @@ The database is pre-built. Tools are available via MCP (`rag-knowledge-base` ser
 - Commit message format: `{type}({scope}): {description}` — use `feat`, `fix`, `docs`, `chore`, `refactor`
 - Stage only files belonging to the same logical change; never `git add -A` across unrelated changes
 - If asked to "commit everything", break it into atomic commits by scope first, then commit each group
-  
+
 ## Applied Learning
 
 When something fails repeatedly, when User has to re-explain, or when a workaround is found for a platform/tool limitation, add a one-line bullet here. Keep each bullet under 15 words. No explanations. Only add things that will save time in future sessions.
