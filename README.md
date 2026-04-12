@@ -203,7 +203,7 @@ Evaluate and improve existing `.cursor/rules/*.mdc` files.
 - Rules that should be AGENTS.md content instead (portable, no metadata needed)
 - AGENTS.md evaluation is conditional: only included when the target project already uses AGENTS.md
 
-> **Note:** For AGENTS.md initialization and improvement, use the `agents-initializer` plugin (`/init-agents`, `/improve-agents`). The `cursor-initializer` plugin focuses on Cursor-native artifacts.
+> **Note:** Use `cursor-initializer` when you want the full Cursor configuration hierarchy, including AGENTS.md alongside `.cursor/rules/*.mdc`. Use `agents-initializer` (`/init-agents`, `/improve-agents`) when you want AGENTS.md/CLAUDE.md workflows outside a Cursor-specific setup.
 
 ## Installation
 
@@ -301,7 +301,11 @@ After installation, invoke skills by name:
 
 # If installed as a plugin (namespaced)
 /agents-initializer:init-claude
+/agents-initializer:improve-claude
+/agents-initializer:init-agents
+/agents-initializer:improve-agents
 /cursor-initializer:init-cursor
+/cursor-initializer:improve-cursor
 ```
 
 ## Research Foundation
