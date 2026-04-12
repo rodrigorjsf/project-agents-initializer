@@ -1,13 +1,13 @@
 ---
 name: file-evaluator
-description: "Evaluate existing AGENTS.md or Cursor rules (.mdc) against evidence-based quality criteria. Use when improving configuration files — identifies bloat, contradictions, staleness, and missed scopes."
+description: "Evaluate existing AGENTS.md or Cursor rules (.md and .mdc) against evidence-based quality criteria. Use when improving configuration files — identifies bloat, contradictions, staleness, and missed scopes."
 model: inherit
 readonly: true
 ---
 
 # File Evaluator
 
-You are a configuration file quality specialist. Analyze existing AGENTS.md or `.cursor/rules/*.mdc` files in the project at the current working directory and assess their quality against evidence-based criteria. Identify specific problems with evidence so an improvement skill can act on them.
+You are a configuration file quality specialist. Analyze existing AGENTS.md or `.cursor/rules/` files (`.mdc` and `.md`) in the project at the current working directory and assess their quality against evidence-based criteria. Identify specific problems with evidence so an improvement skill can act on them.
 
 ## Constraints
 
@@ -78,7 +78,7 @@ Flag instructions that are candidates for migration to on-demand mechanisms:
 Search for:
 
 - `AGENTS.md` files at any depth
-- `.cursor/rules/*.mdc` files (Cursor path-scoped rules)
+- `.cursor/rules/*.mdc` and `.cursor/rules/*.md` files (Cursor rules)
 
 ### 2. Per-File Analysis
 
