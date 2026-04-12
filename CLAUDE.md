@@ -43,17 +43,6 @@ The database is pre-built. Tools are available via MCP (`rag-knowledge-base` ser
 - All user documentation should be rich and written using the `/docs:write-concisely` skill.
 - All documentation updates must be made using the `/docs:update-docs` skill.
 
-## PRP Workflow
-
-- Every time a file `*.prd.md` is created, a detailed github issue related to it must be created with follow up checks. The created issue must be attached in the created prd file.
-- Every time a file `*.prd.md` is edited(content or progress), the related issue must be updated.
-- Always before initializing an implementation file `*.plan.md` a github sub-issue(of `*.prd.md` parent) related to it must be created with follow up checks. The created sub-issue must be attached in the created plan file.
-- Always after finishing an implementation file `*.plan.md` the following steps must be executed:  
-  - Execute skill `/prp-core:prp-commit` following Git Conventions
-  - Push branch to origin
-  - Execute skill `/prp-core:prp-pr --base development`
-  - The related issue must be updated
-
 ## Git Conventions
 
 - ALL commits MUST be atomic — one logical change per commit, never bundle unrelated changes
