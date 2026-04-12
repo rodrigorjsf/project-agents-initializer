@@ -1,6 +1,6 @@
 # Progressive Disclosure Guide
 
-Evidence-based instructions for structuring AGENTS.md and CLAUDE.md hierarchies.
+Evidence-based instructions for structuring AGENTS.md hierarchies and `.cursor/rules/*.mdc` rules in Cursor.
 Sources: a-guide-to-agents.md, research-context-engineering-comprehensive.md, memory/how-claude-remembers-a-project.md
 
 ---
@@ -9,10 +9,10 @@ Sources: a-guide-to-agents.md, research-context-engineering-comprehensive.md, me
 
 - File hierarchy decision table (where to place content)
 - Root file requirements (minimal elements only)
-- Monorepo: what goes where (root vs package level, claudeMdExcludes)
+- Monorepo: what goes where (root vs package level)
 - Progressive disclosure patterns (domain files, nested docs, skills)
-- CLAUDE.md-specific hierarchy (5 scopes, @import, load order)
-- AGENTS.md-specific notes (open standard, symlinks, merging)
+- Cursor rule scoping notes
+- AGENTS.md in Cursor (root, subdirectory, merging)
 - Anti-patterns to detect and remove
 - Validation checklist
 
@@ -103,12 +103,20 @@ docs/
 
 ---
 
-## AGENTS.md-Specific Notes
+## Cursor Rule Scoping Notes
 
-- AGENTS.md is an **open standard** supported by most agent frameworks (not Claude Code)
-- Claude Code uses CLAUDE.md; create a symlink for cross-tool compatibility: `ln -s AGENTS.md CLAUDE.md`
-- AGENTS.md has **no `.claude/rules/` equivalent** — use subdirectory AGENTS.md files for scoped rules
-- Subdirectory AGENTS.md files **merge with root** (not replace)
+- Use `.cursor/rules/*.mdc` when guidance depends on file patterns, activation mode, or agent-requested loading
+- Keep rule metadata minimal: only `description`, `alwaysApply`, and `globs`
+- Prefer narrow `globs:` over `alwaysApply: true` when guidance applies to specific files only
+
+---
+
+## AGENTS.md in Cursor
+
+- Cursor supports `AGENTS.md` at the project root and in subdirectories
+- Nested `AGENTS.md` files merge with parent instructions; more specific scopes take precedence
+- Keep AGENTS.md for project-wide or directory-wide guidance; move file-pattern-specific instructions to `.cursor/rules/*.mdc`
+- Use root AGENTS.md for essentials and subdirectory AGENTS.md files for area-specific tooling or conventions
 
 ---
 
