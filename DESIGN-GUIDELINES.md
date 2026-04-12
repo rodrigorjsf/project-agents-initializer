@@ -217,20 +217,20 @@ Converting a behavioral instruction from CLAUDE.md to a hook removes it from the
 
 **Source**: [Agent Skills Open Standard](docs/claude-code/skills/research-claude-code-skills-format.md) | Project architecture decision
 
-The toolkit ships three distributions with identical skill names but different analysis mechanisms:
+The plugin ships two distributions with identical skill names but different analysis mechanisms:
 
-| Aspect           | Plugin (Claude Code)                      | Plugin (Cursor IDE)                        | Standalone (npx skills add)               |
-| ---------------- | ----------------------------------------- | ------------------------------------------ | ----------------------------------------- |
-| Analysis         | Delegates to named subagents              | Delegates to named subagents               | Reads reference docs, runs inline         |
-| Hooks support    | Full (suggest hooks in improve)           | Full (`.cursor/hooks.json` format)         | None (standalone tools lack hooks)        |
-| Subagent support | Full (suggest subagents)                  | Full (Cursor agent format)                 | None                                      |
-| Rules support    | Full (`.claude/rules/` with path-scoping) | Full (`.cursor/rules/*.mdc` with globs)    | Partial (suggest rules as separate files) |
-| Skills support   | Full                                      | Full                                       | Full                                      |
-| Output quality   | Identical                                 | Identical                                  | Identical                                 |
+| Aspect           | Plugin (Claude Code)                      | Standalone (npx skills add)               |
+| ---------------- | ----------------------------------------- | ----------------------------------------- |
+| Analysis         | Delegates to named subagents              | Reads reference docs, runs inline         |
+| Hooks support    | Full (suggest hooks in improve)           | None (standalone tools lack hooks)        |
+| Subagent support | Full (suggest subagents)                  | None                                      |
+| Rules support    | Full (`.claude/rules/` with path-scoping) | Partial (suggest rules as separate files) |
+| Skills support   | Full                                      | Full                                      |
+| Output quality   | Identical                                 | Identical                                 |
 
-Shared references are copied (not symlinked) into each skill directory. When updating a shared reference, all copies across all distributions must stay in sync.
+Shared references are copied (not symlinked) into each skill directory. When updating a shared reference, all copies across both distributions must stay in sync.
 
-**Implemented in**: `.claude/rules/plugin-skills.md`, `.claude/rules/cursor-plugin-skills.md`, `.claude/rules/standalone-skills.md`, `.claude/rules/reference-files.md`, CLAUDE.md (sync convention)
+**Implemented in**: `.claude/rules/plugin-skills.md`, `.claude/rules/standalone-skills.md`, `.claude/rules/reference-files.md`, CLAUDE.md (sync convention)
 
 ---
 

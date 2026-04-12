@@ -1,5 +1,5 @@
 ---
-applyTo: "**/.claude-plugin,**/.cursor-plugin,**/CLAUDE.md,DESIGN-GUIDELINES.md"
+applyTo: "**/.claude-plugin,**/CLAUDE.md,DESIGN-GUIDELINES.md"
 ---
 
 # Plugin Configuration Review Guidelines
@@ -17,26 +17,20 @@ applyTo: "**/.claude-plugin,**/.cursor-plugin,**/CLAUDE.md,DESIGN-GUIDELINES.md"
 - Every token in CLAUDE.md loads on every request — minimize always-loaded content
 - Apply the test: "Would removing this cause the agent to make mistakes?" If not, cut it
 
-## Plugin Manifests
+## .claude-plugin Files
 
-- `.claude-plugin/plugin.json` — Claude Code plugin specification
-- `.cursor-plugin/plugin.json` — Cursor IDE plugin specification
-- Both must have `name` field; `source` field must point to correct plugin directory
+- Must follow the official Claude Code plugin specification
+- `source` field must point to the correct plugin directory
 
 ## DESIGN-GUIDELINES.md
 
 - Every guideline must have: Source citation, "In practice" section, "Implemented in" traceability
 - Guidelines must map to specific artifacts in the project
 - New guidelines require evidence from published research or official documentation
+- Self-Application Record section must stay current with actual changes made
 
 ## Progressive Disclosure Compliance
 
-- Root files must not contain domain-specific rules (those go in scope files)
+- Root files must not contain domain-specific rules (those go in scope files or `.claude/rules/`)
 - Content should be organized by loading tier: always-loaded → on-demand → invoked
-- Flag content in root CLAUDE.md that only applies to specific file patterns
-
-## Common Issues to Flag
-
-- CLAUDE.md over 40 lines at root or 30 lines in plugins
-- Missing source citations in DESIGN-GUIDELINES.md
-- Cursor plugin manifests with Claude-specific fields or vice versa
+- Flag any content in root CLAUDE.md that only applies to specific file patterns

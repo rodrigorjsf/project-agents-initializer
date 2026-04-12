@@ -1,5 +1,5 @@
 ---
-applyTo: "**/assets/templates/**/*.md,**/assets/templates/**/*.mdc"
+applyTo: "**/assets/templates/**/*.md"
 ---
 
 # Template File Review Guidelines
@@ -22,19 +22,13 @@ Templates should use HTML comment blocks for metadata:
 - Templates define the exact structure of generated output files
 - HTML comments guide the generating agent on what to include/exclude
 - Templates must demonstrate progressive disclosure patterns (where to split content)
-
-## .mdc Template Requirements
-
-- `.mdc` templates (Cursor rules) must use ONLY valid frontmatter: `description`, `alwaysApply`, `globs`
-- Never include `paths:` in .mdc templates (that is Claude Code specific)
-- Must demonstrate the 4 activation modes: Always, Auto-attached, Agent-requested, Manual
+- Source attribution comments (`<!-- Migrated from [source-file]:lines [N-M] -->`) must be present in migration templates
 
 ## Distribution Awareness
 
 - `hook-config.md` template must exist ONLY in plugin improve skill directories — never in standalone
 - Standalone templates must never reference hooks or subagents
 - Init skill templates do NOT include migration-specific templates
-- `cursor-rule.mdc` templates belong in cursor-initializer skills only, not agents-initializer
 
 ## Common Issues to Flag
 
@@ -43,4 +37,3 @@ Templates should use HTML comment blocks for metadata:
 - Hook-related templates in standalone skill directories
 - Migration templates in init skill directories
 - Templates that would generate files exceeding 200 lines
-- `paths:` frontmatter in .mdc templates (Claude leak)

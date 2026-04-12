@@ -7,7 +7,6 @@ Multi-plugin Claude Code marketplace for evidence-based agent artifact engineeri
 Two plugins, each with two separate skill sets — same names, different conventions:
 
 - `plugins/agents-initializer/skills/` — Claude Code plugin; delegates analysis to subagents
-- `plugins/cursor-initializer/skills/` — Cursor IDE plugin; delegates analysis to subagents (Cursor-native format)
 - `plugins/agent-customizer/skills/` — Claude Code plugin; artifact creation/improvement
 - `skills/` — npx skills add; standalone inline analysis, no agent delegation
 
@@ -26,7 +25,6 @@ Each skill directory contains:
 - `.claude/skills/` — development meta-skills for this project (not distributed to end-users)
 
 See `plugins/agents-initializer/CLAUDE.md` for plugin-specific conventions.
-See `plugins/cursor-initializer/CLAUDE.md` for cursor-initializer plugin conventions.
 See `plugins/agent-customizer/CLAUDE.md` for agent-customizer plugin conventions.
 
 ## RAG Knowledge Base

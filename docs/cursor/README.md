@@ -25,7 +25,6 @@ AI agents should treat these documents as authoritative references when generati
 | [`rules/`](./rules/rules.md) | `rules.md` | System-level instructions (Always, Auto-attached, Agent-requested, Manual) that guide agent behavior |
 | [`skills/`](./skills/agent-skills-guide.md) | `agent-skills-guide.md` | Agent Skills standard — portable, version-controlled capability packages for agents |
 | [`subagents/`](./subagents/subagents-guide.md) | `subagents-guide.md` | Subagents — specialized assistants the agent can delegate tasks to in isolated context windows |
-| [`best-practices/`](./best-practices/agent-best-practices.md) | `agent-best-practices.md` | Official Cursor blog guide on agent workflows, planning, context management, and best practices |
 | [`tools/`](#tools) | ↓ 4 guides | Built-in agent tools: terminal, browser, search, and worktrees |
 
 ### tools/ sub-directories
@@ -36,14 +35,6 @@ AI agents should treat these documents as authoritative references when generati
 | [`tools/browser/`](./tools/browser/browser-guide.md) | `browser-guide.md` | Browser automation, design sidebar, session persistence, security, enterprise origin allowlists |
 | [`tools/search/`](./tools/search/search-guide.md) | `search-guide.md` | Instant grep, semantic search, indexing, the Explore subagent, privacy |
 | [`tools/worktrees/`](./tools/worktrees/worktrees-guide.md) | `worktrees-guide.md` | Parallel agents via Git worktrees, Best-of-N models, setup scripts, cleanup |
-
-## best-practices/
-
-**Source:** [cursor.com/blog/agent-best-practices](https://cursor.com/blog/agent-best-practices)
-
-Official Cursor guide covering techniques for working effectively with Cursor's agent — harness architecture, plan mode, context management, rules vs skills, TDD workflows, parallel agents, cloud agents, and debug mode.
-
-→ [`best-practices/agent-best-practices.md`](./best-practices/agent-best-practices.md)
 
 ## hooks/
 
