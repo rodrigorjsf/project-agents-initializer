@@ -23,7 +23,7 @@ Sources: ETH Zurich paper (Evaluating AGENTS.md), Anthropic Best Practices, a-gu
 | Anything the agent can infer from code | Agent reads code directly; redundant instructions waste tokens | "Anything Claude can figure out by reading code" | Anthropic Best Practices |
 | Hook-enforced behaviors (formatting, file blocking, notifications) | Hooks handle these deterministically; config file instructions are redundant and may conflict with hook execution. **Migrate** to hook configuration for zero context cost | "Hooks provide deterministic control over Claude Code's behavior, ensuring certain actions always happen rather than relying on the LLM" | Anthropic Hooks Guide |
 
-*Source: init-agents/SKILL.md:106-116 expanded; research-context-engineering-comprehensive.md:113-121; Evaluating-AGENTS-paper.md abstract*
+*Source: plugins/agents-initializer/skills/init-agents/SKILL.md:106-116 expanded; research-context-engineering-comprehensive.md:113-121; Evaluating-AGENTS-paper.md abstract*
 
 ### Exclusion Actions
 

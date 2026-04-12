@@ -35,13 +35,38 @@ Cursor's rule system offers powerful activation modes — but only if rules are 
 
 ## Process
 
+### Preflight Check
+
+Check whether the project has:
+- A `.cursor/rules/` directory containing `.mdc` or `.md` files — record as **has_rules**
+- An `AGENTS.md` file in the current working directory — record as **has_agents_md**
+
+**If neither exists:** Inform the user: "No Cursor configuration found. Run `init-cursor` to generate an optimized hierarchy from scratch." **STOP.**
+
+Proceed to Phase 1 with `has_rules` and `has_agents_md` flags set.
+
 ### Phase 1: Current State Analysis
 
 Read `${CLAUDE_SKILL_DIR}/references/evaluation-criteria.md` for the scoring rubric and bloat/staleness indicators.
 
-Delegate to the `file-evaluator` agent with this task:
+Build the `file-evaluator` task dynamically based on what was found:
 
-> Evaluate all AGENTS.md files and `.cursor/rules/` files (.mdc and .md) in the project at the current working directory. Check for:
+**If `has_rules` only (no AGENTS.md):** Delegate to the `file-evaluator` agent with this task:
+
+> Evaluate all `.cursor/rules/` files (.mdc and .md) in the project at the current working directory. Check for:
+>
+> 1. Files over 200 lines
+> 2. Bloat indicators (directory listings, obvious conventions, vague instructions)
+> 3. Stale references (file paths that don't exist, commands that aren't in package.json)
+> 4. Progressive disclosure opportunities (content that should be in separate files or auto-attached rules)
+> 5. Rules with `alwaysApply: true` that should use globs or description instead (wasting tokens on every request)
+> 6. Invalid .mdc frontmatter (only `description`, `alwaysApply`, `globs` are valid)
+>
+> Return a structured assessment with specific line numbers and content for each issue.
+
+**If `has_agents_md` (with or without rules):** Delegate to the `file-evaluator` agent with this task:
+
+> Evaluate all AGENTS.md files [if has_rules: and all `.cursor/rules/` files (.mdc and .md)] in the project at the current working directory. Check for:
 >
 > 1. Files over 200 lines
 > 2. Bloat indicators (directory listings, obvious conventions, vague instructions)
@@ -93,7 +118,7 @@ Based on both subagent reports, create improvement plan:
 
 #### Refactoring Actions (optimize loading behavior)
 
-1. **Extract scope-specific content** into subdirectory AGENTS.md files (on-demand loading)
+1. **Extract scope-specific content** into subdirectory AGENTS.md files (on-demand loading) — only if `has_agents_md`
 2. **Convert pattern-specific rules** to `.cursor/rules/*.mdc` with `globs` frontmatter (auto-attached)
 3. **Convert always-loaded rules** to agent-requested (add `description`, set `alwaysApply: false`) when the agent can decide relevance
 4. **Extract domain content** into docs/TESTING.md, docs/BUILD.md, etc. (progressive disclosure)
@@ -120,14 +145,15 @@ For each deletion, document: the specific content being removed, WHY the agent d
 
 #### Addition Actions (lowest priority — only if genuinely missing)
 
-1. **Add missing scope files** for detected scopes without configuration — including library/shared packages
+1. **Add missing scope files** for detected scopes without configuration — including library/shared packages (only if `has_agents_md`)
 2. **Add missing tooling commands** that the codebase-analyzer identified as non-standard
 3. **Create missing `.cursor/rules/*.mdc`** for file patterns with non-obvious conventions — include both convention rules and domain-critical rules auto-attached to sensitive file patterns
+4. **Propose creating AGENTS.md** if `has_rules` but not `has_agents_md` and codebase-analyzer identified project-wide conventions that belong there — present this as an optional addition
 
 When generating new or restructured files, use these templates:
 
-- Root AGENTS.md: Read `${CLAUDE_SKILL_DIR}/assets/templates/root-agents-md.md`
-- Scoped AGENTS.md: Read `${CLAUDE_SKILL_DIR}/assets/templates/scoped-agents-md.md`
+- Root AGENTS.md (only if `has_agents_md`): Read `${CLAUDE_SKILL_DIR}/assets/templates/root-agents-md.md`
+- Scoped AGENTS.md (only if `has_agents_md`): Read `${CLAUDE_SKILL_DIR}/assets/templates/scoped-agents-md.md`
 - `.cursor/rules/*.mdc` files: Read `${CLAUDE_SKILL_DIR}/assets/templates/cursor-rule.mdc`
 - Domain docs: Read `${CLAUDE_SKILL_DIR}/assets/templates/domain-doc.md`
 - Skills (from automation migration): Read `${CLAUDE_SKILL_DIR}/assets/templates/skill.md`
@@ -147,12 +173,12 @@ Maximum 3 iterations.
 
 ### Phase 5: Present and Apply
 
-1. Show a summary overview of all improvements found, grouped by category:
+1. Show a summary overview of all improvements found, grouped by category — include AGENTS.md rows only if `has_agents_md`:
    - **Removals**: X items (bloat: X, stale: X, duplicates: X, contradictions: X)
    - **Refactoring**: X items (scope extraction: X, rule conversion: X, activation mode fix: X, domain extraction: X, consolidation: X)
    - **Automation Migrations**: X items (hooks: X, rules: X, skills: X, subagents: X)
    - **Redundancy Eliminations**: X items
-   - **Additions**: X items
+   - **Additions**: X items (including AGENTS.md creation proposal if applicable)
 
 2. For each suggestion, present a structured card in priority order (Removals → Refactoring → Automation Migrations → Redundancy Eliminations → Additions):
 

@@ -37,15 +37,17 @@ Cursor's configuration hierarchy enables powerful progressive disclosure:
 
 ### Preflight Check
 
-Check if `.cursor/rules/` directory exists AND contains any `.mdc` or `.md` files.
+Check whether the project has **either**:
+- A `.cursor/rules/` directory containing any `.mdc` or `.md` files, OR
+- An `AGENTS.md` file in the current working directory
 
-**If rules already exist:**
+**If either exists:**
 
-1. Inform the user: "Cursor rules already exist in this project. Switching to the improve workflow to optimize your existing configuration."
+1. Inform the user: "Cursor configuration already exists in this project. Switching to the improve workflow to optimize your existing configuration."
 2. Invoke the `improve-cursor` skill and follow its complete process.
 3. **STOP** — do not proceed to Phase 1 or any subsequent phase of this init skill.
 
-**If no rules exist:**
+**If neither exists:**
 Proceed to Phase 1 below.
 
 ### Phase 1: Codebase Analysis
