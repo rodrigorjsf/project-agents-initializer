@@ -20,8 +20,8 @@ applyTo: "**/.claude-plugin,**/.cursor-plugin,**/CLAUDE.md,DESIGN-GUIDELINES.md"
 ## Plugin Manifests
 
 - `.claude-plugin/plugin.json` — Claude Code plugin specification
-- `.cursor-plugin/plugin.json` — Cursor IDE plugin specification
-- Both must have `name` field; `source` field must point to correct plugin directory
+- `.cursor-plugin/plugin.json` — Cursor IDE plugin specification (per-plugin manifest; only `name` field required)
+- Both per-plugin manifests must have a `name` field; the `source` field is marketplace-manifest-only (`.cursor-plugin/marketplace.json`, `.claude-plugin/marketplace.json`) — do not require `source` in per-plugin manifests
 
 ## DESIGN-GUIDELINES.md
 
