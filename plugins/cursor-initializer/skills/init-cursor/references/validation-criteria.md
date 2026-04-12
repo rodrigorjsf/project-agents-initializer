@@ -58,9 +58,9 @@ Any file violating these criteria must be fixed before proceeding:
 - [ ] Root file: one-liner + package manager (if non-standard) + build commands (if non-standard) + pointers
 - [ ] Domain content lives in separate files, not inline
 - [ ] Progressive disclosure pointers point to files that actually exist
-- [ ] **CLAUDE.md-specific**: `.claude/rules/` files have path-scoping (`paths:` frontmatter) when they apply to specific file patterns
-- [ ] **CLAUDE.md-specific**: Minimal content in always-loaded locations (`./CLAUDE.md`, `.claude/rules/*.md` without paths)
-- [ ] **AGENTS.md-specific**: Subdirectory AGENTS.md files used for monorepo package scoping (no `.claude/rules/` equivalent)
+- [ ] **Cursor rules**: `.cursor/rules/*.mdc` files use `globs:` for path-scoped activation (not `alwaysApply: true`) when they apply to specific file patterns
+- [ ] **Cursor rules**: `alwaysApply: true` used only for conventions relevant to every task — not as default
+- [ ] **AGENTS.md-specific**: Subdirectory AGENTS.md files used for monorepo package scoping; path-scoped rules go in `.cursor/rules/*.mdc` with `globs:`
 
 ---
 

@@ -24,10 +24,10 @@ When deciding where to place content, use this table:
 
 | Location | Use when content is... | Load timing |
 |----------|------------------------|-------------|
-| Root AGENTS.md / CLAUDE.md | Relevant to **every single task** in the repo | Always (every request) |
+| Root AGENTS.md | Relevant to **every single task** in the repo | Always (every request) |
 | Separate domain file | Relevant to one domain (TypeScript, testing, API design) | On-demand |
-| Subdirectory AGENTS.md / CLAUDE.md | Specific to one package or area | On-demand when working there |
-| `.claude/rules/` (path-scoped) | Specific to certain file patterns | On-demand when files match |
+| Subdirectory AGENTS.md | Specific to one package or area | On-demand when working there |
+| `.cursor/rules/*.mdc` with `globs:` | Specific to certain file patterns | On-demand when files match |
 | Skill | A workflow the agent should invoke explicitly | On-demand when invoked |
 
 *Source: a-guide-to-agents.md lines 228-233; research-context-engineering-comprehensive.md lines 257-305*
@@ -66,15 +66,9 @@ See each package's AGENTS.md for specific guidelines.
 > "Don't overload any level. The agent sees all merged files in its context."
 > — a-guide-to-agents.md lines 164-193
 
-**`claudeMdExcludes`**: In large monorepos, skip irrelevant ancestor CLAUDE.md files via `.claude/settings.local.json`:
+**Monorepo context scoping in Cursor**: In large monorepos, use `.cursor/rules/*.mdc` with narrow `globs:` patterns to limit rules to relevant packages. Rules with `alwaysApply: true` load for every request — keep them minimal.
 
-```json
-{ "claudeMdExcludes": ["**/other-team/CLAUDE.md", "**/other-team/.claude/rules/**"] }
-```
-
-Patterns match absolute paths with glob syntax. Arrays merge across settings layers. Managed policy CLAUDE.md files cannot be excluded.
-
-*Source: memory/how-claude-remembers-a-project.md lines 243-260*
+*Source: memory/how-claude-remembers-a-project.md lines 243-260; docs/cursor/rules-and-memory.md*
 
 ---
 

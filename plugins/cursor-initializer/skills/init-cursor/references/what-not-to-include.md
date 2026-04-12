@@ -1,6 +1,6 @@
 # What NOT to Include
 
-Evidence-based exclusion table for AGENTS.md and CLAUDE.md content.
+Evidence-based exclusion table for AGENTS.md and `.cursor/rules/*.mdc` content.
 Sources: ETH Zurich paper (Evaluating AGENTS.md), Anthropic Best Practices, a-guide-to-agents.md, hooks/automate-workflow-with-hooks.md
 
 ---
@@ -31,8 +31,8 @@ Not all excluded content should be deleted — some should migrate to on-demand 
 
 | Exclusion Category | Action | Mechanism |
 |-------------------|--------|-----------|
-| Hook-enforced behaviors | **Migrate** | Hook (zero context cost, deterministic enforcement) |
-| Path-specific conventions | **Migrate** | `.claude/rules/` with `paths:` (loads on file match only) |
+| Hook-enforced behaviors | **Migrate** | `.cursor/hooks.json` (zero context cost, deterministic enforcement) |
+| Path-specific conventions | **Migrate** | `.cursor/rules/*.mdc` with `globs:` (loads on file match only) |
 | Domain knowledge blocks >50 lines | **Migrate** | Skill `user-invocable: false` (~100 token startup cost) |
 | Agent-inferable content | **Delete** | No migration — agents discover via tools |
 | Stale, vague, or duplicate content | **Delete** | No migration value |

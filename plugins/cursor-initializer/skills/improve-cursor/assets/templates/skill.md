@@ -1,14 +1,14 @@
 ---
 name: [kebab-case-name]
-description: [One sentence: what this skill does — Claude uses this to decide when to invoke it]
+description: [One sentence: what this skill does — the agent uses this to decide when to invoke it]
 user-invocable: false
 ---
 <!-- TEMPLATE: Skill File (generated from automation migration)
-     Placement: .claude/skills/[kebab-case-name]/SKILL.md
+     Placement: .cursor/skills/[kebab-case-name]/SKILL.md
      Naming: kebab-case, ≤64 chars, lowercase letters/numbers/hyphens only
      Target: Under 200 lines after placeholders are filled
-     Rule: `description` is required — Claude uses it to decide when to invoke
-     Rule: `user-invocable: false` is the default for migrated skills (auto-invoked by Claude)
+     Rule: `description` is required — the agent uses it to decide when to invoke
+     Rule: `user-invocable: false` is the default for migrated skills (auto-invoked by agent)
      Rule: Every instruction must be specific and verifiable
      Source attribution: add <!-- Migrated from [source-file]:lines [N-M] --> below frontmatter
 -->
