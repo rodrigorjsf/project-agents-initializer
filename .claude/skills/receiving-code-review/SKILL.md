@@ -1,7 +1,7 @@
 ---
 name: receiving-code-review
 description: Use when receiving code review feedback, before implementing suggestions, especially if feedback seems unclear or technically questionable - requires technical rigor and verification, not performative agreement or blind implementation
-argument-hint: <pr-number>
+argument-hint: <pr-number>[:review-id]
 ---
 
 # Code Review Reception
@@ -218,25 +218,46 @@ You understand 1,2,3,6. Unclear on 4,5.
 
 When replying to inline review comments on GitHub, reply in the comment thread (`gh api repos/{owner}/{repo}/pulls/{pr}/comments/{id}/replies`), not as a top-level PR comment.
 
+## Non-Interactive Mode
+
+When running in CI or any other non-interactive environment with no human available:
+
+- Scope work to the specific review when a review ID is provided in the argument (`<pr-number>:<review-id>`)
+- Do not pause waiting for clarification
+- Reclassify any `DEFER` item to `SKIP` with the reason `Needs human decision in non-interactive mode`
+- If the `pr-comment-resolver` agent is unavailable in the current environment, perform the same reply-and-resolve work inline
+
 ## PR Comment Analysis Workflow
 
-When invoked with a PR number argument, run this automated workflow end-to-end.
+When invoked with a PR argument, run this automated workflow end-to-end.
 
 ### Phase 1: Fetch PR Comments
 
 ```bash
 # Resolve repo from git remote
 REPO=$(gh repo view --json nameWithOwner -q .nameWithOwner)
-PR=$ARGUMENTS  # PR number from skill invocation
+RAW_ARGUMENTS=$ARGUMENTS
+PR="${RAW_ARGUMENTS%%:*}"
+REVIEW_ID=""
 
-# Fetch all inline review comments
-gh api repos/$REPO/pulls/$PR/comments --paginate
+if [[ "$RAW_ARGUMENTS" == *:* ]]; then
+  REVIEW_ID="${RAW_ARGUMENTS#*:}"
+fi
+
+# Fetch inline review comments
+if [[ -n "$REVIEW_ID" ]]; then
+  gh api repos/$REPO/pulls/$PR/reviews/$REVIEW_ID/comments --paginate
+else
+  gh api repos/$REPO/pulls/$PR/comments --paginate
+fi
 
 # Fetch review-level summaries (for context)
 gh api repos/$REPO/pulls/$PR/reviews --paginate
 ```
 
-Collect every comment. Note the `id`, `user.login`, `user.type`, `path`, `line`, and `body` for each.
+Collect every fetched comment. Note the `id`, `user.login`, `user.type`, `path`, `line`, and `body` for each.
+
+If `REVIEW_ID` is set, do NOT expand scope to older reviews unless the current review payload is incomplete or clearly references an unresolved earlier thread that must be handled together.
 
 ### Phase 2: Triage Each Comment
 
@@ -254,7 +275,10 @@ Build a triage table BEFORE touching any code. For each comment:
 
 Do NOT implement anything during triage. Finish the full table first.
 
-If any comment is `DEFER`, stop and present the deferred items to the user before proceeding.
+If any comment is `DEFER`:
+
+- In interactive mode: stop and present the deferred items to the user before proceeding.
+- In non-interactive mode: reclassify it to `SKIP` with the reason `Needs human decision in non-interactive mode`, then continue.
 
 ### Phase 3: Implement Fixes
 
@@ -266,7 +290,7 @@ For each `FIX` verdict, in priority order (blocking → simple → complex):
 
 Record the commit SHA for each fix.
 
-### Phase 4: Dispatch Comment Resolver (Background)
+### Phase 4: Publish Comment Resolutions
 
 After ALL commits are done, build a resolution payload — one entry per comment:
 
@@ -274,7 +298,7 @@ After ALL commits are done, build a resolution payload — one entry per comment
 comment_id | action | commit_sha | reason
 ```
 
-Then invoke the `pr-comment-resolver` agent with `run_in_background: true`. Pass the following as the task:
+If the `pr-comment-resolver` agent is available in the current environment, invoke it with `run_in_background: true`. Pass the following as the task:
 
 ```
 REPO: {owner/repo}
@@ -285,6 +309,49 @@ RESOLUTIONS:
 
 **Do NOT await the result.** The agent runs in the background and handles all GitHub comment replies and thread resolutions. Continue immediately to Phase 5.
 
+If the agent is unavailable, perform the same work inline in this session:
+
+1. Split `REPO` into `owner` and `repo` first:
+   ```bash
+   owner=$(echo "$REPO" | cut -d/ -f1)
+   repo=$(echo "$REPO" | cut -d/ -f2)
+   ```
+2. Reply to each inline review comment in its thread using `gh api repos/$owner/$repo/pulls/$PR/comments/$comment_id/replies -f body="$reply_body"`
+3. Resolve thread node IDs with GraphQL:
+   ```bash
+
+   gh api graphql -f query='
+   query($owner: String!, $repo: String!, $pr: Int!) {
+     repository(owner: $owner, name: $repo) {
+       pullRequest(number: $pr) {
+         reviewThreads(first: 100) {
+           nodes {
+             id
+             isResolved
+             comments(first: 1) {
+               nodes { databaseId }
+             }
+           }
+         }
+       }
+     }
+   }' -f owner="$owner" -f repo="$repo" -F pr=$PR
+   ```
+4. Map each `comment_id` in your resolution table to a thread node ID using `databaseId`, then resolve each thread:
+   ```bash
+   gh api graphql -f query='
+   mutation($threadId: ID!) {
+     resolveReviewThread(input: {threadId: $threadId}) {
+       thread { isResolved }
+     }
+   }' -f threadId="$thread_node_id"
+   ```
+5. Skip and continue if a single reply or thread resolution fails
+6. Keep replies factual and brief:
+   - `FIX`: `Fixed in {commit_sha}. {brief description}.`
+   - `SKIP`: `Evaluated — skipping. {reason}`
+   - `DEFER`: `Deferred for human review. {reason}`
+
 ### Phase 5: Report to User
 
 ```
@@ -293,7 +360,7 @@ PR #{PR} analysis complete.
 Triage: {total} comments — {fix_count} fixed, {skip_count} skipped, {defer_count} deferred
 Commits: {list of commit SHAs with one-line descriptions}
 Skipped: {list of skipped items with brief reasons}
-Comment resolver: dispatched in background
+Comment resolver: dispatched in background or completed inline
 ```
 
 ## The Bottom Line

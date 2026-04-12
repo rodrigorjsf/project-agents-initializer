@@ -56,3 +56,4 @@ The database is pre-built. Tools are available via MCP (`rag-knowledge-base` ser
 When something fails repeatedly, when User has to re-explain, or when a workaround is found for a platform/tool limitation, add a one-line bullet here. Keep each bullet under 15 words. No explanations. Only add things that will save time in future sessions.
 
 - Agents fail silently on wrong paths. Always verify hardcoded paths.
+- Before creating a new project artifact, check if an existing one can be extended or merged.
