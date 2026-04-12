@@ -1,0 +1,8 @@
+{
+  "name": "copilot-review-fix-loop",
+  "private": true,
+  "description": "Pinned GitHub Copilot CLI dependency for the Copilot review fix loop workflow.",
+  "dependencies": {
+    "@github/copilot": "1.0.24"
+  }
+}

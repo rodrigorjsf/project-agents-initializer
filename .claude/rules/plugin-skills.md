@@ -1,6 +1,7 @@
 ---
 paths:
   - "plugins/agents-initializer/skills/*/SKILL.md"
+  - "plugins/agent-customizer/skills/*/SKILL.md"
 ---
 # Plugin Skill Conventions
 

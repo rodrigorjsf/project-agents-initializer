@@ -41,7 +41,7 @@
 - [ ] SKILL.md files: name ≤64 chars, description ≤1024 chars, body <500 lines
 - [ ] Shared references updated in ALL copies across both distributions
 - [ ] Plugin skills delegate to agents; standalone skills use inline analysis — patterns not mixed
-- [ ] Agent definitions use model: sonnet, read-only tools, maxTurns 15-20
+- [ ] Agent definitions use model: sonnet(except for `pr-comment-resolver` agent), read-only tools, maxTurns 15-20
 - [ ] New guidelines in DESIGN-GUIDELINES.md have source citation and "Implemented in" traceability
 - [ ] Root CLAUDE.md stays within 15-40 line target
 - [ ] Commits are atomic — one logical change per commit

@@ -1,6 +1,7 @@
 ---
 paths:
   - "plugins/agents-initializer/skills/*/references/*.md"
+  - "plugins/agent-customizer/skills/*/references/*.md"
   - "skills/*/references/*.md"
 ---
 # Reference File Conventions
