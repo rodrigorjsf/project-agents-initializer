@@ -86,8 +86,25 @@ jobs:
         with:
           node-version: "22"
 
+      - name: Compute Copilot CLI cache key
+        id: copilot-cache
+        run: |
+          echo "dir=$(npm config get cache)" >>"$GITHUB_OUTPUT"
+          echo "bucket=$(( $(date -u +%s) / 10800 ))" >>"$GITHUB_OUTPUT"
+
+      - name: Cache Copilot CLI dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.copilot-cache.outputs.dir }}
+          key: ${{ runner.os }}-node22-copilot-review-fix-loop-${{ hashFiles('.github/copilot-review-fix-loop/package-lock.json') }}-${{ steps.copilot-cache.outputs.bucket }}
+          restore-keys: |
+            ${{ runner.os }}-node22-copilot-review-fix-loop-${{ hashFiles('.github/copilot-review-fix-loop/package-lock.json') }}-
+
       - name: Install GitHub Copilot CLI
-        run: npm install -g @github/copilot
+        run: npm ci --prefix .github/copilot-review-fix-loop
+
+      - name: Add Copilot CLI to PATH
+        run: echo "$GITHUB_WORKSPACE/.github/copilot-review-fix-loop/node_modules/.bin" >>"$GITHUB_PATH"
 
       - name: Show Copilot CLI version
         run: copilot version

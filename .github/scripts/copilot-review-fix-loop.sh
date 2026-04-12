@@ -33,6 +33,32 @@ read_state_field() {
   awk -F': ' -v key="$field" '$1 == key { print substr($0, length($1) + 3) }' <<<"$body" | head -n1
 }
 
+resolve_copilot_bin() {
+  local workspace_dir
+  local local_bin
+
+  if [[ -n "${COPILOT_BIN:-}" ]]; then
+    if [[ "$COPILOT_BIN" == */* ]]; then
+      [[ -x "$COPILOT_BIN" ]] || fail "Configured COPILOT_BIN is not executable: $COPILOT_BIN"
+      return
+    fi
+
+    command -v "$COPILOT_BIN" >/dev/null 2>&1 || fail "Configured COPILOT_BIN is not available on PATH: $COPILOT_BIN"
+    return
+  fi
+
+  workspace_dir="${GITHUB_WORKSPACE:-$(pwd)}"
+  local_bin="$workspace_dir/.github/copilot-review-fix-loop/node_modules/.bin/copilot"
+
+  if [[ -x "$local_bin" ]]; then
+    COPILOT_BIN="$local_bin"
+    return
+  fi
+
+  COPILOT_BIN=$(command -v copilot || true)
+  [[ -n "$COPILOT_BIN" ]] || fail "GitHub Copilot CLI is not installed. Expected cached dependency at .github/copilot-review-fix-loop or copilot on PATH."
+}
+
 is_copilot_review() {
   local login="${1,,}"
   [[ -n "$login" && "$login" == *copilot* ]]
@@ -165,7 +191,7 @@ run_copilot() {
   local prompt
   local skill_argument="${PR}:${REVIEW_ID}"
   local -a command=(
-    copilot
+    "$COPILOT_BIN"
     -p
     ""
     -s
@@ -216,6 +242,7 @@ main() {
   GITHUB_EVENT_PATH="${GITHUB_EVENT_PATH:?Missing GITHUB_EVENT_PATH.}"
 
   [[ "$MAX_ITERATIONS" =~ ^[0-9]+$ ]] || fail "MAX_ITERATIONS must be numeric."
+  resolve_copilot_bin
 
   if [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]]; then
     resolve_manual_pr

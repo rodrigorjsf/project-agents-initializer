@@ -10,7 +10,7 @@ argument-hint: <pr-number>[:review-id]
 
 Code review requires technical evaluation, not emotional performance.
 
-**Core principle:** Verify before implementing. Ask before assuming. Technical correctness over social comfort.
+**Core principle:** Verify before implementing. Ask before assuming. Technical correctness over social comfort. Do not assume feedback is correct — evaluate it against the codebase and context first.
 
 ## The Response Pattern
 
