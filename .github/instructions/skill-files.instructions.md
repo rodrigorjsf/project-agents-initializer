@@ -32,8 +32,15 @@ Check the file path to determine distribution:
 **Standalone skills** (`skills/*/SKILL.md`):
 - ALL analysis must be inline — explicit bash commands for each step
 - Must NEVER reference agent names or use Task tool delegation
-- Must suggest ONLY skills and path-scoped rules as migration targets (never hooks or subagents)
-- When shared references mention hooks/subagents, SKILL.md must instruct to substitute with rule or skill
+- Must suggest ONLY skills and path-scoped rules as migration targets
+
+## Platform-Specific Output (Critical)
+
+- `init-claude`/`improve-claude` skills → generate `.claude/rules/` and `CLAUDE.md`
+- `init-cursor`/`improve-cursor` skills → generate `.cursor/rules/*.mdc` and AGENTS.md
+- `init-agents`/`improve-agents` skills → generate only AGENTS.md (portable)
+- Flag Claude artifacts (`.claude/rules/`, `CLAUDE.md`, `paths:`) in cursor skills
+- Flag Cursor artifacts (`.cursor/rules/`, `.mdc`, `globs:`) in claude skills
 
 ## Common Issues to Flag
 
@@ -41,4 +48,5 @@ Check the file path to determine distribution:
 - Missing self-validation phase
 - References to files outside the skill's own directory
 - Phase instructions that are vague rather than actionable
+- Cross-platform contamination (Claude references in Cursor skills or vice versa)
 - Name or description exceeding character limits
