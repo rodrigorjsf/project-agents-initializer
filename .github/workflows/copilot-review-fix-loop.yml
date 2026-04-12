@@ -6,15 +6,15 @@ on:
       - submitted
   workflow_dispatch:
     inputs:
-      pr-number:
+      pr_number:
         description: Pull request number to process
         required: true
         type: number
-      review-id:
+      review_id:
         description: Specific Copilot review ID to process
         required: false
         type: string
-      max-iterations:
+      max_iterations:
         description: Override the maximum fix loop iterations for this run
         required: false
         default: "5"
@@ -30,7 +30,7 @@ permissions:
   pull-requests: write
 
 concurrency:
-  group: copilot-review-fix-loop-${{ github.event.pull_request.number || inputs.pr-number }}
+  group: copilot-review-fix-loop-${{ github.event.pull_request.number || inputs.pr_number }}
   cancel-in-progress: false
 
 jobs:
@@ -40,9 +40,9 @@ jobs:
     timeout-minutes: 40
     env:
       GH_TOKEN: ${{ secrets.COPILOT_REVIEW_FIX_TOKEN }}
-      WORKFLOW_PR_NUMBER: ${{ inputs.pr-number }}
-      WORKFLOW_REVIEW_ID: ${{ inputs.review-id }}
-      WORKFLOW_MAX_ITERATIONS: ${{ inputs.max-iterations }}
+      WORKFLOW_PR_NUMBER: ${{ inputs.pr_number }}
+      WORKFLOW_REVIEW_ID: ${{ inputs.review_id }}
+      WORKFLOW_MAX_ITERATIONS: ${{ inputs.max_iterations }}
       WORKFLOW_MODEL: ${{ inputs.model }}
       REPO_DEFAULT_MAX_ITERATIONS: ${{ vars.COPILOT_REVIEW_FIX_MAX_ITERATIONS }}
       REPO_DEFAULT_MODEL: ${{ vars.COPILOT_REVIEW_FIX_MODEL }}
