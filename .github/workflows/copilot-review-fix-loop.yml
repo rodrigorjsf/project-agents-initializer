@@ -1,0 +1,120 @@
+name: copilot-review-fix-loop
+
+on:
+  pull_request_review:
+    types:
+      - submitted
+  workflow_dispatch:
+    inputs:
+      pr-number:
+        description: Pull request number to process
+        required: true
+        type: number
+      review-id:
+        description: Specific Copilot review ID to process
+        required: false
+        type: string
+      max-iterations:
+        description: Override the maximum fix loop iterations for this run
+        required: false
+        default: "5"
+        type: string
+      model:
+        description: Copilot CLI model override (optional)
+        required: false
+        type: string
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: copilot-review-fix-loop-${{ github.event.pull_request.number || inputs.pr-number }}
+  cancel-in-progress: false
+
+jobs:
+  apply-copilot-review-fixes:
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event.pull_request.head.repo.full_name == github.repository && contains(github.event.review.user.login, 'copilot')) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      GH_TOKEN: ${{ secrets.COPILOT_REVIEW_FIX_TOKEN }}
+      WORKFLOW_PR_NUMBER: ${{ inputs.pr-number }}
+      WORKFLOW_REVIEW_ID: ${{ inputs.review-id }}
+      WORKFLOW_MAX_ITERATIONS: ${{ inputs.max-iterations }}
+      WORKFLOW_MODEL: ${{ inputs.model }}
+      REPO_DEFAULT_MAX_ITERATIONS: ${{ vars.COPILOT_REVIEW_FIX_MAX_ITERATIONS }}
+      REPO_DEFAULT_MODEL: ${{ vars.COPILOT_REVIEW_FIX_MODEL }}
+    steps:
+      - name: Validate workflow secret
+        run: |
+          if [[ -z "${GH_TOKEN:-}" ]]; then
+            echo "::error::Set the COPILOT_REVIEW_FIX_TOKEN secret with Copilot Requests, contents:write, issues:write, and pull-requests:write permissions."
+            exit 1
+          fi
+
+      - name: Resolve PR checkout target
+        id: pr
+        run: |
+          set -euo pipefail
+
+          if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then
+            pr_json=$(gh api "repos/${GITHUB_REPOSITORY}/pulls/${WORKFLOW_PR_NUMBER}")
+            if [[ "$(jq -r '.head.repo.full_name' <<<"$pr_json")" != "${GITHUB_REPOSITORY}" ]]; then
+              echo "::error::Manual runs only support same-repository pull requests."
+              exit 1
+            fi
+            echo "repository=$(jq -r '.head.repo.full_name' <<<"$pr_json")" >>"$GITHUB_OUTPUT"
+            echo "ref=$(jq -r '.head.ref' <<<"$pr_json")" >>"$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "repository=${{ github.event.pull_request.head.repo.full_name }}" >>"$GITHUB_OUTPUT"
+          echo "ref=${{ github.event.pull_request.head.ref }}" >>"$GITHUB_OUTPUT"
+
+      - name: Check out PR branch
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ steps.pr.outputs.repository }}
+          ref: ${{ steps.pr.outputs.ref }}
+          fetch-depth: 0
+          token: ${{ secrets.COPILOT_REVIEW_FIX_TOKEN }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Compute Copilot CLI cache key
+        id: copilot-cache
+        run: |
+          echo "dir=$(npm config get cache)" >>"$GITHUB_OUTPUT"
+          echo "bucket=$(( $(date -u +%s) / 10800 ))" >>"$GITHUB_OUTPUT"
+
+      - name: Cache Copilot CLI dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.copilot-cache.outputs.dir }}
+          key: ${{ runner.os }}-node22-copilot-review-fix-loop-${{ hashFiles('.github/copilot-review-fix-loop/package-lock.json') }}-${{ steps.copilot-cache.outputs.bucket }}
+          restore-keys: |
+            ${{ runner.os }}-node22-copilot-review-fix-loop-${{ hashFiles('.github/copilot-review-fix-loop/package-lock.json') }}-
+
+      - name: Install GitHub Copilot CLI
+        run: npm ci --prefix .github/copilot-review-fix-loop
+
+      - name: Add Copilot CLI to PATH
+        run: echo "$GITHUB_WORKSPACE/.github/copilot-review-fix-loop/node_modules/.bin" >>"$GITHUB_PATH"
+
+      - name: Show Copilot CLI version
+        run: copilot version
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      # This loop relies on the branch ruleset enabling "Automatically request Copilot code review"
+      # with "Review new pushes" turned on for the target branch.
+      - name: Apply Copilot review fixes
+        run: bash ./.github/scripts/copilot-review-fix-loop.sh

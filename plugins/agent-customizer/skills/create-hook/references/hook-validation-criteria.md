@@ -15,9 +15,9 @@ Any hook violating these criteria must be fixed before proceeding:
 | Event name | From recognized 22-event list | hooks/claude-hook-reference-doc.md lines 22-46 |
 | Handler type | `command`, `http`, `prompt`, or `agent` only | hooks/claude-hook-reference-doc.md lines 249-257 |
 | `command` path | Script file exists and is executable | hooks/automate-workflow-with-hooks.md |
-| Exit code documentation | Clear exit code behavior defined | Exit 2 to block; exit 0 to allow |
+| Exit code behavior | Exit 2 effect is event-dependent — see full table in hook reference | Blocks execution on exit 2: PreToolUse, PermissionRequest, UserPromptSubmit, Stop, SubagentStop, TeammateIdle, TaskCompleted, ConfigChange, Elicitation, ElicitationResult. Any non-zero exit code fails creation (not just exit 2): WorktreeCreate. Shows stderr only (non-blocking): PostToolUse, PostToolUseFailure, Notification, SubagentStart, SessionStart, SessionEnd, PreCompact, PostCompact. Failures logged in debug mode only (not shown to user): WorktreeRemove. Exit code ignored: StopFailure, InstructionsLoaded. |
 
-*Source: hooks/claude-hook-reference-doc.md lines 132-200; hooks/automate-workflow-with-hooks.md lines 74-92*
+*Source: hooks/claude-hook-reference-doc.md "Exit code 2 behavior per event" table*
 
 ---
 
@@ -25,7 +25,7 @@ Any hook violating these criteria must be fixed before proceeding:
 
 - [ ] Event type matches intent (PreToolUse for blocking, PostToolUse for observation)
 - [ ] Matcher is specific (not `"*"` for blocking hooks)
-- [ ] Error handling defined: exit 2 with meaningful stderr message for blocking
+- [ ] Error handling defined: exit 2 with meaningful stderr for blockable events; non-blockable events should provide informative stderr
 - [ ] Silent success uses exit 0 (not leaving stderr output that confuses verbose mode)
 - [ ] Secrets not hardcoded in `command` string (use environment variables)
 - [ ] `command` hook used for deterministic checks (not `agent` for simple regex checks)
