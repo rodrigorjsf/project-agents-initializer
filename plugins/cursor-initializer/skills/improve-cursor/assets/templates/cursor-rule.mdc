@@ -1,0 +1,36 @@
+<!-- TEMPLATE: cursor-rule.mdc
+  Placement: .cursor/rules/[rule-name].mdc
+  Naming: kebab-case, descriptive of the rule's scope
+  Target: 10-50 lines of rule content
+  
+  ONLY these frontmatter fields are valid:
+  - description (string): What this rule is about — used for agent-requested activation
+  - alwaysApply (boolean): true = every conversation, false = conditional
+  - globs (string|array): File patterns for auto-attachment
+  
+  Activation modes (determined by frontmatter combination):
+  - Always: alwaysApply: true
+  - Auto-attached: globs set, alwaysApply: false
+  - Agent-requested: description set, no globs, alwaysApply: false
+  - Manual: no description, no globs, alwaysApply: false (user @-mentions)
+-->
+---
+description: "[RULE_DESCRIPTION]"
+globs: ["[GLOB_PATTERN]"]
+alwaysApply: false
+---
+
+<!-- CONDITIONAL: Remove globs if this is an agent-requested rule (description-only) -->
+<!-- CONDITIONAL: Set alwaysApply: true if this rule should load on every conversation -->
+<!-- CONDITIONAL: Remove description if this is a globs-only auto-attached rule -->
+
+[RULE_CONTENT]
+
+<!-- 
+  Content guidelines:
+  - Write rules as clear internal docs — direct, actionable
+  - Reference files with @filename.ts instead of copying content
+  - Each rule should focus on one concern
+  - Provide concrete examples, not vague guidance
+  - Keep under 500 lines per rule file
+-->
