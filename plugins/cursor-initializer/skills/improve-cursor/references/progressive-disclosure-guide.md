@@ -103,26 +103,6 @@ docs/
 
 ---
 
-## CLAUDE.md-Specific Hierarchy
-
-| Scope | Location | Loads when |
-|-------|----------|------------|
-| Org-wide | Managed policy (MDM) | Always |
-| Project | `./CLAUDE.md` or `./.claude/CLAUDE.md` | Session start (always) |
-| Personal | `~/.claude/CLAUDE.md` | Session start (always) |
-| Subdirectory | `./subdir/CLAUDE.md` | When reading files in that dir |
-| Path-scoped rules | `.claude/rules/*.md` with `paths:` | When matching files are read |
-
-**Priority rule**: Minimize content in always-loaded locations. Move to on-demand locations wherever possible.
-
-**@import syntax**: CLAUDE.md files can import additional files with `@path/to/file`. Imports expand at launch alongside the importing CLAUDE.md. Relative paths resolve relative to the importing file, not CWD. Max recursion depth: 5 hops. Requires one-time user approval per project.
-
-**Load order**: Claude Code walks up the directory tree from CWD, loading every ancestor CLAUDE.md at session start. Subdirectory CLAUDE.md files load on-demand only when Claude reads files in that directory — not at launch.
-
-*Source: research-context-engineering-comprehensive.md lines 181-208, 257-305*
-
----
-
 ## AGENTS.md-Specific Notes
 
 - AGENTS.md is an **open standard** supported by most agent frameworks (not Claude Code)

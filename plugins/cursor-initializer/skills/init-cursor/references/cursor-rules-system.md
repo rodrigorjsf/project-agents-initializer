@@ -27,8 +27,8 @@ Rules behave differently based on which frontmatter fields are set:
 
 ### Best Practices
 
-- Keep rules under 500 lines
-- Split large rules into multiple composable rules
+- Cursor generally allows larger rules, but this toolkit enforces a stricter ≤200-line limit per file
+- Split anything approaching 200 lines into multiple composable rules
 - Provide concrete examples or reference files
 - Write rules like clear internal docs — avoid vague guidance
 - Reference files instead of copying their contents

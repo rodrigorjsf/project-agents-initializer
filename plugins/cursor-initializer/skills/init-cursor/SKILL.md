@@ -43,7 +43,7 @@ Check whether the project has **either**:
 
 **If either exists:**
 
-1. Inform the user: "Cursor configuration already exists in this project. Switching to the improve workflow to optimize your existing configuration."
+1. Inform the user: "Existing AGENTS.md and/or Cursor rules were found in this project. Switching to the improve workflow to optimize your current configuration."
 2. Invoke the `improve-cursor` skill and follow its complete process.
 3. **STOP** — do not proceed to Phase 1 or any subsequent phase of this init skill.
 

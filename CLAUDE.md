@@ -4,7 +4,7 @@ Multi-plugin Claude Code marketplace for evidence-based agent artifact engineeri
 
 ## Structure
 
-Two plugins, each with two separate skill sets — same names, different conventions:
+Multiple plugin distributions and one standalone distribution — each follows its own platform conventions:
 
 - `plugins/agents-initializer/skills/` — Claude Code plugin; delegates analysis to subagents
 - `plugins/cursor-initializer/skills/` — Cursor IDE plugin; delegates analysis to subagents (Cursor-native format)
@@ -21,7 +21,7 @@ Each skill directory contains:
 
 - Distribution-specific rules in `.claude/rules/plugin-skills.md` and `.claude/rules/standalone-skills.md`
 - Shared references are copied into each skill (not symlinked) — each skill is self-contained
-- When updating a shared reference, update all copies across both distributions in sync
+- When updating an intentionally shared reference, update all intended copies in sync
 - `.claude/rules/` enforces conventions automatically via path-scoped rules
 - `.claude/skills/` — development meta-skills for this project (not distributed to end-users)
 
