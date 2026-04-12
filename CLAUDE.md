@@ -7,7 +7,7 @@ Multi-plugin Claude Code marketplace for evidence-based agent artifact engineeri
 Two plugins, each with two separate skill sets — same names, different conventions:
 
 - `plugins/agents-initializer/skills/` — Claude Code plugin; delegates analysis to subagents
-- `plugins/agent-customizer/skills/` — Claude Code plugin; artifact creation/improvement (planned)
+- `plugins/agent-customizer/skills/` — Claude Code plugin; artifact creation/improvement
 - `skills/` — npx skills add; standalone inline analysis, no agent delegation
 
 Each skill directory contains:
@@ -25,6 +25,7 @@ Each skill directory contains:
 - `.claude/skills/` — development meta-skills for this project (not distributed to end-users)
 
 See `plugins/agents-initializer/CLAUDE.md` for plugin-specific conventions.
+See `plugins/agent-customizer/CLAUDE.md` for agent-customizer plugin conventions.
 
 ## RAG Knowledge Base
 
@@ -49,3 +50,9 @@ The database is pre-built. Tools are available via MCP (`rag-knowledge-base` ser
 - Commit message format: `{type}({scope}): {description}` — use `feat`, `fix`, `docs`, `chore`, `refactor`
 - Stage only files belonging to the same logical change; never `git add -A` across unrelated changes
 - If asked to "commit everything", break it into atomic commits by scope first, then commit each group
+  
+## Applied Learning
+
+When something fails repeatedly, when User has to re-explain, or when a workaround is found for a platform/tool limitation, add a one-line bullet here. Keep  each bullet under 15 words. No explanations. Only add things that will save time in futures sessions.
+
+- Agents fail silently on wrong paths. Always verify hardcoded paths.
