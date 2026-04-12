@@ -28,9 +28,16 @@ Your task input will contain:
 - `PR`: pull request number
 - `RESOLUTIONS`: a table mapping comment IDs to outcomes
 
-### 1. Parse the Resolution Table
+### 1. Parse the Resolution Table and REPO
 
-Extract from your task input:
+Split `REPO` into owner and repo components before using them in API calls:
+
+```bash
+owner=$(echo "$REPO" | cut -d/ -f1)
+repo=$(echo "$REPO" | cut -d/ -f2)
+```
+
+Then extract from your task input:
 
 - `comment_id` — GitHub review comment ID (integer)
 - `action` — FIX, SKIP, or DEFER
@@ -56,7 +63,9 @@ Keep replies factual and brief. No performative language.
 
 ### 3. Resolve Threads via GraphQL
 
-After all replies are posted, attempt to resolve each thread:
+After all replies are posted, attempt to resolve each thread.
+
+> **Note:** The query below fetches up to 100 review threads. For PRs with more than 100 threads, some threads may not be resolved in this pass; this is a known limitation.
 
 ```bash
 # First, get the pullRequest node ID and review thread IDs
@@ -75,7 +84,7 @@ query($owner: String!, $repo: String!, $pr: Int!) {
       }
     }
   }
-}' -f owner="{owner}" -f repo="{repo}" -F pr={PR}
+}' -f owner="$owner" -f repo="$repo" -F pr={PR}
 ```
 
 Map each `comment_id` from the resolution table to a thread node ID using `databaseId`.
