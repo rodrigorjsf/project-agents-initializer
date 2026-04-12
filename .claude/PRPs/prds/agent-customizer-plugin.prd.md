@@ -219,7 +219,7 @@ Every phase follows this mandatory GitHub workflow:
 |---|-------|-------------|--------|----------|---------|----------|
 | 1 | Marketplace Rename & Restructure | Rename project to `agent-engineering-toolkit`, update marketplace.json, repo, origin | complete | - | - | `.claude/PRPs/plans/completed/marketplace-rename-restructure.plan.md` |
 | 2 | Docs Corpus Distillation | Distill 39 docs into artifact-type reference files with source citations | complete | - | 1 | `.claude/PRPs/plans/completed/docs-corpus-distillation.plan.md` |
-| 3 | Plugin Scaffold & Infrastructure | Create `plugins/agent-customizer/` structure, subagents, rules, templates, CLAUDE.md | in-progress | with 2 | 1 | `.claude/PRPs/plans/plugin-scaffold-infrastructure.plan.md` |
+| 3 | Plugin Scaffold & Infrastructure | Create `plugins/agent-customizer/` structure, subagents, rules, templates, CLAUDE.md | complete | with 2 | 1 | `.claude/PRPs/plans/completed/plugin-scaffold-infrastructure.plan.md` |
 | 4 | Create Skills (4 artifact types) | Implement `create-skill`, `create-hook`, `create-rule`, `create-subagent` | pending | - | 2, 3 | - |
 | 5 | Improve Skills (4 artifact types) | Implement `improve-skill`, `improve-hook`, `improve-rule`, `improve-subagent` | pending | - | 4 | - |
 | 6 | Self-Improvement Loop & Validation | Validation criteria per artifact type, self-validation loops, docs drift detection | pending | - | 4, 5 | - |
