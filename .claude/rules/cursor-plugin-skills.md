@@ -12,8 +12,7 @@ paths:
 - Self-validation phase MUST read `references/validation-criteria.md` and loop until all checks pass
 - Reference files must be one level deep from SKILL.md — no nested `references/references/` paths
 - Conditional reference loading pattern: "read X only if project uses Y"
-- init-cursor and improve-cursor generate `.cursor/rules/*.mdc` files — never `.claude/rules/`
-- init-agents and improve-agents generate AGENTS.md files — never CLAUDE.md
+- init-cursor generates AGENTS.md + `.cursor/rules/*.mdc` files; improve-cursor handles AGENTS.md only when target project uses it
 - Subagent definitions use `readonly: true`, NOT `tools:` whitelists or `maxTurns:`
 - .mdc frontmatter allows ONLY: `description` (string), `alwaysApply` (boolean), `globs` (string|array)
 - Never use `paths:` in .mdc frontmatter — that is Claude Code specific
