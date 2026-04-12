@@ -26,7 +26,7 @@
 <!-- CONDITIONAL: Use command hooks for deterministic enforcement that needs
      no LLM judgment (formatting, file blocking, validation scripts).
      Zero context cost. Highest enforcement reliability (100%). -->
-```json
+<!-- Emit raw JSON only. Do not include Markdown headings, tables, prose, or code fences in the generated `.cursor/hooks.json`. -->
 {
   "version": 1,
   "hooks": {
@@ -37,33 +37,3 @@
     ]
   }
 }
-```
-
-### When to Use Each Hook Event
-
-| Event | Use Case |
-|-------|----------|
-| `afterFileEdit` | Run formatters, linters after edits |
-| `beforeShellExecution` | Gate risky commands (e.g., SQL writes) |
-| `stop` | Continue agent loop with `followup_message` |
-| `sessionStart` | Inject context at conversation start |
-| `preToolUse` | Validate tool arguments before execution |
-| `postToolUseFailure` | Retry or log failed tool invocations |
-
-### Hook Script Pattern
-
-Scripts receive JSON on stdin and must output JSON on stdout:
-
-```json
-// Input (varies by event)
-{
-  "tool_name": "edit_file",
-  "file_path": "src/index.ts",
-  "conversation_id": "abc-123"
-}
-
-// Output options
-{ }                                        // Allow (no modification)
-{ "decision": "block", "reason": "..." }   // Block the action
-{ "followup_message": "Continue..." }      // Resume agent (stop hook)
-```

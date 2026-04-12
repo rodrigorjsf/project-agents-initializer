@@ -64,10 +64,10 @@ Build the `file-evaluator` task dynamically based on what was found:
 >
 > Return a structured assessment with specific line numbers and content for each issue.
 
-**If `has_agents_md` (with or without rules):** Delegate to the `file-evaluator` agent with this task:
+**If `has_agents_md` and `has_rules`:** Delegate to the `file-evaluator` agent with this task:
 
-> Evaluate all AGENTS.md files [if has_rules: and all `.cursor/rules/` files (.mdc and .md)] in the project at the current working directory. Check for:
->
+> Evaluate all AGENTS.md files and all `.cursor/rules/` files (.mdc and .md) in the project at the current working directory. Check for:
+> 
 > 1. Files over 200 lines
 > 2. Bloat indicators (directory listings, obvious conventions, vague instructions)
 > 3. Stale references (file paths that don't exist, commands that aren't in package.json)
@@ -77,6 +77,20 @@ Build the `file-evaluator` task dynamically based on what was found:
 > 7. Rules with `alwaysApply: true` that should use globs or description instead (wasting tokens on every request)
 > 8. Content in root AGENTS.md that only applies to specific file patterns (should be in `.cursor/rules/*.mdc` with globs)
 > 9. Invalid .mdc frontmatter (only `description`, `alwaysApply`, `globs` are valid)
+>
+> Return a structured assessment with specific line numbers and content for each issue.
+
+**If `has_agents_md` and not `has_rules`:** Delegate to the `file-evaluator` agent with this task:
+
+> Evaluate all AGENTS.md files in the project at the current working directory. Check for:
+>
+> 1. Files over 200 lines
+> 2. Bloat indicators (directory listings, obvious conventions, vague instructions)
+> 3. Stale references (file paths that don't exist, commands that aren't in package.json)
+> 4. Contradictions between AGENTS.md files
+> 5. Progressive disclosure opportunities (content that should be in separate files)
+> 6. Missing scope-specific files
+> 7. Content in root AGENTS.md that only applies to specific file patterns (should be in `.cursor/rules/*.mdc` with globs)
 >
 > Return a structured assessment with specific line numbers and content for each issue.
 
