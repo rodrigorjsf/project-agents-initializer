@@ -2,6 +2,7 @@
 paths:
   - "plugins/agents-initializer/agents/*.md"
   - "plugins/agent-customizer/agents/*.md"
+  - ".claude/agents/*.md"
 ---
 # Agent File Conventions
 - YAML frontmatter required: `name`, `description`, `tools`, `model`, `maxTurns`
