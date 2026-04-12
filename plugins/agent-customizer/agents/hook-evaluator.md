@@ -65,7 +65,7 @@ Evaluate every hook definition against the Quality Criteria above:
 2. Check each event name against the valid event types list
 3. Check handler type for each hook entry
 4. For `command` type: verify the script path exists and is executable
-5. Check matcher specificity for blocking hooks (PreToolUse with exit 2)
+5. Check matcher applicability: matchers are supported by PreToolUse, PostToolUse*, PermissionRequest, SessionStart/End, Notification, ConfigChange; matchers are silently ignored for UserPromptSubmit, Stop, SubagentStop, TeammateIdle, TaskCompleted, WorktreeCreate, WorktreeRemove — flag any matcher set on ignored-matcher events
 6. Check for hardcoded secrets in command strings
 
 ### 3. Compile Findings
