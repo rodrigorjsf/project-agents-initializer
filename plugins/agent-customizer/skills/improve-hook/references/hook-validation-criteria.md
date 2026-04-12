@@ -15,9 +15,9 @@ Any hook violating these criteria must be fixed before proceeding:
 | Event name | From recognized 22-event list | hooks/claude-hook-reference-doc.md lines 22-46 |
 | Handler type | `command`, `http`, `prompt`, or `agent` only | hooks/claude-hook-reference-doc.md lines 249-257 |
 | `command` path | Script file exists and is executable | hooks/automate-workflow-with-hooks.md |
-| Exit code behavior | Exit 2 effect is event-dependent | Blocks: PreToolUse, PermissionRequest, UserPromptSubmit, Stop, SubagentStop. Shows stderr only (non-blocking): PostToolUse, PostToolUseFailure, SessionStart, SessionEnd, PreCompact, PostCompact, Notification. StopFailure ignores exit code. |
+| Exit code behavior | Exit 2 effect is event-dependent — see full table in hook reference | Blocks execution on exit 2: PreToolUse, PermissionRequest, UserPromptSubmit, Stop, SubagentStop, TeammateIdle, TaskCompleted, ConfigChange, Elicitation, ElicitationResult, WorktreeCreate. Shows stderr only (non-blocking): PostToolUse, PostToolUseFailure, Notification, SubagentStart, SessionStart, SessionEnd, PreCompact, PostCompact, WorktreeRemove. Exit code ignored: StopFailure, InstructionsLoaded. |
 
-*Source: hooks/claude-hook-reference-doc.md lines 132-200; hooks/automate-workflow-with-hooks.md lines 74-92*
+*Source: hooks/claude-hook-reference-doc.md "Exit code 2 behavior per event" table*
 
 ---
 
