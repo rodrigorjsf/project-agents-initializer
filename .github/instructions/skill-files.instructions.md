@@ -16,7 +16,7 @@ Flag any SKILL.md missing frontmatter or violating these constraints.
 
 - Body must be under 500 lines total
 - Must define a clear phase-based workflow (Phase 1, Phase 2, etc.)
-- Must include a self-validation phase that reads `references/validation-criteria.md`
+- Must include a self-validation phase that reads the relevant `references/*validation-criteria.md` file for that skill
 - Reference files must be loaded conditionally using the platform-appropriate skill-root path convention
 - Sibling directories `references/` and `assets/templates/` must exist alongside SKILL.md
 
@@ -25,7 +25,8 @@ Flag any SKILL.md missing frontmatter or violating these constraints.
 Check the file path to determine distribution:
 
 **Plugin skills** (`plugins/*/skills/*/SKILL.md`):
-- Analysis phases MUST delegate to named agents: `codebase-analyzer`, `scope-detector`, `file-evaluator`
+- `plugins/agents-initializer/skills/*/SKILL.md` analysis phases MUST delegate to `codebase-analyzer`, `scope-detector`, or `file-evaluator`
+- `plugins/agent-customizer/skills/*/SKILL.md` analysis phases MUST delegate to `artifact-analyzer`
 - Never contain inline bash analysis commands
 - May suggest all 4 migration mechanisms: hooks, rules, skills, subagents
 - Cursor plugin skills must reference bundled files with relative paths from the skill root (`references/...`, `assets/templates/...`)

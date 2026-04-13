@@ -8,10 +8,10 @@ paths:
 - For `plugins/agents-initializer/skills/*`: analysis phases MUST delegate to `codebase-analyzer`, `scope-detector`, or `file-evaluator`
 - For `plugins/agent-customizer/skills/*`: analysis phases MUST delegate to `artifact-analyzer`
 - Never add inline bash analysis here — subagent delegation keeps the orchestrator context clean
-- Reference agents by registered name for the target plugin (e.g., "Delegate to the `codebase-analyzer` agent with this task:")
+- Reference agents by registered name for the target plugin (e.g., "Delegate to the `artifact-analyzer` agent with this task:")
 - `references/` directory MUST exist alongside SKILL.md and contain evidence-based guidance files
 - `assets/templates/` directory MUST exist alongside SKILL.md and contain output templates
-- Self-validation phase MUST read `references/validation-criteria.md` and loop until all checks pass
+- Self-validation phase MUST read the relevant `references/*validation-criteria.md` file for that skill and loop until all checks pass
 - Reference files must be one level deep from SKILL.md — no nested `references/references/` paths
 - Conditional reference loading pattern: "read X only if project uses Y"
 - Plugin improve skills suggest all 4 migration mechanisms: hooks, path-scoped rules, skills, and subagents
