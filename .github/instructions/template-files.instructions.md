@@ -10,6 +10,7 @@ Templates should use HTML comment blocks for metadata:
 - `<!-- TEMPLATE: ... -->` for placement, naming, line targets, and embedded rules
 - `<!-- CONDITIONAL: ... -->` for optional sections included only when applicable
 - `<!-- MIGRATION: ... -->` blocks apply only in improve (not init) context
+- Migration templates that preserve source material must require a provenance comment like `<!-- Migrated from [source-file]:lines [N-M] -->`
 
 ## Placeholder Conventions
 
@@ -42,5 +43,6 @@ Templates should use HTML comment blocks for metadata:
 - Missing HTML comment metadata
 - Hook-related templates in standalone skill directories
 - Migration templates in init skill directories
+- Migration templates missing provenance attribution comments
 - Templates that would generate files exceeding 200 lines
 - `paths:` frontmatter in .mdc templates (Claude leak)
