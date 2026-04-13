@@ -13,6 +13,7 @@ Maps project scopes to their `applyTo` patterns, convention sources, and instruc
 | rules | `rules.instructions.md` | `.claude/rules/**/*.md` | DESIGN-GUIDELINES.md §1, §10 |
 | documentation | `documentation.instructions.md` | `docs/**/*.md` | DESIGN-GUIDELINES.md §5, Research Foundation section |
 | plugin-config | `plugin-config.instructions.md` | `**/.claude-plugin,**/.cursor-plugin,**/CLAUDE.md,DESIGN-GUIDELINES.md` | DESIGN-GUIDELINES.md §1-§4, plugins/*/CLAUDE.md |
+| prp-artifacts | `prp-artifacts.instructions.md` | `**/*.prd.md,**/*.plan.md,.claude/PRPs/**/*.md` | `.claude/PRPs/CLAUDE.md`, CLAUDE.md §Conventions |
 
 ## Adding New Scopes
 
@@ -27,9 +28,7 @@ When a new scope is identified (e.g., new file type or directory with distinct c
 
 Review these areas periodically for potential new scopes:
 
-- `.claude/PRPs/` — PRP artifacts (plans, PRDs, reports, tests)
 - `.claude/hooks/` — Hook configuration files (if hooks are added)
 - `.claude/settings*.json` — Settings files
 - `.cursor/rules/` — Generated Cursor rules (output of cursor-initializer skills)
-- `plugins/agent-customizer/` — When agent-customizer skills are implemented
 - Root config files — `README.md`, `LICENSE`, `.gitignore`, `next-steps.md`
