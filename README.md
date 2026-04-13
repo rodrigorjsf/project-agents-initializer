@@ -181,10 +181,10 @@ Initialize an optimized `.cursor/rules/*.mdc` hierarchy for your project.
 
 1. Launches a `codebase-analyzer` subagent to detect your tech stack and tooling
 2. Launches a `scope-detector` subagent to identify distinct project contexts
-3. Generates `.cursor/rules/*.mdc` files with appropriate activation modes (`alwaysApply`, `globs`, `description`)
+3. Generates `AGENTS.md` (root + per detected scope) and `.cursor/rules/*.mdc` files with appropriate activation modes (`alwaysApply`, `globs`, `description`)
 4. Presents all files for review before writing
 
-**Preflight check:** If `.cursor/rules/` already has rules, the skill redirects to `improve-cursor`.
+**Preflight check:** If `.cursor/rules/` already has rules **or** the project already has an `AGENTS.md`, the skill redirects to `improve-cursor`.
 
 ### `improve-cursor`
 
