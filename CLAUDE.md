@@ -24,6 +24,7 @@ Each skill directory contains:
 - When updating an intentionally shared reference, update all intended copies in sync
 - `.claude/rules/` enforces conventions automatically via path-scoped rules
 - `.claude/skills/` — development meta-skills for this project (not distributed to end-users)
+- Rules and review instructions describe **current** patterns — user `*.prd.md`/`*.plan.md` files may extend or override conventions for new scope. When new scope is adopted, update affected rules and instructions to reflect the evolved patterns.
 
 See `plugins/agents-initializer/CLAUDE.md` for plugin-specific conventions.
 See `plugins/cursor-initializer/CLAUDE.md` for cursor-initializer plugin conventions.
