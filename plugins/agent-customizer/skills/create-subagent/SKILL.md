@@ -31,8 +31,8 @@ Check if a subagent with the same name already exists at:
 **If a subagent already exists with that name:**
 
 1. Inform the user: "A subagent named `{name}` already exists."
-2. Inform the user that `improve-subagent` is currently a Phase 5 placeholder and not yet executable.
-3. **STOP** — do not proceed to Phase 1 or any subsequent phase of this create skill. Ask the user to choose a different name or wait for the improve workflow implementation.
+2. Suggest using `/agent-customizer:improve-subagent` to evaluate and optimize it instead.
+3. **STOP** — do not proceed. The user should either choose a different name or use the improve skill.
 
 **If no subagent exists with that name:**
 Proceed to Phase 1 below.

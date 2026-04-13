@@ -28,8 +28,8 @@ Check if hooks already exist for the target event in `.claude/settings.json` and
 **If the exact same event + matcher combination already exists:**
 
 1. Inform the user: "A hook for `{event}` with this matcher already exists."
-2. Inform the user that `improve-hook` is currently a Phase 5 placeholder and not yet executable.
-3. **STOP** — do not proceed to Phase 1 or any subsequent phase of this create hook. Ask the user to choose a different matcher/event combination or wait for the improve workflow implementation.
+2. Suggest using `/agent-customizer:improve-hook` to evaluate and optimize it instead.
+3. **STOP** — do not proceed. The user should either choose a different matcher/event combination or use the improve skill.
 
 **If no hook exists for this event+matcher combination:**
 Proceed to Phase 1 below.
