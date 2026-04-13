@@ -6,25 +6,31 @@ applyTo: "**/agents/**/*.md"
 
 ## YAML Frontmatter (Required)
 
-Every agent file must have YAML frontmatter with these fields:
-- `name`: agent identifier
-- `description`: what the agent does
-- `tools`: list of allowed tools
-- `model`: model to use
-- `maxTurns`: maximum execution turns
+Every agent file must have YAML frontmatter. Required fields depend on the plugin:
+
+**Claude Code agents** (`plugins/agents-initializer/agents/`):
+- `name`, `description`, `tools`, `model`, `maxTurns`
+
+**Cursor agents** (`plugins/cursor-initializer/agents/`):
+- `name`, `description`, `model`, `readonly`
 
 ## Mandatory Constraints
 
-- `model` MUST be `sonnet` — never haiku (too weak for analysis) or opus (too costly)
-- `tools` MUST be restricted to read-only: `Read`, `Grep`, `Glob`, `Bash` — no write tools
+**Claude Code agents:**
+- `model` MUST be `sonnet` — never haiku or opus
+- `tools` MUST be restricted to read-only: `Read`, `Grep`, `Glob`, `Bash`
 - `maxTurns`: 15 for codebase/scope agents; 20 for evaluator agents
-- Prompt MUST request structured output format (tables, lists, or labeled sections)
+
+**Cursor agents:**
+- `model` MUST be `inherit` — inherits from parent context
+- `readonly` MUST be `true` — analysis agents must not write
+- Must NOT have `tools` or `maxTurns` fields (Claude-specific)
 
 ## Isolation Rules
 
-- Agents cannot spawn other agents (Task tool is unavailable in agent context)
-- Agents receive only their system prompt plus basic environment — not parent conversation
-- Agent instructions must be self-contained with complete context for the task
+- Cursor agents MAY support nested launches, but this project's Cursor agents MUST NOT spawn other agents
+- Agents receive only their system prompt plus basic environment
+- Agent instructions must be self-contained with complete context
 
 ## Output Quality
 
@@ -34,9 +40,8 @@ Every agent file must have YAML frontmatter with these fields:
 
 ## Common Issues to Flag
 
-- Model set to anything other than sonnet
-- Write tools (Edit, Create, Write) in the tools list
+- Claude agents: model not `sonnet`, write tools in list, maxTurns outside 15-20
+- Cursor agents: `tools`/`maxTurns` present, model not `inherit`, missing `readonly: true`
+- Cross-contamination: Claude frontmatter fields in Cursor agents or vice versa
 - Missing structured output specification in the prompt
-- maxTurns outside the 15-20 range
 - References to spawning other agents or using Task tool
-- Missing YAML frontmatter fields

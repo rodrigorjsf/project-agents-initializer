@@ -39,7 +39,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 40
     env:
-      GH_TOKEN: ${{ secrets.COPILOT_REVIEW_FIX_TOKEN }}
+      GH_TOKEN: ${{ github.token }}
+      COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_REVIEW_FIX_TOKEN }}
       WORKFLOW_PR_NUMBER: ${{ inputs.pr_number }}
       WORKFLOW_REVIEW_ID: ${{ inputs.review_id }}
       WORKFLOW_MAX_ITERATIONS: ${{ inputs.max_iterations }}
@@ -47,10 +48,10 @@ jobs:
       REPO_DEFAULT_MAX_ITERATIONS: ${{ vars.COPILOT_REVIEW_FIX_MAX_ITERATIONS }}
       REPO_DEFAULT_MODEL: ${{ vars.COPILOT_REVIEW_FIX_MODEL }}
     steps:
-      - name: Validate workflow secret
+      - name: Validate Copilot token secret
         run: |
-          if [[ -z "${GH_TOKEN:-}" ]]; then
-            echo "::error::Set the COPILOT_REVIEW_FIX_TOKEN secret with Copilot Requests, contents:write, issues:write, and pull-requests:write permissions."
+          if [[ -z "${COPILOT_GITHUB_TOKEN:-}" ]]; then
+            echo "::error::Set the COPILOT_REVIEW_FIX_TOKEN secret to a fine-grained PAT with the Copilot Requests permission."
             exit 1
           fi
 
@@ -79,7 +80,7 @@ jobs:
           repository: ${{ steps.pr.outputs.repository }}
           ref: ${{ steps.pr.outputs.ref }}
           fetch-depth: 0
-          token: ${{ secrets.COPILOT_REVIEW_FIX_TOKEN }}
+          token: ${{ github.token }}
 
       - name: Set up Node.js
         uses: actions/setup-node@v4

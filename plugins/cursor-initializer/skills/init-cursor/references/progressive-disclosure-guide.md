@@ -1,0 +1,144 @@
+# Progressive Disclosure Guide
+
+Evidence-based instructions for structuring AGENTS.md hierarchies and `.cursor/rules/*.mdc` rules in Cursor.
+Sources: a-guide-to-agents.md, research-context-engineering-comprehensive.md, memory/how-claude-remembers-a-project.md
+
+---
+
+## Contents
+
+- File hierarchy decision table (where to place content)
+- Root file requirements (minimal elements only)
+- Monorepo: what goes where (root vs package level)
+- Progressive disclosure patterns (domain files, nested docs, skills)
+- Cursor rule scoping notes
+- AGENTS.md in Cursor (root, subdirectory, merging)
+- Anti-patterns to detect and remove
+- Validation checklist
+
+---
+
+## File Hierarchy Decision Table
+
+When deciding where to place content, use this table:
+
+| Location | Use when content is... | Load timing |
+|----------|------------------------|-------------|
+| Root AGENTS.md | Relevant to **every single task** in the repo | Always (every request) |
+| Separate domain file | Relevant to one domain (TypeScript, testing, API design) | On-demand |
+| Subdirectory AGENTS.md | Specific to one package or area | On-demand when working there |
+| `.cursor/rules/*.mdc` with `globs:` | Specific to certain file patterns | On-demand when files match |
+| Skill | A workflow the agent should invoke explicitly | On-demand when invoked |
+
+*Source: a-guide-to-agents.md lines 228-233; research-context-engineering-comprehensive.md lines 257-305*
+
+---
+
+## Root File Requirements
+
+Generate root files with **only** these elements:
+
+1. **One-sentence project description** — anchors every agent decision ("This is a React component library for accessible data visualization.")
+2. **Package manager** — only if non-standard (e.g., `pnpm`, `bun`; omit if npm)
+3. **Build/typecheck commands** — only if non-standard
+4. **Progressive disclosure pointers** — links to domain files, not inline content
+
+> "Consider this the absolute minimum... That's honestly it. Everything else should go elsewhere."
+> — a-guide-to-agents.md
+
+---
+
+## Monorepo: What Goes Where
+
+| Level | Generate here | Do NOT put here |
+|-------|---------------|-----------------|
+| Root | Monorepo purpose, how to navigate packages, shared tooling | Package-specific tech stacks, package conventions |
+| Package | Package purpose, specific tech stack, package-specific conventions | Cross-repo decisions |
+
+Root example:
+
+```markdown
+This is a monorepo containing web services and CLI tools.
+Use pnpm workspaces to manage dependencies.
+See each package's AGENTS.md for specific guidelines.
+```
+
+> "Don't overload any level. The agent sees all merged files in its context."
+> — a-guide-to-agents.md lines 164-193
+
+**Monorepo context scoping in Cursor**: In large monorepos, use `.cursor/rules/*.mdc` with narrow `globs:` patterns to limit rules to relevant packages. Rules with `alwaysApply: true` load for every request — keep them minimal.
+
+*Source: memory/how-claude-remembers-a-project.md lines 243-260; docs/cursor/rules-and-memory.md*
+
+---
+
+## Progressive Disclosure Patterns
+
+Apply these patterns when content exceeds root-file scope:
+
+**Extraction trigger**: Extract a section to a separate domain file when it has 3+ distinct rules AND spans 10+ lines, OR when the topic is irrelevant to most work sessions (e.g., database migration conventions in a project where most work is UI changes).
+
+**Move domain rules to separate files:**
+
+```markdown
+# In root file — do this:
+For TypeScript conventions, see docs/TYPESCRIPT.md
+
+# NOT this (inline domain rules):
+Always use const instead of let. Never use var...
+```
+
+**Nest disclosure hierarchically:**
+
+```
+docs/
+├── TYPESCRIPT.md      → references TESTING.md
+├── TESTING.md         → references test runners
+└── BUILD.md           → references build config
+```
+
+**Use skills for workflows** — agents invoke skills only when needed, keeping base context minimal.
+
+*Source: a-guide-to-agents.md lines 110-163*
+
+---
+
+## Cursor Rule Scoping Notes
+
+- Use `.cursor/rules/*.mdc` when guidance depends on file patterns, activation mode, or agent-requested loading
+- Keep rule metadata minimal: only `description`, `alwaysApply`, and `globs`
+- Prefer narrow `globs:` over `alwaysApply: true` when guidance applies to specific files only
+
+---
+
+## AGENTS.md in Cursor
+
+- Cursor supports `AGENTS.md` at the project root and in subdirectories
+- Nested `AGENTS.md` files merge with parent instructions; more specific scopes take precedence
+- Keep AGENTS.md for project-wide or directory-wide guidance; move file-pattern-specific instructions to `.cursor/rules/*.mdc`
+- Use root AGENTS.md for essentials and subdirectory AGENTS.md files for area-specific tooling or conventions
+
+---
+
+## Anti-Patterns to Detect and Remove
+
+| Anti-pattern | Why it fails | Fix |
+|--------------|--------------|-----|
+| Ball-of-mud growth | Each fix adds a rule; after hundreds of additions the file confuses agents | Refactor with progressive disclosure |
+| Auto-generated init files | "Prioritize comprehensiveness over restraint" — flood file with irrelevant content | Author manually, restraint first |
+| Everything in one file | Exceeds ~150-200 instruction attention budget | Split by domain |
+
+> "There's a natural feedback loop that causes AGENTS.md files to grow dangerously large."
+> — a-guide-to-agents.md lines 34-43
+
+---
+
+## Validation
+
+Before finalizing any generated hierarchy, check:
+
+- [ ] Root file contains ONLY: one-liner, package manager (if non-standard), build commands (if non-standard), pointers
+- [ ] Domain content lives in separate files, not inlined
+- [ ] No file exceeds 200 lines
+- [ ] Each file covers exactly one scope
+- [ ] Subdirectory files exist for areas with distinct tooling or conventions

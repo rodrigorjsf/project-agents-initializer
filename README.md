@@ -1,6 +1,6 @@
 # Agent Engineering Toolkit
 
-A multi-plugin marketplace providing evidence-based Claude Code artifact engineering. The `agents-initializer` plugin generates and optimizes AGENTS.md and CLAUDE.md configuration files. Instead of auto-generating one bloated file, this toolkit creates **minimal, scoped files** following progressive disclosure principles — proven by research to outperform comprehensive auto-generated configurations.
+A multi-plugin marketplace providing evidence-based agent artifact engineering. The `agents-initializer` plugin generates and optimizes AGENTS.md and CLAUDE.md configuration files for Claude Code. The `cursor-initializer` plugin does the same for Cursor IDE, generating AGENTS.md and `.cursor/rules/*.mdc` files. Instead of auto-generating one bloated file, this toolkit creates **minimal, scoped files** following progressive disclosure principles — proven by research to outperform comprehensive auto-generated configurations.
 
 ## Why This Plugin Exists
 
@@ -41,11 +41,11 @@ To maintain context integrity during execution, this plugin uses **subagent isol
 
 | Subagent | Role | Used By |
 |----------|------|---------|
-| `codebase-analyzer` | Detects tech stack, package manager, build/test commands | All 4 skills |
+| `codebase-analyzer` | Detects tech stack, package manager, build/test commands | All subagent-backed plugin skills |
 | `scope-detector` | Identifies distinct scopes/contexts in the project | init skills |
 | `file-evaluator` | Assesses existing config file quality against research criteria | improve skills |
 
-All subagents are defined as native Claude Code subagent files with proper YAML frontmatter (`name`, `description`, `tools`, `model`, `maxTurns`). They run on **Claude Sonnet** with read-only tools (`Read`, `Grep`, `Glob`, `Bash`) for cost efficiency and safety. They return structured summaries — high signal, low noise — keeping the orchestrator's context clean.
+The Claude Code plugin uses native Claude subagent files with read-only tool whitelists and `model: sonnet`; the Cursor plugin uses Cursor's native subagent format with `model: inherit` and `readonly: true`. Both return structured summaries — high signal, low noise — keeping the orchestrator's context clean.
 
 #### Subagent Metadata
 
@@ -58,6 +58,17 @@ description: "When to use this agent..."   # Routing signal for Claude's delegat
 tools: Read, Grep, Glob, Bash             # Restricted to read-only + shell
 model: sonnet                              # Cost-efficient for investigation tasks
 maxTurns: 15                               # Prevents runaway execution
+---
+```
+
+The Cursor variant (`plugins/cursor-initializer/agents/`) uses Cursor's native format:
+
+```yaml
+---
+name: codebase-analyzer
+description: "When to use this agent..."
+model: inherit                             # Inherits from parent context
+readonly: true                             # Read-only — boolean, not tool whitelist
 ---
 ```
 
@@ -158,6 +169,42 @@ Evaluate and improve existing CLAUDE.md files and `.claude/rules/`.
 - `.claude/rules/[topic].md` — migrated path-scoped conventions
 - Hook config snippets for `.claude/settings.json` (plugin distribution only)
 
+### Cursor IDE Skills
+
+The `cursor-initializer` plugin provides equivalent skills optimized for Cursor IDE's artifact system:
+
+### `init-cursor`
+
+Initialize an optimized `.cursor/rules/*.mdc` hierarchy for your project.
+
+**What it does:**
+
+1. Launches a `codebase-analyzer` subagent to detect your tech stack and tooling
+2. Launches a `scope-detector` subagent to identify distinct project contexts
+3. Generates `AGENTS.md` (root + per detected scope) and `.cursor/rules/*.mdc` files with appropriate activation modes (`alwaysApply`, `globs`, `description`)
+4. Presents all files for review before writing
+
+**Preflight check:** If `.cursor/rules/` already has rules **or** the project already has an `AGENTS.md`, the skill redirects to `improve-cursor`.
+
+### `improve-cursor`
+
+Evaluate and improve existing `.cursor/rules/*.mdc` files.
+
+**What it does:**
+
+1. Launches a `file-evaluator` subagent to assess .mdc file quality and activation mode correctness
+2. Generates an improvement plan (removals → refactoring → mode optimization → additions)
+3. Presents changes with token savings metrics before applying
+
+**Cursor-specific checks:**
+
+- Invalid frontmatter fields (only `description`, `alwaysApply`, `globs` are valid)
+- Activation mode optimization (e.g., converting `alwaysApply` rules to `globs`-based auto-attachment)
+- Rules that should be AGENTS.md content instead (portable, no metadata needed)
+- AGENTS.md evaluation is conditional: only included when the target project already uses AGENTS.md
+
+> **Note:** Use `cursor-initializer` when you want the full Cursor configuration hierarchy, including AGENTS.md alongside `.cursor/rules/*.mdc`. Use `agents-initializer` (`/init-agents`, `/improve-agents`) when you want AGENTS.md/CLAUDE.md workflows outside a Cursor-specific setup.
+
 ## Installation
 
 ### Claude Code (Native Plugin System)
@@ -192,6 +239,24 @@ claude plugin install agents-initializer@agent-engineering-toolkit --scope proje
 claude plugin install agents-initializer@agent-engineering-toolkit --scope local
 ```
 
+### Cursor IDE (Native Plugin System)
+
+For local development and testing, load this repository through Cursor's local plugin directory:
+
+```bash
+# Clone the repository
+git clone https://github.com/rodrigorjsf/agent-engineering-toolkit.git ~/src/agent-engineering-toolkit
+
+# Register it as a local Cursor plugin marketplace
+mkdir -p ~/.cursor/plugins/local
+ln -s ~/src/agent-engineering-toolkit ~/.cursor/plugins/local/agent-engineering-toolkit
+```
+
+Then restart Cursor (or run **Developer: Reload Window**). The repo root `.cursor-plugin/marketplace.json` exposes the `cursor-initializer` plugin, which provides:
+
+- `/cursor-initializer:init-cursor`
+- `/cursor-initializer:improve-cursor`
+
 ### npx skills add (Third-Party Skills CLI)
 
 For users of the [skills CLI](https://skills.sh/) — works with VS Code Copilot, Cursor, Windsurf, and other AI coding tools:
@@ -206,14 +271,14 @@ npx skills add rodrigorjsf/agent-engineering-toolkit
 # Install for specific AI tools
 npx skills add rodrigorjsf/agent-engineering-toolkit --agent cursor copilot
 
-# Install only specific skills
+# Install only specific standalone skills
 npx skills add rodrigorjsf/agent-engineering-toolkit --skill init-claude improve-claude
 
 # List available skills before installing
 npx skills add rodrigorjsf/agent-engineering-toolkit --list
 ```
 
-**These are standalone skills** — they perform all analysis inline without delegating to subagents. They work with any AI coding tool without requiring Claude Code's subagent system.
+**These are standalone skills** — they come from the root `skills/` directory, perform all analysis inline, and work with any AI coding tool without requiring plugin subagents. The Cursor-specific `init-cursor` / `improve-cursor` skills are **plugin-only** and require the native Cursor plugin install path above.
 
 ### Manual Installation
 
@@ -221,20 +286,22 @@ npx skills add rodrigorjsf/agent-engineering-toolkit --list
 # Clone the repository
 git clone https://github.com/rodrigorjsf/agent-engineering-toolkit.git /tmp/agent-engineering-toolkit
 
-# For Claude Code (project-level)
+# For standalone skills in Claude Code (project-level)
 mkdir -p .claude/skills
-cp -r /tmp/agent-engineering-toolkit/plugins/agents-initializer/skills/* .claude/skills/
+cp -r /tmp/agent-engineering-toolkit/skills/* .claude/skills/
 
-# For Claude Code (user-level, all projects)
-cp -r /tmp/agent-engineering-toolkit/plugins/agents-initializer/skills/* ~/.claude/skills/
+# For standalone skills in Claude Code (user-level, all projects)
+cp -r /tmp/agent-engineering-toolkit/skills/* ~/.claude/skills/
 
 # For VS Code / GitHub Copilot
 mkdir -p .agents/skills
-cp -r /tmp/agent-engineering-toolkit/plugins/agents-initializer/skills/* .agents/skills/
+cp -r /tmp/agent-engineering-toolkit/skills/* .agents/skills/
 
 # Clean up
 rm -rf /tmp/agent-engineering-toolkit
 ```
+
+For the native Claude Code and Cursor plugin distributions, use the plugin installation flows above instead of copying `plugins/*/skills/` by themselves — the plugin variants depend on their surrounding plugin layout (agents, manifests, and namespacing).
 
 ## Usage
 
@@ -247,9 +314,17 @@ After installation, invoke skills by name:
 /improve-claude       # Improve existing CLAUDE.md files
 /improve-agents       # Improve existing AGENTS.md files
 
+# In Cursor IDE
+/init-cursor          # Initialize .cursor/rules/*.mdc + AGENTS.md hierarchy
+/improve-cursor       # Improve existing .cursor/rules/*.mdc files (and AGENTS.md if present)
+
 # If installed as a plugin (namespaced)
 /agents-initializer:init-claude
 /agents-initializer:improve-claude
+/agents-initializer:init-agents
+/agents-initializer:improve-agents
+/cursor-initializer:init-cursor
+/cursor-initializer:improve-cursor
 ```
 
 ## Research Foundation
@@ -292,19 +367,32 @@ For a comprehensive mapping of every design decision to its evidence source, see
 agent-engineering-toolkit/
 ├── .claude-plugin/
 │   └── marketplace.json             # Marketplace catalog (Claude Code plugin system)
+├── .cursor-plugin/
+│   └── marketplace.json             # Marketplace catalog (Cursor plugin system)
 ├── plugins/
-│   └── agents-initializer/          # Claude Code plugin — agent-delegating skills + proper agents
-│       ├── .claude-plugin/
+│   ├── agents-initializer/          # Claude Code plugin — agent-delegating skills + proper agents
+│   │   ├── .claude-plugin/
+│   │   │   └── plugin.json          # Plugin manifest
+│   │   ├── skills/
+│   │   │   ├── init-agents/SKILL.md     # Delegates to codebase-analyzer + scope-detector agents
+│   │   │   ├── init-claude/SKILL.md     # Delegates to codebase-analyzer + scope-detector agents
+│   │   │   ├── improve-agents/SKILL.md  # Delegates to file-evaluator + codebase-analyzer agents
+│   │   │   └── improve-claude/SKILL.md  # Delegates to file-evaluator + codebase-analyzer agents
+│   │   └── agents/                  # Claude Code subagents (proper YAML spec)
+│   │       ├── codebase-analyzer.md # Subagent: tech stack and tooling detection
+│   │       ├── scope-detector.md    # Subagent: project scope/context detection
+│   │       └── file-evaluator.md    # Subagent: config file quality assessment
+│   └── cursor-initializer/         # Cursor IDE plugin — Cursor-native artifact generation
+│       ├── .cursor-plugin/
 │       │   └── plugin.json          # Plugin manifest
+│       ├── AGENTS.md                # Cursor-native plugin config (for working in this directory)
 │       ├── skills/
-│       │   ├── init-agents/SKILL.md     # Delegates to codebase-analyzer + scope-detector agents
-│       │   ├── init-claude/SKILL.md     # Delegates to codebase-analyzer + scope-detector agents
-│       │   ├── improve-agents/SKILL.md  # Delegates to file-evaluator + codebase-analyzer agents
-│       │   └── improve-claude/SKILL.md  # Delegates to file-evaluator + codebase-analyzer agents
-│       └── agents/                  # Claude Code subagents (proper YAML spec)
-│           ├── codebase-analyzer.md # Subagent: tech stack and tooling detection
-│           ├── scope-detector.md    # Subagent: project scope/context detection
-│           └── file-evaluator.md    # Subagent: config file quality assessment
+│       │   ├── init-cursor/SKILL.md     # .cursor/rules/*.mdc + AGENTS.md generation
+│       │   └── improve-cursor/SKILL.md  # .cursor/rules/*.mdc evaluation/improvement (AGENTS.md conditional)
+│       └── agents/                  # Cursor subagents (readonly: true format)
+│           ├── codebase-analyzer.md # Subagent: tech stack detection
+│           ├── scope-detector.md    # Subagent: scope detection
+│           └── file-evaluator.md    # Subagent: .mdc file quality assessment
 ├── skills/                          # npx skills add — standalone skills (no agent delegation)
 │   ├── init-agents/SKILL.md         # Self-contained: inline analysis, no subagents required
 │   ├── init-claude/SKILL.md         # Self-contained: inline analysis, no subagents required
@@ -325,17 +413,21 @@ agent-engineering-toolkit/
 >
 > - `plugins/agents-initializer/skills/` — **Claude Code plugin skills** that follow the official spec: analysis is delegated to isolated `codebase-analyzer`, `scope-detector`, and `file-evaluator` subagents, keeping the orchestrating context clean. Requires Claude Code's subagent system.
 >
-> - `skills/` — **Standalone skills** for `npx skills add` users. Perform all analysis inline with direct bash/file commands. No subagent delegation, compatible with any AI coding tool.
+> - `plugins/cursor-initializer/skills/` — **Cursor plugin skills** for the native Cursor plugin system. Uses Cursor's own subagent format and exposes namespaced `/cursor-initializer:*` commands.
 >
-> `npx skills add` does a recursive SKILL.md search. Both paths are discovered, but they have the same skill names — the root `skills/` (standalone versions) are processed last and take precedence, ensuring npx users get the tool-agnostic standalone versions.
+> - `skills/` — **Standalone skills** for `npx skills add` and manual installation. Perform all analysis inline with direct bash/file commands. No subagent delegation, compatible with any AI coding tool.
+>
+> `npx skills add` should be treated as the standalone distribution only. The root `skills/` directory provides the portable skill set; Cursor-specific plugin skills are not duplicated there.
 
 ## Contributing
 
 Development conventions are enforced by `.claude/rules/` — path-scoped rules load automatically when editing matching files. Key rules:
 
 - `plugin-skills.md` — plugin skill authoring constraints (delegation, validation, limits)
+- `cursor-plugin-skills.md` — cursor plugin constraints (.mdc format, readonly agents)
 - `standalone-skills.md` — standalone skill constraints (inline analysis, distribution awareness)
 - `agent-files.md` — subagent file requirements (frontmatter, model, tools)
+- `cursor-agent-files.md` — Cursor subagent requirements (readonly, model inherit)
 - `reference-files.md` — reference file format and size constraints
 
 See `DESIGN-GUIDELINES.md` for the evidence base behind each convention.

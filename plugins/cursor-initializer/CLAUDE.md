@@ -1,0 +1,14 @@
+# cursor-initializer Plugin
+
+Follows the official Cursor plugin specification. Two Cursor-specific skills: `init-cursor` and `improve-cursor`.
+
+## Conventions
+
+- `skills/` — SKILL.md entry points; authoring constraints in `.claude/rules/cursor-plugin-skills.md`
+- `skills/*/references/` — evidence-based guidance files loaded conditionally by SKILL.md phases
+- `skills/*/assets/templates/` — output template files used during file generation phases
+- `agents/` — Cursor-native subagent format: `name`, `description`, `model`, `readonly` frontmatter
+- Plugin agents MUST NOT spawn other agents and cannot use write tools when `readonly: true`
+- Generated rules use `.mdc` format with only `description`, `alwaysApply`, `globs` frontmatter
+- Generated project output targets `.cursor/rules/` (not `.claude/rules/`)
+- `init-cursor` always generates AGENTS.md; `improve-cursor` only handles AGENTS.md if target project has it

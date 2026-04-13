@@ -1,7 +1,7 @@
 # Test Scenario: Improve — Decent Existing Configuration
 
 **Scenario ID**: S4
-**Skills Under Test**: `improve-agents` (plugin + standalone), `improve-claude` (plugin + standalone)
+**Skills Under Test**: `improve-agents` (plugin + standalone), `improve-claude` (plugin + standalone), `improve-cursor` (plugin)
 **Phase**: GREEN (Tasks M5–M8)
 **Input Fixtures**: `reasonable-agents-md.md`, `reasonable-claude-md.md`
 
@@ -69,6 +69,29 @@ The skill should make targeted improvements without restructuring the whole file
 | Over-specification | Removed (tools enforce this) |
 | Everything else | Preserved exactly as-is |
 
+### improve-cursor (reasonable fixture)
+
+Use `reasonable-agents-md.md` as the existing root file and add a small existing rule such as:
+
+```md
+---
+description: API route conventions
+alwaysApply: true
+---
+
+- Route handlers belong under `src/routes/`
+- Prefer zod for request validation
+```
+
+The skill should make targeted improvements without over-reacting:
+
+| Action | Expected |
+|--------|----------|
+| Existing AGENTS.md | Improved only if genuinely needed |
+| Existing Cursor rule | Kept small and valid; activation mode tightened only if justified |
+| Good content | Preserved exactly as-is |
+| Overall structure | Remains lightweight; no unnecessary file explosion |
+
 ---
 
 ## Pass Criteria
@@ -81,6 +104,8 @@ The skill should make targeted improvements without restructuring the whole file
 | Root file stays concise | Still 15–40 lines after improvement | `wc -l` |
 | Planted issues addressed | All 2–3 issues resolved | Manual checklist |
 | No over-modification | Non-issue sections unchanged | Diff review |
+| Cursor rule remains valid | Frontmatter limited to `description`, `alwaysApply`, `globs` | Manual review |
+| Cursor activation stays proportionate | No gratuitous `alwaysApply: true` retention | Manual review |
 
 ### Scoring (5-dimension rubric)
 
@@ -121,5 +146,6 @@ Watch for:
 - Skills that over-apply changes (rewriting sections that were fine)
 - Skills that miss the subtle issues (only catch obvious violations)
 - Skills that introduce new issues while fixing existing ones
+- `improve-cursor` suggesting a large rules hierarchy for a project that already has a decent minimal setup
 
 **Expected loop behavior**: Loop may not need to iterate if the skill is well-calibrated. Excessive looping on a reasonable file suggests the evaluation criteria are too aggressive.
