@@ -297,7 +297,7 @@ Execute in order. Each task is atomic and independently verifiable.
      - NEVER use broad matchers (`"*"`) for blocking hooks
      - NEVER hardcode secrets in command strings (use environment variables)
      - EVERY hook must use the correct handler type for its purpose (`command` for deterministic, `prompt`/`agent` only when judgment needed)
-     - EVERY `command` hook must specify a script that exits 0 on success, 2 on blocking failure
+     - EVERY `command` hook must specify its decision protocol: either exit 2 + stderr for blocking, or exit 0 + JSON decision output when applicable
   3. Preflight Check: Check if hooks already exist for the target event in `.claude/settings.json` (and `.claude/settings.local.json`). If the exact same event+matcher combination exists → inform user and invoke `improve-hook` skill, then STOP.
   4. Phase 1: Codebase Analysis — delegate to `artifact-analyzer` with task: "Analyze the project to understand existing hook configurations. Focus on: hooks in .claude/settings.json, hook scripts in .claude/hooks/, event types in use, and any gaps in coverage."
   5. Phase 2: Generate Hook — read references progressively:
@@ -311,7 +311,7 @@ Execute in order. Each task is atomic and independently verifiable.
 
 - **MIRROR**: `plugins/agents-initializer/skills/init-agents/SKILL.md:1-92`
 - **GOTCHA**: Hooks go into `.claude/settings.json` (merged into existing `hooks` key), NOT as standalone files — the skill must handle merging with existing settings
-- **GOTCHA**: Exit code 2 behavior is event-dependent — the skill must consult the hook-events-reference.md for the specific event being configured
+- **GOTCHA**: Blocking behavior is event-dependent — verify event blockability in hook-events-reference.md and apply the command decision protocol from hook-authoring-guide.md
 - **GOTCHA**: `command` type hooks need an accompanying shell script written to `.claude/hooks/` with executable permissions
 - **VALIDATE**: Verify valid JSON structure; verify event name from 22-event list; verify exit code documentation matches event type; verify no hardcoded secrets
 
@@ -391,7 +391,7 @@ Execute in order. Each task is atomic and independently verifiable.
 - **MIRROR**: `plugins/agents-initializer/skills/init-agents/SKILL.md:1-92`
 - **GOTCHA**: Plugin subagents have additional restrictions — `hooks`, `mcpServers`, and `permissionMode` fields are ignored. The skill must warn the user if they request these features for a plugin agent.
 - **GOTCHA**: Model selection is critical — the skill must apply the heuristic: Haiku for fast read-only exploration, Sonnet for standard analysis (default), Opus only for complex reasoning
-- **GOTCHA**: Description field is the ONLY routing signal for automatic delegation — it must be specific enough for Claude to know when to invoke the agent
+- **GOTCHA**: Description field is a primary in-file routing signal, but task wording and current context also influence delegation — make the description specific enough to trigger correctly
 - **VALIDATE**: Verify valid YAML frontmatter; verify `name` is lowercase-hyphens only; verify `description` non-empty with "Use when..." trigger; verify `model` is recognized alias; verify `tools` restricts to minimum needed; verify system prompt has role + process + output format + self-verification sections
 
 ### Task 5: Cross-skill validation
