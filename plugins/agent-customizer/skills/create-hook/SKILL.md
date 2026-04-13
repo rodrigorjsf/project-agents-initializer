@@ -14,6 +14,7 @@ Generates a new hook configuration for a Claude Code lifecycle event, with corre
 - **NEVER** use broad matchers (`"*"`) for blocking hooks — overly broad matchers block too many operations
 - **NEVER** hardcode secrets in command strings — use environment variables (e.g., `$MY_SECRET`)
 - **EVERY** hook must use the correct handler type for its purpose: `command` for deterministic checks, `http` for external endpoints, `prompt` or `agent` only when judgment is needed
+- **EVERY** hook must use a handler type supported by the selected event — verify this against the handler support matrix in `hook-events-reference.md`
 - **EVERY** `command` hook must document the decision path used by the script: exit `2` + stderr for blocking, or exit `0` with JSON decision output when applicable
 - **EVERY** hook configuration must produce valid JSON before writing
 </RULES>
@@ -28,7 +29,7 @@ Check if hooks already exist for the target event in `.claude/settings.json` and
 
 1. Inform the user: "A hook for `{event}` with this matcher already exists."
 2. Inform the user that `improve-hook` is currently a Phase 5 placeholder and not yet executable.
-3. **STOP** — do not proceed to Phase 1 or any subsequent phase of this create skill. Ask the user to choose a different matcher/event combination or wait for the improve workflow implementation.
+3. **STOP** — do not proceed to Phase 1 or any subsequent phase of this create hook. Ask the user to choose a different matcher/event combination or wait for the improve workflow implementation.
 
 **If no hook exists for this event+matcher combination:**
 Proceed to Phase 1 below.
@@ -54,6 +55,8 @@ Read `${CLAUDE_SKILL_DIR}/assets/templates/hook-config.md` and fill its placehol
 - User requirements for the new hook (event, purpose, handler type)
 - Phase 1 analysis output (existing hooks, coverage gaps)
 - Evidence from the reference files above
+
+Before choosing the handler, verify in `hook-events-reference.md` that the selected event supports it. If the selected event only supports `command`, do not generate `http`, `prompt`, or `agent` guidance for that hook. If the requested handler is unsupported, stop and ask the user to change the event or handler choice.
 
 Generate the complete hook configuration:
 

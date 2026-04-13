@@ -22,18 +22,22 @@ Generates a new SKILL.md file with supporting references and templates, grounded
 
 ### Preflight Check
 
-Check if a skill with the same name already exists at:
+First determine the target location with the user:
 
-- `.claude/skills/{requested-name}/SKILL.md`
-- `plugins/*/skills/{requested-name}/SKILL.md`
+- `.claude/skills/{requested-name}/SKILL.md` — project-scoped skill
+- `plugins/{plugin}/skills/{requested-name}/SKILL.md` — plugin-scoped skill
 
-**If a skill already exists at either location:**
+Use the selected target location for duplicate detection and for the final write path.
+
+Check if a skill with the same name already exists at the selected target location.
+
+**If a skill already exists at the selected target location:**
 
 1. Inform the user: "A skill named `{name}` already exists."
 2. Inform the user that `improve-skill` is currently a Phase 5 placeholder and not yet executable.
 3. **STOP** — do not proceed to Phase 1 or any subsequent phase of this create skill. Ask the user to choose a different name or wait for the improve workflow implementation.
 
-**If no skill exists with that name:**
+**If no skill exists at the selected target location:**
 Proceed to Phase 1 below.
 
 ### Phase 1: Codebase Analysis
@@ -58,7 +62,7 @@ Read `${CLAUDE_SKILL_DIR}/assets/templates/skill-md.md` and fill its placeholder
 - Phase 1 analysis output (naming conventions, existing patterns, plugin context)
 - Evidence from the reference files above
 
-Generate the complete skill directory structure:
+Generate the complete skill directory structure under the selected target location:
 
 1. `SKILL.md` — primary skill file with frontmatter and phase definitions
 2. `references/` — create only reference files that include initial source attribution sections (no empty stubs without attribution)
@@ -75,4 +79,4 @@ The loop evaluates all hard limits and quality checks, fixes any failures, and r
 1. Show the user the complete generated skill directory (SKILL.md + any stub references/templates)
 2. Cite the evidence from reference files that informed key decisions (frontmatter choices, phase structure, reference selections)
 3. Ask for confirmation before writing any files
-4. On approval, write all files to the target location
+4. On approval, write all files to the selected target location

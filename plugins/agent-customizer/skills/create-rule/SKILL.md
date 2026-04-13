@@ -10,7 +10,7 @@ Generates a new `.claude/rules/` file with correct glob patterns and minimal, sp
 ## Hard Rules
 
 <RULES>
-- **NEVER** create rules longer than 50 lines (path-scoped) or 30 lines (always-loaded)
+- **NEVER** create path-scoped rules longer than 50 lines
 - **NEVER** create rules for standard conventions Claude already knows (e.g., "write clean code")
 - **NEVER** use overly broad glob patterns (`**/*`) unless truly global scope is required
 - **EVERY** path-scoped rule MUST have `paths:` YAML frontmatter listing the target glob patterns
@@ -31,7 +31,7 @@ Check if a rule file already exists in `.claude/rules/` covering the same topic:
 
 1. Inform the user: "A rule covering `{topic}` or overlapping glob patterns already exists."
 2. Inform the user that `improve-rule` is currently a Phase 5 placeholder and not yet executable.
-3. **STOP** — do not proceed to Phase 1 or any subsequent phase of this create skill. Ask the user to choose a different topic/pattern scope or wait for the improve workflow implementation.
+3. **STOP** — do not proceed to Phase 1 or any subsequent phase of this create rule. Ask the user to choose a different topic/pattern scope or wait for the improve workflow implementation.
 
 **If no conflicting rule exists:**
 Proceed to Phase 1 below.
@@ -57,10 +57,10 @@ Read `${CLAUDE_SKILL_DIR}/assets/templates/rule-file.md` and fill its placeholde
 - Phase 1 analysis output (existing rules, gaps, potential contradictions)
 - Evidence from the reference files above
 
-Determine rule type:
+Generate a path-scoped rule:
 
-- **Path-scoped**: Include `paths:` YAML frontmatter with specific glob patterns (max 50 lines)
-- **Always-loaded**: No `paths:` frontmatter — applies to all files (stricter 30-line limit)
+- Include `paths:` YAML frontmatter with specific glob patterns (max 50 lines)
+- Do not generate always-loaded rules from this skill
 
 Generate: `.claude/rules/{topic-name}.md`
 
@@ -76,6 +76,6 @@ The loop evaluates all hard limits and quality checks, fixes any failures, and r
 2. Cite the evidence from reference files that informed key decisions:
    - Why this glob pattern (what files it targets and why)
    - Why each instruction is necessary (what mistakes it prevents)
-   - Why path-scoped vs always-loaded
+   - Why this rule belongs in a path-scoped `.claude/rules/` file
 3. Ask for confirmation before writing any files
 4. On approval, write the rule file to `.claude/rules/{topic-name}.md`
