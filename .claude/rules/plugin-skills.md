@@ -6,7 +6,7 @@ paths:
 # Plugin Skill Conventions
 
 - For `plugins/agents-initializer/skills/*`: analysis phases MUST delegate to agents registered in the plugin's `agents/` directory (currently: `codebase-analyzer`, `scope-detector`, `file-evaluator`)
-- For `plugins/agent-customizer/skills/*`: analysis phases MUST delegate to agents registered in the plugin's `agents/` directory (currently: `artifact-analyzer`)
+- For `plugins/agent-customizer/skills/*`: analysis phases MUST delegate to the registered agent for that phase — use `skill-evaluator`, `hook-evaluator`, `rule-evaluator`, or `subagent-evaluator` for artifact assessment, and use `artifact-analyzer` for broader context when the workflow requires it
 - Never add inline bash analysis here — subagent delegation keeps the orchestrator context clean
 - Reference agents by registered name for the target plugin (e.g., "Delegate to the `codebase-analyzer` agent with this task:")
 - `references/` directory MUST exist alongside SKILL.md and contain evidence-based guidance files

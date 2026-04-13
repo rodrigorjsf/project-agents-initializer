@@ -14,7 +14,8 @@ Evaluate existing `.claude/rules/` files against evidence-based quality criteria
 - **ALWAYS** present changes to the user before applying them
 - **NEVER** broaden path scope without rationale (specific glob → `**/*`)
 - **NEVER** delete rules that apply to real scenarios
-- **NEVER** exceed 30 lines (always-loaded) or 50 lines (path-scoped) after improvements
+- **NEVER** exceed 50 lines after improvements
+- **NEVER** leave a rule without `paths:` frontmatter after improvements
 - **PRESERVE** project-specific custom instructions — only remove generic waste
 </RULES>
 
@@ -22,7 +23,7 @@ Evaluate existing `.claude/rules/` files against evidence-based quality criteria
 
 ### Preflight Check
 
-Check if any `.claude/rules/*.md` files exist in the project.
+Check if any `.md` rule files exist anywhere under `.claude/rules/`.
 
 **If no rule files found:**
 
@@ -37,10 +38,10 @@ Proceed to Phase 1 below.
 
 Delegate to the `rule-evaluator` agent with this task:
 
-> Evaluate rule files in `.claude/rules/`. Check line counts against hard limits (30 always-loaded, 50 path-scoped), YAML frontmatter validity, glob pattern specificity, instruction actionability, one-scope-per-file adherence, and cross-file contradictions/overlaps. Return structured results with severity classifications (AUTO-FAIL/HIGH/MEDIUM/LOW).
+> Evaluate rule files in `.claude/rules/`. Check line counts against the 50-line limit, YAML frontmatter validity, missing `paths:` frontmatter as a defect, glob pattern specificity, instruction actionability, one-scope-per-file adherence, and cross-file contradictions/overlaps. Return structured results with severity classifications (AUTO-FAIL/HIGH/MEDIUM/LOW).
 
 - If the user provides a specific rule file → scope to that file (still cross-check others for conflicts).
-- If no specific file → evaluate ALL rules in `.claude/rules/`.
+- If no specific file → evaluate ALL `.md` rule files under `.claude/rules/` recursively.
 
 The agent runs on Sonnet with read-only tools (Read, Grep, Glob, Bash) in an isolated context. Wait for it to complete and parse its structured output.
 
@@ -83,7 +84,7 @@ For improve operations, also evaluate the **"If This Is an IMPROVE Operation"** 
 
    **WHAT**: The specific content and its current location (file:lines)
    **WHY**: Evidence-based justification with source reference
-   **TOKEN IMPACT**: Estimated tokens saved — always-loaded rules fire on every request
+   **TOKEN IMPACT**: Estimated impact from removing waste or narrowing rule scope so it loads in fewer contexts
    **OPTIONS**:
    - **Option A** (recommended): Primary action
    - **Option B**: Alternative action
@@ -96,7 +97,7 @@ For improve operations, also evaluate the **"If This Is an IMPROVE Operation"** 
    For contradiction resolution, show both conflicting rules side-by-side.
 
 3. After all suggestions are reviewed, show aggregate impact:
-   - **Always-loaded lines**: before → after
+   - **Files missing `paths:`**: before → after
    - **Rules**: before → after
    - **Deferred suggestions**: X items kept as-is
 
@@ -104,6 +105,6 @@ For improve operations, also evaluate the **"If This Is an IMPROVE Operation"** 
 
 5. Report final metrics:
    - Total lines before → after
-   - Always-loaded lines before → after
+   - Files missing `paths:` before → after
    - Files affected
    - Suggestions applied: X of Y (Z deferred)

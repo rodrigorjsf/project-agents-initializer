@@ -25,8 +25,8 @@ Flag any SKILL.md missing frontmatter or violating these constraints.
 Check the file path to determine distribution:
 
 **Plugin skills** (`plugins/*/skills/*/SKILL.md`):
-- `plugins/agents-initializer/skills/*/SKILL.md` analysis phases MUST delegate to agents registered in the plugin's `agents/` directory
-- `plugins/agent-customizer/skills/*/SKILL.md` analysis phases MUST delegate to agents registered in the plugin's `agents/` directory
+- `plugins/agents-initializer/skills/*/SKILL.md` analysis phases MUST delegate to agents registered in the plugin's `agents/` directory (currently: `codebase-analyzer`, `scope-detector`, `file-evaluator`)
+- `plugins/agent-customizer/skills/*/SKILL.md` analysis phases MUST delegate to the registered agent for that phase — use `skill-evaluator`, `hook-evaluator`, `rule-evaluator`, or `subagent-evaluator` for artifact assessment, and use `artifact-analyzer` for broader context when the workflow requires it
 - Never contain inline bash analysis commands
 - May suggest all 4 migration mechanisms: hooks, rules, skills, subagents
 - Cursor plugin skills must reference bundled files with relative paths from the skill root (`references/...`, `assets/templates/...`)

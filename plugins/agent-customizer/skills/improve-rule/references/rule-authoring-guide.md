@@ -18,7 +18,7 @@ Source: memory/how-claude-remembers-a-project.md
 
 ## When to Use Rules
 
-Rules are instruction files loaded into context at session start (always-loaded) or on-demand when matching files are read (path-scoped).
+Rules are instruction files loaded on-demand when Claude reads files matching their scope. In Claude Code more generally, unscoped rules load at session start; in this project, keep that always-loaded guidance in `CLAUDE.md` instead of `.claude/rules/`.
 
 | Use rules when | Use hooks when | Use skills when |
 |----------------|---------------|----------------|
@@ -27,7 +27,7 @@ Rules are instruction files loaded into context at session start (always-loaded)
 | Domain expertise scoped to a path | No LLM judgment required | Complex multi-step instruction sets |
 | Standard behaviors for a subsystem | | |
 
-**Rules load into context** — they cost tokens every session (always-loaded) or every time matching files are read (path-scoped). Keep them focused and concise.
+**Rules load into context** when matching files are read, so keep them focused and concise.
 
 *Source: memory/how-claude-remembers-a-project.md lines 123-129*
 
@@ -39,16 +39,14 @@ Rules are instruction files loaded into context at session start (always-loaded)
 .claude/
 ├── CLAUDE.md           # Main project instructions (always loaded)
 └── rules/
-    ├── code-style.md   # Always-loaded rule (no paths frontmatter)
-    ├── testing.md      # Always-loaded rule
-    └── api-design.md   # Path-scoped rule (with paths frontmatter)
+    ├── testing.md      # Path-scoped rule for test files
+    ├── api-design.md   # Path-scoped rule for API files
+    └── frontend.md     # Path-scoped rule for frontend files
 ```
 
 Each file should cover **one topic** with a descriptive filename. All `.md` files in `.claude/rules/` are discovered recursively — subdirectories like `frontend/` and `backend/` are supported.
 
-**Always-loaded rules** (no `paths` frontmatter): loaded at session launch alongside `.claude/CLAUDE.md`.
-
-**Path-scoped rules** (with `paths` frontmatter): loaded only when Claude reads files matching the specified glob patterns.
+For this project, rules should use `paths` frontmatter so they load only when Claude reads matching files. Put always-loaded project guidance in root `CLAUDE.md`, not in `.claude/rules/`.
 
 *Source: memory/how-claude-remembers-a-project.md lines 123-145*
 
@@ -71,7 +69,7 @@ paths:
 - Use the standard error response format
 ```
 
-Rules without a `paths` field load unconditionally.
+Rules without a `paths` field load unconditionally; in this project that is a defect, not a supported target.
 
 Multiple patterns and brace expansion are supported:
 
@@ -108,7 +106,7 @@ Path-scoped rules trigger when Claude **reads files** matching the pattern, not 
 
 **Size guidelines:**
 
-- Always-loaded rules: ≤30 lines (in context every session)
+- Rules must have `paths:` frontmatter with specific glob patterns
 - Path-scoped rules: ≤50 lines (in context when matching files read)
 - Split large topics into multiple files by subdomain
 

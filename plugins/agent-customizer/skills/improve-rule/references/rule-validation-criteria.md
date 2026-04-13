@@ -11,10 +11,9 @@ Any rule file violating these criteria must be fixed before proceeding:
 
 | Criterion | Threshold | Source |
 |-----------|-----------|--------|
-| Always-loaded rule length | ≤ 30 lines | Context budget: in context every session |
-| Path-scoped rule length | ≤ 50 lines | Context budget: loaded when matching files read |
+| Rule length | ≤ 50 lines | Context budget: loaded when matching files read |
 | YAML frontmatter | Valid YAML if present | memory/how-claude-remembers-a-project.md |
-| `paths:` field | Array format; valid glob patterns | memory/how-claude-remembers-a-project.md lines 147-164 |
+| `paths:` field | Required; array format; valid glob patterns | memory/how-claude-remembers-a-project.md lines 147-164 |
 | Contradictions with other rules | 0 | Claude picks arbitrarily when contradictions exist |
 
 *Source: memory/how-claude-remembers-a-project.md lines 61-75; 147-164*
@@ -25,7 +24,7 @@ Any rule file violating these criteria must be fixed before proceeding:
 
 - [ ] All instructions actionable and verifiable (not "write clean code")
 - [ ] One scope per file (no mixing of testing and code style in same rule)
-- [ ] Path-scoped rules have `paths:` frontmatter with specific glob patterns
+- [ ] Rules have `paths:` frontmatter with specific glob patterns
 - [ ] Glob patterns match only the intended file types (not `**/*` unless truly global)
 - [ ] No overlap with existing rules (same instruction not in multiple files)
 - [ ] No standard conventions Claude already knows from training
