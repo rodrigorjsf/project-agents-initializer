@@ -30,8 +30,8 @@ Check if a rule file already exists in `.claude/rules/` covering the same topic:
 **If a conflicting or duplicate rule already exists:**
 
 1. Inform the user: "A rule covering `{topic}` or overlapping glob patterns already exists."
-2. Inform the user that `improve-rule` is currently a Phase 5 placeholder and not yet executable.
-3. **STOP** — do not proceed to Phase 1 or any subsequent phase of this create skill. Ask the user to choose a different topic/pattern scope or wait for the improve workflow implementation.
+2. Suggest using `/agent-customizer:improve-rule` to evaluate and optimize it instead.
+3. **STOP** — do not proceed. The user should either choose a different topic/pattern scope or use the improve skill.
 
 **If no conflicting rule exists:**
 Proceed to Phase 1 below.

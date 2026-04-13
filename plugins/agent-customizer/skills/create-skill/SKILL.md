@@ -30,8 +30,8 @@ Check if a skill with the same name already exists at:
 **If a skill already exists at either location:**
 
 1. Inform the user: "A skill named `{name}` already exists."
-2. Inform the user that `improve-skill` is currently a Phase 5 placeholder and not yet executable.
-3. **STOP** — do not proceed to Phase 1 or any subsequent phase of this create skill. Ask the user to choose a different name or wait for the improve workflow implementation.
+2. Suggest using `/agent-customizer:improve-skill` to evaluate and optimize it instead.
+3. **STOP** — do not proceed. The user should either choose a different name or use the improve skill.
 
 **If no skill exists with that name:**
 Proceed to Phase 1 below.
