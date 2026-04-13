@@ -37,6 +37,12 @@ Flag any rule file missing the `paths` frontmatter — rules without path-scopin
 - Do not include information agents can infer from the codebase
 - Each rule file should focus on a single concern or file type
 
+## Evaluating New Patterns
+
+- New project scopes (e.g., a new plugin or distribution) may need their own rule files — verify the glob pattern is precise
+- A rule file for a new concern is valid if it follows path-scoping and single-concern conventions
+- Rule changes should not duplicate content already in CLAUDE.md or other rule files
+
 ## Common Issues to Flag
 
 - Missing `paths` frontmatter

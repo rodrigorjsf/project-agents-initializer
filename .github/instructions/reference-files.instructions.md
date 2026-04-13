@@ -25,8 +25,14 @@ applyTo: "**/references/**/*.md"
 ## Information Density
 
 - Prefer tables and structured formats over prose paragraphs
-- Each instruction must be specific and actionable — flag vague guidance like "ensure quality"
+- Each instruction must be specific and actionable — verify vague guidance like "ensure quality" is intentional
 - Content should provide high signal per token — avoid repetition or filler
+
+## Evaluating New Patterns
+
+- New skills may introduce reference files with different structures — verify they maintain information density and source attribution
+- A shared reference updated in one distribution must be synced to all intended copies
+- New reference categories should follow existing naming and depth conventions
 
 ## Common Issues to Flag
 

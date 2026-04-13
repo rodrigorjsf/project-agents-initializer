@@ -18,6 +18,7 @@ applyTo: "docs/**/*.md"
 - `docs/general-llm/` contains general LLM/agent research and guides
 - `docs/shared/` contains cross-tool standards (Agent Skills open standard)
 - `docs/plans/` contains design documents — file names must follow `YYYY-MM-DD-{topic}-design.md` pattern
+- New subdirectories may be added for new documentation domains — verify they follow existing naming conventions
 
 ## Content Quality
 
@@ -30,8 +31,14 @@ applyTo: "docs/**/*.md"
 
 - Describe capabilities, not file structures — file paths change frequently
 - Domain concepts are more stable than paths and safer to document
-- Flag any hardcoded file paths that could become stale
+- Verify any hardcoded file paths that could become stale
 - Commands referenced must be verifiable in project configuration
+
+## Evaluating New Patterns
+
+- New documentation domains may introduce new subdirectories — verify naming conventions and evidence-based content standards
+- Changes to documentation structure should be reflected in any onboarding or README references
+- New file naming patterns should be consistent with existing conventions in the same directory
 
 ## Common Issues to Flag
 

@@ -6,8 +6,8 @@ applyTo: "**/.claude-plugin,**/.cursor-plugin,**/CLAUDE.md,DESIGN-GUIDELINES.md"
 
 ## CLAUDE.md Hierarchy
 
-- Root `CLAUDE.md`: target 15-40 lines — one-sentence description, non-standard tooling, import boundaries, pointers to scope files
-- Plugin `CLAUDE.md` (`plugins/*/CLAUDE.md`): target 10-30 lines — plugin-specific conventions only
+- Root `CLAUDE.md`: target 15-40 lines — one-sentence description, non-standard tooling, import boundaries, pointers to scope files. These are targets, not hard limits — justify overages
+- Plugin `CLAUDE.md` (`plugins/*/CLAUDE.md`): target 10-30 lines — plugin-specific conventions only. These are targets, not hard limits — justify overages
 - Never duplicate content between root and plugin CLAUDE.md files
 - Content that applies only to specific file patterns belongs in `.claude/rules/`, not CLAUDE.md
 
@@ -33,10 +33,16 @@ applyTo: "**/.claude-plugin,**/.cursor-plugin,**/CLAUDE.md,DESIGN-GUIDELINES.md"
 
 - Root files must not contain domain-specific rules (those go in scope files)
 - Content should be organized by loading tier: always-loaded → on-demand → invoked
-- Flag content in root CLAUDE.md that only applies to specific file patterns
+- Verify content in root CLAUDE.md that only applies to specific file patterns
+
+## Evaluating New Patterns
+
+- New plugins may need their own `CLAUDE.md` — verify it follows the hierarchy and doesn't duplicate root content
+- Line budget overages may be justified for plugins with complex conventions — check that every line passes the "would removing this cause mistakes?" test
+- New DESIGN-GUIDELINES entries must include source citation and traceability
 
 ## Common Issues to Flag
 
-- CLAUDE.md over 40 lines at root or 30 lines in plugins
+- CLAUDE.md over 40 lines at root or 30 lines in plugins without justification
 - Missing source citations in DESIGN-GUIDELINES.md
 - Cursor plugin manifests with Claude-specific fields or vice versa

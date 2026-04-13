@@ -32,10 +32,17 @@ Templates should use HTML comment blocks for metadata:
 
 ## Distribution Awareness
 
-- `hook-config.md` template must exist ONLY in plugin improve skill directories — never in standalone
+- Currently, `hook-config.md` templates exist ONLY in plugin improve skill directories — never in standalone
 - Standalone templates must never reference hooks or subagents
 - Init skill templates do NOT include migration-specific templates
-- `cursor-rule.mdc` templates belong in cursor-initializer skills only, not agents-initializer
+- Currently, `cursor-rule.mdc` templates belong in cursor-initializer skills only, not agents-initializer
+- New template types may be introduced for new distributions or artifact systems — verify they follow the init/improve and plugin/standalone boundaries
+
+## Evaluating New Patterns
+
+- New template types for new artifact systems are valid if they follow metadata and placeholder conventions
+- Templates for a new distribution should respect the init/improve and plugin/standalone boundaries
+- Verify new `.mdc` templates use only valid Cursor frontmatter fields
 
 ## Common Issues to Flag
 
