@@ -23,7 +23,11 @@ Generates a new hook configuration for a Claude Code lifecycle event, with corre
 
 ### Preflight Check
 
-Check if hooks already exist for the target event in `.claude/settings.json` and `.claude/settings.local.json`.
+Check if hooks already exist for the target event in:
+
+- `.claude/settings.json`
+- `.claude/settings.local.json`
+- Plugin `hooks/hooks.json`
 
 **If the exact same event + matcher combination already exists:**
 
@@ -38,7 +42,7 @@ Proceed to Phase 1 below.
 
 Delegate to the `artifact-analyzer` agent with this task:
 
-> Analyze the project to understand existing hook configurations. Focus on: hooks defined in `.claude/settings.json` and `.claude/settings.local.json`, hook scripts in `.claude/hooks/`, event types currently in use, handler types used (command/http/prompt/agent), and any gaps in lifecycle event coverage.
+> Analyze the project to understand existing hook configurations. Focus on: hooks defined in `.claude/settings.json`, `.claude/settings.local.json`, and plugin `hooks/hooks.json`; project hook scripts in `.claude/hooks/`; plugin hook scripts in `scripts/`; event types currently in use; handler types used (command/http/prompt/agent); and any gaps in lifecycle event coverage.
 
 The agent runs on Sonnet with read-only tools (Read, Grep, Glob, Bash) in an isolated context. Wait for it to complete and parse its structured output.
 
@@ -58,12 +62,20 @@ Read `${CLAUDE_SKILL_DIR}/assets/templates/hook-config.md` and fill its placehol
 
 Before choosing the handler, verify in `hook-events-reference.md` that the selected event supports it. If the selected event only supports `command`, do not generate `http`, `prompt`, or `agent` guidance for that hook. If the requested handler is unsupported, stop and ask the user to change the event or handler choice.
 
+Choose the target location based on the requested scope:
+
+- `.claude/settings.json` — committed project hook
+- `.claude/settings.local.json` — local-only hook
+- `hooks/hooks.json` — plugin-bundled hook
+
 Generate the complete hook configuration:
 
-1. Hook JSON block — to be merged into the `hooks` key of `.claude/settings.json`
-2. Shell script (if `command` type) — written to `.claude/hooks/{name}.sh` with executable permissions
+1. Hook JSON block — to be merged into the `hooks` key of the selected target file
+2. Shell script (if `command` type):
+   - Project/local hook: write to `.claude/hooks/{name}.sh` with executable permissions
+   - Plugin hook: write to `scripts/{name}.sh` with executable permissions and reference it with `${CLAUDE_PLUGIN_ROOT}/scripts/{name}.sh`
 
-**Important**: The hook JSON must be merged into existing settings, not replace them. Read the current `.claude/settings.json` first and produce the merged result.
+**Important**: The hook JSON must be merged into the selected target file, not replace it. Read the current target file first and produce the merged result.
 
 ### Phase 3: Self-Validation
 
@@ -80,5 +92,5 @@ The loop evaluates all hard limits and quality checks, fixes any failures, and r
    - What the exit code behavior means for this event
 3. Ask for confirmation before writing any files
 4. On approval:
-   - Merge hook JSON into `.claude/settings.json`
-   - Write shell script to `.claude/hooks/{name}.sh` and set executable (`chmod +x`)
+   - Merge hook JSON into the selected target file
+   - Write shell script to `.claude/hooks/{name}.sh` or `scripts/{name}.sh` and set executable (`chmod +x`)

@@ -10,10 +10,10 @@ Generates a new `.claude/rules/` file with correct glob patterns and minimal, sp
 ## Hard Rules
 
 <RULES>
-- **NEVER** create rules longer than 50 lines (path-scoped) or 30 lines (always-loaded)
+- **NEVER** create path-scoped rules longer than 50 lines
 - **NEVER** create rules for standard conventions Claude already knows (e.g., "write clean code")
 - **NEVER** use overly broad glob patterns (`**/*`) unless truly global scope is required
-- **EVERY** path-scoped rule MUST have `paths:` YAML frontmatter listing the target glob patterns
+- **EVERY** generated rule MUST have `paths:` YAML frontmatter listing the target glob patterns
 - **EVERY** instruction must be specific and verifiable — not vague guidance
 - **ONE** topic per rule file — do not bundle unrelated instructions
 </RULES>
@@ -48,7 +48,7 @@ The agent runs on Sonnet with read-only tools (Read, Grep, Glob, Bash) in an iso
 
 Before generating, read these reference documents:
 
-- `${CLAUDE_SKILL_DIR}/references/rule-authoring-guide.md` — when to use rules, path-scoping, glob syntax, always-loaded vs path-scoped, anti-patterns
+- `${CLAUDE_SKILL_DIR}/references/rule-authoring-guide.md` — when to use rules, path-scoping, glob syntax, and anti-patterns
 - `${CLAUDE_SKILL_DIR}/references/prompt-engineering-strategies.md` — rule-specific prompting (zero-shot, no examples in rules)
 
 Read `${CLAUDE_SKILL_DIR}/assets/templates/rule-file.md` and fill its placeholders using:
@@ -57,10 +57,9 @@ Read `${CLAUDE_SKILL_DIR}/assets/templates/rule-file.md` and fill its placeholde
 - Phase 1 analysis output (existing rules, gaps, potential contradictions)
 - Evidence from the reference files above
 
-Determine rule type:
+Generate a path-scoped rule:
 
-- **Path-scoped**: Include `paths:` YAML frontmatter with specific glob patterns (max 50 lines)
-- **Always-loaded**: No `paths:` frontmatter — applies to all files (stricter 30-line limit)
+- Include `paths:` YAML frontmatter with specific glob patterns (max 50 lines)
 
 Generate: `.claude/rules/{topic-name}.md`
 
@@ -76,6 +75,6 @@ The loop evaluates all hard limits and quality checks, fixes any failures, and r
 2. Cite the evidence from reference files that informed key decisions:
    - Why this glob pattern (what files it targets and why)
    - Why each instruction is necessary (what mistakes it prevents)
-   - Why path-scoped vs always-loaded
+   - Why this `paths:` scope is correct for the rule
 3. Ask for confirmation before writing any files
 4. On approval, write the rule file to `.claude/rules/{topic-name}.md`

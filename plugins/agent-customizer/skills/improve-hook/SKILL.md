@@ -41,7 +41,7 @@ Proceed to Phase 1 below.
 
 Delegate to the `hook-evaluator` agent with this task:
 
-> Evaluate hook configurations in `.claude/settings.json` and `.claude/settings.local.json`. Check JSON validity, event names against the 22-event list, handler types, matcher specificity, exit code behavior, command script existence, and security (no hardcoded secrets). Return structured results with severity classifications (AUTO-FAIL/HIGH/MEDIUM/LOW).
+> Evaluate hook configurations in `.claude/settings.json`, `.claude/settings.local.json`, and plugin `hooks/hooks.json`. Check JSON validity, event names against the 22-event list, handler types, matcher specificity, exit code behavior, command script existence, and security (no hardcoded secrets). Return structured results with severity classifications (AUTO-FAIL/HIGH/MEDIUM/LOW).
 
 - If the user provides a specific event/matcher to improve, scope evaluation to that hook.
 - If no specific hook provided, evaluate ALL hooks in the project.
@@ -52,7 +52,7 @@ The agent runs on Sonnet with read-only tools (Read, Grep, Glob, Bash) in an iso
 
 Delegate to the `artifact-analyzer` agent with this task:
 
-> Analyze the project to understand the context around hook configurations. Focus on: all hooks defined and their purposes, hook scripts in `.claude/hooks/`, event coverage gaps, which tools are most commonly used (to inform matcher recommendations), and any skills or rules that could replace observation-only hooks.
+> Analyze the project to understand the context around hook configurations. Focus on: all hooks defined in `.claude/settings.json`, `.claude/settings.local.json`, and `hooks/hooks.json`; project hook scripts in `.claude/hooks/`; plugin hook scripts in `scripts/`; event coverage gaps; and the matcher patterns already used in the project.
 
 Wait for it to complete and parse its structured output.
 
