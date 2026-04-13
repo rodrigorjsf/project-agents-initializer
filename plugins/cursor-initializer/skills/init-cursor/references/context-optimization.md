@@ -21,14 +21,14 @@ Source: research-context-engineering-comprehensive.md
 
 | Limit | Value | Source |
 |-------|-------|--------|
-| Lines per configuration file | ≤ 200 | Anthropic Docs: "Target under 200 lines per CLAUDE.md file." |
+| Lines per configuration file | ≤ 200 | Anthropic Docs: 200-line target for configuration files in this toolkit |
 | Instructions per file | ≤ 150-200 | HumanLayer: "Frontier LLMs can follow ~150-200 instructions with reasonable consistency." |
-| Contradictions between files | 0 | Anthropic: "Claude may pick one arbitrarily." |
+| Contradictions between files | 0 | Anthropic: conflicting instructions make the model choose inconsistently. |
 
-> "Bloated CLAUDE.md files cause Claude to ignore your actual instructions!"
+> Anthropic's warning generalizes here: bloated configuration files cause the model to miss important instructions.
 > — Anthropic Best Practices
 
-> "If Claude keeps doing something you don't want despite having a rule against it, the file is probably too long."
+> Anthropic's warning generalizes here: if a configuration file keeps growing, the model may ignore an instruction even when it is present.
 > — Anthropic Best Practices
 
 ---
@@ -95,7 +95,7 @@ Detect and remove these before generating or improving configuration files:
 | Failed approach accumulation | Look for rules added defensively after incidents | Remove rules that shouldn't be needed |
 | High-churn information | Look for version numbers, file counts, team names | Remove or move to a pointer |
 
-> "Treat CLAUDE.md like code: review it when things go wrong, prune it regularly." — Anthropic Best Practices
+> Treat configuration files like code: review them when things go wrong, prune them regularly. — Adapted from Anthropic Best Practices
 
 *Source: research-context-engineering-comprehensive.md lines 213-253*
 

@@ -11,11 +11,11 @@ Any file violating these criteria must be fixed before proceeding:
 
 | Criterion | Threshold | Source |
 |-----------|-----------|--------|
-| File length | ≤ 200 lines | Anthropic Docs: "Target under 200 lines per CLAUDE.md file" |
+| File length | ≤ 200 lines | Anthropic Docs: 200-line target for configuration files in this toolkit |
 | Root file length (recommended) | 15-40 lines | Derived from "absolute minimum" guidance |
 | Scope file length (recommended) | 10-30 lines | One topic per file guideline |
 | Instruction count | ≤ 150-200 | HumanLayer: "~150-200 instructions with reasonable consistency" |
-| Contradictions between files | 0 | Anthropic: "Claude may pick one arbitrarily" |
+| Contradictions between files | 0 | Anthropic: conflicting instructions make the model choose inconsistently |
 | Language-specific rules in root | 0 | Domain rules belong in separate files |
 | Stale file path references | 0 | "File paths change constantly... actively poisons context" |
 

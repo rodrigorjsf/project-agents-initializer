@@ -1,6 +1,6 @@
 # Evaluation Criteria
 
-Scoring rubric for assessing existing AGENTS.md and CLAUDE.md files before improvement.
+Scoring rubric for assessing existing AGENTS.md files and `.cursor/rules/*` files before improvement.
 Used by IMPROVE skills only. Source: file-evaluator.md, research-context-engineering-comprehensive.md
 
 ---
@@ -22,9 +22,9 @@ Used by IMPROVE skills only. Source: file-evaluator.md, research-context-enginee
 
 | Criterion | Threshold | Source |
 |-----------|-----------|--------|
-| File length | ≤ 200 lines | Anthropic Docs: "Target under 200 lines per CLAUDE.md file" |
+| File length | ≤ 200 lines | Anthropic Docs: 200-line target for configuration files in this toolkit |
 | Instruction count | ≤ 150-200 | HumanLayer: "Frontier LLMs can follow ~150-200 instructions" |
-| Contradictions | 0 | Anthropic: "Claude may pick one arbitrarily" |
+| Contradictions | 0 | Anthropic: conflicting instructions make the model choose inconsistently |
 
 A file violating any hard limit is flagged **OVER LIMIT** regardless of content quality.
 
@@ -40,7 +40,7 @@ Check each line of the file against these indicators:
 | Standard language conventions | Agent already knows from training data | Anthropic Best Practices |
 | Vague instructions ("write clean code") | Not actionable; wastes attention budget | a-guide-to-agents.md |
 | Codebase overview paragraphs | Increases steps without improving navigation | ETH Zurich: Evaluating AGENTS.md |
-| Obvious tool usage ("use git for version control") | Agent already knows this | Anthropic: "If Claude already does it, delete it" |
+| Obvious tool usage ("use git for version control") | Agent already knows this | Anthropic Best Practices |
 | Duplicated content across files | Wastes tokens on every request | research-context-engineering-comprehensive.md |
 
 *Source: file-evaluator.md lines 30-41*
@@ -66,7 +66,7 @@ Check each line of the file against these indicators:
 |----------|------|-----|
 | Does root file stay focused on essentials? | One-sentence desc + tooling + pointers only | Inlines domain rules |
 | Are domain topics in separate files? | Testing in TESTING.md, build in BUILD.md | All topics in one file |
-| Do subdirectory files exist for distinct scopes? | packages/api/CLAUDE.md for API-specific rules | Everything in root |
+| Do subdirectory files exist for distinct scopes? | packages/api/AGENTS.md or `.cursor/rules/api.mdc` for API-specific guidance | Everything in root |
 | Are pointers provided to detailed docs? | "See docs/TESTING.md" | No cross-references |
 
 *Source: file-evaluator.md lines 52-59*
@@ -133,11 +133,11 @@ Return findings in exactly this format:
 ### Files Found
 | File | Lines | Status |
 |------|-------|--------|
-| `./CLAUDE.md` | 342 | ⚠️ Over limit |
+| `./AGENTS.md` | 342 | ⚠️ Over limit |
 
 ### Per-File Issues
 
-#### `./CLAUDE.md` (342 lines — OVER 200 LINE LIMIT)
+#### `./AGENTS.md` (342 lines — OVER 200 LINE LIMIT)
 
 **Bloat Issues:**
 - Lines 45-78: [specific issue with evidence]
@@ -149,7 +149,7 @@ Return findings in exactly this format:
 - Line 12: "[rule A]" conflicts with "[rule B]" at line 89
 
 **Progressive Disclosure Issues:**
-- Lines 150-200: Testing conventions should be in separate `docs/TESTING.md`
+- Lines 150-200: Testing conventions should be in separate `.cursor/rules/testing.mdc`
 
 **Automation Opportunity Issues:**
 - Lines 45-60: Formatting enforcement (HOOK_CANDIDATE — deterministic behavior)

@@ -36,7 +36,7 @@ Each of these wastes tokens without improving agent performance:
 | Standard language conventions | Agent already knows these from training | Anthropic Best Practices |
 | Vague instructions ("write clean code") | Not actionable, wastes attention budget | a-guide-to-agents.md |
 | Codebase overview paragraphs | Increases steps without improving navigation | Evaluating AGENTS.md |
-| Obvious tool usage ("use git for version control") | Agent already knows this | Anthropic: "If Claude already does it correctly, delete it" |
+| Obvious tool usage ("use git for version control") | Agent already knows this | Anthropic Best Practices |
 | Duplicated information across files | Wastes tokens on every request | Context engineering research |
 
 ### Staleness Indicators
