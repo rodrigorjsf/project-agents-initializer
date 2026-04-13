@@ -33,7 +33,7 @@ Not all excluded content should be deleted — some should migrate to on-demand 
 |-------------------|--------|-----------|
 | Hook-enforced behaviors | **Migrate** | `.cursor/hooks.json` (zero context cost, deterministic enforcement) |
 | Path-specific conventions | **Migrate** | `.cursor/rules/*.mdc` with `globs:` (loads on file match only) |
-| Domain knowledge blocks >50 lines | **Migrate** | Skill `user-invocable: false` (~100 token startup cost) |
+| Domain knowledge blocks >50 lines | **Migrate** | Skill (auto-invocable, ~100 token startup cost) |
 | Agent-inferable content | **Delete** | No migration — agents discover via tools |
 | Stale, vague, or duplicate content | **Delete** | No migration value |
 

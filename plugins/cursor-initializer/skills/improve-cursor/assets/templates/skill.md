@@ -1,32 +1,24 @@
 ---
 name: [kebab-case-name]
 description: [One sentence: what this skill does — the agent uses this to decide when to invoke it]
-user-invocable: false
+disable-model-invocation: true
 ---
 <!-- TEMPLATE: Skill File (generated from automation migration)
      Placement: .cursor/skills/[kebab-case-name]/SKILL.md
      Naming: kebab-case, ≤64 chars, lowercase letters/numbers/hyphens only
      Target: Under 200 lines after placeholders are filled
      Rule: `description` is required — the agent uses it to decide when to invoke
-     Rule: `user-invocable: false` is the default for migrated skills (auto-invoked by agent)
+     Rule: `disable-model-invocation: true` is the default for migrated skills (manual invocation)
+     Rule: Remove `disable-model-invocation: true` ONLY when the skill should be auto-invoked
      Rule: Every instruction must be specific and verifiable
      Source attribution: add <!-- Migrated from [source-file]:lines [N-M] --> below frontmatter
 -->
 <!-- Migrated from [source-file]:lines [N-M] -->
 
-<!-- CONDITIONAL: Use `disable-model-invocation: true` instead of `user-invocable: false`
-     ONLY when the skill is heavy, rare, or has side effects (invoked <20% of sessions).
-     With this flag: zero passive context cost; user must invoke manually via slash command.
-     Replace `user-invocable: false` in frontmatter with:
-       disable-model-invocation: true
--->
-
-<!-- CONDITIONAL: Add `context: fork` to frontmatter ONLY when the skill performs
-     context-heavy isolated analysis (similar to a subagent task).
-     With this flag: skill runs in a forked context; parent context cost is zero.
-     Add to frontmatter:
-       context: fork
--->
+<!-- CONDITIONAL: Remove `disable-model-invocation: true` from frontmatter ONLY when
+     this skill should be auto-invoked by the agent based on context.
+     Auto-invocable skills have ~100 token passive context cost (name + description at startup).
+     Default for migrated skills is manual-only to avoid unintended side effects. -->
 
 <!-- CONDITIONAL: Add `allowed-tools` to frontmatter ONLY when the skill requires
      specific tools restricted to its scope.
