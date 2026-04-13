@@ -1,6 +1,6 @@
 # agent-engineering-toolkit
 
-Multi-plugin Claude Code marketplace for evidence-based agent artifact engineering.
+Multi-plugin marketplace for evidence-based agent artifact engineering.
 
 ## Structure
 
@@ -19,7 +19,7 @@ Each skill directory contains:
 
 ## Conventions
 
-- Distribution-specific rules in `.claude/rules/plugin-skills.md` and `.claude/rules/standalone-skills.md`
+- Distribution-specific rules in `.claude/rules/plugin-skills.md`, `.claude/rules/cursor-plugin-skills.md`, and `.claude/rules/standalone-skills.md`
 - Shared references are copied into each skill (not symlinked) — each skill is self-contained
 - When updating an intentionally shared reference, update all intended copies in sync
 - `.claude/rules/` enforces conventions automatically via path-scoped rules

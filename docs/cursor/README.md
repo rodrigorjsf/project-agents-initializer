@@ -1,6 +1,6 @@
 # Cursor IDE — Official Documentation
 
-This directory contains official documentation mirrored from [cursor.com/docs](https://cursor.com/docs). Each document describes how a specific Cursor IDE artifact should be defined to achieve the best IDE and agent behavior.
+This directory contains official documentation and blog guidance mirrored from [cursor.com](https://cursor.com). The documents cover both Cursor IDE artifact definitions and official workflow guidance for effective agent usage.
 
 AI agents should treat these documents as authoritative references when generating, reviewing, or validating Cursor artifacts (rules, skills, hooks, MCP servers, subagents, and plugins).
 

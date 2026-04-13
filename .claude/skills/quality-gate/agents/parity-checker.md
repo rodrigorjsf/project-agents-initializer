@@ -61,6 +61,18 @@ md5sum plugins/agents-initializer/skills/improve-claude/references/claude-rules-
        skills/init-claude/references/claude-rules-system.md
 ```
 
+**Present in cursor skills only (2 copies: plugin init + improve):**
+
+```bash
+md5sum plugins/cursor-initializer/skills/*/references/context-optimization.md
+
+md5sum plugins/cursor-initializer/skills/*/references/validation-criteria.md
+
+md5sum plugins/cursor-initializer/skills/*/references/what-not-to-include.md
+
+md5sum plugins/cursor-initializer/skills/*/references/progressive-disclosure-guide.md
+```
+
 **Present in standalone init skills (2 copies, no plugin counterpart):**
 
 ```bash
@@ -112,6 +124,15 @@ md5sum plugins/agents-initializer/skills/improve-claude/assets/templates/root-cl
 # domain-doc: all 8 skills
 md5sum plugins/agents-initializer/skills/*/assets/templates/domain-doc.md \
        skills/*/assets/templates/domain-doc.md
+
+# cursor templates: init vs improve
+md5sum plugins/cursor-initializer/skills/*/assets/templates/root-agents-md.md
+
+md5sum plugins/cursor-initializer/skills/*/assets/templates/scoped-agents-md.md
+
+md5sum plugins/cursor-initializer/skills/*/assets/templates/domain-doc.md
+
+md5sum plugins/cursor-initializer/skills/*/assets/templates/cursor-rule.mdc
 ```
 
 ---
@@ -143,12 +164,20 @@ Return exactly this structure:
 | automation-migration-guide.md (4 copies) | 4 | [MATCH/MISMATCH] | |
 | evaluation-criteria.md (4 copies) | 4 | [MATCH/MISMATCH] | |
 | claude-rules-system.md (4 copies) | 4 | [MATCH/MISMATCH] | |
+| cursor context-optimization.md (2 copies) | 2 | [MATCH/MISMATCH] | |
+| cursor validation-criteria.md (2 copies) | 2 | [MATCH/MISMATCH] | |
+| cursor what-not-to-include.md (2 copies) | 2 | [MATCH/MISMATCH] | |
+| cursor progressive-disclosure-guide.md (2 copies) | 2 | [MATCH/MISMATCH] | |
 | scope-detector.md (2 copies) | 2 | [MATCH/MISMATCH] | |
 | codebase-analyzer.md (4 copies) | 4 | [MATCH/MISMATCH] | |
 | file-evaluator.md (2 copies) | 2 | [MATCH/MISMATCH] | |
 | root-agents-md.md templates | 4 | [MATCH/MISMATCH] | |
 | root-claude-md.md templates | 4 | [MATCH/MISMATCH] | |
 | domain-doc.md templates | 8 | [MATCH/MISMATCH] | |
+| cursor root-agents-md.md templates | 2 | [MATCH/MISMATCH] | |
+| cursor scoped-agents-md.md templates | 2 | [MATCH/MISMATCH] | |
+| cursor domain-doc.md templates | 2 | [MATCH/MISMATCH] | |
+| cursor-rule.mdc templates | 2 | [MATCH/MISMATCH] | |
 
 ### Divergences Found
 [If none: "✅ No divergences — all shared files are identical across distributions."]

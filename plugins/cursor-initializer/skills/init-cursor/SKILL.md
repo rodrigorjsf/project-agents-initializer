@@ -70,24 +70,24 @@ Wait for it to complete and parse its structured output.
 
 Before generating, read these reference documents:
 
-- `${CLAUDE_SKILL_DIR}/references/progressive-disclosure-guide.md` — hierarchy decisions and loading tiers
-- `${CLAUDE_SKILL_DIR}/references/what-not-to-include.md` — content exclusion criteria
-- `${CLAUDE_SKILL_DIR}/references/context-optimization.md` — token budget guidelines
-- `${CLAUDE_SKILL_DIR}/references/cursor-rules-system.md` — .cursor/rules/ conventions, .mdc format, and activation modes
+- `references/progressive-disclosure-guide.md` — hierarchy decisions and loading tiers
+- `references/what-not-to-include.md` — content exclusion criteria
+- `references/context-optimization.md` — token budget guidelines
+- `references/cursor-rules-system.md` — .cursor/rules/ conventions, .mdc format, and activation modes
 
 Using ONLY the information from Phase 1 and Phase 2, generate the file hierarchy:
 
 #### Root AGENTS.md
 
-Read `${CLAUDE_SKILL_DIR}/assets/templates/root-agents-md.md`. Fill placeholders. Remove empty sections. Target: 15-40 lines.
+Read `assets/templates/root-agents-md.md`. Fill placeholders. Remove empty sections. Target: 15-40 lines.
 
 #### Subdirectory AGENTS.md (per detected scope)
 
-If scopes detected, read `${CLAUDE_SKILL_DIR}/assets/templates/scoped-agents-md.md`. Only scope-specific content differing from root.
+If scopes detected, read `assets/templates/scoped-agents-md.md`. Only scope-specific content differing from root.
 
 #### .cursor/rules/ Files (Metadata-Controlled Rules)
 
-If file-pattern-specific rules or agent-requested rules detected, read `${CLAUDE_SKILL_DIR}/assets/templates/cursor-rule.mdc`. Consult `${CLAUDE_SKILL_DIR}/references/cursor-rules-system.md` for:
+If file-pattern-specific rules or agent-requested rules detected, read `assets/templates/cursor-rule.mdc`. Consult `references/cursor-rules-system.md` for:
 
 - When to create .mdc rules vs using AGENTS.md
 - Activation modes: Always (`alwaysApply: true`), Auto-attached (`globs`), Agent-requested (`description`), Manual
@@ -96,11 +96,11 @@ If file-pattern-specific rules or agent-requested rules detected, read `${CLAUDE
 
 #### Domain Files
 
-If non-standard domain patterns detected, read `${CLAUDE_SKILL_DIR}/assets/templates/domain-doc.md`.
+If non-standard domain patterns detected, read `assets/templates/domain-doc.md`.
 
 ### Phase 4: Self-Validation
 
-Read `${CLAUDE_SKILL_DIR}/references/validation-criteria.md` and execute its **Validation Loop Instructions** against every generated file.
+Read `references/validation-criteria.md` and execute its **Validation Loop Instructions** against every generated file.
 
 Check both general criteria AND the Cursor-specific structural checks:
 - `.mdc` files use ONLY valid frontmatter fields (`description`, `alwaysApply`, `globs`)

@@ -47,7 +47,7 @@ Proceed to Phase 1 with `has_rules` and `has_agents_md` flags set.
 
 ### Phase 1: Current State Analysis
 
-Read `${CLAUDE_SKILL_DIR}/references/evaluation-criteria.md` for the scoring rubric and bloat/staleness indicators.
+Read `references/evaluation-criteria.md` for the scoring rubric and bloat/staleness indicators.
 
 Build the `file-evaluator` task dynamically based on what was found:
 
@@ -115,11 +115,11 @@ Wait for it to complete and parse its structured output.
 
 Read these reference documents:
 
-- `${CLAUDE_SKILL_DIR}/references/progressive-disclosure-guide.md` — hierarchy decisions and loading tiers
-- `${CLAUDE_SKILL_DIR}/references/what-not-to-include.md` — content exclusion criteria
-- `${CLAUDE_SKILL_DIR}/references/context-optimization.md` — token budget guidelines
-- `${CLAUDE_SKILL_DIR}/references/cursor-rules-system.md` — .cursor/rules/ conventions, .mdc format, activation modes
-- `${CLAUDE_SKILL_DIR}/references/automation-migration-guide.md` — automation migration decision criteria (skill vs. hook vs. rule vs. subagent)
+- `references/progressive-disclosure-guide.md` — hierarchy decisions and loading tiers
+- `references/what-not-to-include.md` — content exclusion criteria
+- `references/context-optimization.md` — token budget guidelines
+- `references/cursor-rules-system.md` — .cursor/rules/ conventions, .mdc format, activation modes
+- `references/automation-migration-guide.md` — automation migration decision criteria (skill vs. hook vs. rule vs. subagent)
 
 Based on both subagent reports, create improvement plan:
 
@@ -166,16 +166,16 @@ For each deletion, document: the specific content being removed, WHY the agent d
 
 When generating new or restructured files, use these templates:
 
-- Root AGENTS.md (only if `has_agents_md`): Read `${CLAUDE_SKILL_DIR}/assets/templates/root-agents-md.md`
-- Scoped AGENTS.md (only if `has_agents_md`): Read `${CLAUDE_SKILL_DIR}/assets/templates/scoped-agents-md.md`
-- `.cursor/rules/*.mdc` files: Read `${CLAUDE_SKILL_DIR}/assets/templates/cursor-rule.mdc`
-- Domain docs: Read `${CLAUDE_SKILL_DIR}/assets/templates/domain-doc.md`
-- Skills (from automation migration): Read `${CLAUDE_SKILL_DIR}/assets/templates/skill.md`
-- Hook configs (from automation migration): Read `${CLAUDE_SKILL_DIR}/assets/templates/hook-config.md`
+- Root AGENTS.md (only if `has_agents_md`): Read `assets/templates/root-agents-md.md`
+- Scoped AGENTS.md (only if `has_agents_md`): Read `assets/templates/scoped-agents-md.md`
+- `.cursor/rules/*.mdc` files: Read `assets/templates/cursor-rule.mdc`
+- Domain docs: Read `assets/templates/domain-doc.md`
+- Skills (from automation migration): Read `assets/templates/skill.md`
+- Hook configs (from automation migration): Read `assets/templates/hook-config.md`
 
 ### Phase 4: Self-Validation
 
-Read `${CLAUDE_SKILL_DIR}/references/validation-criteria.md` and execute its **Validation Loop Instructions** against every improved or newly created file.
+Read `references/validation-criteria.md` and execute its **Validation Loop Instructions** against every improved or newly created file.
 
 For improve operations, also evaluate the **"If This Is an IMPROVE Operation"** section. For Cursor rules, also check:
 - `.mdc` files use ONLY valid frontmatter (`description`, `alwaysApply`, `globs`)

@@ -1,7 +1,7 @@
 # Test Scenario: Init — Simple Single-Scope Project
 
 **Scenario ID**: S1
-**Skills Under Test**: `init-agents` (plugin + standalone), `init-claude` (plugin + standalone)
+**Skills Under Test**: `init-agents` (plugin + standalone), `init-claude` (plugin + standalone), `init-cursor` (plugin)
 **Phase**: GREEN (Tasks I1–I4)
 
 ---
@@ -102,6 +102,19 @@ Root CLAUDE.md should contain:
 - Non-obvious build commands or flags
 - Critical constraints (e.g., must maintain mypy strict compliance)
 
+### init-cursor
+
+| File | Expected Lines | Key Constraints |
+|------|---------------|-----------------|
+| `AGENTS.md` (root) | 15–40 | Same minimal root constraints as `init-agents` |
+| `.cursor/rules/*.mdc` | 0 or small focused set | Only generated if truly justified; must use valid Cursor frontmatter |
+
+`init-cursor` should:
+
+- Generate the same minimal root `AGENTS.md` quality bar as `init-agents`
+- Prefer **zero** `.cursor/rules/*.mdc` files for this simple single-scope project unless the analysis finds a truly non-obvious file-pattern rule
+- If any `.mdc` file is generated, keep it focused and validate frontmatter with only `description`, `alwaysApply`, and `globs`
+
 ---
 
 ## Pass Criteria
@@ -115,6 +128,9 @@ Root CLAUDE.md should contain:
 | No generic advice | 0 "write clean", "readable code" phrases | Manual review |
 | No default commands documented | pytest, ruff, mypy not in "run X to do Y" form | Manual review |
 | Non-standard config captured | line-length 120, strict mypy, --cov=src | Manual review |
+| Cursor root file stays minimal | Same 15–40 line target as `init-agents` | `wc -l AGENTS.md` |
+| Cursor rules remain restrained | 0 unnecessary `.cursor/rules/*.mdc` files | Manual review |
+| Cursor frontmatter valid | Only `description`, `alwaysApply`, `globs` | Manual review |
 
 ---
 

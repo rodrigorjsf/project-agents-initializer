@@ -9,6 +9,7 @@ paths:
 - Reference agents by registered name (e.g., "Delegate to the `codebase-analyzer` agent with this task:")
 - `references/` directory MUST exist alongside SKILL.md and contain evidence-based guidance files
 - `assets/templates/` directory MUST exist alongside SKILL.md and contain output templates
+- Bundled files in Cursor SKILL.md files MUST be referenced with relative paths from the skill root (`references/...`, `assets/templates/...`), not `${CLAUDE_SKILL_DIR}`
 - Self-validation phase MUST read `references/validation-criteria.md` and loop until all checks pass
 - Reference files must be one level deep from SKILL.md — no nested `references/references/` paths
 - Conditional reference loading pattern: "read X only if project uses Y"

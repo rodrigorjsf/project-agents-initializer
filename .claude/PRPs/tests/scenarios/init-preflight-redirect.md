@@ -1,7 +1,7 @@
 # Test Scenario: Init — Preflight Redirect When Files Exist
 
 **Scenario ID**: S5
-**Skills Under Test**: `init-agents` (plugin + standalone), `init-claude` (plugin + standalone)
+**Skills Under Test**: `init-agents` (plugin + standalone), `init-claude` (plugin + standalone), `init-cursor` (plugin)
 **Phase**: GREEN (Tasks R1–R4)
 
 ---
@@ -20,6 +20,7 @@ Use the S4 reasonable fixtures as the pre-existing files:
 
 - `reasonable-agents-md.md` → copy as `AGENTS.md` in test project
 - `reasonable-claude-md.md` → copy as `CLAUDE.md` in test project
+- Create `.cursor/rules/existing-rule.mdc` with any valid minimal rule for the Cursor variant
 
 ---
 
@@ -45,6 +46,16 @@ Use the S4 reasonable fixtures as the pre-existing files:
 | Phase 1 execution | Does NOT execute init Phase 1 |
 | Improve flow | Follows complete improve-claude process |
 
+### init-cursor (plugin)
+
+| Step | Expected |
+|------|----------|
+| Preflight check | Detects existing `AGENTS.md` and/or `.cursor/rules/*` |
+| User notification | Emits the Cursor-specific redirect message from `init-cursor` |
+| Redirect | Invokes `improve-cursor` skill |
+| Phase 1 execution | Does NOT execute init Phase 1 |
+| Improve flow | Follows complete improve-cursor process |
+
 ---
 
 ## Pass Criteria
@@ -57,6 +68,7 @@ Use the S4 reasonable fixtures as the pre-existing files:
 | STOP enforced | Init phases 1-5 NOT executed | No init template, no scope detection |
 | Improve flow completes | Improve skill runs to completion | Verify improve output generated |
 | Original file preserved | No overwrite of existing file | Diff before/after |
+| Cursor rules preserved | Existing `.cursor/rules/*` not overwritten during redirect | Diff before/after |
 
 ---
 

@@ -41,11 +41,11 @@ To maintain context integrity during execution, this plugin uses **subagent isol
 
 | Subagent | Role | Used By |
 |----------|------|---------|
-| `codebase-analyzer` | Detects tech stack, package manager, build/test commands | All 4 skills |
+| `codebase-analyzer` | Detects tech stack, package manager, build/test commands | All subagent-backed plugin skills |
 | `scope-detector` | Identifies distinct scopes/contexts in the project | init skills |
 | `file-evaluator` | Assesses existing config file quality against research criteria | improve skills |
 
-All subagents are defined as native Claude Code subagent files with proper YAML frontmatter (`name`, `description`, `tools`, `model`, `maxTurns`). They run on **Claude Sonnet** with read-only tools (`Read`, `Grep`, `Glob`, `Bash`) for cost efficiency and safety. They return structured summaries — high signal, low noise — keeping the orchestrator's context clean.
+The Claude Code plugin uses native Claude subagent files with read-only tool whitelists and `model: sonnet`; the Cursor plugin uses Cursor's native subagent format with `model: inherit` and `readonly: true`. Both return structured summaries — high signal, low noise — keeping the orchestrator's context clean.
 
 #### Subagent Metadata
 
@@ -239,6 +239,24 @@ claude plugin install agents-initializer@agent-engineering-toolkit --scope proje
 claude plugin install agents-initializer@agent-engineering-toolkit --scope local
 ```
 
+### Cursor IDE (Native Plugin System)
+
+For local development and testing, load this repository through Cursor's local plugin directory:
+
+```bash
+# Clone the repository
+git clone https://github.com/rodrigorjsf/agent-engineering-toolkit.git ~/src/agent-engineering-toolkit
+
+# Register it as a local Cursor plugin marketplace
+mkdir -p ~/.cursor/plugins/local
+ln -s ~/src/agent-engineering-toolkit ~/.cursor/plugins/local/agent-engineering-toolkit
+```
+
+Then restart Cursor (or run **Developer: Reload Window**). The repo root `.cursor-plugin/marketplace.json` exposes the `cursor-initializer` plugin, which provides:
+
+- `/cursor-initializer:init-cursor`
+- `/cursor-initializer:improve-cursor`
+
 ### npx skills add (Third-Party Skills CLI)
 
 For users of the [skills CLI](https://skills.sh/) — works with VS Code Copilot, Cursor, Windsurf, and other AI coding tools:
@@ -253,15 +271,14 @@ npx skills add rodrigorjsf/agent-engineering-toolkit
 # Install for specific AI tools
 npx skills add rodrigorjsf/agent-engineering-toolkit --agent cursor copilot
 
-# Install only specific skills (Claude Code or Cursor variants)
+# Install only specific standalone skills
 npx skills add rodrigorjsf/agent-engineering-toolkit --skill init-claude improve-claude
-npx skills add rodrigorjsf/agent-engineering-toolkit --skill init-cursor improve-cursor
 
 # List available skills before installing
 npx skills add rodrigorjsf/agent-engineering-toolkit --list
 ```
 
-**These are standalone skills** — they perform all analysis inline without delegating to subagents. They work with any AI coding tool without requiring Claude Code's subagent system.
+**These are standalone skills** — they come from the root `skills/` directory, perform all analysis inline, and work with any AI coding tool without requiring plugin subagents. The Cursor-specific `init-cursor` / `improve-cursor` skills are **plugin-only** and require the native Cursor plugin install path above.
 
 ### Manual Installation
 
@@ -269,20 +286,22 @@ npx skills add rodrigorjsf/agent-engineering-toolkit --list
 # Clone the repository
 git clone https://github.com/rodrigorjsf/agent-engineering-toolkit.git /tmp/agent-engineering-toolkit
 
-# For Claude Code (project-level)
+# For standalone skills in Claude Code (project-level)
 mkdir -p .claude/skills
-cp -r /tmp/agent-engineering-toolkit/plugins/agents-initializer/skills/* .claude/skills/
+cp -r /tmp/agent-engineering-toolkit/skills/* .claude/skills/
 
-# For Claude Code (user-level, all projects)
-cp -r /tmp/agent-engineering-toolkit/plugins/agents-initializer/skills/* ~/.claude/skills/
+# For standalone skills in Claude Code (user-level, all projects)
+cp -r /tmp/agent-engineering-toolkit/skills/* ~/.claude/skills/
 
 # For VS Code / GitHub Copilot
 mkdir -p .agents/skills
-cp -r /tmp/agent-engineering-toolkit/plugins/agents-initializer/skills/* .agents/skills/
+cp -r /tmp/agent-engineering-toolkit/skills/* .agents/skills/
 
 # Clean up
 rm -rf /tmp/agent-engineering-toolkit
 ```
+
+For the native Claude Code and Cursor plugin distributions, use the plugin installation flows above instead of copying `plugins/*/skills/` by themselves — the plugin variants depend on their surrounding plugin layout (agents, manifests, and namespacing).
 
 ## Usage
 
@@ -394,9 +413,11 @@ agent-engineering-toolkit/
 >
 > - `plugins/agents-initializer/skills/` — **Claude Code plugin skills** that follow the official spec: analysis is delegated to isolated `codebase-analyzer`, `scope-detector`, and `file-evaluator` subagents, keeping the orchestrating context clean. Requires Claude Code's subagent system.
 >
-> - `skills/` — **Standalone skills** for `npx skills add` users. Perform all analysis inline with direct bash/file commands. No subagent delegation, compatible with any AI coding tool.
+> - `plugins/cursor-initializer/skills/` — **Cursor plugin skills** for the native Cursor plugin system. Uses Cursor's own subagent format and exposes namespaced `/cursor-initializer:*` commands.
 >
-> `npx skills add` does a recursive SKILL.md search. Both paths are discovered, but they have the same skill names — the root `skills/` (standalone versions) are processed last and take precedence, ensuring npx users get the tool-agnostic standalone versions.
+> - `skills/` — **Standalone skills** for `npx skills add` and manual installation. Perform all analysis inline with direct bash/file commands. No subagent delegation, compatible with any AI coding tool.
+>
+> `npx skills add` should be treated as the standalone distribution only. The root `skills/` directory provides the portable skill set; Cursor-specific plugin skills are not duplicated there.
 
 ## Contributing
 
