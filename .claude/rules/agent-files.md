@@ -7,8 +7,8 @@ paths:
 ---
 # Agent File Conventions
 - YAML frontmatter required: `name`, `description`, `tools`, `model`, `maxTurns`
-- `model: sonnet` — never haiku (too weak for analysis - except for `pr-comment-resolver` agent) or opus (too costly)
-- `tools:` restrict to read-only: `Read, Grep, Glob, Bash`
-- `maxTurns: 15` for codebase/scope agents; `maxTurns: 20` for evaluator agents
+- `model: sonnet` by default — deviations require justification (e.g., `pr-comment-resolver` uses a different model)
+- `tools:` default to read-only (`Read, Grep, Glob, Bash`) — new agent types may require additional tools when justified
+- `maxTurns:` defaults: 15 for codebase/scope agents, 20 for evaluator agents — adjust per agent when justified
 - Prompt must request structured output format
 - Agents cannot spawn other agents (Task tool unavailable in agent context)
