@@ -13,8 +13,8 @@ Generates a new hook configuration for a Claude Code lifecycle event, with corre
 - **NEVER** create hooks with invalid event names — only events from the 22-event list in hook-events-reference.md are valid
 - **NEVER** use broad matchers (`"*"`) for blocking hooks — overly broad matchers block too many operations
 - **NEVER** hardcode secrets in command strings — use environment variables (e.g., `$MY_SECRET`)
-- **EVERY** hook must use the correct handler type for its purpose: `command` for deterministic checks, `prompt` or `agent` only when judgment is needed
-- **EVERY** `command` hook must document exit code behavior: 0 = success, 2 = block operation (event-dependent)
+- **EVERY** hook must use the correct handler type for its purpose: `command` for deterministic checks, `http` for external endpoints, `prompt` or `agent` only when judgment is needed
+- **EVERY** `command` hook must document the decision path used by the script: exit `2` + stderr for blocking, or exit `0` with JSON decision output when applicable
 - **EVERY** hook configuration must produce valid JSON before writing
 </RULES>
 
@@ -26,9 +26,9 @@ Check if hooks already exist for the target event in `.claude/settings.json` and
 
 **If the exact same event + matcher combination already exists:**
 
-1. Inform the user: "A hook for `{event}` with this matcher already exists. Switching to the improve workflow."
-2. Invoke the `improve-hook` skill and follow its complete process.
-3. **STOP** — do not proceed to Phase 1 or any subsequent phase of this create skill.
+1. Inform the user: "A hook for `{event}` with this matcher already exists."
+2. Inform the user that `improve-hook` is currently a Phase 5 placeholder and not yet executable.
+3. **STOP** — do not proceed to Phase 1 or any subsequent phase of this create skill. Ask the user to choose a different matcher/event combination or wait for the improve workflow implementation.
 
 **If no hook exists for this event+matcher combination:**
 Proceed to Phase 1 below.
@@ -37,7 +37,7 @@ Proceed to Phase 1 below.
 
 Delegate to the `artifact-analyzer` agent with this task:
 
-> Analyze the project to understand existing hook configurations. Focus on: hooks defined in `.claude/settings.json` and `.claude/settings.local.json`, hook scripts in `.claude/hooks/`, event types currently in use, handler types used (command/prompt/agent), and any gaps in lifecycle event coverage.
+> Analyze the project to understand existing hook configurations. Focus on: hooks defined in `.claude/settings.json` and `.claude/settings.local.json`, hook scripts in `.claude/hooks/`, event types currently in use, handler types used (command/http/prompt/agent), and any gaps in lifecycle event coverage.
 
 The agent runs on Sonnet with read-only tools (Read, Grep, Glob, Bash) in an isolated context. Wait for it to complete and parse its structured output.
 
@@ -73,7 +73,7 @@ The loop evaluates all hard limits and quality checks, fixes any failures, and r
 1. Show the user the complete hook configuration (JSON + shell script if applicable)
 2. Cite the evidence from reference files that informed key decisions:
    - Which event was chosen and why
-   - Why this handler type (command/prompt/agent)
+   - Why this handler type (command/http/prompt/agent)
    - What the exit code behavior means for this event
 3. Ask for confirmation before writing any files
 4. On approval:

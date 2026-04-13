@@ -29,9 +29,9 @@ Check if a skill with the same name already exists at:
 
 **If a skill already exists at either location:**
 
-1. Inform the user: "A skill named `{name}` already exists. Switching to the improve workflow to optimize your existing skill."
-2. Invoke the `improve-skill` skill and follow its complete process.
-3. **STOP** — do not proceed to Phase 1 or any subsequent phase of this create skill.
+1. Inform the user: "A skill named `{name}` already exists."
+2. Inform the user that `improve-skill` is currently a Phase 5 placeholder and not yet executable.
+3. **STOP** — do not proceed to Phase 1 or any subsequent phase of this create skill. Ask the user to choose a different name or wait for the improve workflow implementation.
 
 **If no skill exists with that name:**
 Proceed to Phase 1 below.
@@ -61,7 +61,7 @@ Read `${CLAUDE_SKILL_DIR}/assets/templates/skill-md.md` and fill its placeholder
 Generate the complete skill directory structure:
 
 1. `SKILL.md` — primary skill file with frontmatter and phase definitions
-2. `references/` — create stub reference files for each guide the skill will load (can be populated post-creation)
+2. `references/` — create only reference files that include initial source attribution sections (no empty stubs without attribution)
 3. `assets/templates/` — create stub template files if the skill generates output files
 
 ### Phase 3: Self-Validation
