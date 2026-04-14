@@ -30,7 +30,7 @@ Check if a subagent with the same name already exists at:
 
 **If a subagent already exists with that name:**
 
-1. Inform the user: "A subagent named `{name}` already exists."
+1. Inform the user: "A subagent named `{requested-name}` already exists."
 2. Suggest using `/agent-customizer:improve-subagent` to evaluate and optimize it instead.
 3. **STOP** — do not proceed. The user should either choose a different name or use the improve skill.
 

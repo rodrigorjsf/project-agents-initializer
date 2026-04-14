@@ -29,7 +29,7 @@ Check if a skill with the same name already exists at:
 
 **If a skill already exists at either location:**
 
-1. Inform the user: "A skill named `{name}` already exists."
+1. Inform the user: "A skill named `{requested-name}` already exists."
 2. Suggest using `/agent-customizer:improve-skill` to evaluate and optimize it instead.
 3. **STOP** — do not proceed. The user should either choose a different name or use the improve skill.
 
