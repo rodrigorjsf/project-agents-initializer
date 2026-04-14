@@ -7,7 +7,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        **Before submitting:** Search [existing issues](https://github.com/rodrigoknascimento/project-agents-initializer/issues) for duplicates or prior art.
+        **Before submitting:** Search [existing issues](/issues) for duplicates or prior art.
         If a related closed issue exists, explain what's different about your proposal.
 
   - type: textarea
