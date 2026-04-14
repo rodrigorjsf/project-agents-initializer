@@ -18,9 +18,10 @@ Multi-plugin marketplace for evidence-based agent artifact engineering. Three di
 - No generated file exceeds 200 lines; root files target 15-40 lines; scope files target 10-30 lines
 - Every instruction must pass: "Would removing this cause the agent to make mistakes?" If not, cut it
 - Plugin skills delegate to named agents; standalone skills use inline bash — never mix these patterns
-- Claude Code agent definitions: model sonnet, read-only tools only, maxTurns 15-20, structured output
+- Claude Code agent definitions: model sonnet by default, read-only tools, maxTurns 15-20, structured output
 - Cursor agent definitions: model inherit, readonly true — no tools/maxTurns fields
 - SKILL.md name ≤64 chars, description ≤1024 chars, body <500 lines
+- Rules and review instructions describe current patterns — user `*.prd.md`/`*.plan.md` files may extend conventions for new scope
 
 ## Git Conventions
 

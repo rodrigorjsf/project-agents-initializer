@@ -25,8 +25,8 @@ Flag any SKILL.md missing frontmatter or violating these constraints.
 Check the file path to determine distribution:
 
 **Plugin skills** (`plugins/*/skills/*/SKILL.md`):
-- `plugins/agents-initializer/skills/*/SKILL.md` analysis phases MUST delegate to `codebase-analyzer`, `scope-detector`, or `file-evaluator`
-- `plugins/agent-customizer/skills/*/SKILL.md` analysis phases MUST delegate to `artifact-analyzer`
+- `plugins/agents-initializer/skills/*/SKILL.md` analysis phases MUST delegate to agents registered in the plugin's `agents/` directory (currently: `codebase-analyzer`, `scope-detector`, `file-evaluator`)
+- `plugins/agent-customizer/skills/*/SKILL.md` analysis phases MUST delegate to the registered agent for that phase — use `skill-evaluator`, `hook-evaluator`, `rule-evaluator`, or `subagent-evaluator` for artifact assessment, and use `artifact-analyzer` for broader context when the workflow requires it
 - Never contain inline bash analysis commands
 - May suggest all 4 migration mechanisms: hooks, rules, skills, subagents
 - Cursor plugin skills must reference bundled files with relative paths from the skill root (`references/...`, `assets/templates/...`)
@@ -43,8 +43,14 @@ Check the file path to determine distribution:
 - `init-claude`/`improve-claude` skills → generate `.claude/rules/` and `CLAUDE.md`
 - `init-cursor`/`improve-cursor` skills → generate `.cursor/rules/*.mdc` and AGENTS.md
 - `init-agents`/`improve-agents` skills → generate only AGENTS.md (portable)
-- Flag Claude artifacts (`.claude/rules/`, `CLAUDE.md`, `paths:`) in cursor skills
-- Flag Cursor artifacts (`.cursor/rules/`, `.mdc`, `globs:`) in claude skills
+- Verify Claude artifacts (`.claude/rules/`, `CLAUDE.md`, `paths:`) in cursor skills
+- Verify Cursor artifacts (`.cursor/rules/`, `.mdc`, `globs:`) in claude skills
+
+## Evaluating New Patterns
+
+- New plugins or skill types may introduce new delegation patterns — verify they follow the plugin vs standalone boundary
+- A new platform target (beyond Claude/Cursor) may produce different artifact types — check for internal consistency
+- New skill variants should update the relevant `.claude/rules/` file to document the new pattern
 
 ## Common Issues to Flag
 

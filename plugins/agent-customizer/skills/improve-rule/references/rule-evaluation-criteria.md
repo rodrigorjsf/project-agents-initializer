@@ -20,9 +20,8 @@ Source: memory/how-claude-remembers-a-project.md
 
 | Criterion | Threshold | Source |
 |-----------|-----------|--------|
-| Path-scoped rules | `paths:` array present if path-scoped | memory/how-claude-remembers-a-project.md lines 147-164 |
-| Always-loaded rules | ≤ 30 lines | Context budget: loaded every session |
-| Path-scoped rules | ≤ 50 lines | Context budget: loaded when matching files read |
+| Rules | `paths:` array present | memory/how-claude-remembers-a-project.md lines 147-164 |
+| Rules | ≤ 50 lines | Context budget: loaded when matching files read |
 | YAML frontmatter | Valid YAML if present | memory/how-claude-remembers-a-project.md |
 | Instructions | Actionable and verifiable | memory/how-claude-remembers-a-project.md lines 61-75 |
 
@@ -41,7 +40,7 @@ A rule file violating any hard limit is flagged **OVER LIMIT** or **INVALID**.
 | Vague instructions ("write clean code") | Not actionable; ignored in practice |
 | Standard conventions Claude already knows | "If Claude already does it, delete it" |
 | Long explanations or tutorials | Rules are instructions, not documentation |
-| Examples in always-loaded rules | Token waste on every session; be specific instead |
+| Examples in rules | Token waste; be specific instead |
 
 *Source: memory/how-claude-remembers-a-project.md lines 61-75*
 
@@ -68,7 +67,7 @@ A rule file violating any hard limit is flagged **OVER LIMIT** or **INVALID**.
 | One scope per file? | One topic per rule file | Multiple unrelated topics in one file |
 | Glob pattern specific enough? | `src/api/**/*.ts` | `**/*` |
 | No overlap with other rules? | Each rule file covers distinct domain | Same instruction in 3 rule files |
-| Always-loaded rules worth the token cost? | Essential conventions; high reuse | Rarely relevant guidance |
+| Rule scope narrow enough for the token cost? | Specific globs for real target files | Missing `paths:` or broad scope |
 
 *Source: memory/how-claude-remembers-a-project.md lines 123-145*
 
@@ -81,7 +80,7 @@ A rule file violating any hard limit is flagged **OVER LIMIT** or **INVALID**.
 | Path Specificity | Precise globs matching intended files | Some broad patterns | `**/*` or no path scoping for domain-specific rules |
 | Instruction Actionability | All instructions verifiable | Mix of specific and vague | Mostly vague |
 | Scope Separation | One topic per file; no overlap | Some overlap | Everything in one rule file |
-| Conciseness | Always-loaded ≤30 lines; path-scoped ≤50 | Some over limit | Multiple files far over limit |
+| Conciseness | ≤50 lines | Some over limit | Multiple files far over limit |
 | Consistency | 0 contradictions across files | 1 contradiction | 2+ contradictions |
 | **Overall** | | | |
 
@@ -97,12 +96,12 @@ A rule file violating any hard limit is flagged **OVER LIMIT** or **INVALID**.
 ### Files Found
 | File | Lines | Paths Frontmatter | Status |
 |------|-------|-------------------|--------|
-| `code-style.md` | 45 | None (always-loaded) | ⚠️ Over 30-line limit |
+| `code-style.md` | 52 | None | ❌ Missing `paths:` + over 50-line limit |
 | `api-design.md` | 28 | `src/api/**/*.ts` | ✅ |
 
 ### Per-File Issues
 
-#### `code-style.md` (45 lines — always-loaded, over 30-line limit)
+#### `code-style.md` (52 lines — missing `paths:` and over 50-line limit)
 
 **Bloat Issues:**
 - Lines 30-45: Testing conventions — should be in separate `testing.md`
@@ -113,10 +112,10 @@ A rule file violating any hard limit is flagged **OVER LIMIT** or **INVALID**.
 ### Quality Score
 | Dimension | Score (1-10) | Notes |
 |-----------|-------------|-------|
-| Path Specificity | 6 | api-design.md good; code-style.md too broad |
+| Path Specificity | 4 | api-design.md good; code-style.md missing `paths:` |
 | Instruction Actionability | 7 | Most instructions specific |
 | Scope Separation | 4 | code-style.md covers two topics |
-| Conciseness | 5 | code-style.md 45 lines (30-line limit) |
+| Conciseness | 5 | code-style.md 52 lines (50-line limit) |
 | Consistency | 8 | No contradictions |
 | **Overall** | **6** | Split code-style.md, remove stale ref |
 ```

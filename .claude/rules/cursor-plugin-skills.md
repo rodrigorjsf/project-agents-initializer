@@ -4,7 +4,7 @@ paths:
 ---
 # Cursor Plugin Skill Conventions
 
-- Analysis phases MUST delegate to named agents: `codebase-analyzer`, `scope-detector`, `file-evaluator`
+- Analysis phases MUST delegate to agents registered in the plugin's `agents/` directory (currently: `codebase-analyzer`, `scope-detector`, `file-evaluator`)
 - Never add inline bash analysis here — subagent delegation keeps the orchestrator context clean
 - Reference agents by registered name (e.g., "Delegate to the `codebase-analyzer` agent with this task:")
 - `references/` directory MUST exist alongside SKILL.md and contain evidence-based guidance files
@@ -13,7 +13,7 @@ paths:
 - Self-validation phase MUST read `references/validation-criteria.md` and loop until all checks pass
 - Reference files must be one level deep from SKILL.md — no nested `references/references/` paths
 - Conditional reference loading pattern: "read X only if project uses Y"
-- init-cursor generates AGENTS.md + `.cursor/rules/*.mdc` files; improve-cursor handles AGENTS.md only when target project uses it
+- Currently, init-cursor generates AGENTS.md + `.cursor/rules/*.mdc` files; improve-cursor handles AGENTS.md only when target project uses it
 - Subagent definitions use `readonly: true`, NOT `tools:` whitelists or `maxTurns:`
 - .mdc frontmatter allows ONLY: `description` (string), `alwaysApply` (boolean), `globs` (string|array)
 - Never use `paths:` in .mdc frontmatter — that is Claude Code specific
