@@ -2,7 +2,7 @@
 name: pr-comment-resolver
 description: "Internal subagent — invoked only by the receiving-code-review skill after committing fixes. Replies to and resolves GitHub PR review comments with the applied resolution summaries. Do not invoke directly."
 tools: Bash
-model: haiku
+model: gpt-4.1
 memory: project
 background: true
 maxTurns: 20
