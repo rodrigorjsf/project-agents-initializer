@@ -29,6 +29,8 @@ Any rule file violating these criteria must be fixed before proceeding:
 - [ ] No overlap with existing rules (same instruction not in multiple files)
 - [ ] No standard conventions Claude already knows from training
 - [ ] No long explanations — rules are instructions, not documentation
+- [ ] Evidence citations present: rule instructions justify their existence with reference to project conventions or docs (not just "best practice")
+- [ ] Prompt engineering strategy applied: rule uses zero-shot imperative instructions only (no examples, no tutorials, no explanations)
 
 ---
 

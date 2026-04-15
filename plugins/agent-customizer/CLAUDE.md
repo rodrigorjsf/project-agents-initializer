@@ -9,4 +9,4 @@ Follows the official Claude Code plugin specification.
 - `skills/*/assets/templates/` — output template files used during file generation phases
 - `marketplace.json` — plugin `source` must be `"./plugins/agent-customizer"` (not `"."`)
 - Plugin agents cannot spawn other agents and cannot use `hooks` or `mcpServers`
-- `agents/` — 5 subagent definitions: `artifact-analyzer`, `skill-evaluator`, `hook-evaluator`, `rule-evaluator`, `subagent-evaluator`
+- `agents/` — 6 subagent definitions: `artifact-analyzer`, `skill-evaluator`, `hook-evaluator`, `rule-evaluator`, `subagent-evaluator`, `docs-drift-checker`

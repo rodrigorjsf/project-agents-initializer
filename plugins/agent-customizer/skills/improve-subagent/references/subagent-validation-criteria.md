@@ -31,6 +31,8 @@ Any subagent violating these criteria must be fixed before proceeding:
 - [ ] Delegation trigger language is normal ("use when..."), not aggressive ("CRITICAL: MUST always...")
 - [ ] No instructions telling subagent to spawn other subagents (runtime blocks this)
 - [ ] System prompt is task-specific, not generic ("you are a helpful AI")
+- [ ] Evidence citations present: system prompt references source docs for domain-specific constraints (e.g., "per creating-custom-subagents.md")
+- [ ] Prompt engineering strategy applied: system prompt uses role prompting (single-sentence role), structured output format, and confidence filtering per prompt-engineering-strategies.md
 
 ---
 

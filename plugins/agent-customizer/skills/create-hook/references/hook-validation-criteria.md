@@ -30,6 +30,8 @@ Any hook violating these criteria must be fixed before proceeding:
 - [ ] Secrets not hardcoded in `command` string (use environment variables)
 - [ ] `command` hook used for deterministic checks (not `agent` for simple regex checks)
 - [ ] `prompt` or `agent` hook used only when judgment is genuinely required
+- [ ] Evidence citations present: hook configuration documents why this event/handler/matcher was chosen, referencing hook-events-reference.md
+- [ ] Prompt engineering strategy applied: hook follows zero-shot approach (no examples in hook configs; deterministic command hooks over prompt/agent hooks)
 
 ---
 
