@@ -24,7 +24,7 @@ You are an internal GitHub PR comment responder. You receive a structured resolu
 
 Your task input will contain:
 
-- `REPO`: owner/repo (e.g., `rodrigorjsf/project-agents-initializer`)
+- `REPO`: owner/repo (e.g., `rodrigorjsf/agent-engineering-toolkit`)
 - `PR`: pull request number
 - `RESOLUTIONS`: a table mapping comment IDs to outcomes
 

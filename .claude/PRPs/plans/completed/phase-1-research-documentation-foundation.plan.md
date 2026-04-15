@@ -552,5 +552,5 @@ ls skills/init-agents/references/ | grep automation || echo "Not in init-agents 
 - Web research revealed 24 hook events (up from ~6 in existing docs), a new `http` hook type, the `effort` skill frontmatter field, and `paths` YAML list syntax with negation. These are incorporated into the reference's mechanism comparison section.
 - The existing sync mechanism (PostToolUse hook + path-scoped rule) already covers the new reference file paths — no hook or rule changes needed.
 - DESIGN-GUIDELINES.md already has Guideline 10 covering on-demand context loading. Guideline 13 focuses specifically on the **decision framework** for choosing between mechanisms, complementing Guideline 10's **mechanism descriptions**.
-- The PRD requires creating a GitHub sub-issue of #11 for this plan. Execute after plan approval: `gh issue create --title "Phase 1: Research & Documentation Foundation" --body "..." --repo rodrigorjsf/project-agents-initializer` and link to #11.
+- The PRD requires creating a GitHub sub-issue of #11 for this plan. Execute after plan approval: `gh issue create --title "Phase 1: Research & Documentation Foundation" --body "..." --repo rodrigorjsf/agent-engineering-toolkit` and link to #11.
 - The PRD also requires attaching the plan to GitHub issue #11.

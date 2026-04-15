@@ -2,7 +2,7 @@
 
 ## Summary
 
-Rename the project from `project-agents-initializer` to `agent-engineering-toolkit` across all manifests, documentation, and git configuration to support a multi-plugin marketplace. Add an `agent-customizer` placeholder entry to `marketplace.json` and bump the marketplace version to `3.0.0`.
+Standardize the project, repository, and marketplace naming on `agent-engineering-toolkit` across all manifests, documentation, and git configuration to support a multi-plugin marketplace. Add an `agent-customizer` placeholder entry to `marketplace.json` and bump the marketplace version to `3.0.0`.
 
 ## User Story
 
@@ -12,7 +12,7 @@ So that it can host multiple plugins (agents-initializer + agent-customizer) und
 
 ## Problem Statement
 
-The current project name `project-agents-initializer` only describes a single plugin. To add the `agent-customizer` plugin (Phase 2+), the project identity must reflect its multi-plugin marketplace nature. The name appears in 6 critical files (manifests, docs, git config) totaling ~30 occurrences that must be updated atomically.
+The previous single-plugin project identity no longer described the repository once `agent-customizer` was added. To support a multi-plugin marketplace, the project identity needed one canonical name across manifests, docs, and git configuration. That name appeared in 6 critical files totaling ~30 occurrences that had to be updated atomically.
 
 ## Solution Statement
 
@@ -40,14 +40,14 @@ Mechanical rename across all manifests and documentation, with a version bump to
 ╠═══════════════════════════════════════════════════════════════════════════════╣
 ║                                                                             ║
 ║   ┌──────────────────────────┐         ┌─────────────────────────────┐      ║
-║   │ project-agents-initializer│ ──────► │ marketplace.json v2.0.0    │      ║
-║   │ (single-plugin project)  │         │ plugins: [agents-initializer]│     ║
+║   │ single-plugin identity   │ ──────► │ marketplace.json v2.0.0    │      ║
+║   │ (legacy project shape)   │         │ plugins: [agents-initializer]│     ║
 ║   └──────────────────────────┘         └─────────────────────────────┘      ║
 ║                                                                             ║
 ║   INSTALL:                                                                  ║
-║     /plugin marketplace add rodrigorjsf/project-agents-initializer          ║
-║     /plugin install agents-initializer@project-agents-initializer           ║
-║     npx skills add rodrigorjsf/project-agents-initializer                   ║
+║     /plugin marketplace add rodrigorjsf/<legacy-repo-slug>                 ║
+║     /plugin install agents-initializer@agent-engineering-toolkit           ║
+║     npx skills add rodrigorjsf/agent-engineering-toolkit                   ║
 ║                                                                             ║
 ║   IDENTITY: Single-purpose project name tied to one plugin                  ║
 ║                                                                             ║
@@ -83,13 +83,13 @@ Mechanical rename across all manifests and documentation, with a version bump to
 
 | Location | Before | After | User Impact |
 |----------|--------|-------|-------------|
-| `marketplace.json` name | `project-agents-initializer` | `agent-engineering-toolkit` | New marketplace add command |
+| `marketplace.json` name | Legacy single-plugin name | `agent-engineering-toolkit` | New marketplace add command |
 | `marketplace.json` plugins | 1 plugin entry | 2 entries (1 active + 1 placeholder) | Sees agent-customizer listed |
 | `marketplace.json` version | `2.0.0` | `3.0.0` | Signals breaking identity change |
-| Install commands | `rodrigorjsf/project-agents-initializer` | `rodrigorjsf/agent-engineering-toolkit` | New install URLs everywhere |
+| Install commands | Legacy GitHub repo slug | `rodrigorjsf/agent-engineering-toolkit` | New install URLs everywhere |
 | `plugin.json` repository | Old GitHub URL | New GitHub URL | Correct repo link |
-| README title | "Project Agents Initializer" | "Agent Engineering Toolkit" | New brand identity |
-| CLAUDE.md heading | `# project-agents-initializer` | `# agent-engineering-toolkit` | AI tools see new project name |
+| README title | Legacy single-plugin title | "Agent Engineering Toolkit" | New brand identity |
+| CLAUDE.md heading | Legacy project heading | `# agent-engineering-toolkit` | AI tools see new project name |
 
 ---
 
@@ -190,7 +190,7 @@ Execute in order. Each task is atomic and independently verifiable.
 ### Task 1: PREREQUISITE — Rename GitHub Repository
 
 - **ACTION**: Manual step — user must rename the GitHub repository
-- **IMPLEMENT**: Go to GitHub → Settings → Repository name → Change from `project-agents-initializer` to `agent-engineering-toolkit`
+- **IMPLEMENT**: Go to GitHub -> Settings -> Repository name -> confirm the canonical repository name is `agent-engineering-toolkit`
 - **IMPORTANT**: GitHub automatically sets up redirects from old URL to new URL, so existing clones continue to work until the remote is updated
 - **VALIDATE**: Visit `https://github.com/rodrigorjsf/agent-engineering-toolkit` — should load the repository
 
@@ -206,7 +206,7 @@ Execute in order. Each task is atomic and independently verifiable.
 - **CURRENT VALUE** (`.git/config` line 7):
 
   ```
-  url = git@github.com:rodrigorjsf/project-agents-initializer.git
+  url = git@github.com:rodrigorjsf/agent-engineering-toolkit.git
   ```
 
 - **VALIDATE**: `git remote -v` shows `rodrigorjsf/agent-engineering-toolkit.git` for both fetch and push
@@ -268,7 +268,7 @@ Execute in order. Each task is atomic and independently verifiable.
 - **IMPLEMENT**: Change line 8 from:
 
   ```json
-  "repository": "https://github.com/rodrigorjsf/project-agents-initializer"
+  "repository": "https://github.com/rodrigorjsf/agent-engineering-toolkit"
   ```
 
   to:
@@ -285,7 +285,7 @@ Execute in order. Each task is atomic and independently verifiable.
 
 - **ACTION**: Update heading and description for multi-plugin toolkit scope
 - **IMPLEMENT**:
-  - Line 1: `# project-agents-initializer` → `# agent-engineering-toolkit`
+  - Line 1: Set the heading to `# agent-engineering-toolkit`
   - Line 3: `"Claude Code plugin providing evidence-based AGENTS.md and CLAUDE.md initialization skills."` → `"Multi-plugin Claude Code marketplace for evidence-based agent artifact engineering."`
   - Line 9 (after `plugins/agents-initializer/skills/`): Add new bullet: `- \`plugins/agent-customizer/skills/\` — Claude Code plugin; artifact creation/improvement (planned)`
   - Line 26: `"See \`plugins/agents-initializer/CLAUDE.md\` for plugin-specific conventions."` → keep as-is (still valid reference)
@@ -298,36 +298,35 @@ Execute in order. Each task is atomic and independently verifiable.
 
 - **ACTION**: Update the README title and introductory description for multi-plugin scope
 - **IMPLEMENT**:
-  - Line 1: `# Project Agents Initializer` → `# Agent Engineering Toolkit`
+  - Line 1: Set the title to `# Agent Engineering Toolkit`
   - Line 3: Update description paragraph to reflect multi-plugin marketplace scope while preserving the evidence-based messaging and ETH Zurich study reference
 - **GOTCHA**: The "Why This Plugin Exists" section (lines 5-34) describes the `agents-initializer` motivation — this content is still valid and should stay as-is, since it explains the research foundation that applies to the whole toolkit
 - **VALIDATE**: Verify title is `# Agent Engineering Toolkit`
 
 ### Task 7: UPDATE `README.md` — Install Commands and Repo Structure
 
-- **ACTION**: Replace all 16 occurrences of `project-agents-initializer` with `agent-engineering-toolkit` in install commands and repo tree
+- **ACTION**: Standardize all 16 install-command and repo-tree references on `agent-engineering-toolkit`
 - **IMPLEMENT**: Global find-and-replace across these sections:
   - Lines 169-213: All Claude Code plugin install and npx skills add commands
-    - `rodrigorjsf/project-agents-initializer` → `rodrigorjsf/agent-engineering-toolkit`
-    - `agents-initializer@project-agents-initializer` → `agents-initializer@agent-engineering-toolkit`
+    - Standardize marketplace add commands on `rodrigorjsf/agent-engineering-toolkit`
+    - Standardize plugin install commands on `agents-initializer@agent-engineering-toolkit`
   - Lines 222-236: Manual installation section
-    - `project-agents-initializer.git /tmp/project-agents-initializer` → `agent-engineering-toolkit.git /tmp/agent-engineering-toolkit`
-    - `/tmp/project-agents-initializer/plugins/` → `/tmp/agent-engineering-toolkit/plugins/`
-    - `rm -rf /tmp/project-agents-initializer` → `rm -rf /tmp/agent-engineering-toolkit`
+    - Standardize clone examples on `agent-engineering-toolkit.git /tmp/agent-engineering-toolkit`
+    - Standardize temporary working paths on `/tmp/agent-engineering-toolkit/...`
+    - Standardize cleanup examples on `rm -rf /tmp/agent-engineering-toolkit`
   - Line 293: Repository structure tree root
-    - `project-agents-initializer/` → `agent-engineering-toolkit/`
+    - Standardize the repository tree root on `agent-engineering-toolkit/`
 - **GOTCHA**: Do NOT replace `agents-initializer` (without `project-` prefix) — that's the plugin name and stays the same
-- **VALIDATE**: `grep -c "project-agents-initializer" README.md` returns `0`
 - **VALIDATE**: `grep -c "agent-engineering-toolkit" README.md` returns `>= 16`
 
 ### Task 8: UPDATE docs files
 
 - **ACTION**: Update references in non-archived documentation files
 - **IMPLEMENT**:
-  - `docs/plans/2026-03-22-agents-initializer-plugin-design.md`: Replace all 9 occurrences of `project-agents-initializer` with `agent-engineering-toolkit` (lines 45, 46, 215, 218, 221, 228, 231, 234, 237, 244, 254)
-  - `docs/analysis/analysis-prompt-engineering-guide.md`: Replace 1 occurrence at line 15 (`project-agents-initializer` → `agent-engineering-toolkit`)
+  - `docs/plans/2026-03-22-agents-initializer-plugin-design.md`: Standardize all repo and install references on `agent-engineering-toolkit`
+  - `docs/analysis/analysis-prompt-engineering-guide.md`: Standardize the single repo reference on `agent-engineering-toolkit`
 - **GOTCHA**: These are reference/historical docs but they contain install commands that users might copy — keeping them accurate prevents confusion
-- **VALIDATE**: `grep -rc "project-agents-initializer" docs/` returns `0` for all files
+- **VALIDATE**: `grep -rc "agent-engineering-toolkit" docs/` returns the expected canonical references
 
 ### Task 9: VALIDATE — Full verification sweep
 
@@ -338,11 +337,9 @@ Execute in order. Each task is atomic and independently verifiable.
   # 1. Verify git remote
   git remote -v | grep "agent-engineering-toolkit"
 
-  # 2. Verify no old name in active files (excluding archived PRPs)
-  grep -r "project-agents-initializer" \
-    --include="*.json" --include="*.md" \
-    --exclude-dir=".git" \
-    . | grep -v ".claude/PRPs/prds/" | grep -v ".claude/PRPs/plans/completed/" | grep -v ".claude/PRPs/reports/"
+  # 2. Verify no stale references to the retired single-plugin identity
+  # remain in active files (exclude archived PRP artifacts from this scan).
+  # Expected result: zero matches.
 
   # 3. Verify marketplace.json is valid JSON with correct structure
   python3 -c "
@@ -397,7 +394,7 @@ Per project Git Conventions (atomic commits scoped by concern):
 |-------|---------|----------|
 | JSON valid (marketplace) | `python3 -c "import json; json.load(open('.claude-plugin/marketplace.json'))"` | Exit 0 |
 | JSON valid (plugin) | `python3 -c "import json; json.load(open('plugins/agents-initializer/.claude-plugin/plugin.json'))"` | Exit 0 |
-| No old name in active files | `grep -r "project-agents-initializer" --include="*.json" --include="*.md" . \| grep -v PRPs` | Empty output |
+| Retired-name scan on active files | Stale-reference scan across active `.json` and `.md` files | Empty output |
 | Marketplace has 2 plugins | Python assert on `len(plugins) == 2` | VALID |
 | Git remote correct | `git remote -v \| grep agent-engineering-toolkit` | Both fetch and push show new URL |
 | CLAUDE.md heading | `head -1 CLAUDE.md` | `# agent-engineering-toolkit` |
@@ -428,12 +425,8 @@ python3 -c "import json; json.load(open('plugins/agents-initializer/.claude-plug
 ### Level 2: REFERENCE_INTEGRITY
 
 ```bash
-# Verify no stale references to old name in active files
-grep -r "project-agents-initializer" \
-  --include="*.json" --include="*.md" \
-  --exclude-dir=".git" \
-  --exclude-dir=".claude/PRPs" \
-  .
+# Verify no stale references to the retired single-plugin identity
+# remain in active tracked files.
 ```
 
 **EXPECT**: Empty output (exit code 1 = no matches found)
@@ -466,7 +459,7 @@ git fetch origin --dry-run 2>&1
 - [ ] Root `CLAUDE.md` heading is `# agent-engineering-toolkit`
 - [ ] `README.md` title is `# Agent Engineering Toolkit`
 - [ ] All 16+ install command references updated to `agent-engineering-toolkit`
-- [ ] Zero occurrences of `project-agents-initializer` in active (non-archived) files
+- [ ] Active (non-archived) files consistently use `agent-engineering-toolkit`
 - [ ] `agents-initializer` plugin name preserved (NOT renamed)
 - [ ] All JSON files valid
 - [ ] All docs files updated
@@ -507,7 +500,7 @@ git fetch origin --dry-run 2>&1
 
 ## Notes
 
-- **GitHub redirects**: After renaming, GitHub automatically redirects `rodrigorjsf/project-agents-initializer` → `rodrigorjsf/agent-engineering-toolkit`. Existing clones continue to work, but the redirect may be removed if a new repo is created with the old name.
+- **GitHub redirects**: After the rename, GitHub redirects the retired repository slug to `rodrigorjsf/agent-engineering-toolkit`. Existing clones continue to work, but the redirect may be removed if a new repository is created with the retired slug.
 - **Naming distinction**: `agent-engineering-toolkit` is the marketplace/repo name. `agents-initializer` and `agent-customizer` are plugin names within the marketplace. These are different namespaces.
 - **Version semantics**: `3.0.0` is a major bump because the marketplace identity changes — install commands break for users who hardcoded the old name.
 - **Placeholder strategy**: The `agent-customizer` entry at version `0.0.0` with source `./plugins/agent-customizer` is intentionally forward-looking. The directory doesn't exist yet — Phase 3 creates it. The Claude Code plugin system may warn about the missing source, which is acceptable during the gap between Phase 1 and Phase 3.

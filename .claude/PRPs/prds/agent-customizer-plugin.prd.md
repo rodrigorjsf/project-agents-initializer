@@ -14,7 +14,7 @@ Developers using Claude Code who need to create or improve agent artifacts (skil
 
 ## Proposed Solution
 
-Build a second plugin for the marketplace — `agent-customizer` — that provides 8 skills (4 create + 4 improve) for Claude Code artifact types (skills, rules, subagents, hooks). Every skill strictly grounds its guidance in the `docs/` corpus with evidence traceability. Follow the same proven architecture as `agents-initializer`: dual-distribution (plugin with subagent delegation + standalone with inline analysis), progressive disclosure, self-validation loops, and template-based generation. Rename the project/repo from `project-agents-initializer` to `agent-engineering-toolkit` to encompass both plugins.
+Build a second plugin for the marketplace — `agent-customizer` — that provides 8 skills (4 create + 4 improve) for Claude Code artifact types (skills, rules, subagents, hooks). Every skill strictly grounds its guidance in the `docs/` corpus with evidence traceability. Follow the same proven architecture as `agents-initializer`: dual-distribution (plugin with subagent delegation + standalone with inline analysis), progressive disclosure, self-validation loops, and template-based generation. Standardize the project and repository identity on `agent-engineering-toolkit` to encompass both plugins.
 
 ## Key Hypothesis
 
@@ -231,7 +231,7 @@ Every phase follows this mandatory GitHub workflow:
 
 **Phase 1: Marketplace Rename & Restructure**
 
-- **Goal**: Rename the project from `project-agents-initializer` to `agent-engineering-toolkit` to support a multi-plugin marketplace
+- **Goal**: Establish `agent-engineering-toolkit` as the project and repository name for the multi-plugin marketplace
 - **Scope**:
   - Rename GitHub repository
   - Update `marketplace.json`: name, description, version (3.0.0)

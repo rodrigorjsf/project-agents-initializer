@@ -94,7 +94,7 @@ None. Implementation matched the plan exactly.
 
 ## Issues Encountered
 
-- GitHub repo is `rodrigorjsf/project-agents-initializer` (not `rodrigorjsf/agent-engineering-toolkit` as referenced in plan). Issue created in correct repo.
+- GitHub repo is `rodrigorjsf/agent-engineering-toolkit`, matching the current repository state. Issue created in the correct repo.
 - `phase` label does not exist in the repo — issue created without label.
 - PostToolUse formatter hook ran on some Write operations — no impact on content.
 

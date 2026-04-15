@@ -1,6 +1,6 @@
 # Agent Engineering Toolkit
 
-A multi-plugin marketplace providing evidence-based agent artifact engineering. The `agents-initializer` plugin generates and optimizes AGENTS.md and CLAUDE.md configuration files for Claude Code. The `cursor-initializer` plugin does the same for Cursor IDE, generating AGENTS.md and `.cursor/rules/*.mdc` files. Instead of auto-generating one bloated file, this toolkit creates **minimal, scoped files** following progressive disclosure principles — proven by research to outperform comprehensive auto-generated configurations.
+A multi-plugin marketplace providing evidence-based agent artifact engineering. The `agents-initializer` plugin generates and optimizes AGENTS.md and CLAUDE.md configuration files for Claude Code. The `cursor-initializer` plugin does the same for Cursor IDE, generating AGENTS.md and `.cursor/rules/*.mdc` files. The `agent-customizer` plugin creates and improves Claude Code artifact files (skills, hooks, rules, subagents) with documentation-grounded guidance and evidence traceability. Instead of auto-generating one bloated file, this toolkit creates **minimal, scoped files** following progressive disclosure principles — proven by research to outperform comprehensive auto-generated configurations.
 
 ## Why This Plugin Exists
 
@@ -44,6 +44,12 @@ To maintain context integrity during execution, this plugin uses **subagent isol
 | `codebase-analyzer` | Detects tech stack, package manager, build/test commands | All subagent-backed plugin skills |
 | `scope-detector` | Identifies distinct scopes/contexts in the project | init skills |
 | `file-evaluator` | Assesses existing config file quality against research criteria | improve skills |
+| `artifact-analyzer` | Analyzes project artifact landscape — existing skills, hooks, rules, subagents, naming conventions | All agent-customizer skills (Phase 1 or 2) |
+| `skill-evaluator` | Evaluates `SKILL.md` files against evidence-based quality criteria | agent-customizer `improve-skill` |
+| `hook-evaluator` | Evaluates hook configurations against evidence-based quality criteria | agent-customizer `improve-hook` |
+| `rule-evaluator` | Evaluates `.claude/rules/` files against evidence-based quality criteria | agent-customizer `improve-rule` |
+| `subagent-evaluator` | Evaluates subagent definitions against evidence-based quality criteria | agent-customizer `improve-subagent` |
+| `docs-drift-checker` | Verifies reference files against source docs for content drift | agent-customizer quality gate |
 
 The Claude Code plugin uses native Claude subagent files with read-only tool whitelists and `model: sonnet`; the Cursor plugin uses Cursor's native subagent format with `model: inherit` and `readonly: true`. Both return structured summaries — high signal, low noise — keeping the orchestrator's context clean.
 
@@ -205,6 +211,18 @@ Evaluate and improve existing `.cursor/rules/*.mdc` files.
 
 > **Note:** Use `cursor-initializer` when you want the full Cursor configuration hierarchy, including AGENTS.md alongside `.cursor/rules/*.mdc`. Use `agents-initializer` (`/init-agents`, `/improve-agents`) when you want AGENTS.md/CLAUDE.md workflows outside a Cursor-specific setup.
 
+### Agent Customizer Skills
+
+The `agent-customizer` plugin provides 8 skills for creating and improving Claude Code artifacts, each grounded in the Anthropic documentation corpus. See [plugins/agent-customizer/README.md](plugins/agent-customizer/README.md) for full documentation.
+
+#### Create Skills
+
+**`create-skill`**, **`create-hook`**, **`create-rule`**, **`create-subagent`** — Generate new artifacts with 5-phase orchestration: preflight -> codebase analysis -> docs-grounded generation -> self-validation (max 3x) -> user presentation.
+
+#### Improve Skills
+
+**`improve-skill`**, **`improve-hook`**, **`improve-rule`**, **`improve-subagent`** — Evaluate and optimize existing artifacts against evidence-based quality criteria, presenting proposed changes with evidence before applying them.
+
 ## Installation
 
 ### Claude Code (Native Plugin System)
@@ -237,6 +255,16 @@ claude plugin install agents-initializer@agent-engineering-toolkit --scope proje
 
 # Install only for yourself in this project
 claude plugin install agents-initializer@agent-engineering-toolkit --scope local
+```
+
+#### agent-customizer Plugin
+
+```bash
+# Install agent-customizer
+/plugin install agent-customizer@agent-engineering-toolkit
+
+# Or via CLI
+claude plugin install agent-customizer@agent-engineering-toolkit --scope project
 ```
 
 ### Cursor IDE (Native Plugin System)
@@ -325,6 +353,16 @@ After installation, invoke skills by name:
 /agents-initializer:improve-agents
 /cursor-initializer:init-cursor
 /cursor-initializer:improve-cursor
+
+# Agent Customizer skills (namespaced, plugin distribution only)
+/agent-customizer:create-skill       # Generate a new SKILL.md
+/agent-customizer:create-hook        # Generate a hook configuration
+/agent-customizer:create-rule        # Generate a path-scoped .claude/rules/ file
+/agent-customizer:create-subagent    # Generate a subagent definition
+/agent-customizer:improve-skill      # Evaluate and optimize existing skill
+/agent-customizer:improve-hook       # Evaluate and optimize existing hook
+/agent-customizer:improve-rule       # Evaluate and optimize existing rule
+/agent-customizer:improve-subagent   # Evaluate and optimize existing subagent
 ```
 
 ## Research Foundation
@@ -382,7 +420,7 @@ agent-engineering-toolkit/
 │   │       ├── codebase-analyzer.md # Subagent: tech stack and tooling detection
 │   │       ├── scope-detector.md    # Subagent: project scope/context detection
 │   │       └── file-evaluator.md    # Subagent: config file quality assessment
-│   └── cursor-initializer/         # Cursor IDE plugin — Cursor-native artifact generation
+│   ├── cursor-initializer/         # Cursor IDE plugin — Cursor-native artifact generation
 │       ├── .cursor-plugin/
 │       │   └── plugin.json          # Plugin manifest
 │       ├── AGENTS.md                # Cursor-native plugin config (for working in this directory)
@@ -393,6 +431,12 @@ agent-engineering-toolkit/
 │           ├── codebase-analyzer.md # Subagent: tech stack detection
 │           ├── scope-detector.md    # Subagent: scope detection
 │           └── file-evaluator.md    # Subagent: .mdc file quality assessment
+│   └── agent-customizer/            # Claude Code plugin — artifact creation and improvement
+│       ├── .claude-plugin/
+│       │   └── plugin.json          # Plugin manifest
+│       ├── docs-drift-manifest.md   # Registry: reference files -> 12 source docs
+│       ├── agents/                  # 6 subagents (artifact-analyzer, evaluators, drift checker)
+│       └── skills/                  # 8 skills: create-{type} and improve-{type}
 ├── skills/                          # npx skills add — standalone skills (no agent delegation)
 │   ├── init-agents/SKILL.md         # Self-contained: inline analysis, no subagents required
 │   ├── init-claude/SKILL.md         # Self-contained: inline analysis, no subagents required
