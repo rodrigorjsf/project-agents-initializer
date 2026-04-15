@@ -16,5 +16,7 @@ paths:
 
 # [Topic Name]
 
+<!-- Source: [path/to/source-doc.md] — the document or convention that establishes these rules -->
+
 - [Specific, verifiable instruction]
 - [Specific, verifiable instruction]

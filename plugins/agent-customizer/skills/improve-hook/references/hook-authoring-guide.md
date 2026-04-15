@@ -97,7 +97,7 @@ The `matcher` field is a **regex string** filtering on different fields per even
 | `SessionStart` | session start reason | `startup`, `resume`, `clear`, `compact` |
 | `SessionEnd` | session end reason | `clear`, `resume`, `logout` |
 | `SubagentStart`, `SubagentStop` | agent type | `Explore`, `Plan`, custom names |
-| `Notification` | notification type | `permission_prompt`, `idle_prompt` |
+| `Notification` | notification type | `permission_prompt`, `idle_prompt`, `auth_success`, `elicitation_dialog` |
 | `PreCompact`, `PostCompact` | compaction trigger | `manual`, `auto` |
 | `ConfigChange` | config source | `user_settings`, `project_settings` |
 | No matcher support | always fires | `UserPromptSubmit`, `Stop`, `TaskCompleted` |
@@ -138,7 +138,7 @@ For **command** hooks:
 
 For **prompt/agent** hooks — return JSON `{"ok": true/false, "reason": "..."}`. When `ok: false`, Claude receives `reason` as its next instruction.
 
-*Source: hooks/automate-workflow-with-hooks.md lines 74-92; hooks/claude-hook-reference-doc.md lines 80-88*
+*Source: hooks/automate-workflow-with-hooks.md lines ~393-420; hooks/claude-hook-reference-doc.md lines 80-88*
 
 ---
 
@@ -150,4 +150,4 @@ For **prompt/agent** hooks — return JSON `{"ok": true/false, "reason": "..."}`
 - Secrets in hook commands are visible in settings files — use environment variables instead
 - Test hooks with `--verbose` flag to see all hook interactions
 
-*Source: hooks/automate-workflow-with-hooks.md lines 700-745*
+*Source: hooks/claude-hook-reference-doc.md lines 2050-2061*

@@ -11,12 +11,12 @@ Any rule file violating these criteria must be fixed before proceeding:
 
 | Criterion | Threshold | Source |
 |-----------|-----------|--------|
-| Rule length | ≤ 50 lines | Context budget: loaded when matching files read |
+| Rule length | ≤ 50 lines | Context budget: loaded when matching files read — project convention |
 | YAML frontmatter | Valid YAML if present | memory/how-claude-remembers-a-project.md |
 | `paths:` field | Required; array format; valid glob patterns | memory/how-claude-remembers-a-project.md lines 147-164 |
 | Contradictions with other rules | 0 | Claude picks arbitrarily when contradictions exist |
 
-*Source: memory/how-claude-remembers-a-project.md lines 61-75; 147-164*
+*Source: memory/how-claude-remembers-a-project.md lines 61-75; 147-164; Project convention — `.github/instructions/rules.instructions.md`*
 
 ---
 

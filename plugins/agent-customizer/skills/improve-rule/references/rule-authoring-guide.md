@@ -121,7 +121,7 @@ Path-scoped rules trigger when Claude **reads files** matching the pattern, not 
 
 **No contradictions** — if two rules conflict, Claude may pick one arbitrarily. Review `.claude/rules/` periodically to remove outdated or conflicting instructions.
 
-*Source: memory/how-claude-remembers-a-project.md lines 61-75*
+*Source: memory/how-claude-remembers-a-project.md lines 61-75; Project convention — `.github/instructions/rules.instructions.md`*
 
 ---
 
@@ -136,4 +136,4 @@ Path-scoped rules trigger when Claude **reads files** matching the pattern, not 
 | Always-loaded rules for rare situations | Context cost on every session | Convert to path-scoped or skill |
 | Rule files exceeding 50 lines | Poor adherence; attention fragmentation | Split into multiple focused files |
 
-*Source: memory/how-claude-remembers-a-project.md lines 61-75; 123-145*
+*Source: memory/how-claude-remembers-a-project.md lines 61-75; 123-145; Project convention — `.github/instructions/rules.instructions.md`*

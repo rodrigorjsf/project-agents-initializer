@@ -23,7 +23,7 @@ Source: subagents/research-subagent-best-practices.md, subagents/creating-custom
 | `name` field | Present; lowercase letters and hyphens only | subagents/creating-custom-subagents.md lines 217-220 |
 | `description` field | Present, non-empty, specific | subagents/creating-custom-subagents.md lines 217-220 |
 | `model` field | Recognized alias or full model ID | subagents/creating-custom-subagents.md lines 234-241 |
-| `maxTurns` | ≤ 30 for most tasks | subagents/research-subagent-best-practices.md |
+| `maxTurns` | 15–20 for most tasks; values outside 15–20 require justification | Project convention — `.claude/rules/agent-files.md` |
 | System prompt (markdown body) | Present and task-specific | subagents/creating-custom-subagents.md lines 199-212 |
 
 A subagent violating any hard limit is flagged **INVALID** regardless of other quality.
@@ -36,7 +36,7 @@ A subagent violating any hard limit is flagged **INVALID** regardless of other q
 
 | Indicator | Why It's Bloat |
 |-----------|---------------|
-| `maxTurns` > 30 without justification | Runaway agents; most tasks need ≤20 turns |
+| `maxTurns` > 20 without justification | Runaway agents; most tasks need 15–20 turns |
 | Tools: all tools (no restriction on a review agent) | Unintended modifications; context waste |
 | Generic system prompt ("you are a helpful AI") | No specialization; defeats purpose of subagent |
 | `skills` field preloading many skills | Full skill content injected at startup; inflates context |

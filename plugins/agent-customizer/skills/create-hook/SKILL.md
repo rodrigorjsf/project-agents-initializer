@@ -42,7 +42,7 @@ Proceed to Phase 1 below.
 
 Delegate to the `artifact-analyzer` agent with this task:
 
-> Analyze the project to understand existing hook configurations. Focus on: hooks defined in `.claude/settings.json`, `.claude/settings.local.json`, and plugin `hooks/hooks.json`; project hook scripts in `.claude/hooks/`; plugin hook scripts in `scripts/`; event types currently in use; handler types used (command/http/prompt/agent); and any gaps in lifecycle event coverage.
+> Analyze the project to understand existing hook configurations. Focus on: hooks defined in `.claude/settings.json`, `.claude/settings.local.json`, and plugin `hooks/hooks.json`; project hook scripts in `.claude/hooks/`; plugin hook scripts in `scripts/`; event types currently in use; handler types used (command/http/prompt/agent); and any gaps in lifecycle event coverage. Also read root `CLAUDE.md`, `README.md`, and any service-level README files to understand non-standard build commands, tooling, or conventions that hook scripts should use.
 
 The agent runs on Sonnet with read-only tools (Read, Grep, Glob, Bash) in an isolated context. Wait for it to complete and parse its structured output.
 

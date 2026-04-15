@@ -15,7 +15,7 @@ Any subagent violating these criteria must be fixed before proceeding:
 | `name` field | Lowercase letters and hyphens only | subagents/creating-custom-subagents.md lines 217-220 |
 | `description` field | Present and non-empty | subagents/creating-custom-subagents.md lines 217-220 |
 | `model` field | Recognized alias or full model ID | subagents/creating-custom-subagents.md lines 234-241 |
-| `maxTurns` | ≤ 30 (justify if higher) | subagents/research-subagent-best-practices.md |
+| `maxTurns` | 15 for analysis agents; 20 for evaluators; values outside 15–20 require justification | Project convention — `.claude/rules/agent-files.md` |
 | System prompt | Not empty; task-specific | subagents/creating-custom-subagents.md lines 199-212 |
 
 *Source: subagents/creating-custom-subagents.md lines 213-232; subagents/research-subagent-best-practices.md lines 33-55*
@@ -32,7 +32,7 @@ Any subagent violating these criteria must be fixed before proceeding:
 - [ ] No instructions telling subagent to spawn other subagents (runtime blocks this)
 - [ ] System prompt is task-specific, not generic ("you are a helpful AI")
 - [ ] Evidence citations present: system prompt references source docs for domain-specific constraints (e.g., "per creating-custom-subagents.md")
-- [ ] Prompt engineering strategy applied: system prompt uses role prompting (single-sentence role), structured output format, and confidence filtering per prompt-engineering-strategies.md
+- [ ] Prompt engineering strategy applied: system prompt uses role prompting (single-sentence role), structured output format, and confidence filtering per prompt-engineering-strategies.md. **Note:** For evaluation agents that mandate explicit evidence citations per finding (a stricter guarantee), the evidence requirement satisfies the confidence filtering criterion.
 
 ---
 
@@ -46,7 +46,7 @@ Any subagent violating these criteria must be fixed before proceeding:
 
 **Structural:**
 
-- [ ] `maxTurns` not increased beyond 30 without justification
+- [ ] `maxTurns` not increased beyond 20 without justification
 - [ ] Scope of subagent not broadened (single-purpose agents are better than general-purpose)
 
 ---
