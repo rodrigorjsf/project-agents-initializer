@@ -3,6 +3,20 @@
 Evidence-based creation and improvement of Claude Code artifacts (skills, hooks, rules, subagents) grounded in the Anthropic documentation corpus.
 The plugin covers all four artifact types through eight skills: `create-skill`, `create-hook`, `create-rule`, `create-subagent`, `improve-skill`, `improve-hook`, `improve-rule`, and `improve-subagent`.
 
+## Cost and Model Guidance
+
+This plugin analyzes your entire codebase and evaluates artifacts against the Anthropic documentation corpus before generating or improving them.
+Execution cost scales with project size and the number of artifacts — a large project with many existing skills, hooks, and rules can be expensive to run.
+
+**Recommended model:** Claude Opus delivers the best analysis quality for this workload.
+**Viable alternative:** Claude Sonnet with High effort produces decent results at lower cost.
+
+**Usage pattern:** run each skill once per artifact, or when the artifact or its source documentation has changed significantly.
+Not on every session.
+
+The long-term benefit is that every future agent session becomes cheaper and more accurate after
+well-structured artifacts are in place. Treat each creation or improvement run as a one-time investment — not routine work.
+
 ## Why This Plugin Exists
 
 ### The Problem with Ungrounded Artifact Authoring

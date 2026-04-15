@@ -13,6 +13,7 @@ Multi-plugin marketplace for evidence-based agent artifact engineering. Three di
 
 ## Critical Conventions
 
+- README files follow a standard section order with `## Cost and Model Guidance` as section 2 on all READMEs; root README contains only repo-level content with links to per-plugin READMEs for full documentation; see `.github/instructions/readme-files.instructions.md`
 - Shared references are copied (not symlinked) into each skill directory — each skill is self-contained
 - When updating an intentionally shared reference, update all copies of that shared reference in sync
 - No generated file exceeds 200 lines; root files target 15-40 lines; scope files target 10-30 lines
