@@ -26,7 +26,7 @@ Only `name` and `description` are required. All others have sensible defaults.
 | `description` | Yes | — | When Claude should delegate to this agent |
 | `tools` | No | Inherit all | Allowlist: only these tools permitted |
 | `disallowedTools` | No | None | Denylist: these tools removed from pool |
-| `model` | No | `inherit` | `sonnet`, `opus`, `haiku`, full model ID, or `inherit` |
+| `model` | No | `inherit` | `sonnet`, `opus`, `haiku`, full model ID, or `inherit`. Project convention: explicitly set to document intent. |
 | `permissionMode` | No | `default` | `default`, `acceptEdits`, `dontAsk`, `bypassPermissions`, `plan` |
 | `maxTurns` | No | Unlimited | Max agentic turns before agent stops |
 | `skills` | No | None | Skills preloaded (full content injected, not just descriptions) |
@@ -49,12 +49,10 @@ Only `name` and `description` are required. All others have sensible defaults.
 | `sonnet` | Claude Sonnet 4.6 | Balanced capability/cost; daily work | Standard |
 | `opus` | Claude Opus 4.6 | Complex reasoning, architecture | Standard |
 | `inherit` | Same as session | Default behavior | — |
-| `claude-sonnet-4-6[1m]` | Sonnet + 1M context | Large codebases | 1M tokens |
-| `claude-opus-4-6[1m]` | Opus + 1M context | Complex work at scale | 1M tokens |
 
-Full model IDs (e.g., `claude-opus-4-6`) also accepted.
+Full model IDs (e.g., `claude-opus-4-6`, `claude-sonnet-4-6`) also accepted.
 
-*Source: subagents/creating-custom-subagents.md lines 234-241; subagents/research-subagent-best-practices.md lines 92-103*
+*Source: subagents/creating-custom-subagents.md lines 234-241*
 
 ---
 
@@ -127,7 +125,7 @@ These limitations are enforced by the runtime:
 - **Subagents cannot spawn other subagents** — prevents infinite nesting
 - **Subagents do not inherit parent conversation history** — receive only system prompt + environment details
 - **Subagents do not inherit parent skills** — must be explicitly listed in `skills` field (full content injected)
-- **`maxTurns` applies per invocation** — recommend 20-30 for most tasks; unlimited is risky
+- **`maxTurns` applies per invocation** — project convention: 15 for analysis agents, 20 for evaluator agents; values outside 15–20 require explicit justification
 
 *Source: subagents/creating-custom-subagents.md lines 210-212; subagents/research-subagent-best-practices.md lines 36-42*
 
