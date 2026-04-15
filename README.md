@@ -435,6 +435,8 @@ agent-engineering-toolkit/
 │       ├── .claude-plugin/
 │       │   └── plugin.json          # Plugin manifest
 │       ├── docs-drift-manifest.md   # Registry: reference files -> 12 source docs
+│       ├── README.md                # Plugin overview and usage
+│       ├── CLAUDE.md                # Plugin-specific Claude Code guidance
 │       ├── agents/                  # 6 subagents (artifact-analyzer, evaluators, drift checker)
 │       └── skills/                  # 8 skills: create-{type} and improve-{type}
 ├── skills/                          # npx skills add — standalone skills (no agent delegation)
