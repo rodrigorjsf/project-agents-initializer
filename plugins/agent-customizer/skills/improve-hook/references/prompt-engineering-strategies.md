@@ -86,7 +86,7 @@ Source: prompt-engineering-guide.md, claude-prompting-best-practices.md
 - Avoid aggressive trigger language ("CRITICAL: You MUST...") — causes overtriggering with Opus 4.6
 - Use normal delegation language: "Use this tool when..." not "ALWAYS use this tool"
 
-*Source: claude-prompting-best-practices.md lines 50-160; prompt-engineering-guide.md lines 20-80*
+*Source: claude-prompting-best-practices.md lines 373-380; prompt-engineering-guide.md lines 20-80*
 
 ---
 
@@ -116,4 +116,4 @@ Every token in an artifact competes with conversation history and other context.
 - Short artifacts (rules, validation criteria) should be zero-shot and minimal
 - Long artifacts (skill bodies, subagent prompts) should use progressive disclosure
 
-*Source: prompt-engineering-guide.md lines 400-508; claude-prompting-best-practices.md lines 32-50*
+*Source: prompt-engineering-guide.md lines 212-215; claude-prompting-best-practices.md lines 32-50*
