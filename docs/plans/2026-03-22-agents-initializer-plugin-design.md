@@ -1,4 +1,4 @@
-# Design: Project Agents Initializer Plugin
+# Design: Agent Engineering Toolkit Plugin
 
 **Date**: 2026-03-22
 **Status**: Draft

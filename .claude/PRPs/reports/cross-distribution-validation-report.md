@@ -204,7 +204,7 @@ All 8 skills (4 plugin + 4 standalone) are validated and ready for release. Phas
 
 5. **PRD success metrics**: All 5 metrics met.
 
-The project-agents-initializer v2.0.0 skill directory is validated and ready for distribution.
+The agent-engineering-toolkit v2.0.0 skill directory is validated and ready for distribution.
 
 ---
 

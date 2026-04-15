@@ -6,7 +6,7 @@ Update all project governance files (`.claude/rules/`, `CLAUDE.md` files, `plugi
 
 ## User Story
 
-As a developer contributing to the project-agents-initializer plugin,
+As a developer contributing to the agent-engineering-toolkit plugin,
 I want `.claude/rules/` to automatically enforce the new directory conventions (references/, assets/, TOC, frontmatter),
 So that I can't accidentally violate the established patterns when editing skills.
 
@@ -163,7 +163,7 @@ Pattern: YAML frontmatter with `paths:` array → `# Heading` → flat bullet li
 ```markdown
 // SOURCE: CLAUDE.md:1-11
 // COPY THIS PATTERN:
-# project-agents-initializer
+# agent-engineering-toolkit
 
 Claude Code plugin providing evidence-based AGENTS.md and CLAUDE.md initialization skills.
 

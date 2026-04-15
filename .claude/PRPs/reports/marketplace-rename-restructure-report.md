@@ -9,7 +9,7 @@
 
 ## Summary
 
-Renamed the project from `project-agents-initializer` to `agent-engineering-toolkit` across all manifests, documentation, and docs/ reference files. Bumped marketplace version to `3.0.0` and added an `agent-customizer` placeholder entry to `marketplace.json`. All 30 occurrences of the old name in active files were updated in 3 atomic commits.
+Standardized the project, repository, and marketplace identity on `agent-engineering-toolkit` across all manifests, documentation, and docs/ reference files. Bumped marketplace version to `3.0.0` and added an `agent-customizer` placeholder entry to `marketplace.json`. All active-file references were updated in 3 atomic commits.
 
 The GitHub repository rename (Task 1) and git remote URL update (Task 2) remain as manual prerequisites — the user must rename the repository on GitHub and run `git remote set-url origin git@github.com:rodrigorjsf/agent-engineering-toolkit.git` before pushing.
 
@@ -105,7 +105,7 @@ N/A — no code changes, only documentation and configuration.
 
 ## Next Steps
 
-1. **User action required**: Rename GitHub repository from `project-agents-initializer` to `agent-engineering-toolkit`
+1. **User action required**: Confirm the GitHub repository name is `agent-engineering-toolkit`
 2. **User action required**: `git remote set-url origin git@github.com:rodrigorjsf/agent-engineering-toolkit.git`
 3. **User action required**: `git fetch origin` — confirm redirect works
 4. Create PR: `/prp-pr` or `gh pr create`

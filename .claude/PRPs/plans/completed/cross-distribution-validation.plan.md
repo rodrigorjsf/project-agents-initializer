@@ -6,7 +6,7 @@ Validate all 8 skills (4 plugin + 4 standalone) using the RED-GREEN-REFACTOR met
 
 ## User Story
 
-As a developer maintaining the project-agents-initializer plugin,
+As a developer maintaining the agent-engineering-toolkit plugin,
 I want to validate all 8 skills across both distributions using structured test scenarios,
 So that I can confirm output quality, feature parity, and self-validation effectiveness before release.
 

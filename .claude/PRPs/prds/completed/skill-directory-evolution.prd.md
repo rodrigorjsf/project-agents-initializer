@@ -2,7 +2,7 @@
 
 ## Problem Statement
 
-Developers using AI coding agents suffer from poisoned context windows caused by bloated, stale, or poorly structured CLAUDE.md/AGENTS.md files. The `project-agents-initializer` plugin exists to solve this, but its skills currently ship as bare SKILL.md files with zero supporting directories (`references/`, `scripts/`, `assets/`). This means the skills rely entirely on the executing model's general knowledge to produce correct output — leading to inconsistent results, missed best practices, and no guarantee that generated files follow the latest research on context optimization. Additionally, standalone skills (for non-Claude-Code tools) lack feature parity with plugin skills because they cannot delegate to subagents.
+Developers using AI coding agents suffer from poisoned context windows caused by bloated, stale, or poorly structured CLAUDE.md/AGENTS.md files. The `agent-engineering-toolkit` plugin exists to solve this, but its skills currently ship as bare SKILL.md files with zero supporting directories (`references/`, `scripts/`, `assets/`). This means the skills rely entirely on the executing model's general knowledge to produce correct output — leading to inconsistent results, missed best practices, and no guarantee that generated files follow the latest research on context optimization. Additionally, standalone skills (for non-Claude-Code tools) lack feature parity with plugin skills because they cannot delegate to subagents.
 
 ## Evidence
 

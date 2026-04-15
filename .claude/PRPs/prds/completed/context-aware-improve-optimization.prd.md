@@ -2,7 +2,7 @@
 
 ## Problem Statement
 
-Developers using the `project-agents-initializer` plugin have CLAUDE.md/AGENTS.md files that accumulate instructions over time, many of which are rarely relevant to the current task. The improve skills today reorganize content within the CLAUDE/AGENTS hierarchy but never suggest migrating infrequent behaviors to on-demand mechanisms (skills, hooks, rules, subagents). This means the always-loaded context budget (~200 lines / ~150-200 instructions) is consumed by instructions that could load only when needed — wasting attention and degrading agent performance.
+Developers using the `agent-engineering-toolkit` plugin have CLAUDE.md/AGENTS.md files that accumulate instructions over time, many of which are rarely relevant to the current task. The improve skills today reorganize content within the CLAUDE/AGENTS hierarchy but never suggest migrating infrequent behaviors to on-demand mechanisms (skills, hooks, rules, subagents). This means the always-loaded context budget (~200 lines / ~150-200 instructions) is consumed by instructions that could load only when needed — wasting attention and degrading agent performance.
 
 ## Evidence
 
@@ -200,7 +200,7 @@ Preflight: CLAUDE.md exists?
 | 8 | Validation & Testing | Run `/customaize-agent:test-prompt` on all artifacts; validate all test scenarios; verify zero regression | complete | - | 7 | `.claude/PRPs/plans/completed/phase-8-validation-testing.plan.md` |
 | 9 | Self-Application | Apply the new improve flow to the plugin's own CLAUDE.md, rules, and documentation | complete | - | 8 | `.claude/PRPs/plans/completed/phase-9-self-application.plan.md` |
 
-- **ALWAYS** when creating a phase plan, attach the plan with the github issue `https://github.com/rodrigorjsf/project-agents-initializer/issues/11`. For every new created plan **MUST BE CREATED ALSO** a github sub-issue of issue `#11` based on the plan.
+- **ALWAYS** when creating a phase plan, attach the plan with the github issue `https://github.com/rodrigorjsf/agent-engineering-toolkit/issues/11`. For every new created plan **MUST BE CREATED ALSO** a github sub-issue of issue `#11` based on the plan.
 
 ### Phase Details
 

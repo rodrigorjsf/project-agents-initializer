@@ -245,7 +245,7 @@ Execute in order. Each task is atomic and independently verifiable.
 - **IMPLEMENT**: Remove the line:
 
   ```
-  "Bash(mv /home/rodrigo/Workspace/project-agents-initializer/.claude/PRPs/plans/phase-2-init-preflight-redirect.plan.md /home/rodrigo/Workspace/project-agents-initializer/.claude/PRPs/plans/completed/)",
+  "Bash(mv /home/rodrigo/Workspace/agent-engineering-toolkit/.claude/PRPs/plans/phase-2-init-preflight-redirect.plan.md /home/rodrigo/Workspace/agent-engineering-toolkit/.claude/PRPs/plans/completed/)",
   ```
 
 - **ALSO REMOVE**: Line 9 (`mkdir -p .../completed`) is also a one-time operation for Phase 2 that's no longer needed
