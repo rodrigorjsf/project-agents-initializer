@@ -36,7 +36,7 @@ Follow these evaluation instructions. Analyze the target subagent `.md` file and
 | `name` field | Lowercase letters and hyphens only | subagents/creating-custom-subagents.md lines 217-220 |
 | `description` field | Present and non-empty | subagents/creating-custom-subagents.md lines 217-220 |
 | `model` field | Recognized alias or full model ID | subagents/creating-custom-subagents.md lines 234-241 |
-| `maxTurns` | ≤ 30 (justify if higher) | subagents/research-subagent-best-practices.md |
+| `maxTurns` | 15 for analysis agents; 20 for evaluators; values outside 15–20 require justification | subagents/research-subagent-best-practices.md; `.claude/rules/agent-files.md` |
 | System prompt | Not empty; task-specific | subagents/creating-custom-subagents.md lines 199-212 |
 
 ### Quality Checks
@@ -71,7 +71,7 @@ Evaluate the subagent against every criterion above:
 2. Check all required fields (`name`, `description`, `model`, `maxTurns`)
 3. Check `name` format (lowercase letters and hyphens only)
 4. Check `model` is a recognized alias
-5. Check `maxTurns` ≤ 30
+5. Check `maxTurns`: 15 for analysis agents, 20 for evaluators — flag values outside 15–20 as requiring justification
 6. Check `tools` for minimum-necessary principle
 7. Check system prompt for required sections
 
@@ -105,7 +105,7 @@ Return your analysis in exactly this format:
 | name present and valid | ✅/❌ | [value] |
 | description present | ✅/❌ | [value or "missing"] |
 | model recognized | ✅/❌ | [value] |
-| maxTurns ≤ 30 | ✅/❌ | [value] |
+| maxTurns in 15–20 (or justified) | ✅/❌ | [value] |
 | System prompt not empty | ✅/❌ | [line count] |
 
 ### Quality Issues

@@ -15,7 +15,7 @@ Generates a new subagent definition with correct YAML frontmatter, minimal tool 
 - **NEVER** set `maxTurns` > 30 without explicit justification in the system prompt
 - **EVERY** subagent must include: role definition, process steps, output format, and self-verification instructions
 - **EVERY** `description` must include specific "Use when..." trigger phrases so Claude routes correctly
-- **Agents CANNOT spawn other agents** — the Task tool is unavailable at runtime; warn if user requests this
+- **Subagents CANNOT spawn other subagents** — the `Agent` tool is unavailable to subagents at runtime; warn if the user requests nested subagent delegation
 - Plugin context: `hooks`, `mcpServers`, and `permissionMode` fields are ignored for plugin agents
 </RULES>
 

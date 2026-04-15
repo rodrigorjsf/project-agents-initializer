@@ -1,7 +1,7 @@
 # Implementation Report: Standalone Distribution
 
 **Date**: 2026-04-15
-**Plan**: `.claude/PRPs/plans/standalone-distribution.plan.md`
+**Plan**: `.claude/PRPs/plans/completed/standalone-distribution.plan.md`
 **Source PRD**: `.claude/PRPs/prds/agent-customizer-plugin.prd.md` — Phase 9
 **Branch**: `feature/phase-9-standalone-distribution`
 **Status**: Complete
