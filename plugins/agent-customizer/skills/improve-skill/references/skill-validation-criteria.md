@@ -32,6 +32,8 @@ Any skill violating these criteria must be fixed before proceeding:
 - [ ] Reference files cited explicitly so Claude knows what to load and when
 - [ ] `disable-model-invocation: true` set for side-effect workflows (commit, deploy, send)
 - [ ] No instructions explaining what Claude already knows from training
+- [ ] Evidence citations present: key decisions reference source docs (e.g., "per skill-authoring-best-practices.md")
+- [ ] Prompt engineering strategy applied: skill follows relevant strategy from prompt-engineering-strategies.md (role prompting for skills, progressive disclosure for phases)
 
 ---
 
