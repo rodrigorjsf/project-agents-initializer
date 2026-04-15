@@ -21,13 +21,13 @@ Source: memory/how-claude-remembers-a-project.md
 | Criterion | Threshold | Source |
 |-----------|-----------|--------|
 | Rules | `paths:` array present | memory/how-claude-remembers-a-project.md lines 147-164 |
-| Rules | ≤ 50 lines | Context budget: loaded when matching files read |
+| Rules | ≤ 50 lines | Context budget: loaded when matching files read — project convention |
 | YAML frontmatter | Valid YAML if present | memory/how-claude-remembers-a-project.md |
 | Instructions | Actionable and verifiable | memory/how-claude-remembers-a-project.md lines 61-75 |
 
 A rule file violating any hard limit is flagged **OVER LIMIT** or **INVALID**.
 
-*Source: memory/how-claude-remembers-a-project.md lines 61-75; 123-145*
+*Source: memory/how-claude-remembers-a-project.md lines 61-75; 123-145; Project convention — `.github/instructions/rules.instructions.md`*
 
 ---
 
