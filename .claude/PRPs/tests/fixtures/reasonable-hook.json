@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": ".claude/hooks/check-line-limits.sh"
+            "command": ".claude/hooks/check-docs-sync.sh"
           }
         ]
       }
@@ -17,7 +17,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": ".claude/hooks/sync-docs.sh"
+            "command": ".claude/hooks/check-rag-reindex.sh"
           }
         ]
       }
