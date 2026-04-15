@@ -27,10 +27,10 @@ Any hook violating these criteria must be fixed before proceeding:
 - [ ] Matcher is specific (not `"*"` for blocking hooks)
 - [ ] Error handling defined: exit 2 with meaningful stderr for blockable events; non-blockable events should provide informative stderr
 - [ ] Silent success uses exit 0 (not leaving stderr output that confuses verbose mode)
-- [ ] Secrets not hardcoded in `command` string (use environment variables)
+- [ ] Secrets not hardcoded in any hook configuration field (`command` strings, `headers`, URLs, or other values) — use environment variables
 - [ ] `command` hook used for deterministic checks (not `agent` for simple regex checks)
 - [ ] `prompt` or `agent` hook used only when judgment is genuinely required
-- [ ] Evidence citations present: hook configuration documents why this event/handler/matcher was chosen, referencing hook-events-reference.md
+- [ ] Evidence citations present: hook configuration documents why this event/handler/matcher was chosen, referencing hook-events-reference.md. **Note for JSON `command` hooks:** JSON has no comment syntax; evidence for event/matcher choices should be in the task card or improvement plan — not in the JSON itself. This criterion applies to `prompt` and `agent` hook instruction blocks where inline documentation is possible.
 - [ ] Prompt engineering strategy applied: hook follows zero-shot approach (no examples in hook configs; deterministic command hooks over prompt/agent hooks)
 
 ---

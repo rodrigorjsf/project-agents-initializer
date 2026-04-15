@@ -53,12 +53,12 @@ Source: hooks/claude-hook-reference-doc.md
 | `PreToolUse`, `PostToolUse`, `PostToolUseFailure`, `PermissionRequest` | `tool_name` | `Bash`, `Edit\|Write`, `mcp__.*` |
 | `SessionStart` | start reason | `startup`, `resume`, `clear`, `compact` |
 | `SessionEnd` | end reason | `clear`, `resume`, `logout`, `prompt_input_exit` |
-| `SubagentStart`, `SubagentStop` | agent type | `Explore`, `Plan`, `general-purpose` |
-| `Notification` | notification type | `permission_prompt`, `idle_prompt`, `auth_success` |
+| `SubagentStart`, `SubagentStop` | agent type | `Bash`, `Explore`, `Plan`, custom agent names |
+| `Notification` | notification type | `permission_prompt`, `idle_prompt`, `auth_success`, `elicitation_dialog` |
 | `PreCompact`, `PostCompact` | trigger | `manual`, `auto` |
 | `ConfigChange` | config source | `user_settings`, `project_settings`, `local_settings`, `skills` |
-| `StopFailure` | error type | `rate_limit`, `billing_error`, `server_error`, `unknown` |
-| `InstructionsLoaded` | load reason | `session_start`, `nested_traversal`, `path_glob_match` |
+| `StopFailure` | error type | `rate_limit`, `billing_error`, `server_error`, `unknown`, `authentication_failed`, `invalid_request`, `max_output_tokens` |
+| `InstructionsLoaded` | load reason | `session_start`, `nested_traversal`, `path_glob_match`, `include`, `compact` |
 | `Elicitation`, `ElicitationResult` | MCP server name | your configured server names |
 | No matcher | always fires | `UserPromptSubmit`, `Stop`, `TeammateIdle`, `TaskCompleted`, `WorktreeCreate`, `WorktreeRemove` |
 
