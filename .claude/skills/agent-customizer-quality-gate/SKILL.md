@@ -90,7 +90,9 @@ combine the evaluator instructions with this appended instruction:
 Aggregate all outputs from Phases 1–4.
 
 Read `.claude/skills/agent-customizer-quality-gate/references/quality-gate-criteria.md`
-Section `## Expected Results Checklist`. Cross-reference category headings against Phase 1–4
+Sections `## Plugin SKILL.md Checks`, `## Agent File Checks`, `## Reference File Checks`,
+`## Shared-Copy Parity Checks`, `## Docs Drift Checks`, `## Scenario Checks`, and
+`## Plugin Manifest Checks`. Cross-reference those category headings against Phase 1–4
 results to confirm full coverage.
 
 Compute and display the **Quality Gate Dashboard**:
