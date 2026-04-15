@@ -222,8 +222,8 @@ Every phase follows this mandatory GitHub workflow:
 | 3 | Plugin Scaffold & Infrastructure | Create `plugins/agent-customizer/` structure, subagents, rules, templates, CLAUDE.md | complete | with 2 | 1 | `.claude/PRPs/plans/completed/plugin-scaffold-infrastructure.plan.md` |
 | 4 | Create Skills (4 artifact types) | Implement `create-skill`, `create-hook`, `create-rule`, `create-subagent` | complete | - | 2, 3 | `.claude/PRPs/plans/completed/create-skills-implementation.plan.md` |
 | 5 | Improve Skills (4 artifact types) | Implement `improve-skill`, `improve-hook`, `improve-rule`, `improve-subagent` | complete | - | 4 | `.claude/PRPs/plans/completed/improve-skills-implementation.plan.md` |
-| 6 | Self-Improvement Loop & Validation | Validation criteria per artifact type, self-validation loops, docs drift detection | pending | - | 4, 5 | - |
-| 7 | Plugin Documentation | READMEs for both plugins, CLAUDE.md updates, evidence traceability docs | pending | with 6 | 5 | - |
+| 6 | Self-Improvement Loop & Validation | Validation criteria per artifact type, self-validation loops, docs drift detection | complete | - | 4, 5 | `.claude/PRPs/plans/self-improvement-loop-validation.plan.md` |
+| 7 | Plugin Documentation | READMEs for both plugins, CLAUDE.md updates, evidence traceability docs | in-progress | with 6 | 5 | `.claude/PRPs/plans/plugin-documentation.plan.md` |
 | 8 | Quality Gate & Testing | Red-green test scenarios across all 8 skills, quality gate integration | pending | - | 6, 7 | - |
 | 9 | Standalone Distribution | Convert all plugin skills to standalone inline analysis versions | pending | - | 8 | - |
 

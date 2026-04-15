@@ -34,5 +34,8 @@
         ]
       }
     ]
+  },
+  "enabledPlugins": {
+    "superpowers-developing-for-claude-code@superpowers-marketplace": true
   }
 }
