@@ -51,48 +51,39 @@ Proceed directly to Phase 1 with the input as feature description.
 - Complexity: LOW | MEDIUM | HIGH
 - Affected systems list
 
-**Formulate user story:**
-
-```
-As a <user type>
-I want to <action/goal>
-So that <benefit/value>
-```
-
 **GATE**: If requirements are AMBIGUOUS → STOP and ASK user for clarification.
 
 **CHECKPOINT:**
 - [ ] Problem statement is specific and testable
-- [ ] User story follows correct format
 - [ ] Complexity assessed with rationale
 
 ---
 
 ## Phase 2: EXPLORE — Codebase Intelligence
 
-**Directory Discovery** (run these first to understand project structure):
-```bash
-ls -la
-ls -la */ 2>/dev/null | head -50
-```
-
-Do NOT assume `src/` exists — discover the actual structure (could be `app/`, `lib/`, `packages/`, `cmd/`, root-level files, etc.).
-
 Load the full exploration protocol with agent prompts:
 ```
 ${CLAUDE_SKILL_DIR}/references/exploration-protocol.md
 ```
 
-**CRITICAL: Launch `prp-core:codebase-explorer` and `prp-core:codebase-analyst` in parallel.**
+Launch `prp-core:codebase-explorer` and `prp-core:codebase-analyst` in parallel (see protocol for prompts and output format).
 
-Merge results into a unified discovery table (see exploration protocol for format).
+**IMMEDIATELY after merging results** — compose a **Discovery Brief** (authoritative reference for all subsequent phases):
+
+| Section | Content |
+|---------|---------|
+| Key Locations | Table of file:line refs by category (naming, errors, logging, tests, types, config) |
+| Mirrorable Snippets | Top 3 actual code patterns to follow (≤ 5 lines each) |
+| Integration Points | Entry points + data flow summary |
+| Dependencies | Libraries and versions in use |
+| Test Patterns | Test framework, structure, assertion style |
+
+Target: ≤ 50 lines. This brief replaces raw agent output for all subsequent phases.
 
 **CHECKPOINT:**
 - [ ] Both agents launched in parallel and completed
-- [ ] At least 3 similar implementations found with file:line refs
+- [ ] Discovery Brief composed with ≥ 3 mirrorable snippets
 - [ ] Code snippets are ACTUAL (copy-pasted, not invented)
-- [ ] Integration points mapped with data flow traces
-- [ ] Dependencies cataloged with versions
 
 ---
 
@@ -100,46 +91,96 @@ Merge results into a unified discovery table (see exploration protocol for forma
 
 **ONLY AFTER Phase 2 is complete.**
 
-Use `prp-core:web-researcher` agent (see exploration protocol for prompt). Match documentation versions to project's package.json/config.
+Use `prp-core:web-researcher` agent (see exploration protocol for prompt and output format). Match documentation versions to project config.
 
-Format findings with direct links, key insights, gotchas, and version constraints.
+**IMMEDIATELY after results** — compose a **Research Brief** (authoritative reference for subsequent phases):
+
+| Section | Content |
+|---------|---------|
+| Key Docs | Direct links with version-specific anchors |
+| Critical Insights | What affects implementation decisions |
+| Gotchas | Pitfalls with mitigation strategies |
+| Version Constraints | Library compatibility notes |
+
+Target: ≤ 30 lines.
 
 **CHECKPOINT:**
+- [ ] Research Brief composed
 - [ ] Documentation versions match project config
-- [ ] URLs include specific section anchors
-- [ ] Gotchas documented with mitigation strategies
 
 ---
 
 ## Phase 4: DESIGN — UX Transformation
 
-Create ASCII diagrams showing user experience BEFORE and AFTER states including:
-- User flow steps
-- Pain points (before) / Value adds (after)
-- Data flow through the system
+Create ASCII diagrams showing user experience BEFORE and AFTER states including user flow steps, pain points, and data flow.
 
-Document interaction changes in a table: Location | Before | After | User Impact.
+**IMMEDIATELY after design** — compose a **UX Brief** (authoritative reference for subsequent phases):
+
+| Section | Content |
+|---------|---------|
+| Before | Current user experience summary |
+| After | New capabilities and value adds |
+| Interaction Changes | Location → Before → After → User Impact |
+
+Target: ≤ 30 lines.
 
 **CHECKPOINT:**
-- [ ] Before state accurately reflects current system
+- [ ] UX Brief composed
+- [ ] Before state reflects current system
 - [ ] After state shows ALL new capabilities
-- [ ] Data flows are traceable; user value is explicit
 
 ---
 
 ## Phase 5: ARCHITECT — Strategic Design
 
-For complex features, use `prp-core:codebase-analyst` to trace architecture at integration points (see exploration protocol for prompt and analysis framework).
+For complex features, use `prp-core:codebase-analyst` to trace architecture at integration points (see exploration protocol for prompt and output format).
 
 Analyze: architecture fit, execution order, failure modes, performance, security, maintainability.
 
-Document: chosen approach with rationale, rejected alternatives with reasons, explicit scope limits (NOT_BUILDING).
+**IMMEDIATELY after analysis** — compose an **Architecture Brief** (authoritative reference for generation):
+
+| Section | Content |
+|---------|---------|
+| Approach | Chosen approach with rationale |
+| Rejected Alternatives | Options with rejection reasons |
+| Scope Limits | NOT_BUILDING items with justification |
+| Failure Modes | Edge cases with mitigations |
+| Execution Order | Dependency sequence |
+
+Target: ≤ 30 lines.
 
 **CHECKPOINT:**
+- [ ] Architecture Brief composed
 - [ ] Approach aligns with existing architecture
-- [ ] Dependencies ordered correctly
-- [ ] Edge cases identified with mitigations
 - [ ] Scope boundaries explicit and justified
+
+---
+
+## Phase 5.5: VALIDATE — Plan Critic (MEDIUM/HIGH complexity only)
+
+**Skip this phase if complexity is LOW.**
+
+Launch `prp-core:plan-critic` with all phase briefs:
+
+```
+Review these consolidated findings for a plan about: [feature description]
+
+DISCOVERY BRIEF:
+[Discovery Brief content]
+
+RESEARCH BRIEF:
+[Research Brief content]
+
+UX BRIEF:
+[UX Brief content]
+
+ARCHITECTURE BRIEF:
+[Architecture Brief content]
+
+Validate completeness, coherence, and identify blind spots.
+```
+
+Process feedback: incorporate valid findings into the relevant briefs, briefly justify any disagreements.
 
 ---
 
@@ -147,16 +188,48 @@ Document: chosen approach with rationale, rejected alternatives with reasons, ex
 
 **Output path**: `.claude/PRPs/plans/{kebab-case-feature-name}.plan.md`
 
-```bash
-mkdir -p .claude/PRPs/plans
+Compose a **Plan Generation Package** containing all phase briefs and plan-critic feedback (if any).
+
+Launch a general-purpose subagent (sonnet model) to write the plan file in a clean context:
+
+```
+You are a plan writer. Create a comprehensive implementation plan file.
+
+OUTPUT PATH: .claude/PRPs/plans/{feature-name}.plan.md
+
+Create the directory first: mkdir -p .claude/PRPs/plans
+
+TEMPLATE — follow this structure exactly:
+[Include full content of: ${CLAUDE_SKILL_DIR}/references/plan-template.md]
+
+DISCOVERY BRIEF:
+[Discovery Brief]
+
+RESEARCH BRIEF:
+[Research Brief]
+
+UX BRIEF:
+[UX Brief]
+
+ARCHITECTURE BRIEF:
+[Architecture Brief]
+
+PLAN-CRITIC FEEDBACK:
+[Critic feedback if any, or "N/A — LOW complexity"]
+
+VERIFICATION — check every item before saving:
+[Include full content of: ${CLAUDE_SKILL_DIR}/references/verification-checklist.md]
+
+INSTRUCTIONS:
+1. Fill every template section using findings from the briefs
+2. Every pattern reference must include actual code snippets from the Discovery Brief
+3. Every task must have an executable validation command
+4. Replace all placeholder commands with actual project commands discovered in the briefs
+5. Run the verification checklist — fix any failing items before saving
+6. Write the complete file to the output path
 ```
 
-Load the full plan template:
-```
-${CLAUDE_SKILL_DIR}/references/plan-template.md
-```
-
-Fill the template with all findings from Phases 1-5. Every pattern reference must include actual code snippets. Every task must have an executable validation command. Replace all placeholder commands with actual project commands.
+Wait for writer subagent to complete. Verify the plan file was created.
 
 ### If input was from PRD file:
 
@@ -164,80 +237,11 @@ Update the PRD: change phase Status from `pending` to `in-progress`, add plan fi
 
 ---
 
-## Output
+## Phase 7: REPORT
 
-Report to user:
-
+Load the console output template:
 ```
-## Plan Created
-
-**File**: `.claude/PRPs/plans/{feature-name}.plan.md`
-
-{If from PRD: source PRD path, phase number, PRD update confirmation}
-{If parallel phases available: note opportunity with worktree command}
-
-**Summary**: {2-3 sentence overview}
-**Complexity**: {LOW/MEDIUM/HIGH} - {rationale}
-
-**Scope**:
-- {N} files to CREATE
-- {M} files to UPDATE
-- {K} total tasks
-
-**Key Patterns Discovered**:
-- {Pattern 1 with file:line}
-- {Pattern 2 with file:line}
-
-**External Research**: {key docs with versions}
-
-**UX Transformation**:
-- BEFORE: {one-line current state}
-- AFTER: {one-line new state}
-
-**Risks**: {primary risk and mitigation}
-
-**Confidence Score**: {1-10}/10 for one-pass implementation success
-- {Rationale}
-
-**Next Step**: To execute, run the `prp-implement` skill with `.claude/PRPs/plans/{feature-name}.plan.md`
+${CLAUDE_SKILL_DIR}/references/output-template.md
 ```
 
----
-
-## Verification Checklist
-
-Before saving the plan, verify:
-
-**Context completeness:**
-- [ ] All patterns documented with file:line references
-- [ ] External docs versioned to match project config
-- [ ] Integration points mapped with specific file paths
-- [ ] Gotchas captured with mitigation strategies
-
-**Implementation readiness:**
-- [ ] Tasks ordered by dependency (executable top-to-bottom)
-- [ ] Each task is atomic and independently testable
-- [ ] No placeholders — all content is specific and actionable
-- [ ] Pattern references include actual code snippets
-
-**Pattern faithfulness:**
-- [ ] Every new file mirrors existing codebase style exactly
-- [ ] No unnecessary abstractions introduced
-- [ ] Naming follows discovered conventions
-
-**Validation coverage:**
-- [ ] Every task has executable validation command
-- [ ] Edge cases enumerated with test plans
-
-**NO_PRIOR_KNOWLEDGE_TEST**: Could an agent unfamiliar with this codebase implement using ONLY the plan?
-
----
-
-## Success Criteria
-
-- **CONTEXT_COMPLETE**: All patterns, gotchas, integration points documented from actual codebase
-- **IMPLEMENTATION_READY**: Tasks executable top-to-bottom without questions
-- **PATTERN_FAITHFUL**: Every new file mirrors existing codebase style exactly
-- **VALIDATION_DEFINED**: Every task has executable verification command
-- **UX_DOCUMENTED**: Before/After transformation is visually clear
-- **ONE_PASS_TARGET**: Confidence score 8+ indicates high likelihood of first-attempt success
+Report plan creation to user using the template format.

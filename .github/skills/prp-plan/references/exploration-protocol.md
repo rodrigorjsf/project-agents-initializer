@@ -2,15 +2,19 @@
 
 ## Agent Strategy
 
-**Execution Order**: CODEBASE FIRST, RESEARCH SECOND. Solutions must fit existing patterns before introducing new ones.
-
-Launch codebase agents in parallel first, then research agent second.
+Launch codebase agents in parallel first, then research agent after results are merged.
 
 ---
 
 ## Phase 2: Codebase Intelligence
 
-**CRITICAL: Launch two specialized agents in parallel using multiple Task tool calls in a single message.**
+**Before launching agents:** Discover actual project structure. Do NOT assume `src/` or any conventional directory exists.
+```bash
+ls -la && ls -la */ 2>/dev/null | head -50
+```
+Use discovered structure to inform agent prompts below.
+
+Launch two specialized agents in parallel using multiple Task tool calls in a single message.
 
 ### Agent 1: prp-core:codebase-explorer
 
@@ -31,7 +35,23 @@ LOCATE:
 7. Configuration - relevant config files and settings
 8. Dependencies - relevant libraries already in use
 
-Categorize findings by purpose (implementation, tests, config, types, docs).
+OUTPUT FORMAT — return findings in this exact structure:
+
+**LOCATIONS TABLE:**
+| Category | File:Lines | Pattern Description | Key Snippet (≤ 5 lines) |
+|----------|-----------|--------------------|-----------------------|
+| NAMING   | file:lines | pattern desc | snippet |
+| ERRORS   | file:lines | pattern desc | snippet |
+| ... | ... | ... | ... |
+
+**TOP 3 MIRRORABLE SNIPPETS** (actual code to copy, most representative):
+1. [file:lines] — [purpose]
+2. [file:lines] — [purpose]
+3. [file:lines] — [purpose]
+
+**NAMING CONVENTIONS:** [observed patterns with examples]
+
+Keep total output under 80 lines. Prioritize accuracy over coverage.
 Return ACTUAL code snippets from codebase, not generic examples.
 ```
 
@@ -51,6 +71,18 @@ TRACE:
 4. Contracts - interfaces and expectations between components
 5. Patterns in use - design patterns and architectural decisions
 
+OUTPUT FORMAT — return findings in this exact structure:
+
+**DATA FLOW TRACES:**
+- [flow name]: input → step → step → output (file:line refs at each step)
+
+**INTEGRATION CONTRACTS:**
+- [contract name]: [interface/type] at file:line
+
+**ENTRY POINTS:**
+- [entry point]: file:line — [what connects here]
+
+Keep total output under 60 lines. Focus on contracts and flows, minimal code blocks.
 Document what exists with precise file:line references. No suggestions or improvements.
 ```
 
@@ -71,36 +103,36 @@ Combine findings into a unified discovery table:
 
 ## Phase 3: External Research
 
-**ONLY AFTER Phase 2 is complete.**
-
 Use Task tool with `subagent_type="prp-core:web-researcher"`:
 
 ```
 Research external documentation relevant to implementing: [feature description].
 
 FIND:
-1. Official documentation for involved libraries (match versions from package.json: [list relevant deps and versions])
+1. Official documentation for involved libraries (match versions from project config: [list relevant deps and versions])
 2. Known gotchas, breaking changes, deprecations for these versions
 3. Security considerations and best practices
 4. Performance optimization patterns
 
 VERSION CONSTRAINTS:
-- [library]: v{version} (from package.json)
+- [library]: v{version} (from project config)
 
-Return findings with:
-- Direct links to specific doc sections (not just homepages)
-- Key insights that affect implementation
-- Gotchas with mitigation strategies
-- Any conflicts between docs and existing codebase patterns found in Phase 2
-```
+OUTPUT FORMAT — return findings in this exact structure:
 
-**Format findings:**
+**KEY DOCS:**
+- [Library v{version}](url#specific-section): [key insight affecting implementation]
 
-```markdown
-- [Library Docs v{version}](https://url#specific-section)
-  - KEY_INSIGHT: {what we learned that affects implementation}
-  - APPLIES_TO: {which task/file this affects}
-  - GOTCHA: {potential pitfall and how to avoid}
+**GOTCHAS:**
+- [issue]: [mitigation strategy]
+
+**VERSION CONSTRAINTS:**
+- [library]: v{version} — [compatibility note]
+
+**CONFLICTS WITH CODEBASE:**
+- [doc recommendation]: [how codebase does it differently] — [which to follow]
+
+Keep total output under 50 lines. Direct links to specific doc sections, not homepages.
+Flag any conflicts between documentation recommendations and existing codebase patterns from Phase 2.
 ```
 
 ---
@@ -124,6 +156,18 @@ ANALYZE:
 3. What side effects occur at each stage
 4. What error handling patterns are in place
 
+OUTPUT FORMAT — return findings in this exact structure:
+
+**ARCHITECTURE FIT:**
+- [how it integrates] — reference: file:line
+
+**FAILURE MODES:**
+- [mode]: [mitigation]
+
+**CONTRACTS BETWEEN COMPONENTS:**
+- [contract]: file:line — [expectations]
+
+Keep total output under 50 lines. Reference existing patterns by file:line, don't repeat code.
 Document what exists with precise file:line references. No suggestions.
 ```
 
