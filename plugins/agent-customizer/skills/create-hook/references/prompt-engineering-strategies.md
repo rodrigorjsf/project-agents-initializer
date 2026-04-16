@@ -69,7 +69,7 @@ Source: prompt-engineering-guide.md, claude-prompting-best-practices.md
 - Avoid role prompting; context of the event implies the role
 - Be explicit about output format: `{"ok": true/false, "reason": "..."}`
 - For `prompt` and `agent` hooks: write simple, direct evaluation criteria
-- Test with `--verbose` to verify hook output is parsed as intended
+- Test with `--debug` to verify hook output is parsed as intended
 
 ### Rules
 

@@ -52,11 +52,11 @@ Source: hooks/claude-hook-reference-doc.md
 |-------|-------------------|----------------|
 | `PreToolUse`, `PostToolUse`, `PostToolUseFailure`, `PermissionRequest` | `tool_name` | `Bash`, `Edit\|Write`, `mcp__.*` |
 | `SessionStart` | start reason | `startup`, `resume`, `clear`, `compact` |
-| `SessionEnd` | end reason | `clear`, `resume`, `logout`, `prompt_input_exit` |
+| `SessionEnd` | end reason | `clear`, `resume`, `logout`, `prompt_input_exit`, `bypass_permissions_disabled`, `other` |
 | `SubagentStart`, `SubagentStop` | agent type | `Bash`, `Explore`, `Plan`, custom agent names |
 | `Notification` | notification type | `permission_prompt`, `idle_prompt`, `auth_success`, `elicitation_dialog` |
 | `PreCompact`, `PostCompact` | trigger | `manual`, `auto` |
-| `ConfigChange` | config source | `user_settings`, `project_settings`, `local_settings`, `skills` |
+| `ConfigChange` | config source | `user_settings`, `project_settings`, `local_settings`, `policy_settings`, `skills` |
 | `StopFailure` | error type | `rate_limit`, `billing_error`, `server_error`, `unknown`, `authentication_failed`, `invalid_request`, `max_output_tokens` |
 | `InstructionsLoaded` | load reason | `session_start`, `nested_traversal`, `path_glob_match`, `include`, `compact` |
 | `Elicitation`, `ElicitationResult` | MCP server name | your configured server names |
@@ -87,12 +87,33 @@ Source: hooks/claude-hook-reference-doc.md
 }
 ```
 
-Handler type fields:
+**Common fields** (all handler types):
 
-- `command`: `type`, `command` (required), `timeout` (optional, seconds)
-- `http`: `type`, `url` (required), `timeout` (optional)
-- `prompt`: `type`, `prompt` (required), `model` (optional, default Haiku), `timeout`
-- `agent`: `type`, `prompt` (required), `timeout` (optional, default 60s)
+| Field | Required | Description |
+|-------|----------|-------------|
+| `type` | Yes | `"command"`, `"http"`, `"prompt"`, or `"agent"` |
+| `timeout` | No | Seconds before canceling (defaults: 600 command, 30 http/prompt, 60 agent) |
+| `statusMessage` | No | Custom spinner message displayed while the hook runs |
+| `once` | No | If `true`, runs once per session then removed; skills only, not agents |
+
+**Command-specific fields:**
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `command` | Yes | Shell command to execute |
+| `async` | No | If `true`, runs in background without blocking |
+
+**HTTP-specific fields:**
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `url` | Yes | URL to POST to |
+| `headers` | No | Additional HTTP headers as key-value pairs; supports `$VAR_NAME` interpolation |
+| `allowedEnvVars` | No | Env var names allowed for interpolation in `headers` |
+
+**Prompt-specific fields:** `type`, `prompt` (required), `model` (optional, default Haiku), `timeout`
+
+**Agent-specific fields:** `type`, `prompt` (required), `timeout` (optional, default 60s)
 
 *Source: hooks/claude-hook-reference-doc.md lines 258-310*
 

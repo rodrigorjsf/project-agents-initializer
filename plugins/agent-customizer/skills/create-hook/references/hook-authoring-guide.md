@@ -95,12 +95,15 @@ The `matcher` field is a **regex string** filtering on different fields per even
 |-------|----------------|----------------|
 | `PreToolUse`, `PostToolUse`, `PostToolUseFailure`, `PermissionRequest` | tool name | `Bash`, `Edit\|Write`, `mcp__.*` |
 | `SessionStart` | session start reason | `startup`, `resume`, `clear`, `compact` |
-| `SessionEnd` | session end reason | `clear`, `resume`, `logout` |
+| `SessionEnd` | session end reason | `clear`, `resume`, `logout`, `prompt_input_exit`, `bypass_permissions_disabled`, `other` |
 | `SubagentStart`, `SubagentStop` | agent type | `Explore`, `Plan`, custom names |
 | `Notification` | notification type | `permission_prompt`, `idle_prompt`, `auth_success`, `elicitation_dialog` |
 | `PreCompact`, `PostCompact` | compaction trigger | `manual`, `auto` |
-| `ConfigChange` | config source | `user_settings`, `project_settings` |
-| No matcher support | always fires | `UserPromptSubmit`, `Stop`, `TaskCompleted` |
+| `ConfigChange` | config source | `user_settings`, `project_settings`, `local_settings`, `policy_settings`, `skills` |
+| `StopFailure` | error type | `rate_limit`, `billing_error`, `server_error`, `unknown`, `authentication_failed`, `invalid_request`, `max_output_tokens` |
+| `InstructionsLoaded` | load reason | `session_start`, `nested_traversal`, `path_glob_match`, `include`, `compact` |
+| `Elicitation`, `ElicitationResult` | MCP server name | your configured server names |
+| No matcher support | always fires | `UserPromptSubmit`, `Stop`, `TeammateIdle`, `TaskCompleted`, `WorktreeCreate`, `WorktreeRemove` |
 
 MCP tools follow pattern `mcp__<server>__<tool>` — use `mcp__server__.*` to match all tools from a server.
 
@@ -117,6 +120,7 @@ MCP tools follow pattern `mcp__<server>__<tool>` — use `mcp__server__.*` to ma
 | `.claude/settings.local.json` | This project | No (gitignored) |
 | Plugin `hooks/hooks.json` | When plugin enabled | Yes (bundled) |
 | Skill/agent frontmatter | While component active | Yes |
+| Managed policy settings | Organization-wide | Yes, admin-controlled |
 
 *Source: hooks/automate-workflow-with-hooks.md lines 552-565*
 
@@ -144,10 +148,12 @@ For **prompt/agent** hooks — return JSON `{"ok": true/false, "reason": "..."}`
 
 ## Security Considerations
 
-- Hook scripts run with your user permissions — treat them as code you own and trust
-- Prefer `exit 2` with a clear `stderr` message over silent failures
-- Avoid broad matchers (`"*"`) for blocking hooks — they fire on every tool use
-- Secrets in hook commands are visible in settings files — use environment variables instead
-- Test hooks with `--verbose` flag to see all hook interactions
+- **Validate and sanitize inputs**: never trust input data blindly
+- **Always quote shell variables**: use `"$VAR"` not `$VAR`
+- **Block path traversal**: check for `..` in file paths
+- **Use absolute paths**: specify full paths for scripts, using `"$CLAUDE_PROJECT_DIR"` for the project root
+- **Skip sensitive files**: avoid `.env`, `.git/`, keys, etc.
 
-*Source: hooks/claude-hook-reference-doc.md lines 2050-2061*
+Test with `--debug` to see hook execution details, including which hooks matched, exit codes, and output.
+
+*Source: hooks/claude-hook-reference-doc.md lines 2050-2065*
