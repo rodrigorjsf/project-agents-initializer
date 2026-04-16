@@ -49,6 +49,8 @@ Only `name` and `description` are required. All others have sensible defaults.
 | `sonnet` | Claude Sonnet 4.6 | Balanced capability/cost; daily work | Standard |
 | `opus` | Claude Opus 4.6 | Complex reasoning, architecture | Standard |
 | `inherit` | Same as session | Default behavior | — |
+| `sonnet[1m]` | Sonnet + 1M context | Long sessions with large codebases | 1M tokens |
+| `opus[1m]` | Opus + 1M context | Long sessions with complex reasoning | 1M tokens |
 
 Full model IDs (e.g., `claude-opus-4-6`, `claude-sonnet-4-6`) also accepted.
 

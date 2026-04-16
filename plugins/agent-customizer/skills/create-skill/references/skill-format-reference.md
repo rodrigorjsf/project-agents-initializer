@@ -55,7 +55,6 @@ Source: skills/research-claude-code-skills-format.md, skills/extend-claude-with-
 - Only lowercase `a-z`, numbers, and hyphens (`-`)
 - Must NOT start or end with `-`
 - Must NOT contain consecutive `--`
-- Must NOT contain reserved words: `anthropic`, `claude`
 - Must match the parent directory name
 
 *Source: skills/research-claude-code-skills-format.md lines 103-108*

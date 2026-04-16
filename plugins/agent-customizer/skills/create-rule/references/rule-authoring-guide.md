@@ -98,7 +98,7 @@ paths:
 
 Path-scoped rules trigger when Claude **reads files** matching the pattern, not on every tool use.
 
-*Source: memory/how-claude-remembers-a-project.md lines 166-174*
+*Source: memory/how-claude-remembers-a-project.md lines 166-183*
 
 ---
 

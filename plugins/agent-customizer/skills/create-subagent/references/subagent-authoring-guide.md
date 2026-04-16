@@ -84,7 +84,7 @@ Effective subagent system prompts follow this 5-part pattern:
 - Include trigger phrases ("use proactively when...", "use when editing...")
 - Avoid generic descriptions ("helps with code")
 
-*Source: subagents/research-subagent-best-practices.md lines 80-90*
+*Source: subagents/research-subagent-best-practices.md lines 73-76, 374-430*
 
 ---
 
@@ -97,10 +97,11 @@ Effective subagent system prompts follow this 5-part pattern:
 | `opus` | Claude Opus 4.6 | Complex reasoning, architecture, deep planning |
 | `inherit` | Same as main session | Default behavior |
 | `sonnet[1m]` | Sonnet + 1M context | Long sessions with large codebases |
+| `opus[1m]` | Opus + 1M context | Long sessions with complex reasoning |
 
 **Rule of thumb**: Opus for architecture decisions, Sonnet for everything else, Haiku for read-only exploration only.
 
-*Source: subagents/research-subagent-best-practices.md lines 92-103*
+*Source: subagents/research-subagent-best-practices.md lines 318-355*
 
 ---
 
