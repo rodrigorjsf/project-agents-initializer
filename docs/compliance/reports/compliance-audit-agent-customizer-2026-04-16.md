@@ -227,9 +227,25 @@ All 26 findings closed. Gate rerun required to verify CF-004–CF-023 automated 
 | Gate | Scope | Run Date | Report Path | Result | CF-NNN IDs |
 |------|-------|----------|-------------|--------|------------|
 | agent-customizer-quality-gate (initial) | agent-customizer plugin | 2026-04-16 | `.specs/reports/agent-customizer-quality-gate-2026-04-16-findings.md` | FAIL (14 MAJOR, 6 MINOR) | CF-004–CF-023 |
-| agent-customizer-quality-gate (post-correction) | agent-customizer plugin | pending | TBD | pending | CF-004–CF-023 |
+| agent-customizer-quality-gate (post-correction) | agent-customizer plugin | 2026-04-16 | No report (gate PASSED) | ✅ PASS (392/392) | CF-004–CF-023 closed |
 
-**Gate rerun status:** Pending. Corrections for CF-004–CF-023 have been applied to all source files. Post-correction gate run required before Phase 4 agent-customizer scope can be marked COMPLETE. CF-024–CF-029 are manual findings and do not require a gate rerun (instruction-only/manual-validator).
+**Gate rerun status:** ✅ COMPLETE — PASS. All 392 checks passed. Phase 4 agent-customizer scope is **COMPLETE**.
+
+**Parity regression found and fixed during rerun:**
+- Groups X2 (`skill-validation-criteria`) and X5 (`subagent-validation-criteria`) were MISMATCH
+- Root cause: F016 fix applied only to improve-\* copies in prior session; create-\* copies not synced
+- Fix committed: `fix(agent-customizer): sync F016 validation loop step to create-* criteria pairs`
+
+**Post-correction gate dashboard:**
+
+| Category | Checks | Passed | Status |
+|----------|--------|--------|--------|
+| Static Artifact Compliance | 314 | 314 | PASS |
+| Intra-Plugin Parity | 14 | 14 | PASS |
+| Docs Drift | 45 | 45 | PASS |
+| Red-Green Scenario Coverage | 16 | 16 | PASS |
+| Plugin Manifest | 3 | 3 | PASS |
+| **OVERALL** | **392** | **392** | **PASS** |
 
 ---
 
