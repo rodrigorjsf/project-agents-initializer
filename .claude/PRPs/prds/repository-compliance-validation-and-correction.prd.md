@@ -126,7 +126,7 @@ The MVP must cover the full requested program. It includes the normative matrix,
 | # | Phase | Description | Status | Parallel | Depends | PRP Plan |
 |---|-------|-------------|--------|----------|---------|----------|
 | 1 | Normative source matrix | Define the authoritative documentation bundle for every distribution and artifact type, including what is allowed and what is forbidden | complete | - | - | `.claude/PRPs/plans/completed/normative-source-matrix.plan.md` |
-| 2 | Artifact inventory and audit manifest | Enumerate every in-scope artifact, shared copy group, validator, quality gate, and required source bundle | pending | - | 1 | - |
+| 2 | Artifact inventory and audit manifest | Enumerate every in-scope artifact, shared copy group, validator, quality gate, and required source bundle | in-progress | - | 1 | `.claude/PRPs/plans/artifact-inventory-and-audit-manifest.plan.md` |
 | 3 | Finding model and validator protocol | Define the artifact-level evidence format, contamination checks, severity model, and correction loop contract | pending | - | 1,2 | - |
 | 4 | Claude Code scope audit and correction | Review `agents-initializer` and `agent-customizer` artifacts individually against Claude and shared sources only, then correct and revalidate each artifact | pending | limited | 1,2,3 | - |
 | 5 | Standalone scope audit and correction | Review standalone skills individually against Agent Skills standard, relevant general-llm guidance, and approved writing guidance only | pending | limited | 1,2,3 | - |
