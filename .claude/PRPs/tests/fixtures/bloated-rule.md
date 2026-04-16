@@ -1,4 +1,8 @@
-<!-- VIOLATION 1: [PLANTED] Missing 'paths' YAML frontmatter — rule loads on EVERY request, wasting tokens -->
+---
+paths: ["**/*"]
+---
+<!-- VIOLATION 1: [PLANTED] Overly broad paths: ["**/*"] glob — rule matches every file, loading on every request -->
+<!-- VIOLATION 2: [PLANTED] Overly broad glob pattern unconditionally loads this rule for all files in the project -->
 <!-- VIOLATION 8: [PLANTED] No source attribution — no 'Source:' reference to convention origin -->
 
 # Development Conventions
@@ -48,9 +52,6 @@ Branch names should use kebab-case with prefixes like feature/, fix/, docs/.
 
 Write clean, readable code. Follow SOLID principles. Avoid deep nesting. Keep functions small.
 Document public APIs. Code review everything before merging.
-
-<!-- VIOLATION 2: [PLANTED] Overly broad glob pattern would apply to all files if paths frontmatter existed -->
-<!-- If this had paths frontmatter, it would be: paths: ["**/*"] -->
 
 ## Additional Guidelines
 

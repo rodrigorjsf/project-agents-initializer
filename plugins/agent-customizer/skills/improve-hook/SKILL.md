@@ -24,6 +24,7 @@ Evaluate existing hook configurations against evidence-based quality criteria an
 
 Check if hooks exist in:
 
+- The user-provided path (if given)
 - `.claude/settings.json` (hooks key)
 - `.claude/settings.local.json` (hooks key)
 - Plugin `hooks/hooks.json`
@@ -45,6 +46,7 @@ Delegate to the `hook-evaluator` agent with this task:
 
 - If the user provides a specific event/matcher to improve, scope evaluation to that hook.
 - If no specific hook provided, evaluate ALL hooks in the project.
+- If any hook file is malformed JSON, report the parse error to the user and stop — do not attempt to evaluate a broken file.
 
 The agent runs on Sonnet with read-only tools (Read, Grep, Glob, Bash) in an isolated context. Wait for it to complete and parse its structured output.
 

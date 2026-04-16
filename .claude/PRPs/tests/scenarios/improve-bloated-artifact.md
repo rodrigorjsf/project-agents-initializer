@@ -54,14 +54,14 @@ a degraded state and the improve skill must identify all violations and propose 
 | 5 | Hardcoded secret/token in configuration | YES | Security |
 | 6 | No `exit 2` path in validation script | YES | Error handling |
 | 7 | Wrong exit code behavior assumption | YES | Event semantics |
-| 8 | No evidence citation comments | YES | Attribution |
+| 8 | No evidence citation comments | NO | Attribution — JSON format has limited comment support; JSON-only hooks are exempt from this check per hook-validation-criteria.md |
 
 ### bloated-rule.md (8 violations)
 
 | # | Violation | Must Detect | Maps to Check |
 |---|-----------|------------|---------------|
-| 1 | Missing `paths:` YAML frontmatter | YES | R-frontmatter (CRITICAL) |
-| 2 | Overly broad glob pattern (conceptual `**/*`) | YES | R-glob (MAJOR) |
+| 1 | `paths:` present but uses overly broad `**/*` glob — loads on every request | YES | R-frontmatter + R-glob (CRITICAL) |
+| 2 | Overly broad glob pattern `**/*` matches all files in the project | YES | R-glob (MAJOR) |
 | 3 | Explanatory prose instead of direct assertions | YES | R-style (MAJOR) |
 | 4 | Standard language conventions (PEP 8, gofmt) | YES | R-content (MAJOR) |
 | 5 | Duplicates CLAUDE.md content | YES | R-duplication (MAJOR) |
@@ -103,7 +103,7 @@ a degraded state and the improve skill must identify all violations and propose 
 |----------|-----------|-------------|
 | bloated-skill.md | 10 violations, inline bash, missing validation | All violations detected; proposed fixes for each |
 | bloated-hook.json | Invalid JSON, wrong event, wildcard matcher | All issues flagged; corrected config proposed |
-| bloated-rule.md | No frontmatter, prose, multi-concern | All violations surfaced; focused rule proposed |
+| bloated-rule.md | Overly broad glob, prose, multi-concern | All violations surfaced; focused rule proposed |
 | bloated-subagent.md | Missing model, write tools, agent spawning | All violations caught; read-only agent proposed |
 
 ---

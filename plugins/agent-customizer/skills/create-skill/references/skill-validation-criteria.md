@@ -24,6 +24,7 @@ Any skill violating these criteria must be fixed before proceeding:
 
 ## Quality Checks (All must pass)
 
+- [ ] Has a self-validation phase that reads the skill's `references/*validation-criteria.md`
 - [ ] `${CLAUDE_SKILL_DIR}` used for all bundled file references (not hardcoded paths)
 - [ ] `description` written in third person ("Processes..." not "I process..." or "You can use...")
 - [ ] `description` includes what the skill does AND when to use it

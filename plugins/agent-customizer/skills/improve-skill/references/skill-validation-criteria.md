@@ -24,6 +24,7 @@ Any skill violating these criteria must be fixed before proceeding:
 
 ## Quality Checks (All must pass)
 
+- [ ] Has a self-validation phase that reads the skill's `references/*validation-criteria.md`
 - [ ] `${CLAUDE_SKILL_DIR}` used for all bundled file references (not hardcoded paths)
 - [ ] `description` written in third person ("Processes..." not "I process..." or "You can use...")
 - [ ] `description` includes what the skill does AND when to use it
@@ -60,8 +61,9 @@ Any skill violating these criteria must be fixed before proceeding:
 Execute this loop for each generated or improved skill:
 
 1. Evaluate the skill against ALL criteria above
-2. If ANY criterion fails: identify the specific failure, fix the skill, restart evaluation
-3. Maximum 3 iterations — if still failing after 3 attempts, surface the remaining issues to the user
+2. **For improve operations:** verify each suggestion in the improvement plan has a WHY field citing a source doc — no suggestion may lack a source reference
+3. If ANY criterion fails: identify the specific failure, fix the skill, restart evaluation
+4. Maximum 3 iterations — if still failing after 3 attempts, surface the remaining issues to the user
 4. Only proceed to writing skills when ALL criteria pass
 
 **Do not skip criteria for "minor" violations.** Hard limits are hard limits.

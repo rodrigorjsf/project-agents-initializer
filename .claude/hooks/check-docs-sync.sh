@@ -72,4 +72,6 @@ if [[ "$NEEDS_SYNC" == "true" ]]; then
   fi
 fi
 
+# Exit 0 intentional: this is a PostToolUse hook. PostToolUse is non-blocking — exit 2 has no effect.
+# The hook's purpose is notification only; blocking execution would be incorrect here.
 exit 0

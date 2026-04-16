@@ -23,7 +23,10 @@ Evaluate existing `.claude/rules/` files against evidence-based quality criteria
 
 ### Preflight Check
 
-Check if any `.md` rule files exist anywhere under `.claude/rules/`.
+Check if rule files exist at:
+
+- The user-provided path (if given)
+- Any `.md` file anywhere under `.claude/rules/`
 
 **If no rule files found:**
 

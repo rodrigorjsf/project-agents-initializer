@@ -41,7 +41,7 @@ Proceed to Phase 1 below.
 
 Delegate to the `artifact-analyzer` agent with this task:
 
-> Analyze the project to understand existing subagents. Focus on: agent names and roles in `.claude/agents/` and `plugins/*/agents/`, tool restrictions in use, model choices, `maxTurns` values, which skills delegate to which agents, and naming conventions. Flag any agents similar in purpose to `{requested-name}`.
+> Analyze the project to understand existing subagents. Focus on: agent names and roles in `.claude/agents/` and `plugins/*/agents/`, tool restrictions in use, model choices, `maxTurns` values, which skills delegate to which agents, and naming conventions. Flag any agents similar in purpose to `{requested-name}`. Also identify the project layout: whether this is a monorepo (multiple plugin directories, workspace files like `pnpm-workspace.yaml`) or a single-package project.
 
 The agent runs on Sonnet with read-only tools (Read, Grep, Glob, Bash) in an isolated context. Wait for it to complete and parse its structured output.
 

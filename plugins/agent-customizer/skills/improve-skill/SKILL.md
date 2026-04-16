@@ -65,7 +65,7 @@ Based on both agent reports, create improvement plan with categories:
 
 1. **Removals** — bloat (inlined content, over-specified instructions), stale (broken agent refs, removed tools), duplicates
 2. **Refactoring** — progressive disclosure optimization, phase consolidation, reference path corrections
-3. **Additions** — missing sections (Hard Rules, preflight check, self-validation, output format)
+3. **Additions** — missing sections (self-validation, output format). Only suggest Hard Rules or Preflight if the skill has user-facing interactions or side effects — do NOT suggest them for informational/analysis-only skills that read and report.
 
 ### Phase 4: Self-Validation
 

@@ -40,7 +40,7 @@ Proceed to Phase 1 below.
 
 Delegate to the `artifact-analyzer` agent with this task:
 
-> Analyze the project to understand existing skills, naming conventions, and integration patterns. Focus on: existing skill directory structure, naming patterns, which skills delegate to agents, plugin conventions in CLAUDE.md files, and any skill that is similar to `{requested-name}` in purpose.
+> Analyze the project to understand existing skills, naming conventions, and integration patterns. Focus on: existing skill directory structure, naming patterns, which skills delegate to agents, plugin conventions in CLAUDE.md files, and any skill that is similar to `{requested-name}` in purpose. Also identify the project layout: whether this is a monorepo (multiple plugin directories, workspace files like `pnpm-workspace.yaml`) or a single-package project.
 
 The agent runs on Sonnet with read-only tools (Read, Grep, Glob, Bash) in an isolated context. Wait for it to complete and parse its structured output.
 
