@@ -55,7 +55,7 @@ Extract commands from configuration files:
 
 - **package.json**: Read `scripts` section for build, test, lint, typecheck, dev commands
 - **Makefile**: Read target names
-- **pyproject.toml**: Read `[tool.pytest]`, `[tool.ruff]`, `[scripts]` sections
+- **pyproject.toml**: Read `[tool.pytest]`, `[tool.ruff]`, `[tool.mypy]`, `[scripts]` sections. Also extract non-standard configuration values (e.g., `addopts = "--cov=src"` in pytest, `strict = true` in mypy, `line-length` override in ruff).
 - **Cargo.toml**: Check for workspace configuration
 
 Only report non-standard commands. Don't report `npm test` if that's the standard.
@@ -65,7 +65,7 @@ Only report non-standard commands. Don't report `npm test` if that's the standar
 Identify key frameworks and tools by checking dependencies:
 
 - Frameworks: React, Next.js, Vue, Angular, Express, FastAPI, Django, Rails, etc.
-- Databases: Check for ORM configs (Prisma, TypeORM, SQLAlchemy, etc.)
+- Databases: Check for ORM configs (Prisma, TypeORM, SQLAlchemy, etc.). Also check for migration tools: `alembic.ini` (Alembic), `schema.prisma` (Prisma Migrate), Flyway/Liquibase config. Report the migration run command (e.g., `alembic upgrade head`, `prisma migrate deploy`) as non-standard.
 - Testing: Jest, Vitest, pytest, Go test, RSpec, etc.
 - Linting: ESLint, Prettier, Ruff, clippy, etc.
 - CI/CD: Check `.github/workflows/`, `.gitlab-ci.yml`, `Jenkinsfile`
@@ -99,6 +99,8 @@ Return your analysis in exactly this format:
 - Lint: `[command]`
 - Typecheck: `[command]`
 - Dev server: `[command]`
+- Config: `[tool] [key] = [value]` (only non-default configuration values)
+- Migrate: `[command]` (only if a migration tool is present)
 
 ### Tech Stack
 - [Only list items that are non-obvious from the language/framework]

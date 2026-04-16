@@ -18,6 +18,14 @@
 - Test: `[command]`
 - Lint: `[command]`
 - Typecheck: `[command]`
+<!-- CONDITIONAL: Non-standard configuration values — include ONLY if project overrides tool defaults.
+     Example: `strict = true` in mypy, `addopts = "--cov=src"` in pytest, line-length override in ruff.
+     Remove if all tooling uses default configuration. -->
+- Config: `[tool] [key] = [value]`
+<!-- CONDITIONAL: Cross-scope prerequisites — include ONLY if a build step in one scope must complete
+     before another scope can run (e.g., WASM package must build before web package).
+     Remove if no cross-scope ordering dependencies exist. -->
+- Prerequisite: `[command]` must run before `[scope]`
 
 ## Context
 

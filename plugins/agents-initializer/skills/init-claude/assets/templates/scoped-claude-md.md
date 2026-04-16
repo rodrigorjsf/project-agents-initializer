@@ -14,6 +14,9 @@
      Remove the entire section if this scope uses the same tooling as root. -->
 - Build: `[scope-specific command]`
 - Test: `[scope-specific command]`
+<!-- CONDITIONAL: Include ONLY if this scope has migration commands not in root.
+     Remove if no migrations are scoped to this package. -->
+- Migrate: `[scope-specific migration command]`
 
 ## Conventions
 

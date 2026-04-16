@@ -12,12 +12,19 @@ Any file violating these criteria must be fixed before proceeding:
 | Criterion | Threshold | Source |
 |-----------|-----------|--------|
 | File length | ≤ 200 lines | Anthropic Docs: "Target under 200 lines per CLAUDE.md file" |
-| Root file length (recommended) | 15-40 lines | Derived from "absolute minimum" guidance |
-| Scope file length (recommended) | 10-30 lines | One topic per file guideline |
 | Instruction count | ≤ 150-200 | HumanLayer: "~150-200 instructions with reasonable consistency" |
-| Contradictions between files | 0 | Anthropic: "Claude may pick one arbitrarily" |
+| Contradictions (within or between files) | 0 | Anthropic: "Claude may pick one arbitrarily" |
 | Language-specific rules in root | 0 | Domain rules belong in separate files |
 | Stale file path references | 0 | "File paths change constantly... actively poisons context" |
+
+## Recommended Targets (Advisory)
+
+Directional goals — not auto-fail triggers. Apply during IMPROVE operations when within the 200-line hard limit:
+
+| Target | Range | Note |
+|--------|-------|------|
+| Root file length | 15-40 lines | Derived from "absolute minimum" guidance |
+| Scope file length | 10-30 lines | One topic per file guideline |
 
 ---
 
@@ -25,7 +32,9 @@ Any file violating these criteria must be fixed before proceeding:
 
 - [ ] Every instruction is actionable (not vague like "write clean code")
 - [ ] Package manager specified if non-standard (pnpm, bun, yarn; omit if npm)
-- [ ] Build/test commands included if non-standard
+- [ ] Non-standard commands documented (build, test, lint, migrate — e.g., `alembic upgrade head`, `prisma migrate deploy`)
+- [ ] Non-standard configuration values documented (e.g., `addopts = "--cov=src"`, `strict = true`, line-length overrides)
+- [ ] Cross-scope build prerequisites at root level (e.g., WASM must build before web — document ordering at root)
 - [ ] Progressive disclosure applied: domain docs referenced, not inlined
 - [ ] No information that tools can enforce (linting, formatting rules → use hooks instead)
 - [ ] No duplication of content across files in the hierarchy
