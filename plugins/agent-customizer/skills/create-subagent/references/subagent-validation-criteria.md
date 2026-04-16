@@ -56,8 +56,9 @@ Any subagent violating these criteria must be fixed before proceeding:
 Execute this loop for each generated or improved subagent:
 
 1. Evaluate the subagent against ALL criteria above
-2. If ANY criterion fails: identify the specific failure, fix the subagent, restart evaluation
-3. Maximum 3 iterations — if still failing after 3 attempts, surface the remaining issues to the user
+2. **For improve operations:** verify each suggestion in the improvement plan has a WHY field citing a source doc — no suggestion may lack a source reference
+3. If ANY criterion fails: identify the specific failure, fix the subagent, restart evaluation
+4. Maximum 3 iterations — if still failing after 3 attempts, surface the remaining issues to the user
 4. Only proceed to writing subagents when ALL criteria pass
 
 **Do not skip criteria for "minor" violations.** Hard limits are hard limits.
