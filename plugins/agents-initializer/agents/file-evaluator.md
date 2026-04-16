@@ -39,6 +39,7 @@ Each of these wastes tokens without improving agent performance:
 | Codebase overview paragraphs | Increases steps without improving navigation | Evaluating AGENTS.md |
 | Obvious tool usage ("use git for version control") | Agent already knows this | Anthropic: "If Claude already does it correctly, delete it" |
 | Duplicated information across files | Wastes tokens on every request | Context engineering research |
+| **Architectural path trap** | Lists of paths WITH behavioral constraints (e.g., `services/ must not import from routes/`) are **not** directory listings — flag only pure path listings with no rules attached | Evaluating AGENTS.md |
 
 ### Staleness Indicators
 
@@ -71,6 +72,7 @@ Flag instructions that are candidates for migration to on-demand mechanisms:
 | Content agents can infer from code | Deletion | `DELETE_CANDIDATE` |
 | Instructions duplicated across multiple files | Consolidation | `CONSOLIDATE` |
 | Version numbers, team names, high-churn content | Deletion | `DELETE_CANDIDATE` |
+| Standard default commands (e.g., `npm test`, `cargo build`, `go test ./...`) | Agent knows platform defaults from training | `DELETE_CANDIDATE` |
 
 ## Process
 

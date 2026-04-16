@@ -58,6 +58,8 @@ If the instruction passes this test, include it. If it fails (agent would do the
 
 **Comprehensive-over-restrained mindset**: More content feels safer but performs worse. "Unnecessary requirements from context files make tasks harder." — ETH Zurich, Evaluating AGENTS.md (abstract)
 
+**Architectural path trap**: Architectural constraints that reference file paths are NOT the same as directory listings. Test: would removing this cause an architectural mistake? A constraint like "Services must not import from `routes/` — keep separation strict" is essential even with a path reference. A bare listing of `routes/`, `services/`, `lib/` with no behavioral constraint is bloat. Keep the constraint; remove the listing.
+
 ---
 
 ## What TO Include Instead

@@ -11,10 +11,11 @@ Used by IMPROVE skills only. Source: file-evaluator.md, research-context-enginee
 - Bloat indicators table (directory listings, vague instructions, duplicates)
 - Staleness indicators table (stale paths, failing commands, outdated refs)
 - Progressive disclosure assessment (root focus, domain separation, pointers)
-- Instruction specificity assessment (goldilocks zone examples)
+- Instruction specificity assessment (goldilocks zone, config-enforcement distinction)
 - Automation opportunity assessment (migration candidate signals and classification)
 - Quality score rubric (6-dimension scoring 1-10)
 - Evaluation output template
+- Calibrated improvement mode (restrained suggestions for high-quality files)
 
 ---
 
@@ -83,6 +84,13 @@ Every instruction should be in the Goldilocks zone:
 | ✅ Specific | "Run `npm test` before committing" | None — verifiable *(format example only; standard commands should still be excluded per what-not-to-include.md)* |
 | ❌ Too vague | "Format code properly" | Cannot be verified or acted on |
 | ❌ Too specific | "File `src/auth/handlers.ts` handles JWT" | Over-specified file path, will go stale |
+
+**Config-enforcement distinction** — check before flagging as redundant:
+
+| Type | Example | Verdict |
+|------|---------|---------|
+| Enforced by config file | "Strict mode is enabled" (`tsconfig.json` has `"strict": true`) | ❌ DELETE — agent reads the config directly |
+| Project decision not in config | "Use `unknown` over `any`; validate with `zod`" | ✅ Keep — agent cannot infer rationale |
 
 *Source: research-context-engineering-comprehensive.md lines 131-134*
 
@@ -169,3 +177,15 @@ Return findings in exactly this format:
 | Automation Opportunity | 8 | 0 migration candidates missed |
 | **Overall** | **4** | Needs significant refactoring |
 ```
+
+---
+
+## Calibrated Improvement Mode
+
+When the overall quality score is **7/10 or higher** across all dimensions and no hard-limit violations exist:
+
+- Generate **at most one actionable suggestion per identified issue** — not one per paragraph
+- Default to **keeping content as-is** for borderline cases (dimension score ≥ 6 with ambiguous evidence)
+- Focus exclusively on clear violations from the criteria above — not speculative improvements
+- A file scoring 7-9/10 exits the workflow with surgical targeted changes, not a full restructure
+- Progressive disclosure extraction candidates meeting the 10+ line / 3+ rule threshold are always suggested — calibrated mode never suppresses these, as domain topics are rarely relevant to most sessions

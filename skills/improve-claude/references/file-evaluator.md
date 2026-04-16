@@ -82,9 +82,9 @@ Flag instructions that are candidates for migration to on-demand mechanisms:
 | Content agents can infer from code | Deletion | `DELETE_CANDIDATE` |
 | Instructions duplicated across multiple files | Consolidation | `CONSOLIDATE` |
 | Version numbers, team names, high-churn content | Deletion | `DELETE_CANDIDATE` |
+| Standard default commands (e.g., `npm test`, `cargo build`, `go test ./...`) | Agent knows platform defaults from training | `DELETE_CANDIDATE` |
 
 *Source: automation-migration-guide.md lines 58-72*
-
 **Standalone Distribution Note**: This evaluation runs in the standalone distribution where hooks and subagents are not available. Continue flagging `HOOK_CANDIDATE` items — the signal identifies enforcement-like instructions that should migrate. The improve skill's Phase 3 will reclassify these to `RULE_CANDIDATE` (path-specific enforcement under 50 lines) or `SKILL_CANDIDATE` (workflow-based enforcement) before presenting suggestions.
 
 ---
@@ -107,7 +107,7 @@ For each file found:
 1. Count metrics: lines, sections (markdown headers), bullet points, code blocks
 2. Scan for bloat indicators: check each line against the bloat indicators table
 3. Check for staleness: verify referenced paths exist, commands work
-4. Identify contradictions: compare instructions across all files for conflicts
+4. Identify contradictions within each file and between files: look for conflicting rules at different line numbers in the same file, and compare instructions across separate files for cross-file conflicts
 5. Assess progressive disclosure: is content at the right scope level?
 6. Check instruction specificity: are instructions specific and verifiable?
 7. Scan for automation opportunities: check each instruction against the automation opportunity indicators table above
