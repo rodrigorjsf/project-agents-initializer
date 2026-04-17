@@ -106,7 +106,7 @@ SKILL.md is the index; detailed content lives in supporting files loaded on dema
 
 ```markdown
 ## Phase 1: Analyze
-Read ${CLAUDE_SKILL_DIR}/references/reference.md for detailed context.
+Read references/reference.md for detailed context.
 ```
 
 **Pattern 2 — Phased loading:**
@@ -139,7 +139,7 @@ Use `disable-model-invocation: true` for workflows with side effects (commit, de
 | Explaining what Claude already knows | Wastes tokens; dilutes attention | Delete it |
 | Generic descriptions ("helps with data") | Poor skill discovery | Be specific about what + when |
 | Inlining all reference content in SKILL.md | Context bloat on every invocation | Move to `references/` subdirectory |
-| Hardcoded file paths | Goes stale | Use `${CLAUDE_SKILL_DIR}` for bundled files |
+| Hardcoded absolute paths | Goes stale | Use relative `references/` paths for bundled files |
 | Over-explaining for Opus | Patronizing + token waste | Trust the model; provide minimal scaffolding |
 | Contradictions between phases | Claude picks one arbitrarily | Review all phases for consistency |
 

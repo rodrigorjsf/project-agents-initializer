@@ -7,8 +7,8 @@ description: "[What this skill does and when to use it. Third person.]"
      Rule: name ≤ 64 chars, lowercase letters/numbers/hyphens only
      Rule: description ≤ 1024 chars, third person, no XML tags
      Rule: Body under 500 lines
-     Rule: Use ${CLAUDE_SKILL_DIR}/references/ for evidence-based guidance
-     Rule: Use ${CLAUDE_SKILL_DIR}/assets/templates/ for output templates
+     Rule: Use references/ for evidence-based guidance
+     Rule: Use assets/templates/ for output templates
      Rule: Progressive disclosure — load references per phase, not all upfront
 -->
 
@@ -35,7 +35,7 @@ description: "[What this skill does and when to use it. Third person.]"
 <!-- Read references, apply templates -->
 
 ### Phase 3: Self-Validation
-<!-- Read ${CLAUDE_SKILL_DIR}/references/[type]-validation-criteria.md -->
+<!-- Read references/[type]-validation-criteria.md -->
 
 ### Phase 4: Present and Write
 <!-- Show artifact with evidence citations, write on approval -->
