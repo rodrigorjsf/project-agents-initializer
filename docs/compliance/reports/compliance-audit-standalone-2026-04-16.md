@@ -3,7 +3,7 @@
 **Scope ID**: standalone  
 **Audit Date**: 2026-04-16  
 **Auditor Phase**: 5 (Standalone Scope Audit and Correction)  
-**Plan Reference**: `.claude/PRPs/plans/standalone-scope-audit-and-correction.plan.md`  
+**Plan Reference**: `.claude/PRPs/plans/completed/standalone-scope-audit-and-correction.plan.md`  
 **Total Artifacts Audited**: 114 (per `docs/compliance/artifact-audit-manifest.md` §8)
 
 ---
