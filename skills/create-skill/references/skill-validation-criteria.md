@@ -24,7 +24,7 @@ Any skill violating these criteria must be fixed before proceeding:
 
 ## Quality Checks (All must pass)
 
-- [ ] Bundled file references use relative `references/` paths (not hardcoded absolute paths)
+- [ ] Bundled file references use relative paths within the skill directory (e.g., `references/...` and `assets/templates/...`), not absolute or cross-directory paths
 - [ ] `description` written in third person ("Processes..." not "I process..." or "You can use...")
 - [ ] `description` includes what the skill does AND when to use it
 - [ ] Progressive disclosure applied: references loaded per phase, not all upfront
