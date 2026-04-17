@@ -20,7 +20,7 @@ the generated files are in place. Treat the first execution as a one-time invest
 
 ### The Problem with Auto-Generated Config Files
 
-The ETH Zurich study ["Evaluating AGENTS.md"](../docs/general-llm/Evaluating-AGENTS-paper.pdf) (February 2026) evaluated multiple coding agents across hundreds of real-world tasks:
+The ETH Zurich study ["Evaluating AGENTS.md"](https://github.com/rodrigorjsf/agent-engineering-toolkit/blob/development/docs/general-llm/Evaluating-AGENTS-paper.pdf) (February 2026) evaluated multiple coding agents across hundreds of real-world tasks:
 
 | Setting | Task Success Impact | Cost Impact |
 |---------|-------------------|-------------|
@@ -50,7 +50,7 @@ These skills generate files that mimic what an experienced developer would write
 
 ### Academic Research
 
-- **[Evaluating AGENTS study](../docs/general-llm/Evaluating-AGENTS-paper.pdf)** (ETH Zurich, Feb 2026) — Rigorous study of context file effectiveness across multiple coding agents.
+- **[Evaluating AGENTS study](https://github.com/rodrigorjsf/agent-engineering-toolkit/blob/development/docs/general-llm/Evaluating-AGENTS-paper.pdf)** (ETH Zurich, Feb 2026) — Rigorous study of context file effectiveness across multiple coding agents.
 
 ### Anthropic Official Documentation
 
@@ -61,7 +61,7 @@ These skills generate files that mimic what an experienced developer would write
 
 ### Practitioner Guides
 
-- **[A Complete Guide to AGENTS.md](../docs/general-llm/a-guide-to-agents.md)** — Progressive disclosure patterns, monorepo support, domain files.
+- **[A Complete Guide to AGENTS.md](https://github.com/rodrigorjsf/agent-engineering-toolkit/blob/development/docs/general-llm/a-guide-to-agents.md)** — Progressive disclosure patterns, monorepo support, domain files.
 
 ## Architecture
 

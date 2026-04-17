@@ -39,11 +39,11 @@ Proceed to Phase 1 below.
 
 ### Phase 1: Evaluate
 
-Read `${CLAUDE_SKILL_DIR}/references/skill-evaluator.md` and follow its evaluation instructions to evaluate the skill at `{target-path}`. Check hard limits (body ≤500 lines, references ≤200 lines, frontmatter valid), structural quality (progressive disclosure, phase structure, reference loading), and token efficiency. Return structured evaluation results with severity classifications (AUTO-FAIL/HIGH/MEDIUM/LOW).
+Read `references/skill-evaluator.md` and follow its evaluation instructions to evaluate the skill at `{target-path}`. Check hard limits (body ≤500 lines, references ≤200 lines, frontmatter valid), structural quality (progressive disclosure, phase structure, reference loading), and token efficiency. Return structured evaluation results with severity classifications (AUTO-FAIL/HIGH/MEDIUM/LOW).
 
 ### Phase 2: Codebase Context
 
-Read `${CLAUDE_SKILL_DIR}/references/artifact-analyzer.md` and follow its analysis instructions.
+Read `references/artifact-analyzer.md` and follow its analysis instructions.
 
 Focus on: which agents the skill delegates to and whether those agents still exist, naming conventions for similar skills, any other skills that overlap in purpose, and the plugin structure.
 
@@ -51,9 +51,9 @@ Focus on: which agents the skill delegates to and whether those agents still exi
 
 Read these reference documents:
 
-- `${CLAUDE_SKILL_DIR}/references/skill-authoring-guide.md` — core principles, structure, progressive disclosure, anti-patterns
-- `${CLAUDE_SKILL_DIR}/references/skill-evaluation-criteria.md` — bloat/staleness indicators, quality rubric
-- `${CLAUDE_SKILL_DIR}/references/prompt-engineering-strategies.md` — skill-specific prompting strategies
+- `references/skill-authoring-guide.md` — core principles, structure, progressive disclosure, anti-patterns
+- `references/skill-evaluation-criteria.md` — bloat/staleness indicators, quality rubric
+- `references/prompt-engineering-strategies.md` — skill-specific prompting strategies
 
 Based on both evaluation and analysis results, create improvement plan with categories:
 
@@ -65,7 +65,7 @@ Based on both evaluation and analysis results, create improvement plan with cate
 
 ### Phase 4: Self-Validation
 
-Read `${CLAUDE_SKILL_DIR}/references/skill-validation-criteria.md` and execute its **Validation Loop Instructions** against the improved skill.
+Read `references/skill-validation-criteria.md` and execute its **Validation Loop Instructions** against the improved skill.
 
 For improve operations, also evaluate the **"If This Is an IMPROVE Operation"** section. Maximum 3 iterations. Do not proceed to Phase 5 until ALL criteria pass.
 

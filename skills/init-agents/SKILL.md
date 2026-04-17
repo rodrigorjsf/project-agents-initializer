@@ -41,13 +41,13 @@ Proceed to Phase 1 below.
 
 ### Phase 1: Codebase Analysis
 
-Read `${CLAUDE_SKILL_DIR}/references/codebase-analyzer.md` and follow its codebase analysis instructions to analyze the project at the current working directory.
+Read `references/codebase-analyzer.md` and follow its codebase analysis instructions to analyze the project at the current working directory.
 
 Focus: Return ONLY non-standard, non-obvious information that would cause an agent to make mistakes if it didn't know them. Be ruthlessly minimal.
 
 ### Phase 2: Scope Detection
 
-Read `${CLAUDE_SKILL_DIR}/references/scope-detector.md` and follow its scope detection instructions for the project at the current working directory.
+Read `references/scope-detector.md` and follow its scope detection instructions for the project at the current working directory.
 
 Focus: Only flag scopes with genuinely different tooling or conventions. A simple single-package project should have ZERO additional scopes.
 
@@ -55,27 +55,27 @@ Focus: Only flag scopes with genuinely different tooling or conventions. A simpl
 
 Before generating, read these reference documents:
 
-- `${CLAUDE_SKILL_DIR}/references/progressive-disclosure-guide.md` — file hierarchy decisions
-- `${CLAUDE_SKILL_DIR}/references/what-not-to-include.md` — content exclusion criteria
-- `${CLAUDE_SKILL_DIR}/references/context-optimization.md` — token budget guidelines
+- `references/progressive-disclosure-guide.md` — file hierarchy decisions
+- `references/what-not-to-include.md` — content exclusion criteria
+- `references/context-optimization.md` — token budget guidelines
 
 Using ONLY the information from Phase 1 and Phase 2, generate the file hierarchy:
 
 #### Root AGENTS.md
 
-Read `${CLAUDE_SKILL_DIR}/assets/templates/root-agents-md.md`. Fill its placeholders using ONLY the analysis output from Phase 1 and Phase 2. Follow the HTML comment instructions in the template to determine which sections to include or remove. Remove any section that would be empty. Target: 15-40 lines.
+Read `assets/templates/root-agents-md.md`. Fill its placeholders using ONLY the analysis output from Phase 1 and Phase 2. Follow the HTML comment instructions in the template to determine which sections to include or remove. Remove any section that would be empty. Target: 15-40 lines.
 
 #### Scope AGENTS.md (per detected scope)
 
-If scopes were detected, read `${CLAUDE_SKILL_DIR}/assets/templates/scoped-agents-md.md` for each scope. Only include scope-specific content that differs from root.
+If scopes were detected, read `assets/templates/scoped-agents-md.md` for each scope. Only include scope-specific content that differs from root.
 
 #### Domain Files (only if non-standard patterns detected)
 
-If the codebase-analyzer identified non-standard domain patterns, read `${CLAUDE_SKILL_DIR}/assets/templates/domain-doc.md` and generate a file per domain.
+If the codebase-analyzer identified non-standard domain patterns, read `assets/templates/domain-doc.md` and generate a file per domain.
 
 ### Phase 4: Self-Validation
 
-Read `${CLAUDE_SKILL_DIR}/references/validation-criteria.md` and execute its **Validation Loop Instructions** against every generated file.
+Read `references/validation-criteria.md` and execute its **Validation Loop Instructions** against every generated file.
 
 The loop evaluates all hard limits and quality checks, fixes any failures, and re-evaluates — maximum 3 iterations. Do not proceed to Phase 5 until ALL criteria pass for ALL files.
 

@@ -124,7 +124,7 @@ Use these patterns to move content from always-consumed to on-demand locations:
 
 | Claim | Source |
 |-------|--------|
-| ≤200 lines per file | Anthropic Docs: claude-code/memory |
+| ≤200 lines per file | Agent Skills Standard |
 | ~150-200 instruction limit | HumanLayer (Kyle) via a-guide-to-agents.md |
 | n² attention constraint / context rot | Anthropic Engineering Blog |
 | Lost-in-the-middle effect | Liu et al., arXiv:2307.03172 |

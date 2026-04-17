@@ -24,7 +24,7 @@ Any skill violating these criteria must be fixed before proceeding:
 
 ## Quality Checks (All must pass)
 
-- [ ] `${CLAUDE_SKILL_DIR}` used for all bundled file references (not hardcoded paths)
+- [ ] Bundled file references use relative paths within the skill directory (e.g., `references/...` and `assets/templates/...`), not absolute or cross-directory paths
 - [ ] `description` written in third person ("Processes..." not "I process..." or "You can use...")
 - [ ] `description` includes what the skill does AND when to use it
 - [ ] Progressive disclosure applied: references loaded per phase, not all upfront
@@ -51,7 +51,7 @@ Any skill violating these criteria must be fixed before proceeding:
 **Structural:**
 
 - [ ] Reference file ≤200 line limit not violated by merging content; >100-line files have a `## Contents` TOC
-- [ ] `${CLAUDE_SKILL_DIR}` references not broken by renaming or moving files
+- [ ] Relative `references/` paths not broken by renaming or moving files
 
 ---
 
