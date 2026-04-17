@@ -14,7 +14,7 @@ Generates a new SKILL.md file with supporting references and templates, grounded
 - **NEVER** inline reference content in SKILL.md body — use the `references/` subdirectory
 - **NEVER** exceed 500 lines in the SKILL.md body
 - **EVERY** reference file must be ≤ 200 lines with source attribution
-- **EVERY** skill must use `${CLAUDE_SKILL_DIR}` for all bundled file references (not hardcoded paths)
+- **EVERY** skill must use relative `references/` paths for all bundled file references (not hardcoded absolute paths)
 - **EVERY** skill description must be third-person and include a "Use when..." trigger phrase
 </RULES>
 
@@ -38,7 +38,7 @@ Proceed to Phase 1 below.
 
 ### Phase 1: Codebase Analysis
 
-Read `${CLAUDE_SKILL_DIR}/references/artifact-analyzer.md` and follow its analysis instructions to analyze the project at the current working directory.
+Read `references/artifact-analyzer.md` and follow its analysis instructions to analyze the project at the current working directory.
 
 Focus on: existing skill directory structure, naming patterns, which skills delegate to agents, plugin conventions in CLAUDE.md files, and any skill that is similar to `{requested-name}` in purpose.
 
@@ -46,11 +46,11 @@ Focus on: existing skill directory structure, naming patterns, which skills dele
 
 Before generating, read these reference documents:
 
-- `${CLAUDE_SKILL_DIR}/references/skill-authoring-guide.md` — core principles, structure rules, progressive disclosure, anti-patterns
-- `${CLAUDE_SKILL_DIR}/references/skill-format-reference.md` — frontmatter fields, name validation, string substitution variables
-- `${CLAUDE_SKILL_DIR}/references/prompt-engineering-strategies.md` — per-artifact prompting strategies for skills
+- `references/skill-authoring-guide.md` — core principles, structure rules, progressive disclosure, anti-patterns
+- `references/skill-format-reference.md` — frontmatter fields, name validation, string substitution variables
+- `references/prompt-engineering-strategies.md` — per-artifact prompting strategies for skills
 
-Read `${CLAUDE_SKILL_DIR}/assets/templates/skill-md.md` and fill its placeholders using:
+Read `assets/templates/skill-md.md` and fill its placeholders using:
 
 - User requirements for the new skill
 - Phase 1 analysis output (naming conventions, existing patterns, plugin context)
@@ -64,7 +64,7 @@ Generate the complete skill directory structure:
 
 ### Phase 3: Self-Validation
 
-Read `${CLAUDE_SKILL_DIR}/references/skill-validation-criteria.md` and execute its **Validation Loop Instructions** against the generated skill.
+Read `references/skill-validation-criteria.md` and execute its **Validation Loop Instructions** against the generated skill.
 
 The loop evaluates all hard limits and quality checks, fixes any failures, and re-evaluates — maximum 3 iterations. Do not proceed to Phase 4 until ALL criteria pass.
 

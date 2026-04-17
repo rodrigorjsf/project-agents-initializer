@@ -43,7 +43,7 @@ A skill violating any hard limit is flagged **OVER LIMIT** regardless of content
 | Redundant phase instructions (same guidance repeated) | Dilutes attention; each phase should add distinct value |
 | Over-specified tool restrictions for simple tasks | Correct tool access should be inferred from task type |
 | Explaining standard practices Claude already knows | "Claude is already very smart — add only novel context" |
-| Hardcoded project-specific paths (not using `${CLAUDE_SKILL_DIR}`) | Will go stale; breaks skill portability |
+| Hardcoded absolute paths (not using relative `references/` paths) | Will go stale; breaks skill portability |
 
 *Source: skills/skill-authoring-best-practices.md lines 11-60*
 
@@ -69,7 +69,7 @@ A skill violating any hard limit is flagged **OVER LIMIT** regardless of content
 |----------|------|-----|
 | Does SKILL.md stay focused on phase overview? | Phases are concise with file references | All guidance inlined in SKILL.md |
 | Are references loaded per phase, not all upfront? | Each phase reads only its relevant references | Phase 1 loads all references |
-| Are supporting files referenced explicitly? | "Read ${CLAUDE_SKILL_DIR}/references/X.md" | Files exist but never referenced |
+| Are supporting files referenced explicitly? | "Read references/X.md" | Files exist but never referenced |
 | Is SKILL.md body under 500 lines? | Clean entry point with external depth | Monolithic, all content inline |
 
 *Source: skills/skill-authoring-best-practices.md lines 251-300*

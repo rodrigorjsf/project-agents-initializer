@@ -56,7 +56,7 @@ Follow these evaluation instructions. Analyze the target SKILL.md file and evalu
 | Inlined long reference content | Should be in `references/` subdirectory |
 | Phase instructions over 10 lines | Depth belongs in reference files |
 | Instructions Claude already knows | Wastes attention budget |
-| `${CLAUDE_SKILL_DIR}` not used for bundled paths | Hardcoded paths break on relocation |
+| Absolute paths used instead of relative `references/` paths | Breaks skill portability |
 
 ## Process
 
@@ -67,8 +67,8 @@ Read the target SKILL.md file. Record:
 - Line count
 - `name` and `description` frontmatter values
 - Phase structure (how many phases, what each does)
-- Any `${CLAUDE_SKILL_DIR}/references/` load instructions
-- Any `${CLAUDE_SKILL_DIR}/assets/templates/` load instructions
+- Any `references/` load instructions
+- Any `assets/templates/` load instructions
 
 ### 2. Check Against Criteria
 

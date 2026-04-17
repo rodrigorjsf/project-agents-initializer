@@ -49,13 +49,13 @@ Proceed to Phase 1 below.
 
 ### Phase 1: Codebase Analysis
 
-Read `${CLAUDE_SKILL_DIR}/references/codebase-analyzer.md` and follow its codebase analysis instructions to analyze the project at the current working directory.
+Read `references/codebase-analyzer.md` and follow its codebase analysis instructions to analyze the project at the current working directory.
 
 Focus: Return ONLY non-standard, non-obvious information that would cause Claude to make mistakes if it didn't know them. Be ruthlessly minimal.
 
 ### Phase 2: Scope Detection
 
-Read `${CLAUDE_SKILL_DIR}/references/scope-detector.md` and follow its scope detection instructions for the project at the current working directory.
+Read `references/scope-detector.md` and follow its scope detection instructions for the project at the current working directory.
 
 Focus: Only flag scopes with genuinely different tooling or conventions. A simple single-package project should have ZERO additional scopes. Also identify areas that would benefit from path-scoped .claude/rules/ files. Check shared/library packages in monorepos — even utility packages may need their own scope if they have unique constraints (e.g., zero-dependency rules, dual exports, conditional imports).
 
@@ -63,24 +63,24 @@ Focus: Only flag scopes with genuinely different tooling or conventions. A simpl
 
 Before generating, read these reference documents:
 
-- `${CLAUDE_SKILL_DIR}/references/progressive-disclosure-guide.md` — hierarchy decisions and loading tiers
-- `${CLAUDE_SKILL_DIR}/references/what-not-to-include.md` — content exclusion criteria
-- `${CLAUDE_SKILL_DIR}/references/context-optimization.md` — token budget guidelines
-- `${CLAUDE_SKILL_DIR}/references/claude-rules-system.md` — .claude/rules/ conventions and path-scoping
+- `references/progressive-disclosure-guide.md` — hierarchy decisions and loading tiers
+- `references/what-not-to-include.md` — content exclusion criteria
+- `references/context-optimization.md` — token budget guidelines
+- `references/claude-rules-system.md` — .claude/rules/ conventions and path-scoping
 
 Using ONLY the information from Phase 1 and Phase 2, generate the file hierarchy:
 
 #### Root CLAUDE.md
 
-Read `${CLAUDE_SKILL_DIR}/assets/templates/root-claude-md.md`. Fill placeholders. Remove empty sections. Target: 15-40 lines.
+Read `assets/templates/root-claude-md.md`. Fill placeholders. Remove empty sections. Target: 15-40 lines.
 
 #### Subdirectory CLAUDE.md (per detected scope)
 
-If scopes detected, read `${CLAUDE_SKILL_DIR}/assets/templates/scoped-claude-md.md`. Only scope-specific content differing from root.
+If scopes detected, read `assets/templates/scoped-claude-md.md`. Only scope-specific content differing from root.
 
 #### .claude/rules/ Files (Path-Scoped Rules)
 
-If file-pattern-specific rules detected, read `${CLAUDE_SKILL_DIR}/assets/templates/claude-rule.md`. Consult `${CLAUDE_SKILL_DIR}/references/claude-rules-system.md` for:
+If file-pattern-specific rules detected, read `assets/templates/claude-rule.md`. Consult `references/claude-rules-system.md` for:
 
 - When to create rules files vs using CLAUDE.md
 - Path-scoping conventions and glob patterns
@@ -88,11 +88,11 @@ If file-pattern-specific rules detected, read `${CLAUDE_SKILL_DIR}/assets/templa
 
 #### Domain Files
 
-If non-standard domain patterns detected, read `${CLAUDE_SKILL_DIR}/assets/templates/domain-doc.md`.
+If non-standard domain patterns detected, read `assets/templates/domain-doc.md`.
 
 ### Phase 4: Self-Validation
 
-Read `${CLAUDE_SKILL_DIR}/references/validation-criteria.md` and execute its **Validation Loop Instructions** against every generated file.
+Read `references/validation-criteria.md` and execute its **Validation Loop Instructions** against every generated file.
 
 Check both general criteria AND the CLAUDE.md-specific structural checks (path-scoping, minimal always-loaded content). Maximum 3 iterations.
 

@@ -36,14 +36,14 @@ Proceed to Phase 1 below.
 
 ### Phase 1: Evaluate
 
-Read `${CLAUDE_SKILL_DIR}/references/rule-evaluator.md` and follow its evaluation instructions to evaluate the rule file at `{target-path}`. Check line counts against the 50-line limit, YAML frontmatter validity, missing `paths:` frontmatter as a defect, glob pattern specificity, instruction actionability, one-scope-per-file adherence, and cross-file contradictions/overlaps. Return structured results with severity classifications (AUTO-FAIL/HIGH/MEDIUM/LOW).
+Read `references/rule-evaluator.md` and follow its evaluation instructions to evaluate the rule file at `{target-path}`. Check line counts against the 50-line limit, YAML frontmatter validity, missing `paths:` frontmatter as a defect, glob pattern specificity, instruction actionability, one-scope-per-file adherence, and cross-file contradictions/overlaps. Return structured results with severity classifications (AUTO-FAIL/HIGH/MEDIUM/LOW).
 
 - If the user provides a specific rule file → scope to that file (still cross-check others for conflicts).
 - If no specific file → evaluate ALL `.md` rule files under `.claude/rules/` recursively.
 
 ### Phase 2: Codebase Context
 
-Read `${CLAUDE_SKILL_DIR}/references/artifact-analyzer.md` and follow its analysis instructions.
+Read `references/artifact-analyzer.md` and follow its analysis instructions.
 
 Focus on: all rule files and topics, glob pattern staleness (do globs still match files), CLAUDE.md overlaps.
 
@@ -51,9 +51,9 @@ Focus on: all rule files and topics, glob pattern staleness (do globs still matc
 
 Read these reference documents:
 
-- `${CLAUDE_SKILL_DIR}/references/rule-authoring-guide.md` — when to use rules, path-scoping, glob syntax, anti-patterns
-- `${CLAUDE_SKILL_DIR}/references/rule-evaluation-criteria.md` — bloat/staleness indicators, quality rubric
-- `${CLAUDE_SKILL_DIR}/references/prompt-engineering-strategies.md` — rule-specific prompting (zero-shot only)
+- `references/rule-authoring-guide.md` — when to use rules, path-scoping, glob syntax, anti-patterns
+- `references/rule-evaluation-criteria.md` — bloat/staleness indicators, quality rubric
+- `references/prompt-engineering-strategies.md` — rule-specific prompting (zero-shot only)
 
 Based on both evaluation and analysis results, create improvement plan with categories:
 
@@ -65,7 +65,7 @@ Based on both evaluation and analysis results, create improvement plan with cate
 
 ### Phase 4: Self-Validation
 
-Read `${CLAUDE_SKILL_DIR}/references/rule-validation-criteria.md` and execute its **Validation Loop Instructions** against the improved rule files.
+Read `references/rule-validation-criteria.md` and execute its **Validation Loop Instructions** against the improved rule files.
 
 For improve operations, also evaluate the **"If This Is an IMPROVE Operation"** section. Maximum 3 iterations. Do not proceed to Phase 5 until ALL criteria pass.
 
