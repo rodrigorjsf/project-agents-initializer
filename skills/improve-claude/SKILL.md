@@ -37,9 +37,9 @@ Key metrics from research:
 
 ### Phase 1: Current State Analysis
 
-Read `${CLAUDE_SKILL_DIR}/references/evaluation-criteria.md` for the scoring rubric and bloat/staleness indicators.
+Read `references/evaluation-criteria.md` for the scoring rubric and bloat/staleness indicators.
 
-Read `${CLAUDE_SKILL_DIR}/references/file-evaluator.md` and follow its evaluation instructions to evaluate all CLAUDE.md files and .claude/rules/ files in the project at the current working directory.
+Read `references/file-evaluator.md` and follow its evaluation instructions to evaluate all CLAUDE.md files and .claude/rules/ files in the project at the current working directory.
 
 Check for:
 
@@ -56,7 +56,7 @@ Build a structured assessment with specific line numbers and content for each is
 
 ### Phase 2: Codebase Comparison
 
-Read `${CLAUDE_SKILL_DIR}/references/codebase-analyzer.md` and follow its codebase analysis instructions. Focus on:
+Read `references/codebase-analyzer.md` and follow its codebase analysis instructions. Focus on:
 
 1. Verifying that tooling commands documented in CLAUDE.md files still work
 2. Identifying scopes that have distinct tooling but lack their own CLAUDE.md — including library/shared packages in monorepos that have unique constraints (zero-dependency rules, dual exports, conditional imports, server-only markers)
@@ -69,11 +69,11 @@ Return ONLY actionable findings.
 
 Read these reference documents:
 
-- `${CLAUDE_SKILL_DIR}/references/progressive-disclosure-guide.md` — hierarchy decisions and loading tiers
-- `${CLAUDE_SKILL_DIR}/references/what-not-to-include.md` — content exclusion criteria
-- `${CLAUDE_SKILL_DIR}/references/context-optimization.md` — token budget guidelines
-- `${CLAUDE_SKILL_DIR}/references/claude-rules-system.md` — .claude/rules/ conventions and path-scoping
-- `${CLAUDE_SKILL_DIR}/references/automation-migration-guide.md` — automation migration decision criteria (skill vs. hook vs. rule vs. subagent)
+- `references/progressive-disclosure-guide.md` — hierarchy decisions and loading tiers
+- `references/what-not-to-include.md` — content exclusion criteria
+- `references/context-optimization.md` — token budget guidelines
+- `references/claude-rules-system.md` — .claude/rules/ conventions and path-scoping
+- `references/automation-migration-guide.md` — automation migration decision criteria (skill vs. hook vs. rule vs. subagent)
 
 Based on both analyses, create improvement plan:
 
@@ -119,15 +119,15 @@ For each deletion, document: the specific content being removed, WHY the agent d
 
 When generating new or restructured files, use these templates:
 
-- Root CLAUDE.md: Read `${CLAUDE_SKILL_DIR}/assets/templates/root-claude-md.md`
-- Scoped CLAUDE.md: Read `${CLAUDE_SKILL_DIR}/assets/templates/scoped-claude-md.md`
-- .claude/rules/ files: Read `${CLAUDE_SKILL_DIR}/assets/templates/claude-rule.md`
-- Domain docs: Read `${CLAUDE_SKILL_DIR}/assets/templates/domain-doc.md`
-- Skills (from automation migration): Read `${CLAUDE_SKILL_DIR}/assets/templates/skill.md`
+- Root CLAUDE.md: Read `assets/templates/root-claude-md.md`
+- Scoped CLAUDE.md: Read `assets/templates/scoped-claude-md.md`
+- .claude/rules/ files: Read `assets/templates/claude-rule.md`
+- Domain docs: Read `assets/templates/domain-doc.md`
+- Skills (from automation migration): Read `assets/templates/skill.md`
 
 ### Phase 4: Self-Validation
 
-Read `${CLAUDE_SKILL_DIR}/references/validation-criteria.md` and execute its **Validation Loop Instructions** against every improved or newly created file.
+Read `references/validation-criteria.md` and execute its **Validation Loop Instructions** against every improved or newly created file.
 
 For improve operations, also evaluate the **"If This Is an IMPROVE Operation"** section. For CLAUDE.md files, also check **CLAUDE.md-specific** structural checks (path-scoping, minimal always-loaded content). Maximum 3 iterations.
 

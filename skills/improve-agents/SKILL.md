@@ -31,9 +31,9 @@ The ETH Zurich study found that **unnecessary requirements in context files make
 
 ### Phase 1: Current State Analysis
 
-Read `${CLAUDE_SKILL_DIR}/references/evaluation-criteria.md` for the complete scoring rubric, bloat indicators table, and staleness detection patterns. Use this to inform the evaluation and to understand the expected output format.
+Read `references/evaluation-criteria.md` for the complete scoring rubric, bloat indicators table, and staleness detection patterns. Use this to inform the evaluation and to understand the expected output format.
 
-Read `${CLAUDE_SKILL_DIR}/references/file-evaluator.md` and follow its evaluation instructions to evaluate all AGENTS.md files in the project at the current working directory.
+Read `references/file-evaluator.md` and follow its evaluation instructions to evaluate all AGENTS.md files in the project at the current working directory.
 
 Check for:
 
@@ -48,7 +48,7 @@ Build a structured assessment with specific line numbers and content for each is
 
 ### Phase 2: Codebase Comparison
 
-Read `${CLAUDE_SKILL_DIR}/references/codebase-analyzer.md` and follow its codebase analysis instructions. Focus on:
+Read `references/codebase-analyzer.md` and follow its codebase analysis instructions. Focus on:
 
 1. Verifying that tooling commands documented in AGENTS.md files still work
 2. Identifying scopes that have distinct tooling but lack their own AGENTS.md
@@ -60,10 +60,10 @@ Return ONLY actionable findings.
 
 Read these reference documents for improvement guidance:
 
-- `${CLAUDE_SKILL_DIR}/references/progressive-disclosure-guide.md` — hierarchy decisions
-- `${CLAUDE_SKILL_DIR}/references/what-not-to-include.md` — content exclusion criteria
-- `${CLAUDE_SKILL_DIR}/references/context-optimization.md` — token budget guidelines
-- `${CLAUDE_SKILL_DIR}/references/automation-migration-guide.md` — automation migration decision criteria
+- `references/progressive-disclosure-guide.md` — hierarchy decisions
+- `references/what-not-to-include.md` — content exclusion criteria
+- `references/context-optimization.md` — token budget guidelines
+- `references/automation-migration-guide.md` — automation migration decision criteria
 
 Based on both analyses, create an improvement plan. Categorize actions:
 
@@ -107,15 +107,15 @@ For each deletion, document: the specific content being removed, WHY the agent d
 
 When generating new or restructured files, use these templates for consistent structure:
 
-- Root AGENTS.md: Read `${CLAUDE_SKILL_DIR}/assets/templates/root-agents-md.md`
-- Scoped AGENTS.md: Read `${CLAUDE_SKILL_DIR}/assets/templates/scoped-agents-md.md`
-- Domain docs: Read `${CLAUDE_SKILL_DIR}/assets/templates/domain-doc.md`
-- .claude/rules/ files (from automation migration): Read `${CLAUDE_SKILL_DIR}/assets/templates/claude-rule.md`
-- Skills (from automation migration): Read `${CLAUDE_SKILL_DIR}/assets/templates/skill.md`
+- Root AGENTS.md: Read `assets/templates/root-agents-md.md`
+- Scoped AGENTS.md: Read `assets/templates/scoped-agents-md.md`
+- Domain docs: Read `assets/templates/domain-doc.md`
+- .claude/rules/ files (from automation migration): Read `assets/templates/claude-rule.md`
+- Skills (from automation migration): Read `assets/templates/skill.md`
 
 ### Phase 4: Self-Validation
 
-Read `${CLAUDE_SKILL_DIR}/references/validation-criteria.md` and execute its **Validation Loop Instructions** against every improved or newly created file.
+Read `references/validation-criteria.md` and execute its **Validation Loop Instructions** against every improved or newly created file.
 
 For improve operations, also evaluate the **"If This Is an IMPROVE Operation"** section in validation-criteria.md — checking information preservation, custom command retention, and progressive disclosure structure preservation.
 
