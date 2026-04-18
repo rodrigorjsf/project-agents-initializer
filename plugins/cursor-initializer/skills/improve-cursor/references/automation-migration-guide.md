@@ -84,7 +84,6 @@ Compare all available on-demand mechanisms when recommending a migration:
 | Hook (`.cursor/hooks.json` — `prompt` type) | Zero | LLM-judged | Decisions requiring judgment, complex verification |
 | Path-scoped rule (`.cursor/rules/` with `globs:`) | Zero until file match | Advisory, scoped to matched files | File-pattern-specific conventions |
 | Subagent (Task tool) | Isolated context | Delegated execution | Parallel analysis, heavy processing |
-| Auto memory | First 200 lines at startup | Advisory — system-managed | Cross-session learnings, preferences |
 
 Hook events: `preToolUse`, `postToolUse`, `postToolUseFailure`, `stop`, `sessionStart`, `beforeShellExecution`, and others — see `.cursor/hooks.json` schema for the full list. Block by returning `{"decision": "block"}` from a `prompt`-type hook.
 
@@ -102,9 +101,8 @@ When suggesting migrations, recommend only mechanisms available in the target di
 |---|---|---|---|
 | Skills | Suggest | Suggest | Both distributions support skills fully |
 | Path-scoped rules | Suggest | Suggest (as separate files) | Both support rules; standalone uses file conventions |
-| Hooks | Suggest | Do not suggest | Hooks require Claude Code; standalone tools lack hook support |
-| Subagents | Suggest | Do not suggest | Subagent delegation requires Claude Code plugin architecture |
-| Auto memory | Mention only | Mention only | System-managed; not a direct migration target |
+| Hooks | Suggest | Do not suggest | Cursor plugin supports hooks; standalone distributions do not provide hook infrastructure |
+| Subagents | Suggest | Do not suggest | Cursor plugin supports subagents; standalone distributions use inline analysis instead of agent delegation |
 
 Check the distribution type before generating improvement suggestions. Filter mechanism recommendations to include only supported mechanisms for the detected distribution.
 
