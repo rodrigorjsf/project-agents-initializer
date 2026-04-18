@@ -182,6 +182,8 @@ Validate completeness, coherence, and identify blind spots.
 
 Process feedback: incorporate valid findings into the relevant briefs, briefly justify any disagreements.
 
+Make sure to execute `prp-verification-before-completion` skill for every claim you make in the briefs and critic feedback. No evidence = no claim.
+
 ---
 
 ## Phase 6: GENERATE — Implementation Plan File
