@@ -101,8 +101,8 @@ When suggesting migrations, recommend only mechanisms available in the target di
 |---|---|---|---|
 | Skills | Suggest | Suggest | Both distributions support skills fully |
 | Path-scoped rules | Suggest | Suggest (as separate files) | Both support rules; standalone uses file conventions |
-| Hooks | Suggest | Do not suggest | Hooks require Claude Code; standalone tools lack hook support |
-| Subagents | Suggest | Do not suggest | Subagent delegation requires Claude Code plugin architecture |
+| Hooks | Suggest | Do not suggest | Cursor plugin supports hooks; standalone distributions do not provide hook infrastructure |
+| Subagents | Suggest | Do not suggest | Cursor plugin supports subagents; standalone distributions use inline analysis instead of agent delegation |
 
 Check the distribution type before generating improvement suggestions. Filter mechanism recommendations to include only supported mechanisms for the detected distribution.
 
