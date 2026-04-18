@@ -1,7 +1,10 @@
 ---
 name: code-reviewer
 description: Reviews code for project guideline compliance, bugs, and quality issues. Use after writing code, before commits, or before PRs. Specify files to review or defaults to unstaged git changes. High-confidence issues only (80+) to minimize noise.
-model: claude-sonnet-4.6
+model: Claude Sonnet 4.6 (copilot)
+target: vscode
+tools: [read, search, agent]
+agents: [codebase-analyzer, pr-comment-resolver, code-simplifier, comment-analyzer, docs-impact-agent, pr-test-analyzer, silent-failure-hunter]
 ---
 
 Review code against project guidelines with high precision. Report only high-confidence issues (80+).
