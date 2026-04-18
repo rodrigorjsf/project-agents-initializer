@@ -2,7 +2,7 @@
 name: rubber-duck
 description: A rubber duck with critical thinking skills. Use this agent when you're stuck, want to challenge your assumptions, or need a fresh perspective on a problem.
 tools: Read, Grep, Glob
-model: sonnet
+model: opus
 maxTurns: 15
 ---
 
