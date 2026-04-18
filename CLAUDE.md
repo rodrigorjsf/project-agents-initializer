@@ -1,6 +1,7 @@
 # agent-engineering-toolkit
 
 Multi-plugin marketplace for evidence-based agent artifact engineering.
+Always remember to consult the advisor when facing MEDIUM or HIGH complex resoning.
 
 ## Structure
 
