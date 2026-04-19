@@ -7,9 +7,9 @@ applyTo: "docs/compliance/**,**/*.prd.md,**/*.plan.md"
 ## When reviewing changes to `docs/compliance/**`
 
 - **Finding model completeness**: Every compliance finding (CF-NNN) must include all required fields: file path, rule violated, rule source (with line ref), severity (CRITICAL/MAJOR/MINOR), current state, expected state, impact, and proposed fix. Reject findings that omit any field.
-- **Scope-gate map accuracy**: If a new scope or gate was added, confirm the Scope-to-Gate Map in `regression-prevention-workflow.md` has been updated to include the new entry.
+- **Scope-gate map accuracy**: If a new scope or gate was added, confirm the Scope-to-Gate Map in `docs/compliance/regression-prevention-workflow.md` has been updated to include the new entry.
 - **Drift manifest currency**: If a reference file was added, removed, or renamed, confirm the corresponding drift manifest row was updated. Stale manifest rows are silent failures — they never trigger a finding.
-- **Parity family integrity**: If a shared-copy reference was edited, confirm all members of its intended parity family are identical. Parity families are listed in `docs/compliance/repository-global-validation-protocol.md`.
+- **Parity family integrity**: If a shared-copy reference was edited, confirm all members of its intended parity family are identical. Parity families are enumerated in `docs/compliance/artifact-audit-manifest.md` under the Shared Copy Group Registry section.
 
 ## When reviewing `*.prd.md` files
 
