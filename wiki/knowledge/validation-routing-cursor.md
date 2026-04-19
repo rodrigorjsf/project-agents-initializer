@@ -56,7 +56,7 @@ The following must NEVER be used as normative authority for Cursor plugin artifa
 - `docs/claude-code/skills/` — Claude skill `${CLAUDE_SKILL_DIR}` and `paths:` rule format
 - `docs/claude-code/subagents/` — Claude agent frontmatter fields
 - `docs/claude-code/memory/` — CLAUDE.md hierarchy and `paths:` scoping
-- `.claude/rules/**` — Claude Code path-scoped rules
+- Claude-only files under `.claude/rules/` that govern Claude memory, Claude hooks, or Claude-specific `paths:` semantics — do NOT exclude Cursor-specific project rules (e.g., `cursor-plugin-skills.md`, `cursor-agent-files.md`) that are part of `cursor-plugin-bundle`
 - `CLAUDE.md` (any level) — Claude Code memory system
 - Any `CLAUDE-*` source ID
 
@@ -102,5 +102,5 @@ search_all("cursor mdc frontmatter globs description alwaysApply")
 
 - Loading `docs/claude-code/skills/` to check skill format — Cursor skills use relative paths, not `${CLAUDE_SKILL_DIR}`
 - Using Claude agent constraints (`model: sonnet`, `tools:`) when auditing Cursor agent definitions
-- Loading `.claude/rules/` convention files when validating Cursor artifacts — those rules apply only to Claude Code contexts
+- Loading Claude-only `.claude/rules/` files (e.g., `claude-memory.md`, `plugin-skills.md`) when validating Cursor artifacts — use Cursor-specific project rules bundled for this scope (`cursor-plugin-skills.md`, `cursor-agent-files.md`) instead, but do not apply Claude-only conventions
 - Checking `.mdc` files for `paths:` instead of `globs:` — `paths:` is a Claude leak and a contamination finding
