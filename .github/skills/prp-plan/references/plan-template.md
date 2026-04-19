@@ -5,6 +5,11 @@ Save to `.claude/PRPs/plans/{kebab-case-feature-name}.plan.md`:
 ````markdown
 # Feature: {Feature Name}
 
+## Issue (IGNORE if no issues available)
+
+- Related PRD Issue: [<repository_prd_issue_url>]
+- Plan Issue: [<repository_plan_issue_url>]
+
 ## Summary
 
 {One paragraph: What we're building and high-level approach}

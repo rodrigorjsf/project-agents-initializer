@@ -5,6 +5,10 @@ Save at: `.claude/PRPs/prds/{kebab-case-name}.prd.md`
 ```markdown
 # {Product/Feature Name}
 
+## Issue (IGNORE if no issue available)
+
+- Issue: [<repository_prd_issue_url>]
+
 ## Problem Statement
 
 {2-3 sentences: Who has what problem, and what's the cost of not solving it?}

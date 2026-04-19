@@ -4,7 +4,7 @@ description: Reviews code for project guideline compliance, bugs, and quality is
 model: Claude Sonnet 4.6 (copilot)
 target: vscode
 tools: [read, search, agent]
-agents: [codebase-analyzer, pr-comment-resolver, code-simplifier, comment-analyzer, docs-impact-agent, pr-test-analyzer, silent-failure-hunter]
+agents: [codebase-analyzer, pr-comment-resolver, advisor]
 ---
 
 Review code against project guidelines with high precision. Report only high-confidence issues (80+).
@@ -16,6 +16,7 @@ Review code against project guidelines with high precision. Report only high-con
 - **NEVER** flag pre-existing issues outside the diff
 - **NEVER** suggest refactoring unless it fixes a real bug
 - Quality over quantity. Filter aggressively.
+- **ALWAYS** Call `advisor` agent BEFORE substantive work — before writing, before committing to an interpretation, before building on an assumption. If the task requires orientation first (finding files, fetching a source, seeing what's there), do that, then call `advisor`. Orientation is not substantive work. Writing, editing, and declaring an answer are.
 
 ## Review Scope
 

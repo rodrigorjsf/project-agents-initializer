@@ -2,37 +2,39 @@
 applyTo: "**/*.prd.md,**/*.plan.md,.claude/PRPs/**/*.md"
 ---
 
-# PRP Framework — AI-powered workflow automation plugin for Claude Code.
+# PRP Workflow Execution
 
-Skills are the primary interface. Invoke by name (e.g., "run the prp-plan skill").
+## Before Creating PRP Artifacts
 
-| Workflow | Skills |
-|----------|--------|
-| Full pipeline | `prp-core-runner` (orchestrates: plan → implement → commit → PR) |
-| Plan & Build | `prp-plan`, `prp-implement`, `prp-commit`, `prp-pr` |
-| Research | `prp-codebase-question`, `prp-debug`, `prp-prd`, `prp-research-team` |
-| Issues | `prp-issue-investigate`, `prp-issue-fix` |
-| Review | `prp-review`, `prp-review-agents` |
-| Autonomous | `prp-ralph` (start loop), `prp-ralph-cancel` (stop loop) |
+- Run the `prp-advisor` skill before writing any `*.prd.md` or `*.plan.md` file and before committing to any interpretation or assumption.
 
-## PRP Methodology
+## After `*.prd.md` Is Created
 
-**PRP = PRD + curated codebase intelligence + agent/runbook** — enables one-pass implementation.
+- Create a GitHub issue using the skill's `references/issue-template.md`.
+- Write the created issue URL into the `<repository_prd_issue_url>` field in the PRD file.
 
-When creating PRPs, include: goal, business value, user-visible behavior, all needed context (docs, examples, gotchas), implementation blueprint with task list, and executable validation commands.
+## After `*.prd.md` Is Updated
 
-When executing PRPs: load and understand all context → create plan with todos → implement following blueprint → validate at each step → fix failures before proceeding.
+- Update the corresponding GitHub issue to reflect the latest content or status changes.
 
-- Always run the `rubber-duck.md` Agent to critique your ideas before writing any `*.prd.md` or `*.plan.md` files.
-- Every time a file `*.prd.md` is created, create a GitHub issue for that PRD with equivalent detail and follow-up checks. Attach the issue in the PRD file.
-- Every time a file `*.prd.md` is edited (content or progress), the related issue must be updated.
-- Always before initializing an implementation file `*.plan.md`, create a GitHub sub-issue (of the `*.prd.md` parent, or an issue if no parent PRD exists) for that plan with equivalent detail and follow-up checks. Attach the created sub-issue and parent issue in the plan file.
-- Always after finishing an implementation file `*.plan.md` and moving it to `.claude/PRPs/plans/completed/`, execute the following steps:  
-  - Execute skill `/prp-core:prp-commit` following Git Conventions
-  - Push branch to origin
-  - Execute skill `/prp-core:prp-pr --base development`
-  - The related issue must be updated
+## After `*.plan.md` Is Created
 
-## DO NOT DO
+- Create a GitHub issue using the skill's `references/issue-template.md`.
+- Write the parent PRD issue URL into `<repository_prd_issue_url>` in the plan file.
+- Write the created plan issue URL into `<repository_plan_issue_url>` in the plan file.
 
-Do not create a Pull Request if the `*.plan.md` was not executed and moved to `.claude/PRPs/plans/completed/`.
+## At Each Phase or Task Completion
+
+- Run the `prp-verification-before-completion` skill before declaring any phase or task complete.
+- Run the `prp-commit` skill after every completed task or phase.
+
+## After a Plan Is Fully Implemented (archived to `completed/`)
+
+- Run `prp-commit` to commit final changes.
+- Run `git push origin HEAD` to push the branch.
+- Run the `prp-pr` skill to create a pull request.
+- Update the plan GitHub issue to reflect implementation completion.
+
+## Blocked Action
+
+- Do NOT run `prp-pr` until `*.plan.md` has been executed and archived to `.claude/PRPs/plans/completed/`.
