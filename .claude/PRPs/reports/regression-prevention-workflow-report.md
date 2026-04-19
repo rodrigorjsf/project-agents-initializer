@@ -21,7 +21,7 @@
 | agent-customizer-quality-gate has regression checkpoint | ✅ |
 | cursor-initializer-quality-gate created (5 phases) | ✅ |
 | Both drift manifests created | ✅ |
-| PRD Phase 9 updated to in-progress | ✅ |
+| PRD Phase 9 updated to complete | ✅ |
 | compliance-maintenance rule has paths frontmatter | ✅ |
 | repository-global-validation-protocol created | ✅ |
 | regression-prevention-workflow.md created | ✅ |
@@ -50,7 +50,7 @@
 |------|-------|--------|
 | `.claude/skills/quality-gate/SKILL.md` | D3 | Inserted Phase 3 Docs Drift, renumbered Phase 3→4, 4→5, 5→6, added regression checkpoint; updated description and quality gate dashboard |
 | `.claude/skills/agent-customizer-quality-gate/SKILL.md` | E4 | Appended regression checkpoint section |
-| `.claude/PRPs/prds/repository-compliance-validation-and-correction.prd.md` | F1 | Phase 9 status: pending → in-progress; added plan path |
+| `.claude/PRPs/prds/repository-compliance-validation-and-correction.prd.md` | F1 | Phase 9 status: pending → complete; added plan path |
 
 ---
 
@@ -65,7 +65,7 @@
 
 Phase 9 closes three structural gaps:
 
-1. **cursor-initializer quality gate gap** — New `.claude/skills/cursor-initializer-quality-gate/` with 4 agents and a criteria reference mirrors the agents-initializer gate pattern with cursor-specific constraints (`model: inherit`, `readonly: true`).
+1. **cursor-initializer quality gate gap** — New `.claude/skills/cursor-initializer-quality-gate/` with 3 Claude Code agents and a criteria reference mirrors the agents-initializer gate pattern. The gate agents follow Claude Code agent conventions; the cursor-specific constraints (`model: inherit`, `readonly: true`) apply to the Cursor plugin artifacts being audited.
 
 2. **Docs drift coverage gap** — Two new drift manifests (`plugins/agents-initializer/docs-drift-manifest.md` at 28 rows; `skills/docs-drift-manifest.md` at 76 rows) extend drift detection to the two scopes that previously had none. Both manifests are wired into the updated `quality-gate/SKILL.md` Phase 3.
 
