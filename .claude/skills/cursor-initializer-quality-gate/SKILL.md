@@ -1,6 +1,6 @@
 ---
 name: cursor-initializer-quality-gate
-description: "Performs a complete quality gate analysis of the cursor-initializer plugin. Validates all artifacts against documented conventions, checks intra-plugin shared-copy parity, runs docs drift detection, evaluates red-green test scenarios, and generates a structured findings report compatible with /prp-core:prp-prd when issues are found."
+description: "Performs a complete quality gate analysis of the cursor-initializer plugin. Validates all artifacts against documented conventions, checks intra-plugin shared-copy parity, evaluates red-green test scenarios, and generates a structured findings report compatible with /prp-core:prp-prd when issues are found."
 ---
 
 # Cursor-Initializer Quality Gate Analysis
