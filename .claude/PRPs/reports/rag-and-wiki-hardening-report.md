@@ -1,6 +1,6 @@
 # Implementation Report
 
-**Plan**: `.claude/PRPs/plans/rag-and-wiki-hardening.plan.md`
+**Plan**: `.claude/PRPs/plans/completed/rag-and-wiki-hardening.plan.md`
 **Source Issue**: #56
 **Branch**: `feature/rag-and-wiki-hardening`
 **Date**: 2026-04-19

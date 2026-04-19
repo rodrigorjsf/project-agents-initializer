@@ -385,9 +385,9 @@ paths:
 - **ACTION**: Trigger a full reindex to ingest the new wiki pages and wiki source
 - **IMPLEMENT**:
   ```bash
-  uv run --project rag python -m rag index --config rag.config.yaml
+  uv run --project rag python -m rag --config rag.config.yaml index
   ```
-- **GOTCHA**: This command must be run from the repo root (`/home/rodrigo/Workspace/agent-engineering-toolkit/`) where `rag.config.yaml` lives. The `--config` flag is required.
+- **GOTCHA**: This command must be run from the repo root (`/home/rodrigo/Workspace/agent-engineering-toolkit/`) where `rag.config.yaml` lives. The `--config` flag is defined on the top-level parser and must appear **before** the `index` subcommand.
 - **VALIDATE**: Check exit code is 0; look for `wiki/knowledge/` entries in index output; check DB exists at `.rag/knowledge.db`
 
 ---
@@ -463,7 +463,7 @@ ls wiki/knowledge/compliance-routing.md wiki/knowledge/validation-routing-claude
 grep "compliance-routing" wiki/knowledge/index.md
 
 # Full reindex
-uv run --project rag python -m rag index --config rag.config.yaml
+uv run --project rag python -m rag --config rag.config.yaml index
 
 # Positive recall: routing page must appear (requires .rag/knowledge.db)
 uv run --project rag python -c "
