@@ -95,12 +95,14 @@ If non-standard domain patterns detected, read `assets/templates/domain-doc.md`.
 Read `references/validation-criteria.md` and execute its **Validation Loop Instructions** against every generated file.
 
 Check both general criteria AND the CLAUDE.md-specific structural checks (path-scoping, minimal always-loaded content). Maximum 3 iterations.
+For init flows, treat output-size targets as required validation gates: the root file MUST finish within 15-40 lines and each scoped file MUST finish within 10-30 lines. If a monorepo root exceeds target, move scope-specific detail into subdirectory CLAUDE.md, rules, or domain files and rerun the validation loop.
 
 ### Phase 5: Present and Write
 
 1. Show the user ALL generated files with their content before writing
 2. Explain briefly why each file exists and what evidence supports its content
-3. Highlight which files are always-loaded (root CLAUDE.md) vs on-demand (subdirectory, rules)
-4. Ask for confirmation before writing files
-5. Write all files to the project
-6. Create `.claude/rules/` directory if generating rules files
+3. Include a concise validation summary: iteration count, final root line count, scoped file count, and any fixes made during self-validation
+4. Highlight which files are always-loaded (root CLAUDE.md) vs on-demand (subdirectory, rules)
+5. Ask for confirmation before writing files
+6. Write all files to the project
+7. Create `.claude/rules/` directory if generating rules files

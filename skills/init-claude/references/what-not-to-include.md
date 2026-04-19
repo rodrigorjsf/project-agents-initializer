@@ -47,6 +47,7 @@ Apply this test to each line before including it:
 > — Anthropic Best Practices
 
 If the instruction passes this test, include it. If it fails (agent would do the right thing anyway), delete it.
+If a vague line can be rewritten into one concrete project-specific constraint that would prevent mistakes, clarify it in place; otherwise delete it.
 
 ---
 
@@ -59,6 +60,7 @@ If the instruction passes this test, include it. If it fails (agent would do the
 **Comprehensive-over-restrained mindset**: More content feels safer but performs worse. "Unnecessary requirements from context files make tasks harder." — ETH Zurich, Evaluating AGENTS.md (abstract)
 
 **Architectural path trap**: Architectural constraints that reference file paths are NOT the same as directory listings. Test: would removing this cause an architectural mistake? A constraint like "Services must not import from `routes/` — keep separation strict" is essential even with a path reference. A bare listing of `routes/`, `services/`, `lib/` with no behavioral constraint is bloat. Keep the constraint; remove the listing.
+If a file-path reference is stale and not part of a necessary architectural constraint, delete it rather than swapping in another brittle path.
 
 ---
 
