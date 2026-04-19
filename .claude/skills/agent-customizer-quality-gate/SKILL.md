@@ -130,3 +130,20 @@ After writing the file, report:
 > ⚠️ Quality Gate FAILED — [N] finding(s) across [N] category(ies).
 > Findings report: `.specs/reports/agent-customizer-quality-gate-[DATE]-findings.md`
 > Next step: Run `/prp-core:prp-prd` with this findings file to create a remediation PRD.
+
+---
+
+## Regression Checkpoint
+
+After the gate completes, confirm the following before closing the session:
+
+1. **Drift manifest current** — if any agent-customizer reference file was modified this session,
+   verify its row in `plugins/agent-customizer/docs-drift-manifest.md` still reflects the correct
+   source path and line range.
+2. **Parity families intact** — if any shared-copy reference was changed, verify all copies in the
+   parity family remain in sync (see `docs/compliance/regression-prevention-workflow.md`
+   § Change Type Matrix).
+3. **No new convention gaps** — if a new skill, agent, or reference was added, confirm it either
+   appears in the next quality gate run scope or is tracked in a pending PRD.
+
+If any item above is unresolved, file a follow-up issue before merging.
