@@ -6,7 +6,7 @@ applyTo: "**/*.prd.md,**/*.plan.md,.claude/PRPs/**/*.md"
 
 ## Before Creating PRP Artifacts
 
-- Run the `prp-advisor` skill before writing any `*.prd.md` or `*.plan.md` file and before committing to any interpretation or assumption.
+- Run the `advisor` skill before writing any `*.prd.md` or `*.plan.md` file and before committing to any interpretation or assumption.
 
 ## After `*.prd.md` Is Created
 
