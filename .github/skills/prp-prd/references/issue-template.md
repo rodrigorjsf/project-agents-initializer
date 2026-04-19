@@ -1,7 +1,7 @@
 # Context
 
 [A CLEAR CONTEXT DESCRIPTION OF THE ISSUE]
-<!-- CLEAR doesn't means short -->
+<!-- CLEAR doesn't mean short -->
 
 ## Objective
 
@@ -11,14 +11,14 @@
 
 [LIST OF REQUIRED SCOPES]
 
-## Success criterias
+## Success criteria
 
-[LIST OF SUCCESS CRITERIAS]
+[LIST OF SUCCESS CRITERIA]
 
 ## What are the expected tasks to execute
 
-- [] Task 1
-- [] Task 2
+- [ ] Task 1
+- [ ] Task 2
 ...
 
 ## Steps to reproduce (IGNORE if not a bug)
@@ -34,6 +34,6 @@
 
 ## Expected behavior after finished
 
-- [] Behaviour 1
-- [] Behaviour 2
+- [ ] Behaviour 1
+- [ ] Behaviour 2
 ...
