@@ -92,7 +92,7 @@ Present the skill with this description and invoke it for each artifact type.
 | Templates directory created | `assets/templates/` exists | `ls` check |
 | Evidence citations present | ≥ 1 `Source:` in reference files | `grep -r "Source:" references/` |
 | Delegates to `artifact-analyzer` | Required for create skills | `grep "artifact-analyzer"` |
-| Uses `${CLAUDE_SKILL_DIR}` | No hardcoded paths | `grep '${CLAUDE_SKILL_DIR}'` |
+| Plugin bundled-file refs use `${CLAUDE_SKILL_DIR}` | No hardcoded absolute paths in plugin outputs | `grep '${CLAUDE_SKILL_DIR}'` |
 
 ### create-hook
 
@@ -158,4 +158,4 @@ Present the skill with this description and invoke it for each artifact type.
 | Generic wildcard hook matcher | Specific tool-name matcher |
 | Missing `paths:` in rule | paths: frontmatter present |
 | Write tools in subagent | Read-only tool restriction enforced |
-| Hardcoded absolute paths | `${CLAUDE_SKILL_DIR}` used |
+| Hardcoded absolute paths in plugin skill output | `${CLAUDE_SKILL_DIR}` used for bundled files |

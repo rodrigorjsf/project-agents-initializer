@@ -17,6 +17,16 @@
 - Test: `[command]`
 - Lint: `[command]`
 - Typecheck: `[command]`
+<!-- CONDITIONAL: Non-standard configuration values — include ONLY if project overrides tool defaults.
+     Example: coverage addopts, strict type-checking, line-length overrides.
+     Remove if all tooling uses default configuration. -->
+- Config: `[tool] [key] = [value]`
+
+## Critical Constraints
+
+<!-- CONDITIONAL: Include ONLY if analysis found 1-3 repo-wide non-obvious constraints,
+     architectural boundaries, or domain terms that would cause mistakes if omitted. -->
+- `[constraint or non-obvious pattern]`
 
 ## Context
 

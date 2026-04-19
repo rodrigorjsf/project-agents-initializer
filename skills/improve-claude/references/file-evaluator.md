@@ -1,8 +1,7 @@
 # File Evaluation Instructions
-
 Structured process for evaluating existing AGENTS.md/CLAUDE.md files against evidence-based quality criteria.
-Used by IMPROVE skills for current state analysis. Source: agents/file-evaluator.md
-
+Used by IMPROVE skills for current state analysis.
+Source: agents/file-evaluator.md
 ---
 
 Follow these file evaluation instructions. Analyze existing AGENTS.md or CLAUDE.md files in the project at the current working directory and assess their quality against evidence-based criteria. Identify specific problems with evidence so an improvement skill can act on them.
@@ -54,6 +53,7 @@ Each of these wastes tokens without improving agent performance:
 | Indicator | How to Detect |
 |-----------|---------------|
 | Referenced file paths that don't exist | Check if each `path/to/file` in the content actually exists |
+| Referenced docs or import-style pointers that don't resolve | Check every `@import`, `See ...md`, and similar pointer target |
 | Documented commands that fail | Try running documented build/test commands |
 | Package references to uninstalled deps | Check if mentioned packages are in manifest files |
 | Outdated framework version references | Compare mentioned versions with actual versions |
@@ -106,7 +106,7 @@ For each file found:
 
 1. Count metrics: lines, sections (markdown headers), bullet points, code blocks
 2. Scan for bloat indicators: check each line against the bloat indicators table
-3. Check for staleness: verify referenced paths exist, commands work
+3. Check for staleness: verify referenced paths exist, `@import` / pointer targets resolve, and commands work
 4. Identify contradictions within each file and between files: look for conflicting rules at different line numbers in the same file, and compare instructions across separate files for cross-file conflicts
 5. Assess progressive disclosure: is content at the right scope level?
 6. Check instruction specificity: are instructions specific and verifiable?

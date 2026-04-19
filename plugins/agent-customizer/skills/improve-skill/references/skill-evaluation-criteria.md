@@ -69,7 +69,7 @@ A skill violating any hard limit is flagged **OVER LIMIT** regardless of content
 |----------|------|-----|
 | Does SKILL.md stay focused on phase overview? | Phases are concise with file references | All guidance inlined in SKILL.md |
 | Are references loaded per phase, not all upfront? | Each phase reads only its relevant references | Phase 1 loads all references |
-| Are supporting files referenced explicitly? | "Read ${CLAUDE_SKILL_DIR}/references/X.md" | Files exist but never referenced |
+| Are supporting files referenced explicitly? | "Read the relevant supporting file for this phase" | Files exist but never referenced |
 | Is SKILL.md body under 500 lines? | Clean entry point with external depth | Monolithic, all content inline |
 
 *Source: skills/skill-authoring-best-practices.md lines 251-300*

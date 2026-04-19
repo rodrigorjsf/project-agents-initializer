@@ -65,7 +65,7 @@ Only report non-standard commands. Don't report `npm test` if that's the standar
 Identify key frameworks and tools by checking dependencies:
 
 - Frameworks: React, Next.js, Vue, Angular, Express, FastAPI, Django, Rails, etc.
-- Databases: Check for ORM configs (Prisma, TypeORM, SQLAlchemy, etc.). Also check for migration tools: `alembic.ini` (Alembic), `schema.prisma` (Prisma Migrate), Flyway/Liquibase config. Report the migration run command (e.g., `alembic upgrade head`, `prisma migrate deploy`) as non-standard.
+- Databases: Check for ORM configs (Prisma, TypeORM, SQLAlchemy, etc.). Also check for migration tools: `alembic.ini`, `alembic/env.py`, `alembic/versions/` (Alembic), `schema.prisma` (Prisma Migrate), Flyway/Liquibase config. Report the migration run command (e.g., `alembic upgrade head`, `prisma migrate deploy`) as non-standard.
 - Testing: Jest, Vitest, pytest, Go test, RSpec, etc.
 - Linting: ESLint, Prettier, Ruff, clippy, etc.
 - CI/CD: Check `.github/workflows/`, `.gitlab-ci.yml`, `Jenkinsfile`
@@ -76,8 +76,10 @@ Look for anything unusual that would trip up an agent:
 
 - Custom build scripts or tooling
 - Monorepo tools (Turborepo, Nx, Lerna, etc.)
+- Cross-scope build chains or ordering requirements (e.g., generated artifacts or WASM packages that must build before another scope)
 - Code generation (protobuf, GraphQL codegen, etc.)
 - Environment setup requirements (.env files, Docker, etc.)
+- Migration workflows that live in app-specific directories rather than a root config file
 - Repository-specific tools mentioned in existing documentation
 
 ## Output Format

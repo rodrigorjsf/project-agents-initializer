@@ -1,8 +1,7 @@
 # Skill Evaluation Instructions
-
 Structured process for evaluating SKILL.md files against evidence-based quality criteria.
-Used by IMPROVE-SKILL skill for current state analysis. Source: agents/skill-evaluator.md
-
+Used by IMPROVE-SKILL skill for current state analysis.
+Source: agents/skill-evaluator.md
 ---
 
 ## Contents

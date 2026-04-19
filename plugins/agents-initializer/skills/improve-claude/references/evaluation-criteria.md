@@ -1,8 +1,7 @@
 # Evaluation Criteria
-
 Scoring rubric for assessing existing AGENTS.md and CLAUDE.md files before improvement.
-Used by IMPROVE skills only. Source: file-evaluator.md, research-context-engineering-comprehensive.md
-
+Used by IMPROVE skills only.
+Source: file-evaluator.md, research-context-engineering-comprehensive.md
 ---
 
 ## Contents
@@ -206,4 +205,6 @@ When the overall quality score is **7/10 or higher** across all dimensions and n
 - Default to **keeping content as-is** for borderline cases (dimension score ≥ 6 with ambiguous evidence)
 - Focus exclusively on clear violations from the criteria above — not speculative improvements
 - A file scoring 7-9/10 exits the workflow with surgical targeted changes, not a full restructure
-- Progressive disclosure extraction candidates meeting the 10+ line / 3+ rule threshold are always suggested — calibrated mode never suppresses these, as domain topics are rarely relevant to most sessions
+- Progressive disclosure extraction candidates meeting the 10+ line / 3+ rule threshold are suggested only when they resolve a documented failing criterion or remove clearly non-root content without rewriting unrelated sections
+- Preserve non-issue sections in place; calibrated mode favors issue-local edits over structural churn
+- If the file still exceeds the root line target after issue-local fixes, allow one additional low-churn extraction or consolidation step focused on the lowest-value remaining block; do not rewrite preserved sections

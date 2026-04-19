@@ -133,6 +133,8 @@ If the plan involves API/server changes, use the integration test commands from 
 ### 4.5 Edge Case Testing
 Run any edge case tests specified in the plan.
 
+Make sure to execute `prp-verification-before-completion` skill for every claim you make in the briefs and critic feedback. No evidence = no claim.
+
 **CHECKPOINT**: Type-check passes, lint passes, tests pass, build succeeds, integration tests pass (if applicable).
 
 ---

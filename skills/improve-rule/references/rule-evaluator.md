@@ -1,8 +1,7 @@
 # Rule Evaluation Instructions
-
 Structured process for evaluating .claude/rules/ files against evidence-based quality criteria.
-Used by IMPROVE-RULE skill for current state analysis. Source: agents/rule-evaluator.md
-
+Used by IMPROVE-RULE skill for current state analysis.
+Source: agents/rule-evaluator.md
 ---
 
 ## Contents

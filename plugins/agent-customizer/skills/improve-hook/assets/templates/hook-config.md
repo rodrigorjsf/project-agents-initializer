@@ -28,28 +28,13 @@
         "matcher": "[tool-name-or-pattern]",
         "hooks": [
           {
-            "type": "command",
-            "command": "[shell-command-to-execute]"
+            "type": "[command|prompt]",
+            "[handler-key: command|prompt]": "[handler-value]"
           }
         ]
       }
     ]
   }
 }
-
-<!-- CONDITIONAL: For prompt-type hooks (no external command needed) -->
-{
-  "hooks": {
-    "[HookEvent]": [
-      {
-        "matcher": "[tool-name-or-pattern]",
-        "hooks": [
-          {
-            "type": "prompt",
-            "prompt": "[instruction-for-Claude]"
-          }
-        ]
-      }
-    ]
-  }
-}
+<!-- CONDITIONAL: If the hook blocks write operations, use a concrete matcher such as `Write|Edit|Create`
+     instead of `"*"` or an omitted matcher. -->
