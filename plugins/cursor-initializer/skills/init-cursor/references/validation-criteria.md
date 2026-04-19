@@ -26,6 +26,7 @@ Any file violating these criteria must be fixed before proceeding:
 - [ ] Every instruction is actionable (not vague like "write clean code")
 - [ ] Package manager specified if non-standard (pnpm, bun, yarn; omit if npm)
 - [ ] Build/test commands included if non-standard
+- [ ] Non-default config overrides included when analysis found them
 - [ ] Progressive disclosure applied: domain docs referenced, not inlined
 - [ ] No information that tools can enforce (linting, formatting rules → use hooks instead)
 - [ ] No duplication of content across files in the hierarchy
@@ -61,6 +62,7 @@ Any file violating these criteria must be fixed before proceeding:
 - [ ] **Cursor rules**: `.cursor/rules/*.mdc` files use `globs:` for path-scoped activation (not `alwaysApply: true`) when they apply to specific file patterns
 - [ ] **Cursor rules**: `alwaysApply: true` used only for conventions relevant to every task — not as default
 - [ ] **AGENTS.md-specific**: Subdirectory AGENTS.md files used for monorepo package scoping; path-scoped rules go in `.cursor/rules/*.mdc` with `globs:`
+- [ ] **Init simple projects**: Generate zero `.cursor/rules/*.mdc` files unless analysis found a necessary non-obvious file-pattern convention
 
 ---
 

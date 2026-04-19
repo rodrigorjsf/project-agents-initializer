@@ -57,12 +57,13 @@ Delegate to the `codebase-analyzer` agent with this task:
 > Analyze the project at the current working directory. Return ONLY non-standard, non-obvious information that would cause the agent to make mistakes if it didn't know them. Be ruthlessly minimal.
 
 The agent runs in an isolated context with read-only access. Wait for it to complete and parse its structured output.
+Require the parsed output to surface any non-default config overrides (for example coverage addopts, strict type-checking, or line-length overrides) so they can be preserved in the root AGENTS.md when relevant.
 
 ### Phase 2: Scope Detection
 
 Delegate to the `scope-detector` agent with this task:
 
-> Detect scopes in the project at the current working directory. Only flag scopes with genuinely different tooling or conventions. A simple single-package project should have ZERO additional scopes. Also identify areas that would benefit from auto-attached `.cursor/rules/*.mdc` files with globs patterns.
+> Detect scopes in the project at the current working directory. Only flag scopes with genuinely different tooling or conventions. A simple single-package project should have ZERO additional scopes. Also identify areas that would benefit from auto-attached `.cursor/rules/*.mdc` files with globs patterns. For simple single-package projects, prefer generating ZERO `.cursor/rules/*.mdc` files unless a truly non-obvious file-pattern-specific convention exists.
 
 Wait for it to complete and parse its structured output.
 
@@ -107,6 +108,8 @@ Check both general criteria AND the Cursor-specific structural checks:
 - No `paths:` frontmatter (Claude-specific — invalid in Cursor)
 - Activation mode is appropriate for each rule's content
 - Always-loaded content is minimal (use auto-attached or agent-requested where possible)
+- For simple single-package projects, zero `.cursor/rules/*.mdc` files is the default passing outcome unless analysis found a necessary non-obvious file-pattern convention
+- Root AGENTS.md must preserve non-default config overrides when analysis found them
 
 Maximum 3 iterations.
 
@@ -114,7 +117,8 @@ Maximum 3 iterations.
 
 1. Show the user ALL generated files with their content before writing
 2. Explain briefly why each file exists and what evidence supports its content
-3. Highlight which files are always-loaded (root AGENTS.md, `alwaysApply: true` rules) vs on-demand (subdirectory AGENTS.md, globs-based rules, agent-requested rules)
-4. Ask for confirmation before writing files
-5. Write all files to the project
-6. Create `.cursor/rules/` directory if generating rules files
+3. Include a concise validation summary: iteration count, final root line count, generated rule count, and any fixes made during self-validation
+4. Highlight which files are always-loaded (root AGENTS.md, `alwaysApply: true` rules) vs on-demand (subdirectory AGENTS.md, globs-based rules, agent-requested rules)
+5. Ask for confirmation before writing files
+6. Write all files to the project
+7. Create `.cursor/rules/` directory if generating rules files

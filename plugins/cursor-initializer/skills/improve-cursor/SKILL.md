@@ -144,6 +144,7 @@ Based on both subagent reports, create improvement plan:
    - Select target mechanism: hook (`.cursor/hooks.json` — deterministic enforcement), `.cursor/rules/*.mdc` with globs (file-pattern convention), skill (domain knowledge/infrequent workflow), or subagent (isolated analysis)
    - Estimate token savings using the token impact estimation table
    - This is the plugin distribution — suggest all mechanisms. Use the decision flowchart to select the best mechanism for each candidate.
+   - In calibrated high-quality cases, keep migration and extraction suggestions proportional to the confirmed issues. Do not create new files or rules unless they resolve a documented criterion, and preserve non-issue sections in place.
 
 #### Redundancy Elimination (delete what agents already know)
 
@@ -182,6 +183,7 @@ For improve operations, also evaluate the **"If This Is an IMPROVE Operation"** 
 - No `paths:` frontmatter (Claude-specific — invalid in Cursor)
 - Activation mode is appropriate for each rule's content
 - Always-loaded content is minimal
+In calibrated high-quality cases, treat unrelated structural churn as a validation failure: if a change rewrites a non-issue section, adds extra files or rules, or increases file count without fixing a documented criterion, revert and choose the smaller fix.
 
 Maximum 3 iterations.
 
@@ -194,7 +196,9 @@ Maximum 3 iterations.
    - **Redundancy Eliminations**: X items
    - **Additions**: X items (including AGENTS.md creation proposal if applicable)
 
-2. For each suggestion, present a structured card in priority order (Removals → Refactoring → Automation Migrations → Redundancy Eliminations → Additions):
+2. Include a concise validation summary: iteration count, final root line count, file-count delta, rule-count delta, and what each validation iteration fixed
+
+3. For each suggestion, present a structured card in priority order (Removals → Refactoring → Automation Migrations → Redundancy Eliminations → Additions):
 
    **WHAT**: The specific content and its current location (file:lines)
    **WHY**: Evidence-based justification with source reference
@@ -208,13 +212,13 @@ Maximum 3 iterations.
    Wait for the user to select an option for each suggestion before proceeding to the next.
    If the user selects "Keep as-is", preserve the content in its exact current location — no modification.
 
-3. After all suggestions are reviewed, show aggregate token impact analysis:
+4. After all suggestions are reviewed, show aggregate token impact analysis:
    - **Always-loaded tokens**: before → after
    - **On-demand tokens**: before → after
    - **Removed tokens**: total waste eliminated
    - **Deferred suggestions**: X items kept as-is (user chose to preserve)
 
-4. Apply ONLY the approved changes (options A or B selections):
+5. Apply ONLY the approved changes (options A or B selections):
    - Execute each approved change in dependency order
    - Verify after each change:
      - All files under 200 lines
@@ -222,7 +226,7 @@ Maximum 3 iterations.
      - Progressive disclosure tree is consistent
      - `.mdc` files have valid frontmatter (only `description`, `alwaysApply`, `globs`)
 
-5. Report final metrics:
+6. Report final metrics:
    - Total lines before → after
    - Always-loaded lines before → after
    - Files before → after

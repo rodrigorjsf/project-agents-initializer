@@ -26,6 +26,7 @@ Any file violating these criteria must be fixed before proceeding:
 - [ ] Every instruction is actionable (not vague like "write clean code")
 - [ ] Package manager specified if non-standard (pnpm, bun, yarn; omit if npm)
 - [ ] Build/test commands included if non-standard
+- [ ] Non-default config overrides included when analysis found them
 - [ ] Progressive disclosure applied: domain docs referenced, not inlined
 - [ ] No information that tools can enforce (linting, formatting rules → use hooks instead)
 - [ ] No duplication of content across files in the hierarchy
@@ -50,6 +51,7 @@ Any file violating these criteria must be fixed before proceeding:
 
 - [ ] Files not merged that should stay separate (each scope gets its own file)
 - [ ] Scope widened rather than narrowed where the original had too little coverage
+- [ ] In high-quality files, unrelated churn is avoided: no extra files or rules unless they fix a documented criterion
 
 ---
 
