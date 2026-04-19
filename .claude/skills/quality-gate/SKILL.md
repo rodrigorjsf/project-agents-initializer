@@ -1,6 +1,6 @@
 ---
 name: quality-gate
-description: "Performs a complete quality gate analysis of the agents-initializer project. Validates all artifacts against documented conventions, checks cross-distribution parity, evaluates red-green test scenario coverage, and generates a structured findings report compatible with /prp-core:prp-prd when issues are found."
+description: "Performs a complete quality gate analysis of the agents-initializer project. Validates all artifacts against documented conventions, checks cross-distribution parity, runs docs drift detection, evaluates red-green test scenario coverage, and generates a structured findings report compatible with /prp-core:prp-prd when issues are found."
 ---
 
 # Quality Gate Analysis
@@ -41,7 +41,26 @@ Read `.claude/skills/quality-gate/agents/parity-checker.md`. Skip the YAML front
 
 ---
 
-## Phase 3: Red-Green Test Evaluation
+## Phase 3: Docs Drift Detection
+
+Delegate to the shared docs-drift-checker agent:
+`plugins/agent-customizer/agents/docs-drift-checker.md`
+
+Skip the YAML frontmatter block. Pass the remaining content as the task to a general-purpose
+agent via the Task tool, with this appended instruction:
+
+> **Manifests to check:** Read `plugins/agents-initializer/docs-drift-manifest.md` and
+> `skills/docs-drift-manifest.md`, then verify all source docs and line ranges cited in both.
+> Ignore any hardcoded path to the agent-customizer manifest in the agent body — use the two
+> manifests listed here instead.
+
+**Wait for completion.** Collect structured output as `drift_report`, which contains:
+- Alignment status per reference file in each manifest
+- Drift findings: source doc paths, line range shifts, content claim mismatches
+
+---
+
+## Phase 4: Red-Green Test Evaluation
 
 Read `.claude/skills/quality-gate/agents/scenario-evaluator.md`. Skip the YAML frontmatter block. Use the remaining content as the base evaluator instructions.
 
@@ -64,11 +83,11 @@ Read `.claude/skills/quality-gate/agents/scenario-evaluator.md`. Skip the YAML f
 
 ---
 
-## Phase 4: Findings Synthesis
+## Phase 5: Findings Synthesis
 
-Aggregate all outputs from Phases 1, 2, and 3.
+Aggregate all outputs from Phases 1, 2, 3, and 4.
 
-Read `.claude/skills/quality-gate/references/quality-gate-criteria.md` Section `## Expected Results Checklist`. Cross-reference the category headings in the checklist against the Phase 1–3 results to confirm every category was covered. Note any categories with no corresponding results.
+Read `.claude/skills/quality-gate/references/quality-gate-criteria.md` Section `## Expected Results Checklist`. Cross-reference the category headings in the checklist against the Phase 1–4 results to confirm every category was covered. Note any categories with no corresponding results.
 
 Compute and display the **Quality Gate Dashboard**:
 
@@ -79,6 +98,7 @@ Category                    Checks  Passed  Failed  Status
 ─────────────────────────────────────────────────────────
 Static Artifact Compliance    [N]     [N]     [N]   [PASS/FAIL]
 Cross-Distribution Parity     [N]     [N]     [N]   [PASS/FAIL]
+Docs Drift                    [N]     [N]     [N]   [PASS/FAIL]
 Red-Green Test Coverage         4     [N]     [N]   [PASS/FAIL]
 ─────────────────────────────────────────────────────────
 OVERALL                       [N]     [N]     [N]   [PASS/FAIL]
@@ -90,11 +110,11 @@ OVERALL                       [N]     [N]     [N]   [PASS/FAIL]
 
 **Stop here. Do NOT write any report file to `.specs/reports/`.**
 
-**If any checks fail:** Proceed to Phase 5.
+**If any checks fail:** Proceed to Phase 6.
 
 ---
 
-## Phase 5: Findings Report
+## Phase 6: Findings Report
 
 Generate `.specs/reports/quality-gate-[YYYY-MM-DD]-findings.md`.
 
@@ -117,3 +137,20 @@ After writing the file, report:
 > ⚠️ Quality Gate FAILED — [N] finding(s) across [N] category(ies).
 > Findings report: `.specs/reports/quality-gate-[date]-findings.md`
 > Next step: Run `/prp-core:prp-prd` with this findings file to create a remediation PRD.
+
+---
+
+## Regression Checkpoint
+
+After the gate completes, confirm the following before closing the session:
+
+1. **Drift manifests current** — if any reference file was modified this session, verify its row in
+   `plugins/agents-initializer/docs-drift-manifest.md` or `skills/docs-drift-manifest.md` still
+   reflects the correct source path and line range.
+2. **Parity families intact** — if any shared-copy reference was changed, verify all copies in the
+   parity family remain in sync (see `docs/compliance/regression-prevention-workflow.md`
+   § Change Type Matrix).
+3. **No new convention gaps** — if a new skill, agent, or reference was added, confirm it either
+   appears in the next quality gate run scope or is tracked in a pending PRD.
+
+If any item above is unresolved, file a follow-up issue before merging.

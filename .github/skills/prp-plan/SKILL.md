@@ -66,7 +66,7 @@ Load the full exploration protocol with agent prompts:
 ${CLAUDE_SKILL_DIR}/references/exploration-protocol.md
 ```
 
-Launch `prp-core:codebase-explorer` and `prp-core:codebase-analyst` in parallel (see protocol for prompts and output format).
+Launch subagents in parallel using `subagent_type="prp-core:codebase-explorer"` and `subagent_type="prp-core:codebase-analyst"` (see protocol for prompts and output format).
 
 **IMMEDIATELY after merging results** — compose a **Discovery Brief** (authoritative reference for all subsequent phases):
 

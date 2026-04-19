@@ -23,6 +23,7 @@ Multi-plugin marketplace for evidence-based agent artifact engineering. Three di
 - Cursor agent definitions: model inherit, readonly true — no tools/maxTurns fields
 - SKILL.md name ≤64 chars, description ≤1024 chars, body <500 lines
 - Rules and review instructions describe current patterns — user `*.prd.md`/`*.plan.md` files may extend conventions for new scope
+- Invoke `advisor` BEFORE substantive work — before writing, before committing to an interpretation, before building on an assumption. If the task requires orientation first (finding files, fetching a source, seeing what's there), do that, then invoke `advisor`. Orientation is not substantive work. Writing, editing, and declaring an answer are.
 
 ## Git Conventions
 
