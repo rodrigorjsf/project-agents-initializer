@@ -13,6 +13,8 @@ Perform a complete quality gate of the agents-initializer project. This meta-ski
 
 **Convention sources:** `.claude/rules/`, `plugins/agents-initializer/CLAUDE.md`, `DESIGN-GUIDELINES.md`
 
+**Routing guidance:** For platform-scoped validation, run `search_docs("compliance routing [platform]")` before loading convention files to retrieve the scope-specific source bundle and forbidden-source list. See `[[compliance-routing]]` in the wiki.
+
 **Test scenarios:** `.claude/PRPs/tests/scenarios/` (4 scenarios, init + improve)
 
 **Report output:** `.specs/reports/quality-gate-[YYYY-MM-DD]-findings.md` (if issues found)

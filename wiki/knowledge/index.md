@@ -1,6 +1,6 @@
 # Wiki Index
 
-Total pages: **26**
+Total pages: **30**
 
 ---
 
@@ -59,3 +59,12 @@ Total pages: **26**
 | [[persuasion-in-ai]]          | Seven persuasion principles with quantitative effect sizes      |
 | [[multilingual-performance]]  | Tokenization disparities, English-thinking, Portuguese analysis |
 | [[whitespace-and-formatting]] | Formatting costs (1 token), structural quality improvements     |
+
+## Compliance & Validation
+
+| Page                               | Summary                                                              |
+| ---------------------------------- | -------------------------------------------------------------------- |
+| [[compliance-routing]]             | Decision table: scope → bundle → primary/forbidden sources → queries |
+| [[validation-routing-claude]]      | Claude plugin scope: primary sources, forbidden sources, query guide |
+| [[validation-routing-cursor]]      | Cursor plugin scope: primary sources, forbidden sources, query guide |
+| [[validation-routing-standalone]]  | Standalone scope: primary sources, forbidden sources, query guide    |
