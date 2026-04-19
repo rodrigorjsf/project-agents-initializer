@@ -23,7 +23,7 @@ When creating PRPs, include: goal, business value, user-visible behavior, all ne
 
 When executing PRPs: load and understand all context → create plan with todos → implement following blueprint → validate at each step → fix failures before proceeding.
 
-- Always run the `rubber-duck.md` Agent to critique your ideas before writting any `*.prd.md` or `*.plan.md` files.
+- Always run the `rubber-duck.md` Agent to critique your ideas before writing any `*.prd.md` or `*.plan.md` files.
 - Every time a file `*.prd.md` is created, create a GitHub issue for that PRD with equivalent detail and follow-up checks. Attach the issue in the PRD file.
 - Every time a file `*.prd.md` is edited (content or progress), the related issue must be updated.
 - Always before initializing an implementation file `*.plan.md`, create a GitHub sub-issue (of the `*.prd.md` parent, or an issue if no parent PRD exists) for that plan with equivalent detail and follow-up checks. Attach the created sub-issue and parent issue in the plan file.
