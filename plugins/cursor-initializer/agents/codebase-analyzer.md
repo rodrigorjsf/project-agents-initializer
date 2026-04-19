@@ -54,7 +54,7 @@ Extract commands from configuration files:
 
 - **package.json**: Read `scripts` section for build, test, lint, typecheck, dev commands
 - **Makefile**: Read target names
-- **pyproject.toml**: Read `[tool.pytest]`, `[tool.ruff]`, `[scripts]` sections
+- **pyproject.toml**: Read `[tool.pytest]`, `[tool.ruff]`, `[tool.mypy]`, `[scripts]` sections. Extract non-standard configuration values such as coverage addopts, strict type-checking, and line-length overrides.
 - **Cargo.toml**: Check for workspace configuration
 
 Only report non-standard commands. Don't report `npm test` if that's the standard.
@@ -98,6 +98,7 @@ Return your analysis in exactly this format:
 - Lint: `[command]`
 - Typecheck: `[command]`
 - Dev server: `[command]`
+- Config: `[tool] [key] = [value]` (only non-default configuration values)
 
 ### Tech Stack
 - [Only list items that are non-obvious from the language/framework]

@@ -61,9 +61,13 @@ Read `${CLAUDE_SKILL_DIR}/assets/templates/subagent-definition.md` and fill its 
 
 Apply model selection heuristic:
 
-- `haiku` — fast read-only exploration agents (simple lookups, no reasoning required)
-- `sonnet` — standard analysis and review agents (default for most subagents)
+- `haiku` — narrow read-only lookup agents with no structured judgment, policy evaluation, or config review
+- `sonnet` — standard analysis, review, and configuration-inspection agents (default for most subagents)
 - `opus` — complex multi-step reasoning only (requires explicit justification)
+
+Unless the user explicitly asks for a cheaper exploration agent, choose `sonnet` for any agent that inspects configuration, evaluates compliance, or produces structured findings.
+
+If Phase 1 detects a monorepo or multi-service layout, make the generated system prompt name the relevant services, workspaces, and scope boundaries the agent should inspect. Do not leave multi-service targets implicit.
 
 Determine target location:
 
@@ -73,6 +77,11 @@ Determine target location:
 ### Phase 3: Self-Validation
 
 Read `${CLAUDE_SKILL_DIR}/references/subagent-validation-criteria.md` and execute its **Validation Loop Instructions** against the generated subagent definition.
+
+In addition to the shared criteria, enforce two scenario-sensitive checks before proceeding:
+
+- Treat `sonnet` as the default for configuration inspection, compliance review, and other structured analysis agents unless the user explicitly asks for a cheaper exploration agent
+- If Phase 1 detected a monorepo or multi-service layout, confirm the generated prompt names the relevant services, workspaces, or scope boundaries explicitly
 
 The loop evaluates all hard limits and quality checks, fixes any failures, and re-evaluates — maximum 3 iterations. Do not proceed to Phase 4 until ALL criteria pass.
 

@@ -95,9 +95,11 @@ Based on both analyses, create improvement plan:
 7. **Migrate automation candidates** — for each instruction flagged in Phase 1 as `HOOK_CANDIDATE`, `RULE_CANDIDATE`, or `SKILL_CANDIDATE`:
    - Classify using the decision flowchart in automation-migration-guide.md
    - Select target mechanism: path-scoped `.claude/rules/` (file-pattern convention) or skill (domain knowledge/infrequent workflow)
+   - For concise file-pattern-specific formatting guidance in a high-quality file, prefer a path-scoped `.claude/rules/` file over broader restructuring
    - Reclassify `HOOK_CANDIDATE` items: if the behavior is path-specific and under 50 lines → `RULE_CANDIDATE`; if it is a workflow or domain block → `SKILL_CANDIDATE`
    - Estimate token savings using the token impact estimation table in automation-migration-guide.md
    - This is the standalone distribution — suggest only skills and path-scoped rules. Do not suggest hooks or subagents (these require Claude Code). When automation-migration-guide.md references hooks or subagents, substitute with the closest available mechanism.
+   - In calibrated mode (overall quality score ≥ 7 with no hard-limit violations), keep migration and extraction suggestions proportional to the confirmed issues. Do not create new files or migrations unless they resolve a failing criterion, and preserve non-issue sections in place.
 
 #### Redundancy Elimination (delete what agents already know)
 
@@ -130,6 +132,7 @@ When generating new or restructured files, use these templates:
 Read `references/validation-criteria.md` and execute its **Validation Loop Instructions** against every improved or newly created file.
 
 For improve operations, also evaluate the **"If This Is an IMPROVE Operation"** section. For CLAUDE.md files, also check **CLAUDE.md-specific** structural checks (path-scoping, minimal always-loaded content). Maximum 3 iterations.
+In calibrated high-quality cases (overall quality score ≥ 7 and no hard limits), treat unrelated structural churn as a validation failure: if a change rewrites a non-issue section, adds extra files, or increases file count without fixing a documented criterion, revert and choose the smaller fix.
 
 ### Phase 5: Present and Apply
 
@@ -139,8 +142,9 @@ For improve operations, also evaluate the **"If This Is an IMPROVE Operation"** 
    - **Automation Migrations**: X items (rules: X, skills: X)
    - **Redundancy Eliminations**: X items
    - **Additions**: X items
+2. Include a concise validation summary: iteration count, final root line count, file-count delta, and what each validation iteration fixed
 
-2. For each suggestion, present a structured card in priority order (Removals → Refactoring → Automation Migrations → Redundancy Eliminations → Additions):
+3. For each suggestion, present a structured card in priority order (Removals → Refactoring → Automation Migrations → Redundancy Eliminations → Additions):
 
    **WHAT**: The specific content and its current location (file:lines)
    **WHY**: Evidence-based justification with source reference (e.g., "Agents can infer directory structure from tools — source: analysis-evaluating-agents-paper.md lines 36-41")
@@ -154,13 +158,13 @@ For improve operations, also evaluate the **"If This Is an IMPROVE Operation"** 
    Wait for the user to select an option for each suggestion before proceeding to the next.
    If the user selects "Keep as-is", preserve the content in its exact current location — no modification.
 
-3. After all suggestions are reviewed, show aggregate token impact analysis:
+4. After all suggestions are reviewed, show aggregate token impact analysis:
    - **Always-loaded tokens**: before → after
    - **On-demand tokens**: before → after
    - **Removed tokens**: total waste eliminated
    - **Deferred suggestions**: X items kept as-is (user chose to preserve)
 
-4. Apply ONLY the approved changes (options A or B selections):
+5. Apply ONLY the approved changes (options A or B selections):
    - Execute each approved change in dependency order
    - Verify after each change:
      - All files under 200 lines
@@ -168,7 +172,7 @@ For improve operations, also evaluate the **"If This Is an IMPROVE Operation"** 
      - Progressive disclosure tree is consistent
      - Path-scoped rules have valid glob patterns
 
-5. Report final metrics:
+6. Report final metrics:
    - Total lines before → after
    - Always-loaded lines before → after
    - Files before → after

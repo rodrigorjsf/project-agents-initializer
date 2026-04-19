@@ -23,9 +23,9 @@ When evaluating an instruction block for migration, follow this decision path:
 
 1. **Is it always needed for every task and under 5 lines?** → Keep in CLAUDE.md/AGENTS.md root
 2. **Can the agent infer it from code?** → DELETE — do not document
-3. **Is it a deterministic rule (no judgment needed)?** → Hook (`command` type)
-4. **Does enforcement require LLM judgment?** → Hook (`prompt` or `agent` type)
-5. **Is it path-specific and under 50 lines?** → `.claude/rules/` with `paths:` frontmatter
+3. **Is it path-specific and under 50 lines?** → `.claude/rules/` with `paths:` frontmatter
+4. **Is it a deterministic rule (no judgment needed) and broader than a single path-scoped rule?** → Hook (`command` type)
+5. **Does enforcement require LLM judgment beyond a path-scoped rule?** → Hook (`prompt` or `agent` type)
 6. **Is it a workflow or domain block (50-500 lines)?** → Skill (`user-invocable: false`)
 7. **Is it heavy, rare, or has side effects?** → Skill (`disable-model-invocation: true`)
 8. **Is it context-heavy isolated analysis?** → Skill (`context: fork`)
@@ -62,8 +62,8 @@ Use these signals to identify instructions that should migrate from always-loade
 | Indicator | What It Suggests | Threshold |
 |---|---|---|
 | Instructions mentioning specific file patterns | Path-scoped rule candidate | Any glob pattern → suggest `.claude/rules/` with `paths:` |
-| Formatting, blocking, or notification behaviors | Hook candidate | Deterministic behavior → suggest `command` hook |
-| "Always"/"never" enforcement semantics | Hook candidate | Binary enforcement → suggest `PreToolUse` hook |
+| Formatting, blocking, or notification behaviors | Hook candidate only if not better expressed as a concise path-scoped rule | Deterministic behavior spanning multiple files/tools → suggest `command` hook |
+| "Always"/"never" enforcement semantics | Hook candidate only when the behavior must apply globally, not just to one file pattern | Binary enforcement across the workflow → suggest `PreToolUse` hook |
 | Domain knowledge blocks >50 lines | Skill candidate | >50 lines of domain content → suggest skill |
 | Workflow instructions invoked <20% of sessions | Low-frequency skill | Low usage → suggest `disable-model-invocation: true` |
 | Content agents can infer from code | DELETE candidate | Directory listings, codebase overviews, standard conventions |

@@ -37,6 +37,7 @@ A directory is NOT a distinct scope if:
 - Its conventions are identical to the root
 - It has no independent tooling or commands
 - It is a simple utility directory with no unique constraints
+- It is a repo-internal `tools/` or shared-config package with no distinct developer workflow — handle it at root or in a domain doc instead
 
 ## Process
 
@@ -50,7 +51,7 @@ Look for:
 - `turbo.json`
 - `Cargo.toml` with `[workspace]`
 - `go.work`
-- Multiple `package.json` / `Cargo.toml` / `go.mod` files
+- Multiple `package.json` / `pyproject.toml` / `setup.py` / `requirements.txt` / `Cargo.toml` / `go.mod` files
 
 ### 2. Identify Package Boundaries
 
@@ -59,11 +60,13 @@ For each potential package/service:
 - Check if it has its own build/test commands
 - Determine its primary tech stack
 - Note any unique dependencies or tooling
+- Pay special attention to shared/library packages with their own manifest or unique constraints — they often deserve scopes even without a user-facing binary
+- Treat Python service manifests (`pyproject.toml`, `setup.py`, `requirements.txt`) as package boundaries when they define an independent app or workflow inside a monorepo
 
 ### 3. Identify Domain Boundaries
 
 Beyond packages, check for distinct domains:
-- `scripts/` or `tools/` directories with their own execution environment
+- `scripts/` or `tools/` directories with their own execution environment — default these to root/domain-doc treatment unless they have genuinely different tooling or constraints
 - `docs/` directories that may need documentation-specific guidance
 - Infrastructure code (`terraform/`, `kubernetes/`, `docker/`) with different tooling
 - Database-related directories (`migrations/`, `seeds/`) with ordering or naming conventions

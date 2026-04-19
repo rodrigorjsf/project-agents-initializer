@@ -38,7 +38,7 @@ a degraded state and the improve skill must identify all violations and propose 
 | 4 | Inline bash analysis blocks in plugin skill | YES | P8 (MAJOR) |
 | 5 | No self-validation phase | YES | P9 (MAJOR) |
 | 6 | References loaded all upfront (not per-phase) | YES | P9/P12 (MAJOR) |
-| 7 | Hardcoded absolute paths instead of `${CLAUDE_SKILL_DIR}` | YES | Convention |
+| 7 | Plugin skill uses hardcoded absolute paths instead of `${CLAUDE_SKILL_DIR}` | YES | Convention |
 | 8 | No evidence citations anywhere | YES | R3 (MINOR) |
 | 9 | No `references/` directory referenced | YES | P10 (CRITICAL) |
 | 10 | Vague phase instructions ("ensure quality") | YES | Convention |

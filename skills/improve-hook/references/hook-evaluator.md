@@ -1,8 +1,7 @@
 # Hook Evaluation Instructions
-
 Structured process for evaluating hook configurations against evidence-based quality criteria.
-Used by IMPROVE-HOOK skill for current state analysis. Source: agents/hook-evaluator.md
-
+Used by IMPROVE-HOOK skill for current state analysis.
+Source: agents/hook-evaluator.md
 ---
 
 ## Contents

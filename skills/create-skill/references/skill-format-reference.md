@@ -76,7 +76,7 @@ Use these variables inside SKILL.md content:
 **Critical**: Use relative `references/` paths to reference bundled files (portable across all AI tools); not hardcoded absolute paths:
 
 ```
-Read references/guide.md for detailed context.
+Read the bundled guide material for detailed context.
 ```
 
 Dynamic context injection with `!` prefix runs shell commands before skill loads:

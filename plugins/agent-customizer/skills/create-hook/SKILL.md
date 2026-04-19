@@ -60,6 +60,8 @@ Read `${CLAUDE_SKILL_DIR}/assets/templates/hook-config.md` and fill its placehol
 - Phase 1 analysis output (existing hooks, coverage gaps)
 - Evidence from the reference files above
 
+For blocking pre-write hooks, translate the user intent into an explicit write-tool matcher instead of a wildcard or omitted matcher. Use a concrete matcher pattern for write-capable tools in the target environment (for example `Write|Edit|Create`) and keep it specific to the operations that should block.
+
 Before choosing the handler, verify in `hook-events-reference.md` that the selected event supports it. If the selected event only supports `command`, do not generate `http`, `prompt`, or `agent` guidance for that hook. If the requested handler is unsupported, stop and ask the user to change the event or handler choice.
 
 Choose the target location based on the requested scope:

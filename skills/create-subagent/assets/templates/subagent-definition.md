@@ -9,14 +9,15 @@ maxTurns: [15 for analysis agents, 20 for evaluator agents]
      Placement: .claude/agents/[name].md or plugins/[plugin]/agents/[name].md
      Rule: name and description are REQUIRED fields
      Rule: tools restricts to allowlist — omit to inherit all
-     Rule: model: sonnet for most agents, haiku for fast read-only, opus for complex reasoning
+     Rule: model: sonnet for most agents, haiku only for narrow read-only lookup agents, opus for complex reasoning
      Rule: Plugin agents CANNOT use hooks, mcpServers, or permissionMode
      Rule: Agents cannot spawn other agents
+     Rule: If scope spans multiple services or workspaces, name them explicitly in the prompt
 -->
 
 # [Agent Name]
 
-[One-sentence identity statement]
+[One-sentence identity statement; name target services/workspaces when scope is multi-service]
 
 ## Constraints
 

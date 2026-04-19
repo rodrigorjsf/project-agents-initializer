@@ -58,6 +58,8 @@ Read `${CLAUDE_SKILL_DIR}/assets/templates/skill-md.md` and fill its placeholder
 - Phase 1 analysis output (naming conventions, existing patterns, plugin context)
 - Evidence from the reference files above
 
+If Phase 1 detects a monorepo or multi-service layout, make the generated phases name the target service, package, or workspace explicitly and use project-relative paths or globs for that scope. Do not leave multi-service boundaries implicit.
+
 Generate the complete skill directory structure:
 
 1. `SKILL.md` — primary skill file with frontmatter and phase definitions
@@ -67,6 +69,8 @@ Generate the complete skill directory structure:
 ### Phase 3: Self-Validation
 
 Read `${CLAUDE_SKILL_DIR}/references/skill-validation-criteria.md` and execute its **Validation Loop Instructions** against the generated skill.
+
+If Phase 1 detected a monorepo or multi-service layout, add one extra validation pass: confirm the generated phases name the target service, package, or workspace explicitly and use project-relative paths or globs for that scope.
 
 The loop evaluates all hard limits and quality checks, fixes any failures, and re-evaluates — maximum 3 iterations. Do not proceed to Phase 4 until ALL criteria pass.
 

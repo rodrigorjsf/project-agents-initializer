@@ -557,18 +557,18 @@ Type taxonomy and validator code legend used in all inventory tables.
 
 ## 10. Shared Copy Group Registry
 
-Groups are stable identifiers referenced in inventory Ph.7 columns. Member paths are the filesystem truth — Task 2 cross-validates all member paths exist.
+Groups are stable identifiers referenced in inventory Ph.7 columns. Member paths are the filesystem truth — Task 2 cross-validates all member paths exist. Some Phase 7 groups contain multiple parity families under one stable ID when platform or lifecycle adaptations are intentional; in those cases, the Parity Enforcer column names the family split instead of requiring one hash across every listed member.
 
 ### SCG Groups (Reference Shared Copies)
 
 | Group ID | Shared File | Member Paths | Copies | Parity Enforcer |
 |----------|-------------|--------------|--------|-----------------|
-| SCG-01 | `context-optimization.md` | agents-init/improve-agents, agents-init/improve-claude, agents-init/init-agents, agents-init/init-claude, cursor-init/improve-cursor, cursor-init/init-cursor, standalone/improve-agents, standalone/improve-claude, standalone/init-agents, standalone/init-claude | 10 | quality-gate parity-checker (X1) |
-| SCG-02 | `validation-criteria.md` (initializer) | same 10 skill directories as SCG-01 | 10 | quality-gate parity-checker (X2) |
-| SCG-03 | `what-not-to-include.md` | same 10 skill directories as SCG-01 | 10 | quality-gate parity-checker (X1) |
-| SCG-04 | `progressive-disclosure-guide.md` | same 10 skill directories as SCG-01 | 10 | quality-gate parity-checker (X1) |
-| SCG-05 | `automation-migration-guide.md` | agents-init/improve-agents, agents-init/improve-claude, cursor-init/improve-cursor, standalone/improve-agents, standalone/improve-claude | 5 | quality-gate parity-checker (X1) |
-| SCG-06 | `evaluation-criteria.md` | agents-init/improve-agents, agents-init/improve-claude, cursor-init/improve-cursor, standalone/improve-agents, standalone/improve-claude | 5 | quality-gate parity-checker (X1) |
+| SCG-01 | `context-optimization.md` | Family A: agents-init ×4 + standalone ×4; Family B: cursor-init ×2 | 8 + 2 | quality-gate parity-checker (X1 split families) |
+| SCG-02 | `validation-criteria.md` (initializer) | Family A: agents-init ×4 + standalone ×4; Family B: cursor-init ×2 | 8 + 2 | quality-gate parity-checker (X2 split families) |
+| SCG-03 | `what-not-to-include.md` | Family A: agents-init ×4 + standalone ×4; Family B: cursor-init ×2 | 8 + 2 | quality-gate parity-checker (X1 split families) |
+| SCG-04 | `progressive-disclosure-guide.md` | Family A: agents-init ×4 + standalone ×4; Family B: cursor-init ×2 | 8 + 2 | quality-gate parity-checker (X1 split families) |
+| SCG-05 | `automation-migration-guide.md` | Family A: agents-init ×2 + standalone ×2; Family B: cursor-init improve-cursor singleton | 4 + 1 | quality-gate parity-checker (X1 family A) + manual validator (singleton) |
+| SCG-06 | `evaluation-criteria.md` | Family A: agents-init ×2 + standalone ×2; Family B: cursor-init improve-cursor singleton | 4 + 1 | quality-gate parity-checker (X1 family A) + manual validator (singleton) |
 | SCG-07 | `claude-rules-system.md` | agents-init/improve-claude, agents-init/init-claude, standalone/improve-claude, standalone/init-claude | 4 | quality-gate parity-checker (X1) |
 | SCG-08 | `codebase-analyzer.md` (standalone refs) | standalone/improve-agents, standalone/improve-claude, standalone/init-agents, standalone/init-claude | 4 | quality-gate parity-checker (X1) |
 | SCG-09 | `file-evaluator.md` (standalone refs) | standalone/improve-agents, standalone/improve-claude | 2 | quality-gate parity-checker (X1) |
@@ -598,15 +598,15 @@ Groups are stable identifiers referenced in inventory Ph.7 columns. Member paths
 | Group ID | Shared Template | Member Distributions | Copies | Parity Enforcer |
 |----------|-----------------|----------------------|--------|-----------------|
 | TCG-01 | `domain-doc.md` | agents-init ×4, cursor-init ×2, standalone ×4 | 10 | quality-gate parity-checker (T2) |
-| TCG-02 | `root-agents-md.md` | agents-init ×2, cursor-init ×2, standalone ×2 | 6 | quality-gate parity-checker (T2) |
-| TCG-03 | `scoped-agents-md.md` | agents-init ×2, cursor-init ×2, standalone ×2 | 6 | quality-gate parity-checker (T2) |
+| TCG-02 | `root-agents-md.md` | Family A: agents-init ×2 + standalone ×2; Family B: cursor-init ×2 | 4 + 2 | quality-gate parity-checker (T2 split families) |
+| TCG-03 | `scoped-agents-md.md` | Family A: agents-init ×2 + standalone ×2; Family B: cursor-init ×2 | 4 + 2 | quality-gate parity-checker (T2 split families) |
 | TCG-04 | `root-claude-md.md` | agents-init ×2, standalone ×2 | 4 | quality-gate parity-checker (T2) |
-| TCG-05 | `scoped-claude-md.md` | agents-init ×2, standalone ×2 | 4 | quality-gate parity-checker (T2) |
-| TCG-06 | `claude-rule.md` | agents-init ×3, standalone ×3 | 6 | quality-gate parity-checker (T2) |
-| TCG-07 | `hook-config.md` | agents-init ×2, agent-custom ×2, cursor-init ×1, standalone ×2 | 7 | quality-gate parity-checker (T2) |
-| TCG-08 | `skill.md` | agents-init ×2, cursor-init ×1, standalone ×2 | 5 | quality-gate parity-checker (T2) |
-| TCG-09 | `skill-md.md` | agent-custom ×2 (SCG-23), standalone ×2 | 4 | quality-gate (T2) + agent-custom-qg (X13) |
-| TCG-10 | `subagent-definition.md` | agent-custom ×2 (SCG-24), standalone ×2 | 4 | quality-gate (T2) + agent-custom-qg (X14) |
+| TCG-05 | `scoped-claude-md.md` | agents-init ×2 + standalone ×2 | 4 | quality-gate parity-checker (T2) |
+| TCG-06 | `claude-rule.md` | Family A: init-claude plugin + standalone; Family B: improve-agents + improve-claude across plugin + standalone | 2 + 4 | quality-gate parity-checker (T2 split families) |
+| TCG-07 | `hook-config.md` | Family A: agents-init improve pair; Family B: agent-custom create/improve + standalone create/improve hook pair; Family C: cursor-init improve singleton | 2 + 4 + 1 | quality-gate parity-checker (T2 split families) + manual validator (singleton) |
+| TCG-08 | `skill.md` | Family A: agents-init improve pair + standalone improve pair; Family B: cursor-init improve singleton | 4 + 1 | quality-gate parity-checker (T2 family A) + manual validator (singleton) |
+| TCG-09 | `skill-md.md` | Family A: agent-custom create/improve pair (SCG-23); Family B: standalone create/improve pair | 2 + 2 | quality-gate parity-checker (T2 family B) + agent-custom-qg (X13 family A) |
+| TCG-10 | `subagent-definition.md` | Family A: agent-custom create/improve pair (SCG-24); Family B: standalone create/improve pair | 2 + 2 | quality-gate parity-checker (T2 family B) + agent-custom-qg (X14 family A) |
 
 ---
 

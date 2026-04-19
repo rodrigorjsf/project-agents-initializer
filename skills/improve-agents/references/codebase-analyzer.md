@@ -1,8 +1,7 @@
 # Codebase Analysis Instructions
-
 Structured process for detecting project tech stack, tooling, and non-standard patterns.
-Used by INIT and IMPROVE skills for codebase analysis. Source: agents/codebase-analyzer.md
-
+Used by INIT and IMPROVE skills for codebase analysis.
+Source: agents/codebase-analyzer.md
 ---
 
 Follow these codebase analysis instructions. Analyze the project at the current working directory and return a structured summary of its technical characteristics. Focus on facts that would cause mistakes if an AI coding agent didn't know them.

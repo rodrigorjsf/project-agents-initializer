@@ -10,6 +10,7 @@ description: "[What this skill does and when to use it. Third person.]"
      Rule: Use references/ for evidence-based guidance
      Rule: Use assets/templates/ for output templates
      Rule: Progressive disclosure — load references per phase, not all upfront
+     Rule: If analysis finds a monorepo or multi-service layout, generated phases must name the target service/workspace explicitly
 -->
 
 # [Skill Title]
@@ -29,10 +30,10 @@ description: "[What this skill does and when to use it. Third person.]"
 <!-- CONDITIONAL: Check if artifact exists — redirect to improve if so -->
 
 ### Phase 1: [Analysis Phase Name]
-<!-- Delegate to appropriate subagent -->
+<!-- Delegate to appropriate subagent; if monorepo, record the target service/workspace -->
 
 ### Phase 2: [Generation Phase Name]
-<!-- Read references, apply templates -->
+<!-- Read references, apply templates, and use project-relative paths/globs for the detected service/workspace -->
 
 ### Phase 3: Self-Validation
 <!-- Read references/[type]-validation-criteria.md -->
