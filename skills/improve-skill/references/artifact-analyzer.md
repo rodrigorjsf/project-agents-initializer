@@ -1,8 +1,7 @@
 # Artifact Analysis Instructions
-
 Structured process for inventorying existing Claude Code artifacts and conventions.
-Used by CREATE and IMPROVE skills for codebase context analysis. Source: agents/artifact-analyzer.md
-
+Used by CREATE and IMPROVE skills for codebase context analysis.
+Source: agents/artifact-analyzer.md
 ---
 
 ## Contents
