@@ -66,7 +66,7 @@ Load the full exploration protocol with agent prompts:
 ${CLAUDE_SKILL_DIR}/references/exploration-protocol.md
 ```
 
-Launch `codebase-explorer.agent` and `codebase-analyst.agent` in parallel (see protocol for prompts and output format).
+Launch subagents in parallel using `subagent_type="prp-core:codebase-explorer"` and `subagent_type="prp-core:codebase-analyst"` (see protocol for prompts and output format).
 
 **IMMEDIATELY after merging results** — compose a **Discovery Brief** (authoritative reference for all subsequent phases):
 
@@ -160,7 +160,7 @@ Target: ≤ 30 lines.
 
 **Skip this phase if complexity is LOW.**
 
-Launch `plan-critic.agent` with all phase briefs:
+Launch `prp-core:plan-critic` with all phase briefs:
 
 ```
 Review these consolidated findings for a plan about: [feature description]
