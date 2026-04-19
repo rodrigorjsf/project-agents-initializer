@@ -72,14 +72,14 @@ Source: `.claude/rules/plugin-skills.md`, `.claude/rules/standalone-skills.md`, 
 | # | Check | Threshold | Severity if Violated |
 |---|-------|-----------|---------------------|
 | T1 | All required templates present per skill type | Required | CRITICAL |
-| T2 | Templates identical across plugin and standalone | Required | MAJOR |
+| T2 | Templates identical within each intended multi-copy family | Required | MAJOR |
 
 ### Cross-Distribution Parity
 
 | # | Check | Threshold | Severity if Violated |
 |---|-------|-----------|---------------------|
-| X1 | Shared reference files byte-identical across all copies | Required | MAJOR |
-| X2 | Shared template files byte-identical across distributions | Required | MAJOR |
+| X1 | Shared reference files byte-identical within each intended multi-copy family | Required | MAJOR |
+| X2 | Shared template files byte-identical within each intended multi-copy family | Required | MAJOR |
 
 ### Red-Green Test Coverage
 
