@@ -75,7 +75,7 @@ Use these variables inside SKILL.md content:
 **Critical**: Always use `${CLAUDE_SKILL_DIR}` to reference bundled files, not hardcoded paths:
 
 ```
-Read ${CLAUDE_SKILL_DIR}/references/guide.md for detailed context.
+Read the bundled guide material for detailed context.
 ```
 
 Dynamic context injection with `!` prefix runs shell commands before skill loads:

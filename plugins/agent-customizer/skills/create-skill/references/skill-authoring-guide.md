@@ -106,7 +106,7 @@ SKILL.md is the index; detailed content lives in supporting files loaded on dema
 
 ```markdown
 ## Phase 1: Analyze
-Read ${CLAUDE_SKILL_DIR}/references/reference.md for detailed context.
+Read the bundled reference material for detailed context.
 ```
 
 **Pattern 2 — Phased loading:**
