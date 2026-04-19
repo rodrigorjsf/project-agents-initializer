@@ -46,6 +46,7 @@ Each of these wastes tokens without improving agent performance:
 | Indicator | How to Detect |
 |-----------|---------------|
 | Referenced file paths that don't exist | Check if each `path/to/file` in the content actually exists |
+| Referenced docs or import-style pointers that don't resolve | Check every `@import`, `See ...md`, and similar pointer target |
 | Documented commands that fail | Try running documented build/test commands |
 | Package references to uninstalled deps | Check if mentioned packages are in manifest files |
 | Outdated framework version references | Compare mentioned versions with actual versions |
@@ -91,7 +92,7 @@ For each file found:
 
 1. Count metrics: lines, sections (markdown headers), bullet points, code blocks
 2. Scan for bloat indicators: check each line against the bloat indicators table
-3. Check for staleness: verify referenced paths exist, commands work
+3. Check for staleness: verify referenced paths exist, `@import` / pointer targets resolve, and commands work
 4. Identify contradictions: compare instructions across all files for conflicts
 5. Assess progressive disclosure: is content at the right scope level?
 6. Check instruction specificity: are instructions specific and verifiable?
