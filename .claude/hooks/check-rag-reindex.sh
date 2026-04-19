@@ -41,6 +41,9 @@ case "$FILE_PATH" in
   .claude/hooks/*.sh)
     MATCHES=true
     ;;
+  wiki/knowledge/*.md|wiki/knowledge/**/*.md)
+    MATCHES=true
+    ;;
   plugins/**/*.py|plugins/**/*.sh)
     MATCHES=true
     ;;
