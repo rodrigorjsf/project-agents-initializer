@@ -2,6 +2,23 @@
 
 ---
 
+## 2026-04-19 — Phase 8: RAG & wiki hardening
+
+**Source**: `docs/compliance/normative-source-matrix.md` (bundle definitions at lines 261-306)
+
+**Pages created:** 4 routing pages under `Compliance & Validation`
+
+- `compliance-routing.md` — master routing decision table (scope → bundle → sources → queries)
+- `validation-routing-claude.md` — Claude plugin scope routing guide
+- `validation-routing-cursor.md` — Cursor plugin scope routing guide
+- `validation-routing-standalone.md` — Standalone scope routing guide
+
+**wiki/knowledge/ added to RAG `docs` collection** via `rag.config.yaml` update. Reindexed via `uv run --project rag python -m rag index --config rag.config.yaml`.
+
+**Pages updated:** `index.md` — added `## Compliance & Validation` section; count updated 26 → 30.
+
+---
+
 ## 2026-04-18 — Batch ingest from docs/
 
 **Source directories scanned:**
