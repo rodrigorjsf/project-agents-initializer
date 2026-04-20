@@ -628,10 +628,10 @@ Enforcement status per (scope × artifact type). Cells show active rule/instruct
 | agent-customizer | template | — | `i:tf` | `ac:X` (X13–X14) | — | no |
 | agent-customizer | drift-manifest | — | — | `ac:D` | — | no |
 | agent-customizer | plugin-manifest | — | `i:pc` | — | — | **yes** (no gate) |
-| cursor-initializer | skill | `r:cp` | `i:sf` | — | — | **yes** (no quality gate) |
-| cursor-initializer | agent | `r:ca` | `i:ad` | — | — | **yes** (no quality gate) |
-| cursor-initializer | reference | `r:rf` | `i:rf` | — | — | **yes** (no parity gate) |
-| cursor-initializer | template | — | `i:tf` | — | — | **yes** (no quality gate) |
+| cursor-initializer | skill | `r:cp` | `i:sf` | `ci:P` (P1–P10) | — | no |
+| cursor-initializer | agent | `r:ca` | `i:ad` | `ci:A` (A1–A5) | — | no |
+| cursor-initializer | reference | `r:rf` | `i:rf` | `ci:R` (R1–R5), `ci:X` (X1–X2) | — | no |
+| cursor-initializer | template | — | `i:tf` | `ci:T` (T1–T4), `ci:X` | — | no |
 | standalone | skill | `r:ss` | `i:sf` | `q:S` (S1–S11) | — | no |
 | standalone | reference | `r:rf` | `i:rf` | `q:R` (R1–R5), `q:X` (X1–X2) | — | no |
 | standalone | template | — | `i:tf` | `q:T` (T1–T2), `q:X` | — | no |
@@ -649,11 +649,11 @@ Enforcement status per (scope × artifact type). Cells show active rule/instruct
 |-------|-------------|-----------------|-----------------|-----------------|---------------------|--------------|
 | agents-initializer | `.claude/skills/quality-gate/` | ✅ P1–P12, A1–A6, R1–R5 | ✅ X1–X2, T1–T2 | ❌ none | ✅ G1–G4 | No drift detection |
 | agent-customizer | `.claude/skills/agent-customizer-quality-gate/` | ✅ P1–P12, A1–A6, R1–R5 | ✅ X1–X14, T1–T3 | ✅ D1–D3 | ✅ G1–G4 | Full coverage |
-| cursor-initializer | **No quality gate** | ❌ | ❌ | ❌ | ❌ | **All coverage manual** |
+| cursor-initializer | `.claude/skills/cursor-initializer-quality-gate/` | ✅ P1–P10, A1–A5, R1–R5 | ✅ X1–X2, T1–T4 | ❌ none | ✅ G1–G4 | No drift detection |
 | standalone | `.claude/skills/quality-gate/` (shared) | ✅ S1–S11, R1–R5 | ✅ X1–X2, T1–T2 | ❌ none | ✅ G1–G4 | No drift detection |
 | repository-global | **No quality gate** | ❌ | ❌ | ❌ | ❌ | **All coverage manual** |
 
-> **Remediation**: cursor-initializer and repository-global quality gate gaps are documented here and **deferred to Phase 9** (regression prevention). Drift detection for agents-initializer and standalone is also deferred to Phase 9.
+> **Note**: cursor-initializer quality gate shipped in Phase 9 (`.claude/skills/cursor-initializer-quality-gate/`); first full run executed in Phase 10. Drift detection for agents-initializer, cursor-initializer, and standalone is not implemented (no drift manifest). Repository-global coverage remains manual-only.
 
 ---
 
@@ -664,7 +664,7 @@ Enforcement status per (scope × artifact type). Cells show active rule/instruct
 | 3 | Cross-cutting | — | — | Normative source matrix cross-validation; validator protocol definition |
 | 4 | agents-initializer + agent-customizer | 111 | Both quality gates available | Claude Code scope audit; ~51 agents-init + ~60 agent-customizer |
 | 5 | standalone | 114 | quality-gate (partial) | Standalone scope audit |
-| 6 | cursor-initializer | 31 | **None** (manual only) | Cursor scope audit; no automated quality gate |
+| 6 | cursor-initializer | 31 | `.claude/skills/cursor-initializer-quality-gate/` | Cursor scope audit; automated gate shipped Phase 9, first full run Phase 10 |
 | 7 | Cross-cutting (Ph.7?=yes) | ~180 | Parity checkers | Parity review for all SCG/TCG groups; drift remediation for agent-customizer |
 | 8 | RAG/Wiki infrastructure | — | None | RAG hardening; out of scope for distribution artifact audit |
 | 9 | All | 354 | New/extended gates | Regression prevention; cursor-initializer and repository-global gap remediation |
