@@ -18,7 +18,7 @@
 - Lint: `[command]`
 - Typecheck: `[command]`
 <!-- CONDITIONAL: Non-standard configuration values — include ONLY if project overrides tool defaults.
-     Example: coverage addopts, strict type-checking, line-length overrides.
+     Example: `strict = true` in mypy, `addopts = "--cov=src"` in pytest, line-length override in ruff.
      Remove if all tooling uses default configuration. -->
 - Config: `[tool] [key] = [value]`
 
