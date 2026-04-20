@@ -64,7 +64,7 @@ maxTurns: 20
 You are a code reviewer specializing in [domain]...
 ```
 
-*Source: subagents/creating-custom-subagents.md lines 1-50*
+*Source: subagents/creating-custom-subagents.md lines 151-210*
 
 ---
 
@@ -127,7 +127,7 @@ If both defined: denylist applied first, then allowlist resolves against remaini
 - Explorers: `Read, Grep, Glob, Bash(readonly commands)`
 - Full-capability (rare): all tools — justify explicitly
 
-*Source: subagents/creating-custom-subagents.md lines 73-93*
+*Source: subagents/creating-custom-subagents.md lines 245-295*
 
 ---
 
@@ -144,7 +144,7 @@ If both defined: denylist applied first, then allowlist resolves against remaini
 | maxTurns > 30 | Runaway agents | Cap at 20-30 for most tasks |
 | Vague system prompt | Inconsistent behavior | Add role, process, output format |
 
-*Source: subagents/research-subagent-best-practices.md lines 152-180*
+*Source: subagents/research-subagent-best-practices.md line ~791 (Section 14)*
 
 ---
 
@@ -165,4 +165,4 @@ Consolidate similar issues. Prioritize by: CRITICAL (bugs/security) > HIGH > MED
 
 This pattern significantly reduces noise and keeps output actionable.
 
-*Source: subagents/research-subagent-best-practices.md lines 132-146*
+*Source: subagents/research-subagent-best-practices.md lines 463-475*
