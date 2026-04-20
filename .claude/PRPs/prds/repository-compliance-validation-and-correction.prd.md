@@ -1,6 +1,6 @@
 # Repository Compliance Validation and Correction Program
 
-**Status**: DRAFT  
+**Status**: COMPLETE  
 **GitHub Issue**: [#56](https://github.com/rodrigorjsf/agent-engineering-toolkit/issues/56)  
 **Primary Scope**: Full repository compliance program across Claude Code plugins, Cursor plugin, and standalone skills  
 
@@ -148,7 +148,7 @@ The MVP must cover the full requested program. It includes the normative matrix,
 | 7 | Shared references, self-sufficiency, parity, and docs drift remediation | Reconcile shared copies, scoped reference bundles, drift manifests, templates, rules, and instructions affected by compliance fixes | complete | limited | 4,5,6 | `.claude/PRPs/plans/completed/shared-references-self-sufficiency-parity-and-docs-drift-remediation.plan.md` |
 | 8 | RAG and Wiki hardening | Reduce validation noise with scoped retrieval, metadata, routing rules, and task-oriented wiki material only where evidence shows a gap | complete | - | 1,2,3 | `.claude/PRPs/plans/completed/rag-and-wiki-hardening.plan.md` |
 | 9 | Regression prevention workflow | Add repeatable execution flow, mandatory quality-gate checkpoints, and maintenance rules that prevent new external-scope documentation dependencies | complete | - | 4,5,6,7,8 | `.claude/PRPs/plans/completed/regression-prevention-workflow.plan.md` |
-| 10 | Final certification | Run the full repository closeout, verify all scoped gates pass, prove self-sufficiency constraints hold, and publish a final compliance summary | pending | - | 7,8,9 | - |
+| 10 | Final certification | Run the full repository closeout, verify all scoped gates pass, prove self-sufficiency constraints hold, and publish a final compliance summary | complete | - | 7,8,9 | `.claude/PRPs/plans/completed/final-certification.plan.md` |
 
 ### Phase Details
 
