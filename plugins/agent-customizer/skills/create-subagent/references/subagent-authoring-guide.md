@@ -144,7 +144,7 @@ If both defined: denylist applied first, then allowlist resolves against remaini
 | maxTurns > 30 | Runaway agents | Cap at 20-30 for most tasks |
 | Vague system prompt | Inconsistent behavior | Add role, process, output format |
 
-*Source: subagents/research-subagent-best-practices.md line ~791 (Section 14)*
+*Source: subagents/research-subagent-best-practices.md lines 791-819*
 
 ---
 
