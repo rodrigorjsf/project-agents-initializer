@@ -27,23 +27,23 @@ or manually.
 | `init-agents/references/context-optimization.md` | `docs/general-llm/research-context-engineering-comprehensive.md` | baseline |
 | `init-agents/references/progressive-disclosure-guide.md` | `docs/general-llm/a-guide-to-agents.md`, `docs/general-llm/research-context-engineering-comprehensive.md` (inline citations) | baseline |
 | `init-agents/references/scope-detector.md` | `plugins/agents-initializer/agents/scope-detector.md` | baseline |
-| `init-agents/references/validation-criteria.md` | `plugins/agents-initializer/skills/improve-agents/SKILL.md` (lines 108-122), `plugins/agents-initializer/agents/file-evaluator.md` (lines 23-59) | baseline |
-| `init-agents/references/what-not-to-include.md` | `docs/general-llm/research-context-engineering-comprehensive.md` (lines 113-121), `docs/general-llm/Evaluating-AGENTS-paper.md` (abstract) | baseline |
+| `init-agents/references/validation-criteria.md` | `plugins/agents-initializer/agents/file-evaluator.md` (lines 23-59) | baseline |
+| `init-agents/references/what-not-to-include.md` | `docs/general-llm/research-context-engineering-comprehensive.md` (lines 112-121), `docs/general-llm/Evaluating-AGENTS-paper.md` (abstract) | baseline |
 | `init-claude/references/claude-rules-system.md` | `docs/claude-code/memory/how-claude-remembers-a-project.md`, `docs/general-llm/research-context-engineering-comprehensive.md` (inline citations) | baseline |
 | `init-claude/references/codebase-analyzer.md` | `plugins/agents-initializer/agents/codebase-analyzer.md` | baseline |
 | `init-claude/references/context-optimization.md` | `docs/general-llm/research-context-engineering-comprehensive.md` | baseline |
 | `init-claude/references/progressive-disclosure-guide.md` | `docs/general-llm/a-guide-to-agents.md`, `docs/general-llm/research-context-engineering-comprehensive.md` (inline citations) | baseline |
 | `init-claude/references/scope-detector.md` | `plugins/agents-initializer/agents/scope-detector.md` | baseline |
-| `init-claude/references/validation-criteria.md` | `plugins/agents-initializer/skills/improve-claude/SKILL.md` (lines 143-160), `plugins/agents-initializer/agents/file-evaluator.md` (lines 23-59) | baseline |
-| `init-claude/references/what-not-to-include.md` | `docs/general-llm/research-context-engineering-comprehensive.md` (lines 113-121), `docs/general-llm/Evaluating-AGENTS-paper.md` (abstract) | baseline |
+| `init-claude/references/validation-criteria.md` | `plugins/agents-initializer/agents/file-evaluator.md` (lines 23-59) | baseline |
+| `init-claude/references/what-not-to-include.md` | `docs/general-llm/research-context-engineering-comprehensive.md` (lines 112-121), `docs/general-llm/Evaluating-AGENTS-paper.md` (abstract) | baseline |
 | `improve-agents/references/automation-migration-guide.md` | `.claude/PRPs/prds/completed/context-aware-improve-optimization.prd.md`, `docs/analysis/analysis-automate-workflow-with-hooks.md`, `docs/analysis/analysis-skill-authoring-best-practices.md`, `docs/analysis/analysis-how-claude-remembers-a-project.md` | baseline |
 | `improve-agents/references/codebase-analyzer.md` | `plugins/agents-initializer/agents/codebase-analyzer.md` | baseline |
 | `improve-agents/references/context-optimization.md` | `docs/general-llm/research-context-engineering-comprehensive.md` | baseline |
 | `improve-agents/references/evaluation-criteria.md` | `plugins/agents-initializer/agents/file-evaluator.md`, `docs/general-llm/research-context-engineering-comprehensive.md` | baseline |
 | `improve-agents/references/file-evaluator.md` | `plugins/agents-initializer/agents/file-evaluator.md` | baseline |
 | `improve-agents/references/progressive-disclosure-guide.md` | `docs/general-llm/a-guide-to-agents.md`, `docs/general-llm/research-context-engineering-comprehensive.md` (inline citations) | baseline |
-| `improve-agents/references/validation-criteria.md` | `plugins/agents-initializer/skills/improve-agents/SKILL.md` (lines 108-122), `plugins/agents-initializer/agents/file-evaluator.md` (lines 23-59) | baseline |
-| `improve-agents/references/what-not-to-include.md` | `docs/general-llm/research-context-engineering-comprehensive.md` (lines 113-121), `docs/general-llm/Evaluating-AGENTS-paper.md` (abstract) | baseline |
+| `improve-agents/references/validation-criteria.md` | `plugins/agents-initializer/agents/file-evaluator.md` (lines 23-59) | baseline |
+| `improve-agents/references/what-not-to-include.md` | `docs/general-llm/research-context-engineering-comprehensive.md` (lines 112-121), `docs/general-llm/Evaluating-AGENTS-paper.md` (abstract) | baseline |
 | `improve-claude/references/automation-migration-guide.md` | `.claude/PRPs/prds/completed/context-aware-improve-optimization.prd.md`, `docs/analysis/analysis-automate-workflow-with-hooks.md`, `docs/analysis/analysis-skill-authoring-best-practices.md`, `docs/analysis/analysis-how-claude-remembers-a-project.md` | baseline |
 | `improve-claude/references/claude-rules-system.md` | `docs/claude-code/memory/how-claude-remembers-a-project.md`, `docs/general-llm/research-context-engineering-comprehensive.md` (inline citations) | baseline |
 | `improve-claude/references/codebase-analyzer.md` | `plugins/agents-initializer/agents/codebase-analyzer.md` | baseline |
@@ -51,8 +51,8 @@ or manually.
 | `improve-claude/references/evaluation-criteria.md` | `plugins/agents-initializer/agents/file-evaluator.md`, `docs/general-llm/research-context-engineering-comprehensive.md` | baseline |
 | `improve-claude/references/file-evaluator.md` | `plugins/agents-initializer/agents/file-evaluator.md` | baseline |
 | `improve-claude/references/progressive-disclosure-guide.md` | `docs/general-llm/a-guide-to-agents.md`, `docs/general-llm/research-context-engineering-comprehensive.md` (inline citations) | baseline |
-| `improve-claude/references/validation-criteria.md` | `plugins/agents-initializer/skills/improve-claude/SKILL.md` (lines 143-160), `plugins/agents-initializer/agents/file-evaluator.md` (lines 23-59) | baseline |
-| `improve-claude/references/what-not-to-include.md` | `docs/general-llm/research-context-engineering-comprehensive.md` (lines 113-121), `docs/general-llm/Evaluating-AGENTS-paper.md` (abstract) | baseline |
+| `improve-claude/references/validation-criteria.md` | `plugins/agents-initializer/agents/file-evaluator.md` (lines 23-59) | baseline |
+| `improve-claude/references/what-not-to-include.md` | `docs/general-llm/research-context-engineering-comprehensive.md` (lines 112-121), `docs/general-llm/Evaluating-AGENTS-paper.md` (abstract) | baseline |
 | `create-hook/references/artifact-analyzer.md` | `plugins/agent-customizer/agents/artifact-analyzer.md` | baseline |
 | `create-hook/references/hook-authoring-guide.md` | `docs/claude-code/hooks/automate-workflow-with-hooks.md`, `docs/claude-code/hooks/claude-hook-reference-doc.md` | baseline |
 | `create-hook/references/hook-events-reference.md` | `docs/claude-code/hooks/claude-hook-reference-doc.md` | baseline |
@@ -109,8 +109,6 @@ or manually.
 | `plugins/agents-initializer/agents/codebase-analyzer.md` | 4 |
 | `plugins/agents-initializer/agents/file-evaluator.md` | 8 |
 | `plugins/agents-initializer/agents/scope-detector.md` | 2 |
-| `plugins/agents-initializer/skills/improve-agents/SKILL.md` | 2 |
-| `plugins/agents-initializer/skills/improve-claude/SKILL.md` | 2 |
 | `plugins/agent-customizer/agents/artifact-analyzer.md` | 8 |
 | `plugins/agent-customizer/agents/hook-evaluator.md` | 1 |
 | `plugins/agent-customizer/agents/rule-evaluator.md` | 1 |

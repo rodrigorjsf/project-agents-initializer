@@ -113,24 +113,6 @@ Flag each candidate in the Per-File Issues output under `**Automation Opportunit
 
 ---
 
-## Automation Opportunity Assessment
-
-Check each instruction block for migration potential to on-demand mechanisms:
-
-| Signal | Classification | Priority |
-|--------|---------------|----------|
-| File pattern globs in instruction text | Path-scoped rule candidate (`RULE_CANDIDATE`) | HIGH — pure token savings |
-| "Always"/"never" deterministic enforcement | Hook candidate (`HOOK_CANDIDATE`) | HIGH — deterministic enforcement |
-| Domain knowledge or workflow block >50 lines | Skill candidate (`SKILL_CANDIDATE`) | MEDIUM — net savings = block − 100 tokens |
-| Standard conventions / agent-inferable content | DELETE candidate (`DELETE_CANDIDATE`) | HIGH — pure savings |
-| Content duplicated across multiple files | Consolidation candidate (`CONSOLIDATE`) | MEDIUM — saves (N−1) × content size |
-
-Flag each candidate in the Per-File Issues output under `**Automation Opportunity Issues:**`.
-
-*Source: automation-migration-guide.md lines 58-72*
-
----
-
 ## Quality Score Rubric
 
 Score each dimension 1-10 based on observed issues:
@@ -208,3 +190,4 @@ When the overall quality score is **7/10 or higher** across all dimensions and n
 - Progressive disclosure extraction candidates meeting the 10+ line / 3+ rule threshold are suggested only when they resolve a documented failing criterion or remove clearly non-root content without rewriting unrelated sections
 - Preserve non-issue sections in place; calibrated mode favors issue-local edits over structural churn
 - If the file still exceeds the root line target after issue-local fixes, allow one additional low-churn extraction or consolidation step focused on the lowest-value remaining block; do not rewrite preserved sections
+- Domain-specific blocks meeting the 10+ line / 3+ rule threshold but under 50 lines should be extracted to a domain-doc (not `SKILL_CANDIDATE`); the 50-line threshold applies only to `SKILL_CANDIDATE` classification

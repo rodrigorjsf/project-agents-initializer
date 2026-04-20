@@ -47,6 +47,7 @@ Each of these wastes tokens without improving agent performance:
 | Codebase overview paragraphs | Increases steps without improving navigation | Evaluating AGENTS.md |
 | Obvious tool usage ("use git for version control") | Agent already knows this | Anthropic: "If Claude already does it correctly, delete it" |
 | Duplicated information across files | Wastes tokens on every request | Context engineering research |
+| **Architectural path trap** | Lists of paths WITH behavioral constraints (e.g., `services/ must not import from routes/`) are **not** directory listings — flag only pure path listings with no rules attached | Evaluating AGENTS.md |
 
 ### Staleness Indicators
 
