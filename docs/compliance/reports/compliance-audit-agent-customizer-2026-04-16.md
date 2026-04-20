@@ -22,7 +22,7 @@
 
 All 26 findings (CF-004–CF-029) CLOSED after corrections applied in Phase 4 compliance session (2026-04-16). CF-004–CF-023 sourced from gate run (F001–F020); CF-024–CF-029 from manual source doc verification. Quality gate rerun pending.
 
-**Phase 10 Update (2025-07-15):** Authoritative gate rerun executed as Phase 10 Task 4 (`agent-customizer-quality-gate`). Phase 1 Static: 287/287 PASS. Phase 2 Parity: 14/14 PASS. Phase 3 Drift: 34/34 PASS (2 SHIFTED citations corrected this session). Phase 4 Scenarios: 12/16 (4 PARTIAL — scenario coverage gaps, not artifact compliance failures). CF-004–CF-023 automated-gate-pass evidence: **RESOLVED** — all static and parity checks confirm corrections from 2026-04-16 are in place. Revalidation date: 2025-07-15. Full results in `.specs/reports/agent-customizer-quality-gate-2025-07-15-findings.md` and Phase 10 certification report §7.5.
+**Phase 10 Update (2026-04-19):** Authoritative gate rerun executed as Phase 10 Task 4 (`agent-customizer-quality-gate`). Phase 1 Static: 287/287 PASS. Phase 2 Parity: 14/14 PASS. Phase 3 Drift: 34/34 PASS (2 SHIFTED citations corrected this session). Phase 4 Scenarios: 12/16 (4 PARTIAL — scenario coverage gaps, not artifact compliance failures). CF-004–CF-023 automated-gate-pass evidence: **RESOLVED** — all static and parity checks confirm corrections from 2026-04-16 are in place. Revalidation date: 2025-07-15. Full results in `.specs/reports/agent-customizer-quality-gate-2025-07-15-findings.md` and Phase 10 certification report §7.5.
 
 ---
 
@@ -222,7 +222,7 @@ Discovered during line-by-line comparison of reference files against source docs
 
 All 26 findings closed. Gate rerun required to verify CF-004–CF-023 automated pass; gate pending (see §7.5).
 
-**Phase 10 Update (2025-07-15):** Gate rerun completed. See §7.5 Phase 10 row for full results. CF-004–CF-023 pending annotation: **RESOLVED**.
+**Phase 10 Update (2026-04-19):** Gate rerun completed. See §7.5 Phase 10 row for full results. CF-004–CF-023 pending annotation: **RESOLVED**.
 
 ---
 

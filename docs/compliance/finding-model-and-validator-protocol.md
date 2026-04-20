@@ -158,6 +158,8 @@ Report files: `docs/compliance/reports/compliance-audit-[scope]-[YYYY-MM-DD].md`
 | Provenance | … | … | … | … |
 | **Total** | … | … | … | … |
 
+> **Note — Phase 10 certification alternative:** Final certification reports covering multiple scopes and automated gates may use an aggregate pass/fail check-count table (rows by gate category + scope, columns: Total Checks / Passed / Failed / Status) instead of the finding-category format above. This aggregate format is valid when the report summarises automated gate run results rather than manual audit findings.
+
 **7.3 Findings** — CF-NNN records ordered by severity (CRITICAL first), then by category.
 
 **7.4 Correction Log**

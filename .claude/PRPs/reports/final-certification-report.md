@@ -27,7 +27,7 @@ The full certification report is at:
 | All prior-phase CF findings (CF-001 – CF-074) verified CLOSED | ✅ |
 | Phase 10 new findings (CF-075 – CF-080) all CLOSED | ✅ |
 | Aggregate dashboard: 1261/1267 checks pass | ✅ |
-| 6 open findings are non-blocking improvement items (not CRITICAL/MAJOR) | ✅ |
+| 6 open findings are non-blocking improvement items (no CRITICAL findings; MAJOR findings are open design decisions and calibration gaps) | ✅ |
 | Contamination scans (4): 0 actual violations | ✅ |
 | Self-sufficiency scans (3): 0 operational violations | ✅ |
 | artifact-audit-manifest cursor-initializer rows updated (§11, §12, §13) | ✅ |

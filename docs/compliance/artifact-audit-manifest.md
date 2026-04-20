@@ -647,13 +647,13 @@ Enforcement status per (scope × artifact type). Cells show active rule/instruct
 
 | Scope | Quality Gate | Static (Phase 1) | Parity (Phase 2) | Drift (Phase 3) | Scenarios (Phase 4) | Coverage Gap |
 |-------|-------------|-----------------|-----------------|-----------------|---------------------|--------------|
-| agents-initializer | `.claude/skills/quality-gate/` | ✅ P1–P12, A1–A6, R1–R5 | ✅ X1–X2, T1–T2 | ❌ none | ✅ G1–G4 | No drift detection |
+| agents-initializer | `.claude/skills/quality-gate/` | ✅ P1–P12, A1–A6, R1–R5 | ✅ X1–X2, T1–T2 | ✅ (Phase 3, via manifest) | ✅ G1–G4 | No cursor-initializer drift |
 | agent-customizer | `.claude/skills/agent-customizer-quality-gate/` | ✅ P1–P12, A1–A6, R1–R5 | ✅ X1–X14, T1–T3 | ✅ D1–D3 | ✅ G1–G4 | Full coverage |
 | cursor-initializer | `.claude/skills/cursor-initializer-quality-gate/` | ✅ P1–P10, A1–A5, R1–R5 | ✅ X1–X2, T1–T4 | ❌ none | ✅ G1–G4 | No drift detection |
-| standalone | `.claude/skills/quality-gate/` (shared) | ✅ S1–S11, R1–R5 | ✅ X1–X2, T1–T2 | ❌ none | ✅ G1–G4 | No drift detection |
+| standalone | `.claude/skills/quality-gate/` (shared) | ✅ S1–S11, R1–R5 | ✅ X1–X2, T1–T2 | ✅ (Phase 3, via manifest) | ✅ G1–G4 | No cursor-initializer drift |
 | repository-global | **No quality gate** | ❌ | ❌ | ❌ | ❌ | **All coverage manual** |
 
-> **Note**: cursor-initializer quality gate shipped in Phase 9 (`.claude/skills/cursor-initializer-quality-gate/`); first full run executed in Phase 10. Drift detection for agents-initializer, cursor-initializer, and standalone is not implemented (no drift manifest). Repository-global coverage remains manual-only.
+> **Note**: cursor-initializer quality gate shipped in Phase 9 (`.claude/skills/cursor-initializer-quality-gate/`); first full run executed in Phase 10. Drift detection for agents-initializer and standalone is implemented via `plugins/agents-initializer/docs-drift-manifest.md` and `skills/docs-drift-manifest.md` respectively (quality-gate Phase 3). Cursor-initializer has no drift manifest; cursor drift detection not yet implemented. Repository-global coverage remains manual-only.
 
 ---
 
