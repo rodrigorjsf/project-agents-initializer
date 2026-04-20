@@ -76,7 +76,7 @@ Based on both agent reports, create improvement plan with categories:
 
 1. **Removals** — bloat (inlined content, over-specified instructions), stale (broken agent refs, removed tools), duplicates
 2. **Refactoring** — progressive disclosure optimization, phase consolidation, reference path corrections
-3. **Additions** — missing sections (self-validation, output format). Only suggest Hard Rules or Preflight if the skill has user-facing interactions or side effects — do NOT suggest them for informational/analysis-only skills that read and report. Do NOT suggest adding a `## Behavioral Guidelines` section to analysis-only skills — reserve it for multi-phase user-interactive workflows or skills with side effects.
+3. **Additions** — missing sections (self-validation, output format). Only suggest Hard Rules or Preflight if the skill has user-facing interactions or side effects — do NOT suggest them for informational/analysis-only skills that read and report.
 
 If all three categories yield zero items after analysis, conclude: "No improvements needed — artifact is already convention-compliant." and proceed directly to Phase 5 with an empty improvement summary.
 
