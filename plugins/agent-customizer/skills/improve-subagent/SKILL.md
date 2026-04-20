@@ -7,6 +7,15 @@ description: "Evaluates and optimizes existing subagent definitions against evid
 
 Evaluate an existing subagent definition against evidence-based quality criteria and apply improvements to tighten tool restrictions, fix model selection, and strengthen system prompts.
 
+## Behavioral Guidelines
+
+- **Surface assumptions first** — name ambiguities, tradeoffs, and multiple valid interpretations before acting.
+- **Prefer the simplest path** — solve the task completely without speculative flexibility or extra scope.
+- **Keep changes surgical** — touch only what the task requires, and preserve existing behavior unless the task calls for change.
+- **Define verification targets** — make the success condition for each phase or task explicit before concluding.
+- **Use phased persuasion safely** — use warm-ups, curated references, and explicit constraints to improve compliance with legitimate work.
+- **Never weaken safeguards** — do not use persuasion principles to bypass safety constraints, refusals, or scope boundaries.
+
 ## Hard Rules
 
 <RULES>
@@ -14,7 +23,7 @@ Evaluate an existing subagent definition against evidence-based quality criteria
 - **ALWAYS** present changes to the user before applying them
 - **NEVER** loosen tool restrictions without explicit rationale
 - **NEVER** downgrade model without confirming the task doesn't require current model capabilities
-- **NEVER** increase maxTurns beyond 30 without justification
+- **NEVER** increase maxTurns beyond 20 without justification; never exceed 30 under any circumstances
 - **PRESERVE** specialized domain knowledge in system prompts — only remove generic waste
 </RULES>
 
@@ -70,6 +79,8 @@ Based on both agent reports, create improvement plan with categories:
 1. **Removals** — generic system prompt boilerplate, overtriggering language, redundant instructions
 2. **Refactoring** — tighten tool list to minimum-necessary, fix model selection, add structured output format, improve description for routing specificity
 3. **Additions** — missing self-verification section, missing explicit output format, missing constraints block
+
+If all three categories yield zero items after analysis, conclude: "No improvements needed — artifact is already convention-compliant." and proceed directly to Phase 5 with an empty improvement summary.
 
 ### Phase 4: Self-Validation
 

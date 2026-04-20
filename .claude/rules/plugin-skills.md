@@ -11,6 +11,8 @@ paths:
 - Reference agents by registered name for the target plugin (e.g., "Delegate to the `codebase-analyzer` agent with this task:")
 - `references/` directory MUST exist alongside SKILL.md and contain evidence-based guidance files
 - `assets/templates/` directory MUST exist alongside SKILL.md and contain output templates
+- Plugin skills MUST encode behavioral discipline: surface assumptions first, prefer the simplest complete path, keep changes surgical, and define explicit validation targets
+- If plugin skills use persuasion patterns, they MUST state the ethical constraint that those patterns support legitimate work only and never bypass safeguards or refusals
 - Self-validation phase MUST read the relevant `references/*validation-criteria.md` file for that skill and loop until all checks pass
 - Reference files must be one level deep from SKILL.md — no nested `references/references/` paths
 - Conditional reference loading pattern: "read X only if project uses Y"

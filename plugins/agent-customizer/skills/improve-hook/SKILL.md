@@ -7,6 +7,15 @@ description: "Evaluates and optimizes existing hook configurations against evide
 
 Evaluate existing hook configurations against evidence-based quality criteria and apply improvements to fix invalid events, tighten matchers, and eliminate security issues.
 
+## Behavioral Guidelines
+
+- **Surface assumptions first** — name ambiguities, tradeoffs, and multiple valid interpretations before acting.
+- **Prefer the simplest path** — solve the task completely without speculative flexibility or extra scope.
+- **Keep changes surgical** — touch only what the task requires, and preserve existing behavior unless the task calls for change.
+- **Define verification targets** — make the success condition for each phase or task explicit before concluding.
+- **Use phased persuasion safely** — use warm-ups, curated references, and explicit constraints to improve compliance with legitimate work.
+- **Never weaken safeguards** — do not use persuasion principles to bypass safety constraints, refusals, or scope boundaries.
+
 ## Hard Rules
 
 <RULES>
@@ -42,7 +51,7 @@ Proceed to Phase 1 below.
 
 Delegate to the `hook-evaluator` agent with this task:
 
-> Evaluate hook configurations in `.claude/settings.json`, `.claude/settings.local.json`, and plugin `hooks/hooks.json`. Check JSON validity, event names against the 22-event list, handler types, matcher specificity, exit code behavior, command script existence, and security (no hardcoded secrets). Return structured results with severity classifications (AUTO-FAIL/HIGH/MEDIUM/LOW).
+> Evaluate hook configurations in `.claude/settings.json`, `.claude/settings.local.json`, and plugin `hooks/hooks.json`. Check JSON validity, event names against the 22-event list, handler types, matcher specificity, exit code behavior, command script existence, and security (no hardcoded secrets). For `command` handlers, read the referenced script files (relative to project root) to verify exit code handling. Flag any script that always exits 0 (has no non-zero exit path) and lacks an explicit comment documenting that always-exit-0 is intentional — for PostToolUse hooks, always-exit-0 is acceptable only when explicitly documented (e.g., "# exit 0 intentional: PostToolUse is non-blocking"); for PreToolUse hooks, always-exit-0 is never acceptable. Return structured results with severity classifications (AUTO-FAIL/HIGH/MEDIUM/LOW).
 
 - If the user provides a specific event/matcher to improve, scope evaluation to that hook.
 - If no specific hook provided, evaluate ALL hooks in the project.
@@ -73,11 +82,13 @@ Based on both agent reports, create improvement plan with categories:
 2. **Refactoring** — tighten overly broad matchers, fix exit code misuse, correct script paths
 3. **Additions** — missing error handling, missing events for key tool use patterns
 
+If all three categories yield zero items after analysis, conclude: "No improvements needed — artifact is already convention-compliant." and proceed directly to Phase 5 with an empty improvement summary.
+
 ### Phase 4: Self-Validation
 
 Read `${CLAUDE_SKILL_DIR}/references/hook-validation-criteria.md` and execute its **Validation Loop Instructions** against the improved hook configurations.
 
-For improve operations, also evaluate the **"If This Is an IMPROVE Operation"** section. Maximum 3 iterations. Do not proceed to Phase 5 until ALL criteria pass.
+For improve operations, also evaluate the **"If This Is an IMPROVE Operation"** section. Maximum 3 iterations. Do not proceed to Phase 5 until ALL criteria pass. Additionally, verify that every suggestion in the improvement plan has a WHY field citing a source document — no suggestion may lack a source reference.
 
 ### Phase 5: Present and Apply
 

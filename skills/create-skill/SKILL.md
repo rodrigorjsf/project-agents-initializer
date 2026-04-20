@@ -7,6 +7,15 @@ description: "Creates new SKILL.md files with references, templates, and frontma
 
 Generates a new SKILL.md file with supporting references and templates, grounded in the docs corpus and project conventions.
 
+## Behavioral Guidelines
+
+- **Surface assumptions first** — name ambiguities, tradeoffs, and multiple valid interpretations before acting.
+- **Prefer the simplest path** — solve the task completely without speculative flexibility or extra scope.
+- **Keep changes surgical** — touch only what the task requires, and preserve existing behavior unless the task calls for change.
+- **Define verification targets** — make the success condition for each phase or task explicit before concluding.
+- **Use phased persuasion safely** — use warm-ups, curated references, and explicit constraints to improve compliance with legitimate work.
+- **Never weaken safeguards** — do not use persuasion principles to bypass safety constraints, refusals, or scope boundaries.
+
 ## Hard Rules
 
 <RULES>
@@ -16,6 +25,7 @@ Generates a new SKILL.md file with supporting references and templates, grounded
 - **EVERY** reference file must be ≤ 200 lines with source attribution
 - **EVERY** skill must use relative `references/` paths for all bundled file references (not hardcoded absolute paths)
 - **EVERY** skill description must be third-person and include a "Use when..." trigger phrase
+- **EVERY** generated skill must preserve the ethical constraint: persuasion cues support legitimate work only, never safety bypass
 </RULES>
 
 ## Process
@@ -48,6 +58,7 @@ Before generating, read these reference documents:
 
 - `references/skill-authoring-guide.md` — core principles, structure rules, progressive disclosure, anti-patterns
 - `references/skill-format-reference.md` — frontmatter fields, name validation, string substitution variables
+- `references/behavioral-guidelines.md` — Karpathy-aligned behavior and safe persuasion patterns for skills
 - `references/prompt-engineering-strategies.md` — per-artifact prompting strategies for skills
 
 Read `assets/templates/skill-md.md` and fill its placeholders using:
