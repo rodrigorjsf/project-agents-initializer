@@ -169,6 +169,9 @@ md5sum skills/create-skill/assets/templates/skill-md.md \
 
 md5sum skills/create-subagent/assets/templates/subagent-definition.md \
        skills/improve-subagent/assets/templates/subagent-definition.md
+
+md5sum skills/create-skill/references/behavioral-guidelines.md \
+       skills/improve-skill/references/behavioral-guidelines.md
 ```
 
 ---
@@ -223,6 +226,7 @@ Return exactly this structure:
 | non-cursor skill.md templates | 4 | [MATCH/MISMATCH] | |
 | standalone skill-md.md templates | 2 | [MATCH/MISMATCH] | |
 | standalone subagent-definition.md templates | 2 | [MATCH/MISMATCH] | |
+| standalone behavioral-guidelines.md | 2 | [MATCH/MISMATCH] | |
 
 ### Divergences Found
 [If none: "✅ No divergences — all shared files are identical within their intended copy families."]
