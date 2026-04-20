@@ -113,8 +113,8 @@ Create a new Claude Code skill with frontmatter, phases, references, and templat
 **What it does:**
 
 1. Launches `artifact-analyzer` to detect existing skill patterns and naming conventions.
-2. Loads the skill authoring and format references from the docs corpus.
-3. Generates `SKILL.md` with YAML frontmatter, phase definitions, and bundled references.
+2. Loads the skill authoring, behavioral, and format references from the docs corpus.
+3. Generates `SKILL.md` with YAML frontmatter, phase definitions, bundled references, and behavioral guidelines.
 4. Validates the draft against `skill-validation-criteria.md`, looping up to three times.
 5. Presents the result with evidence citations before writing.
 
@@ -124,6 +124,7 @@ Create a new Claude Code skill with frontmatter, phases, references, and templat
 
 - `SKILL.md` with valid frontmatter and phased instructions
 - `references/` files with source attribution
+- A behavioral-guidelines reference that encodes Karpathy-aligned discipline and safe-only persuasion
 - `assets/templates/` scaffolding when the skill needs output templates
 
 ### `create-hook`
@@ -193,7 +194,7 @@ Evaluate and optimize an existing `SKILL.md` file against evidence-based quality
 **What it does:**
 
 1. Launches `skill-evaluator` to assess the current `SKILL.md`.
-2. Compares the result against current skill authoring guidance.
+2. Compares the result against current skill authoring and behavioral guidance.
 3. Builds an improvement plan in removal → refactor → addition order.
 4. Validates the plan against `skill-validation-criteria.md`.
 5. Presents the proposed changes with evidence before applying them.
@@ -204,6 +205,7 @@ Evaluate and optimize an existing `SKILL.md` file against evidence-based quality
 
 - YAML frontmatter validity and discovery fields
 - Phase structure and progressive disclosure
+- Behavioral discipline and safe-only persuasion framing
 - Reference usage and bundled path conventions
 - Token efficiency and line-count limits
 

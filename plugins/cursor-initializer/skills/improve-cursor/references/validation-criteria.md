@@ -53,6 +53,8 @@ Any file violating these criteria must be fixed before proceeding:
 - [ ] Scope widened rather than narrowed where the original had too little coverage
 - [ ] In high-quality files, unrelated churn is avoided: no extra files or rules unless they fix a documented criterion
 
+**Quality calibration:** A file scoring ≥ 7/10 that is already within the 200-line budget must NOT be restructured purely to reduce line count — quality and information preservation take precedence over line minimization.
+
 ---
 
 ## Structural Checks

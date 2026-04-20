@@ -89,7 +89,7 @@ Present the skill with this description and invoke it for each artifact type.
 | Valid YAML frontmatter | `name` + `description` present | Read first `---` block |
 | Body within limit | ≤ 500 lines | `wc -l SKILL.md` |
 | References directory created | `references/` exists | `ls` check |
-| Templates directory created | `assets/templates/` exists | `ls` check |
+| Templates directory created | `assets/templates/` exists (exception: validator-type skills may omit this; confirm skill type was correctly classified before flagging) | `ls` check |
 | Evidence citations present | ≥ 1 `Source:` in reference files | `grep -r "Source:" references/` |
 | Delegates to `artifact-analyzer` | Required for create skills | `grep "artifact-analyzer"` |
 | Plugin bundled-file refs use `${CLAUDE_SKILL_DIR}` | No hardcoded absolute paths in plugin outputs | `grep '${CLAUDE_SKILL_DIR}'` |

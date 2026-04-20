@@ -240,6 +240,7 @@ Type taxonomy and validator code legend used in all inventory tables.
 | `skills/create-rule/assets/templates/rule-file.md` | template | `i:tf` | — | no |
 | `skills/create-skill/SKILL.md` | skill | `r:ps`, `i:sf`, `ac:P` | — | no |
 | `skills/create-skill/references/prompt-engineering-strategies.md` | reference | `r:rf`, `i:rf`, `ac:R`, `ac:X` | SCG-11 | yes |
+| `skills/create-skill/references/behavioral-guidelines.md` | reference | `r:rf`, `i:rf`, `ac:R`, `ac:X` | SCG-25 | yes |
 | `skills/create-skill/references/skill-authoring-guide.md` | reference | `r:rf`, `i:rf`, `ac:R`, `ac:X` | SCG-16 | yes |
 | `skills/create-skill/references/skill-format-reference.md` | reference | `r:rf`, `i:rf`, `ac:R`, `ac:X` | SCG-20 | yes |
 | `skills/create-skill/references/skill-validation-criteria.md` | reference | `r:rf`, `i:rf`, `ac:R`, `ac:X` | SCG-12 | yes |
@@ -265,6 +266,7 @@ Type taxonomy and validator code legend used in all inventory tables.
 | `skills/improve-rule/assets/templates/rule-file.md` | template | `i:tf` | — | no |
 | `skills/improve-skill/SKILL.md` | skill | `r:ps`, `i:sf`, `ac:P` | — | no |
 | `skills/improve-skill/references/prompt-engineering-strategies.md` | reference | `r:rf`, `i:rf`, `ac:R`, `ac:X` | SCG-11 | yes |
+| `skills/improve-skill/references/behavioral-guidelines.md` | reference | `r:rf`, `i:rf`, `ac:R`, `ac:X` | SCG-25 | yes |
 | `skills/improve-skill/references/skill-authoring-guide.md` | reference | `r:rf`, `i:rf`, `ac:R`, `ac:X` | SCG-16 | yes |
 | `skills/improve-skill/references/skill-evaluation-criteria.md` | reference | `r:rf`, `i:rf`, `ac:R` | — | no |
 | `skills/improve-skill/references/skill-format-reference.md` | reference | `r:rf`, `i:rf`, `ac:R`, `ac:X` | SCG-20 | yes |
@@ -345,6 +347,7 @@ Type taxonomy and validator code legend used in all inventory tables.
 | `create-skill/SKILL.md` | skill | `r:ss`, `i:sf`, `q:S` | — | no |
 | `create-skill/references/artifact-analyzer.md` | reference | `r:rf`, `i:rf`, `q:R` | — | no |
 | `create-skill/references/prompt-engineering-strategies.md` | reference | `r:rf`, `i:rf`, `q:R` | — | no |
+| `create-skill/references/behavioral-guidelines.md` | reference | `r:rf`, `i:rf`, `q:R` | SCG-25 | yes |
 | `create-skill/references/skill-authoring-guide.md` | reference | `r:rf`, `i:rf`, `q:R` | — | no |
 | `create-skill/references/skill-format-reference.md` | reference | `r:rf`, `i:rf`, `q:R` | — | no |
 | `create-skill/references/skill-validation-criteria.md` | reference | `r:rf`, `i:rf`, `q:R` | — | no |
@@ -405,6 +408,7 @@ Type taxonomy and validator code legend used in all inventory tables.
 | `improve-skill/SKILL.md` | skill | `r:ss`, `i:sf`, `q:S` | — | no |
 | `improve-skill/references/artifact-analyzer.md` | reference | `r:rf`, `i:rf`, `q:R` | — | no |
 | `improve-skill/references/prompt-engineering-strategies.md` | reference | `r:rf`, `i:rf`, `q:R` | — | no |
+| `improve-skill/references/behavioral-guidelines.md` | reference | `r:rf`, `i:rf`, `q:R` | SCG-25 | yes |
 | `improve-skill/references/skill-authoring-guide.md` | reference | `r:rf`, `i:rf`, `q:R` | — | no |
 | `improve-skill/references/skill-evaluation-criteria.md` | reference | `r:rf`, `i:rf`, `q:R` | — | no |
 | `improve-skill/references/skill-evaluator.md` | reference | `r:rf`, `i:rf`, `q:R` | — | no |
@@ -592,6 +596,7 @@ Groups are stable identifiers referenced in inventory Ph.7 columns. Member paths
 | SCG-22 | X12 | `subagent-config-reference.md` | create-subagent ↔ improve-subagent | 2 | agent-customizer-qg parity-checker |
 | SCG-23 | X13 | `skill-md.md` (template) | create-skill ↔ improve-skill | 2 | agent-customizer-qg parity-checker |
 | SCG-24 | X14 | `subagent-definition.md` (template) | create-subagent ↔ improve-subagent | 2 | agent-customizer-qg parity-checker |
+| SCG-25 | X15 | `behavioral-guidelines.md` | create-skill ↔ improve-skill (plugin + standalone) | 4 | agent-customizer-qg parity-checker (plugin 2) + quality-gate parity-checker (standalone 2) |
 
 ### TCG Groups (Template Shared Copies)
 

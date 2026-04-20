@@ -2,7 +2,7 @@
 
 Centralized registry of all reference file → source doc mappings for drift detection
 across all skills in the `skills/` standalone distribution.
-Updated: 2025-07-20
+Updated: 2026-04-20
 
 ## Contents
 
@@ -57,18 +57,19 @@ or manually.
 | `create-hook/references/hook-authoring-guide.md` | `docs/claude-code/hooks/automate-workflow-with-hooks.md`, `docs/claude-code/hooks/claude-hook-reference-doc.md` | baseline |
 | `create-hook/references/hook-events-reference.md` | `docs/claude-code/hooks/claude-hook-reference-doc.md` | baseline |
 | `create-hook/references/hook-validation-criteria.md` | `docs/claude-code/hooks/claude-hook-reference-doc.md`, `docs/claude-code/hooks/automate-workflow-with-hooks.md` | baseline |
-| `create-hook/references/prompt-engineering-strategies.md` | `docs/general-llm/prompt-engineering-guide.md` (lines 212-215), `docs/claude-code/claude-prompting-best-practices.md` (lines 373-380) | baseline |
+| `create-hook/references/prompt-engineering-strategies.md` | `docs/general-llm/prompt-engineering-guide.md` (lines 212-215), `docs/claude-code/claude-prompting-best-practices.md` (lines 373-380), `.github/instructions/karpathy-guidelines.instructions.md`, `docs/general-llm/persuasion-principles.md` | baseline |
 | `create-rule/references/artifact-analyzer.md` | `plugins/agent-customizer/agents/artifact-analyzer.md` | baseline |
-| `create-rule/references/prompt-engineering-strategies.md` | `docs/general-llm/prompt-engineering-guide.md` (lines 212-215), `docs/claude-code/claude-prompting-best-practices.md` (lines 373-380) | baseline |
+| `create-rule/references/prompt-engineering-strategies.md` | `docs/general-llm/prompt-engineering-guide.md` (lines 212-215), `docs/claude-code/claude-prompting-best-practices.md` (lines 373-380), `.github/instructions/karpathy-guidelines.instructions.md`, `docs/general-llm/persuasion-principles.md` | baseline |
 | `create-rule/references/rule-authoring-guide.md` | `docs/claude-code/memory/how-claude-remembers-a-project.md` | baseline |
 | `create-rule/references/rule-validation-criteria.md` | `docs/claude-code/memory/how-claude-remembers-a-project.md` | baseline |
 | `create-skill/references/artifact-analyzer.md` | `plugins/agent-customizer/agents/artifact-analyzer.md` | baseline |
-| `create-skill/references/prompt-engineering-strategies.md` | `docs/general-llm/prompt-engineering-guide.md` (lines 212-215), `docs/claude-code/claude-prompting-best-practices.md` (lines 373-380) | baseline |
-| `create-skill/references/skill-authoring-guide.md` | `docs/shared/skill-authoring-best-practices.md`, `docs/claude-code/skills/extend-claude-with-skills.md` | baseline |
+| `create-skill/references/behavioral-guidelines.md` | self-contained — no external source documents; all content is inline with ✅/❌ examples | baseline |
+| `create-skill/references/prompt-engineering-strategies.md` | `docs/general-llm/prompt-engineering-guide.md` (lines 212-215), `docs/claude-code/claude-prompting-best-practices.md` (lines 373-380), `.github/instructions/karpathy-guidelines.instructions.md`, `docs/general-llm/persuasion-principles.md` | baseline |
+| `create-skill/references/skill-authoring-guide.md` | `docs/shared/skill-authoring-best-practices.md`, `docs/claude-code/skills/extend-claude-with-skills.md`, `.github/instructions/karpathy-guidelines.instructions.md`, `docs/general-llm/persuasion-principles.md` | baseline |
 | `create-skill/references/skill-format-reference.md` | `docs/claude-code/skills/research-claude-code-skills-format.md` (lines 90-125), `docs/claude-code/skills/extend-claude-with-skills.md` (lines 169-199) | baseline |
-| `create-skill/references/skill-validation-criteria.md` | `docs/shared/skill-authoring-best-practices.md`, `docs/claude-code/skills/extend-claude-with-skills.md` | baseline |
+| `create-skill/references/skill-validation-criteria.md` | `docs/shared/skill-authoring-best-practices.md`, `docs/claude-code/skills/extend-claude-with-skills.md`, `.github/instructions/karpathy-guidelines.instructions.md`, `docs/general-llm/persuasion-principles.md` | baseline |
 | `create-subagent/references/artifact-analyzer.md` | `plugins/agent-customizer/agents/artifact-analyzer.md` | baseline |
-| `create-subagent/references/prompt-engineering-strategies.md` | `docs/general-llm/prompt-engineering-guide.md` (lines 212-215), `docs/claude-code/claude-prompting-best-practices.md` (lines 373-380) | baseline |
+| `create-subagent/references/prompt-engineering-strategies.md` | `docs/general-llm/prompt-engineering-guide.md` (lines 212-215), `docs/claude-code/claude-prompting-best-practices.md` (lines 373-380), `.github/instructions/karpathy-guidelines.instructions.md`, `docs/general-llm/persuasion-principles.md` | baseline |
 | `create-subagent/references/subagent-authoring-guide.md` | `docs/general-llm/subagents/research-subagent-best-practices.md`, `docs/claude-code/subagents/creating-custom-subagents.md` | baseline |
 | `create-subagent/references/subagent-config-reference.md` | `docs/claude-code/subagents/creating-custom-subagents.md`, `docs/claude-code/subagents/claude-orchestrate-of-claude-code-sessions.md` | baseline |
 | `create-subagent/references/subagent-validation-criteria.md` | `docs/claude-code/subagents/creating-custom-subagents.md`, `docs/general-llm/subagents/research-subagent-best-practices.md` | baseline |
@@ -78,22 +79,23 @@ or manually.
 | `improve-hook/references/hook-evaluator.md` | `plugins/agent-customizer/agents/hook-evaluator.md` | baseline |
 | `improve-hook/references/hook-events-reference.md` | `docs/claude-code/hooks/claude-hook-reference-doc.md` | baseline |
 | `improve-hook/references/hook-validation-criteria.md` | `docs/claude-code/hooks/claude-hook-reference-doc.md`, `docs/claude-code/hooks/automate-workflow-with-hooks.md` | baseline |
-| `improve-hook/references/prompt-engineering-strategies.md` | `docs/general-llm/prompt-engineering-guide.md` (lines 212-215), `docs/claude-code/claude-prompting-best-practices.md` (lines 373-380) | baseline |
+| `improve-hook/references/prompt-engineering-strategies.md` | `docs/general-llm/prompt-engineering-guide.md` (lines 212-215), `docs/claude-code/claude-prompting-best-practices.md` (lines 373-380), `.github/instructions/karpathy-guidelines.instructions.md`, `docs/general-llm/persuasion-principles.md` | baseline |
 | `improve-rule/references/artifact-analyzer.md` | `plugins/agent-customizer/agents/artifact-analyzer.md` | baseline |
-| `improve-rule/references/prompt-engineering-strategies.md` | `docs/general-llm/prompt-engineering-guide.md` (lines 212-215), `docs/claude-code/claude-prompting-best-practices.md` (lines 373-380) | baseline |
+| `improve-rule/references/prompt-engineering-strategies.md` | `docs/general-llm/prompt-engineering-guide.md` (lines 212-215), `docs/claude-code/claude-prompting-best-practices.md` (lines 373-380), `.github/instructions/karpathy-guidelines.instructions.md`, `docs/general-llm/persuasion-principles.md` | baseline |
 | `improve-rule/references/rule-authoring-guide.md` | `docs/claude-code/memory/how-claude-remembers-a-project.md` | baseline |
 | `improve-rule/references/rule-evaluation-criteria.md` | `docs/claude-code/memory/how-claude-remembers-a-project.md` | baseline |
 | `improve-rule/references/rule-evaluator.md` | `plugins/agent-customizer/agents/rule-evaluator.md` | baseline |
 | `improve-rule/references/rule-validation-criteria.md` | `docs/claude-code/memory/how-claude-remembers-a-project.md` | baseline |
 | `improve-skill/references/artifact-analyzer.md` | `plugins/agent-customizer/agents/artifact-analyzer.md` | baseline |
-| `improve-skill/references/prompt-engineering-strategies.md` | `docs/general-llm/prompt-engineering-guide.md` (lines 212-215), `docs/claude-code/claude-prompting-best-practices.md` (lines 373-380) | baseline |
-| `improve-skill/references/skill-authoring-guide.md` | `docs/shared/skill-authoring-best-practices.md`, `docs/claude-code/skills/extend-claude-with-skills.md` | baseline |
+| `improve-skill/references/behavioral-guidelines.md` | self-contained — no external source documents; all content is inline with ✅/❌ examples | baseline |
+| `improve-skill/references/prompt-engineering-strategies.md` | `docs/general-llm/prompt-engineering-guide.md` (lines 212-215), `docs/claude-code/claude-prompting-best-practices.md` (lines 373-380), `.github/instructions/karpathy-guidelines.instructions.md`, `docs/general-llm/persuasion-principles.md` | baseline |
+| `improve-skill/references/skill-authoring-guide.md` | `docs/shared/skill-authoring-best-practices.md`, `docs/claude-code/skills/extend-claude-with-skills.md`, `.github/instructions/karpathy-guidelines.instructions.md`, `docs/general-llm/persuasion-principles.md` | baseline |
 | `improve-skill/references/skill-evaluation-criteria.md` | `docs/shared/skill-authoring-best-practices.md`, `docs/general-llm/Evaluating-AGENTS-paper.md` | baseline |
 | `improve-skill/references/skill-evaluator.md` | `plugins/agent-customizer/agents/skill-evaluator.md` | baseline |
 | `improve-skill/references/skill-format-reference.md` | `docs/claude-code/skills/research-claude-code-skills-format.md` (lines 90-125), `docs/claude-code/skills/extend-claude-with-skills.md` (lines 169-199) | baseline |
-| `improve-skill/references/skill-validation-criteria.md` | `docs/shared/skill-authoring-best-practices.md`, `docs/claude-code/skills/extend-claude-with-skills.md` | baseline |
+| `improve-skill/references/skill-validation-criteria.md` | `docs/shared/skill-authoring-best-practices.md`, `docs/claude-code/skills/extend-claude-with-skills.md`, `.github/instructions/karpathy-guidelines.instructions.md`, `docs/general-llm/persuasion-principles.md` | baseline |
 | `improve-subagent/references/artifact-analyzer.md` | `plugins/agent-customizer/agents/artifact-analyzer.md` | baseline |
-| `improve-subagent/references/prompt-engineering-strategies.md` | `docs/general-llm/prompt-engineering-guide.md` (lines 212-215), `docs/claude-code/claude-prompting-best-practices.md` (lines 373-380) | baseline |
+| `improve-subagent/references/prompt-engineering-strategies.md` | `docs/general-llm/prompt-engineering-guide.md` (lines 212-215), `docs/claude-code/claude-prompting-best-practices.md` (lines 373-380), `.github/instructions/karpathy-guidelines.instructions.md`, `docs/general-llm/persuasion-principles.md` | baseline |
 | `improve-subagent/references/subagent-authoring-guide.md` | `docs/general-llm/subagents/research-subagent-best-practices.md`, `docs/claude-code/subagents/creating-custom-subagents.md` | baseline |
 | `improve-subagent/references/subagent-config-reference.md` | `docs/claude-code/subagents/creating-custom-subagents.md`, `docs/claude-code/subagents/claude-orchestrate-of-claude-code-sessions.md` | baseline |
 | `improve-subagent/references/subagent-evaluation-criteria.md` | `docs/general-llm/subagents/research-subagent-best-practices.md`, `docs/claude-code/subagents/creating-custom-subagents.md` | baseline |
@@ -128,6 +130,8 @@ or manually.
 | `docs/claude-code/subagents/creating-custom-subagents.md` | 6 |
 | `docs/general-llm/a-guide-to-agents.md` | 6 |
 | `docs/general-llm/Evaluating-AGENTS-paper.md` | 8 |
+| `.github/instructions/karpathy-guidelines.instructions.md` | 14 |
+| `docs/general-llm/persuasion-principles.md` | 14 |
 | `docs/general-llm/prompt-engineering-guide.md` | 8 |
 | `docs/general-llm/research-context-engineering-comprehensive.md` | 14 |
 | `docs/general-llm/subagents/research-subagent-best-practices.md` | 4 |

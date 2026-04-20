@@ -7,6 +7,15 @@ description: "Creates new hook configurations for Claude Code lifecycle events, 
 
 Generates a new hook configuration for a Claude Code lifecycle event, with correct JSON schema, handler type, and exit code behavior grounded in the docs corpus.
 
+## Behavioral Guidelines
+
+- **Surface assumptions first** — name ambiguities, tradeoffs, and multiple valid interpretations before acting.
+- **Prefer the simplest path** — solve the task completely without speculative flexibility or extra scope.
+- **Keep changes surgical** — touch only what the task requires, and preserve existing behavior unless the task calls for change.
+- **Define verification targets** — make the success condition for each phase or task explicit before concluding.
+- **Use phased persuasion safely** — use warm-ups, curated references, and explicit constraints to improve compliance with legitimate work.
+- **Never weaken safeguards** — do not use persuasion principles to bypass safety constraints, refusals, or scope boundaries.
+
 ## Hard Rules
 
 <RULES>
@@ -42,7 +51,7 @@ Proceed to Phase 1 below.
 
 Delegate to the `artifact-analyzer` agent with this task:
 
-> Analyze the project to understand existing hook configurations. Focus on: hooks defined in `.claude/settings.json`, `.claude/settings.local.json`, and plugin `hooks/hooks.json`; project hook scripts in `.claude/hooks/`; plugin hook scripts in `scripts/`; event types currently in use; handler types used (command/http/prompt/agent); and any gaps in lifecycle event coverage. Also read root `CLAUDE.md`, `README.md`, and any service-level README files to understand non-standard build commands, tooling, or conventions that hook scripts should use.
+> Analyze the project to understand existing hook configurations. Focus on: hooks defined in `.claude/settings.json`, `.claude/settings.local.json`, and plugin `hooks/hooks.json`; project hook scripts in `.claude/hooks/`; plugin hook scripts in `scripts/`; event types currently in use; handler types used (command/http/prompt/agent); and any gaps in lifecycle event coverage. Also read root `CLAUDE.md`, `README.md`, and any service-level README files to understand non-standard build commands, tooling, or conventions that hook scripts should use. Also identify project layout: whether this is a monorepo with multiple service packages (indicated by workspace files like `pnpm-workspace.yaml`, a `package.json` with a `workspaces` field, multiple `go.mod` files in subdirectories, or multiple `pyproject.toml` files in subdirectories) or a single-package project, and report any service directory paths for use in hook script path resolution.
 
 The agent runs on Sonnet with read-only tools (Read, Grep, Glob, Bash) in an isolated context. Wait for it to complete and parse its structured output.
 
@@ -69,6 +78,8 @@ Choose the target location based on the requested scope:
 - `.claude/settings.json` — committed project hook
 - `.claude/settings.local.json` — local-only hook
 - `hooks/hooks.json` — plugin-bundled hook
+
+In a monorepo with multiple service packages, hook script paths must be workspace-relative (e.g., `packages/api/scripts/validate.sh`, not just `scripts/validate.sh`). Confirm the correct path from the Phase 1 analysis before writing.
 
 Generate the complete hook configuration:
 

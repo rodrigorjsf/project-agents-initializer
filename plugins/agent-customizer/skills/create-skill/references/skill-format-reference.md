@@ -45,7 +45,7 @@ Source: skills/research-claude-code-skills-format.md, skills/extend-claude-with-
 | `agent` | Subagent type when `context: fork` (e.g., `Explore`, `Plan`, `general-purpose`) |
 | `hooks` | Hooks scoped to this skill's lifecycle (see hooks documentation) |
 
-*Source: skills/research-claude-code-skills-format.md lines 90-125; skills/extend-claude-with-skills.md lines 183-198*
+*Source: skills/research-claude-code-skills-format.md lines 90-130; skills/extend-claude-with-skills.md lines 183-198*
 
 ---
 

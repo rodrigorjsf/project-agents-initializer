@@ -24,7 +24,7 @@ Source: hooks/claude-hook-reference-doc.md, hooks/automate-workflow-with-hooks.m
 | Event name | From recognized 22-event list | hooks/claude-hook-reference-doc.md lines 22-46 |
 | Handler type | `command`, `http`, `prompt`, or `agent` | hooks/claude-hook-reference-doc.md lines 249-257 |
 | Matcher field | Valid regex string or empty | hooks/claude-hook-reference-doc.md lines 162-179 |
-| Command path | Executable file exists or is a valid command | hooks/automate-workflow-with-hooks.md |
+| Command path | Absolute script paths must resolve to an existing executable; relative workspace paths (e.g., `.claude/hooks/*.sh`, `scripts/`) are plausible and must not be flagged INVALID | hooks/automate-workflow-with-hooks.md |
 
 A hook configuration violating any hard limit is flagged **INVALID** regardless of intent.
 
@@ -53,7 +53,7 @@ A hook configuration violating any hard limit is flagged **INVALID** regardless 
 |-----------|---------------|
 | Deprecated event names | Verify against current 22-event reference list |
 | Invalid tool names in matcher | Check tool names against current Claude Code tools |
-| Hardcoded absolute paths to scripts that don't exist | Verify each `command` script path exists |
+| Hardcoded absolute paths to scripts that don't exist | Verify each absolute `command` script path exists; relative paths (not starting with `/`) are treated as plausible and are not a staleness indicator *(staleness-evaluation heuristic only; Phase 4 validation uses a stricter existence check — see hook-validation-criteria.md)* |
 | Outdated matcher values (e.g., old session end reasons) | Verify against current matcher value lists |
 
 *Source: hooks/claude-hook-reference-doc.md lines 162-179*
@@ -66,7 +66,7 @@ A hook configuration violating any hard limit is flagged **INVALID** regardless 
 |----------|------|-----|
 | Event type matches intent? | `PreToolUse` for blocking, `PostToolUse` for formatting | Using `PostToolUse` to try to block actions |
 | Matcher is specific, not `"*"`? | `"Edit\|Write"` for file hooks | `"*"` on a blocking hook |
-| Error handling defined? | Exit 2 with clear stderr message | Silent failure (exit 0 always) |
+| Error handling defined? | Exit 2 with clear stderr on failure (PreToolUse); PostToolUse scripts may exit 0 if explicitly documented as intentional | Silent failure — no error path, no stderr, no comment explaining why always-exit-0 is intentional |
 | Security posture appropriate? | Hook validates before allowing | Hook only logs, never blocks |
 | Hook type appropriate for task? | `command` for deterministic, `prompt` for judgment | `agent` for a simple grep check |
 
@@ -86,6 +86,8 @@ A hook configuration violating any hard limit is flagged **INVALID** regardless 
 | **Overall** | | | |
 
 *Source: hooks/claude-hook-reference-doc.md lines 249-257*
+
+> **UNCERTAIN classification**: When the `command` handler references an external script that cannot be read from the repository, classify Error Handling as **UNCERTAIN** (not Bad) — exit-code behavior cannot be verified from the hook configuration alone. Report it as a gap rather than a violation.
 
 ---
 

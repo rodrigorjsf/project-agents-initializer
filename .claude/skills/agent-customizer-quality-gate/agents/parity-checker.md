@@ -128,6 +128,13 @@ md5sum plugins/agent-customizer/skills/create-subagent/assets/templates/subagent
        plugins/agent-customizer/skills/improve-subagent/assets/templates/subagent-definition.md
 ```
 
+### Group 15: behavioral-guidelines.md (create-skill ↔ improve-skill)
+
+```bash
+md5sum plugins/agent-customizer/skills/create-skill/references/behavioral-guidelines.md \
+       plugins/agent-customizer/skills/improve-skill/references/behavioral-guidelines.md
+```
+
 ---
 
 ## Interpreting Results
@@ -165,6 +172,7 @@ Return exactly this structure:
 | 12 | subagent-config-reference.md | 2 | MATCH/MISMATCH |
 | 13 | template skill-md.md | 2 | MATCH/MISMATCH |
 | 14 | template subagent-definition.md | 2 | MATCH/MISMATCH |
+| 15 | behavioral-guidelines.md | 2 | MATCH/MISMATCH |
 
 ### Divergences Found
 [If none: "✅ No divergences — all shared files are identical across create/improve pairs."]

@@ -7,6 +7,15 @@ description: "Creates new subagent definitions with YAML frontmatter grounded in
 
 Generates a new subagent definition with correct YAML frontmatter, minimal tool restrictions, and a structured system prompt grounded in the docs corpus.
 
+## Behavioral Guidelines
+
+- **Surface assumptions first** — name ambiguities, tradeoffs, and multiple valid interpretations before acting.
+- **Prefer the simplest path** — solve the task completely without speculative flexibility or extra scope.
+- **Keep changes surgical** — touch only what the task requires, and preserve existing behavior unless the task calls for change.
+- **Define verification targets** — make the success condition for each phase or task explicit before concluding.
+- **Use phased persuasion safely** — use warm-ups, curated references, and explicit constraints to improve compliance with legitimate work.
+- **Never weaken safeguards** — do not use persuasion principles to bypass safety constraints, refusals, or scope boundaries.
+
 ## Hard Rules
 
 <RULES>
@@ -41,7 +50,7 @@ Proceed to Phase 1 below.
 
 Delegate to the `artifact-analyzer` agent with this task:
 
-> Analyze the project to understand existing subagents. Focus on: agent names and roles in `.claude/agents/` and `plugins/*/agents/`, tool restrictions in use, model choices, `maxTurns` values, which skills delegate to which agents, and naming conventions. Flag any agents similar in purpose to `{requested-name}`. Also identify the project layout: whether this is a monorepo (multiple plugin directories, workspace files like `pnpm-workspace.yaml`) or a single-package project.
+> Analyze the project to understand existing subagents. Focus on: agent names and roles in `.claude/agents/` and `plugins/*/agents/`, tool restrictions in use, model choices, `maxTurns` values, which skills delegate to which agents, and naming conventions. Flag any agents similar in purpose to `{requested-name}`. Also identify the project layout: whether this is a monorepo with multiple service packages (indicated by workspace files like `pnpm-workspace.yaml`, a `package.json` with a `workspaces` field, multiple `go.mod` files in subdirectories, or multiple `pyproject.toml` files in subdirectories) or a single-package project, and report any service directory paths for use in scope resolution.
 
 The agent runs on Sonnet with read-only tools (Read, Grep, Glob, Bash) in an isolated context. Wait for it to complete and parse its structured output.
 

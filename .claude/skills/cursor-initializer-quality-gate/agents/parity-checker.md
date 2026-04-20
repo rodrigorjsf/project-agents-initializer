@@ -29,9 +29,6 @@ byte-for-byte identical within the cursor parity family.
 md5sum plugins/cursor-initializer/skills/init-cursor/references/context-optimization.md \
        plugins/cursor-initializer/skills/improve-cursor/references/context-optimization.md
 
-md5sum plugins/cursor-initializer/skills/init-cursor/references/validation-criteria.md \
-       plugins/cursor-initializer/skills/improve-cursor/references/validation-criteria.md
-
 md5sum plugins/cursor-initializer/skills/init-cursor/references/what-not-to-include.md \
        plugins/cursor-initializer/skills/improve-cursor/references/what-not-to-include.md
 
