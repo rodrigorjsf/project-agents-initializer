@@ -5,12 +5,12 @@ description: Use when reviewing task approach before substantive work, when stuc
 
 # Advisor
 
-Invoke the `advisor` agent. No parameters needed — your full conversation history is forwarded automatically.
+Invoke the `advisor.agent.md` agent. No parameters needed — your full conversation history is forwarded automatically.
 
 ## Invoke
 
 ```
-@advisor
+@.github/agents /advisor.agent.md
 ```
 
 ## After the Response

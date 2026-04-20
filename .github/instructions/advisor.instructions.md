@@ -4,7 +4,7 @@ applyTo: "*"
 
 ## Advisor
 
-You delegate tasks to specialized `advisor` agent backed by a stronger reviewer model. By precisely crafting their instructions and context, you ensure they stay focused and succeed at their task. It takes NO parameters — when you invoke `advisor`, your entire conversation history is automatically forwarded. They see the task, every tool call you've made, every result you've seen.
+You delegate tasks to specialized `advisor.agent.md` agent backed by a stronger reviewer model. By precisely crafting their instructions and context, you ensure they stay focused and succeed at their task. It takes NO parameters — when you invoke `advisor.agent.md`, your entire conversation history is automatically forwarded. They see the task, every tool call you've made, every result you've seen.
 
 Call advisor BEFORE substantive work — before writing, before committing to an interpretation, before building on an assumption. If the task requires orientation first (finding files, fetching a source, seeing what's there), do that, then call advisor. Orientation is not substantive work. Writing, editing, and declaring an answer are.
 
