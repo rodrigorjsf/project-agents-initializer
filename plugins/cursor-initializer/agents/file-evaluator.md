@@ -70,7 +70,7 @@ Flag instructions that are candidates for migration to on-demand mechanisms:
 | Content agents can infer from code | Deletion | `DELETE_CANDIDATE` |
 | `npm test` (language-default test command) | Deletion | `DELETE_CANDIDATE` |
 | `pytest` (language-default test command) | Deletion | `DELETE_CANDIDATE` |
-| `cargo test ./...` (language-default test command) | Deletion | `DELETE_CANDIDATE` |
+| `cargo test` (language-default test command) | Deletion | `DELETE_CANDIDATE` |
 | `go test ./...` (language-default test command) | Deletion | `DELETE_CANDIDATE` |
 | Instructions duplicated across multiple files | Consolidation | `CONSOLIDATE` |
 | Version numbers, team names, high-churn content | Deletion | `DELETE_CANDIDATE` |
