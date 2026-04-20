@@ -10,7 +10,7 @@ paths:
 - Never add inline bash analysis here — subagent delegation keeps the orchestrator context clean
 - Reference agents by registered name for the target plugin (e.g., "Delegate to the `codebase-analyzer` agent with this task:")
 - `references/` directory MUST exist alongside SKILL.md and contain evidence-based guidance files
-- `assets/templates/` directory MUST exist alongside SKILL.md and contain output templates
+- `assets/templates/` directory MUST exist alongside SKILL.md and contain output templates; validator-type or report-only plugin skills that do not generate templated artifacts MAY omit it
 - Plugin skills MUST encode behavioral discipline: surface assumptions first, prefer the simplest complete path, keep changes surgical, and define explicit validation targets
 - If plugin skills use persuasion patterns, they MUST state the ethical constraint that those patterns support legitimate work only and never bypass safeguards or refusals
 - Self-validation phase MUST read the relevant `references/*validation-criteria.md` file for that skill and loop until all checks pass

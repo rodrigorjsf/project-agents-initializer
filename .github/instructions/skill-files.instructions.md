@@ -20,7 +20,7 @@ Flag any SKILL.md missing frontmatter or violating these constraints.
 - If persuasion patterns are used, they must be framed only as support for legitimate, beneficial, well-scoped work — never to bypass safeguards or refusals
 - Must include a self-validation phase that reads the relevant `references/*validation-criteria.md` file for that skill
 - Reference files must be loaded conditionally using the platform-appropriate skill-root path convention
-- Sibling directories `references/` and `assets/templates/` must exist alongside SKILL.md
+- Sibling directories `references/` and `assets/templates/` must exist alongside SKILL.md; validator-type or report-only skills that generate no templated artifacts MAY omit `assets/templates/`
 
 ## Plugin vs Standalone Pattern (Critical)
 
