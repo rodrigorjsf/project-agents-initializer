@@ -63,7 +63,7 @@ or manually.
 | `create-rule/references/rule-authoring-guide.md` | `docs/claude-code/memory/how-claude-remembers-a-project.md` | baseline |
 | `create-rule/references/rule-validation-criteria.md` | `docs/claude-code/memory/how-claude-remembers-a-project.md` | baseline |
 | `create-skill/references/artifact-analyzer.md` | `plugins/agent-customizer/agents/artifact-analyzer.md` | baseline |
-| `create-skill/references/behavioral-guidelines.md` | `.github/instructions/karpathy-guidelines.instructions.md`, `docs/general-llm/persuasion-principles.md` | baseline |
+| `create-skill/references/behavioral-guidelines.md` | self-contained — no external source documents; all content is inline with ✅/❌ examples | baseline |
 | `create-skill/references/prompt-engineering-strategies.md` | `docs/general-llm/prompt-engineering-guide.md` (lines 212-215), `docs/claude-code/claude-prompting-best-practices.md` (lines 373-380), `.github/instructions/karpathy-guidelines.instructions.md`, `docs/general-llm/persuasion-principles.md` | baseline |
 | `create-skill/references/skill-authoring-guide.md` | `docs/shared/skill-authoring-best-practices.md`, `docs/claude-code/skills/extend-claude-with-skills.md`, `.github/instructions/karpathy-guidelines.instructions.md`, `docs/general-llm/persuasion-principles.md` | baseline |
 | `create-skill/references/skill-format-reference.md` | `docs/claude-code/skills/research-claude-code-skills-format.md` (lines 90-125), `docs/claude-code/skills/extend-claude-with-skills.md` (lines 169-199) | baseline |
@@ -87,7 +87,7 @@ or manually.
 | `improve-rule/references/rule-evaluator.md` | `plugins/agent-customizer/agents/rule-evaluator.md` | baseline |
 | `improve-rule/references/rule-validation-criteria.md` | `docs/claude-code/memory/how-claude-remembers-a-project.md` | baseline |
 | `improve-skill/references/artifact-analyzer.md` | `plugins/agent-customizer/agents/artifact-analyzer.md` | baseline |
-| `improve-skill/references/behavioral-guidelines.md` | `.github/instructions/karpathy-guidelines.instructions.md`, `docs/general-llm/persuasion-principles.md` | baseline |
+| `improve-skill/references/behavioral-guidelines.md` | self-contained — no external source documents; all content is inline with ✅/❌ examples | baseline |
 | `improve-skill/references/prompt-engineering-strategies.md` | `docs/general-llm/prompt-engineering-guide.md` (lines 212-215), `docs/claude-code/claude-prompting-best-practices.md` (lines 373-380), `.github/instructions/karpathy-guidelines.instructions.md`, `docs/general-llm/persuasion-principles.md` | baseline |
 | `improve-skill/references/skill-authoring-guide.md` | `docs/shared/skill-authoring-best-practices.md`, `docs/claude-code/skills/extend-claude-with-skills.md`, `.github/instructions/karpathy-guidelines.instructions.md`, `docs/general-llm/persuasion-principles.md` | baseline |
 | `improve-skill/references/skill-evaluation-criteria.md` | `docs/shared/skill-authoring-best-practices.md`, `docs/general-llm/Evaluating-AGENTS-paper.md` | baseline |
