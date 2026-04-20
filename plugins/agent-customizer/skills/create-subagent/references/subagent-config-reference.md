@@ -116,7 +116,7 @@ Main → (delegate) → Researcher agent → (report) → Main → (delegate) �
 **Parallel decomposition:**
 Spawn multiple independent subagents simultaneously. Main aggregates results.
 
-*Source: subagents/claude-orchestrate-of-claude-code-sessions.md lines 1-80*
+*Source: subagents/creating-custom-subagents.md lines 619-637*
 
 ---
 

@@ -1,19 +1,17 @@
 {
   "hooks": {
-    "PreToolUse": [
+    "PostToolUse": [
       {
-        "matcher": "Write|Edit|Create",
+        "matcher": "Write|Edit",
         "hooks": [
           {
             "type": "command",
             "command": ".claude/hooks/check-docs-sync.sh"
           }
         ]
-      }
-    ],
-    "PostToolUse": [
+      },
       {
-        "matcher": "Edit|Write",
+        "matcher": "Edit|Create",
         "hooks": [
           {
             "type": "command",

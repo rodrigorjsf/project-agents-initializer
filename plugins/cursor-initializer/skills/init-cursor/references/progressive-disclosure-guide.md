@@ -30,6 +30,8 @@ When deciding where to place content, use this table:
 | `.cursor/rules/*.mdc` with `globs:` | Specific to certain file patterns | On-demand when files match |
 | Skill | A workflow the agent should invoke explicitly | On-demand when invoked |
 
+**Borderline tiebreaker (10–15 lines):** When domain content falls between 10–15 lines, prefer extracting it to a separate domain file if it applies to only one domain — even if the size alone doesn't demand it. Root file brevity is more valuable than the small cost of an additional file.
+
 *Source: a-guide-to-agents.md lines 228-233; research-context-engineering-comprehensive.md lines 257-305*
 
 ---

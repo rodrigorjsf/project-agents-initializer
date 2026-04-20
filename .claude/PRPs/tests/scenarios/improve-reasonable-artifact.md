@@ -53,8 +53,8 @@ The reasonable-skill.md:
 
 The reasonable-hook.json:
 - Is valid JSON
-- Uses recognized event names (`PreToolUse`, `PostToolUse`)
-- Has specific matchers (`Write|Edit|Create`, `Edit|Write`)
+- Uses recognized event names (`PostToolUse`)
+- Has specific matchers (`Write|Edit`, `Edit|Create`) aligned with what each script processes
 - Has no embedded secrets
 - Commands point to relative paths
 

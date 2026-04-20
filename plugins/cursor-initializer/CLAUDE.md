@@ -12,3 +12,4 @@ Follows the official Cursor plugin specification. Two Cursor-specific skills: `i
 - Generated rules use `.mdc` format with only `description`, `alwaysApply`, `globs` frontmatter
 - Generated project output targets `.cursor/rules/` (not `.claude/rules/`)
 - `init-cursor` always generates AGENTS.md; `improve-cursor` only handles AGENTS.md if target project has it
+- `validation-criteria.md` intentionally diverges between `init-cursor` and `improve-cursor` — `improve-cursor` has additional preservation and calibration rules; these files are NOT a parity family
