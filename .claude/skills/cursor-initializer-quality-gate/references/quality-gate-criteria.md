@@ -57,10 +57,12 @@ Source: `.claude/rules/cursor-plugin-skills.md`, `.claude/rules/reference-files.
 
 | # | Check | Threshold | Severity if Violated |
 |---|-------|-----------|---------------------|
-| T1 | All required templates present per skill type | Required | CRITICAL |
+| T1 | All three activation-mode `.mdc` variants present in both skills (`cursor-rule-always.mdc`, `cursor-rule-globs.mdc`, `cursor-rule-description.mdc`) | Required | CRITICAL |
 | T2 | `.mdc` templates use ONLY valid frontmatter: `description`, `alwaysApply`, `globs` | Cursor constraint | CRITICAL |
 | T3 | `.mdc` templates do NOT contain `paths:` | Prohibited (Claude field) | CRITICAL |
-| T4 | Templates identical within each intended init/improve copy family | Required | MAJOR |
+| T4 | The three `.mdc` variants are byte-identical between init-cursor and improve-cursor | Required | MAJOR |
+| T5 | `init-cursor` does NOT generate `AGENTS.md` (rules-first; no legacy monolithic context file output) | Cursor constraint | CRITICAL |
+| T6 | `improve-cursor` migrates `AGENTS.md` non-destructively when present in the target project (original file left intact) | Cursor constraint | CRITICAL |
 
 ### Cross-Copy Parity (init-cursor ↔ improve-cursor)
 

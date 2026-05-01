@@ -66,16 +66,18 @@ Inspect all files matching `plugins/cursor-initializer/skills/*/references/*.md`
 
 ### 4. Template Files
 
-Verify required template files exist using `ls`:
+Verify required template files exist using `ls`. The Cursor distribution is rules-first: `init-cursor` generates only `.cursor/rules/*.mdc` files, and `improve-cursor` adds automation-migration outputs (skill, hook). Both skills ship the three activation-mode-specific `.mdc` variants.
 
 | Skill | Required Templates |
 |-------|-------------------|
-| `plugins/cursor-initializer/skills/init-cursor/assets/templates/` | `root-agents-md.md`, `scoped-agents-md.md`, `domain-doc.md`, `cursor-rule.mdc` |
-| `plugins/cursor-initializer/skills/improve-cursor/assets/templates/` | `root-agents-md.md`, `scoped-agents-md.md`, `domain-doc.md`, `cursor-rule.mdc` |
+| `plugins/cursor-initializer/skills/init-cursor/assets/templates/` | `cursor-rule-always.mdc`, `cursor-rule-globs.mdc`, `cursor-rule-description.mdc` |
+| `plugins/cursor-initializer/skills/improve-cursor/assets/templates/` | `cursor-rule-always.mdc`, `cursor-rule-globs.mdc`, `cursor-rule-description.mdc`, `hook-config.md`, `skill.md` |
 
 Verify template content:
 - `.mdc` templates MUST use only valid Cursor frontmatter: `description`, `alwaysApply`, `globs`
 - `.mdc` templates MUST NOT contain `paths:` (Claude-specific field)
+- `init-cursor` MUST NOT generate `AGENTS.md` (rules-first — legacy monolithic context files are never produced by init)
+- `improve-cursor` MUST migrate `AGENTS.md` non-destructively only when an `AGENTS.md` file is present in the target project (the original file is left intact)
 
 ### 5. Plugin Manifest
 
