@@ -5,7 +5,7 @@ Follows the official Cursor plugin specification. Customizer of the Cursor distr
 ## Conventions
 
 - `skills/` — `SKILL.md` entry points; per-skill `references/` and `assets/templates/` directories land with each artifact-type slice.
-- `agents/` — Cursor-native subagent format: frontmatter exposes only `name`, `description`, `model`, `readonly`; no Claude-Code-specific frontmatter fields.
+- `agents/` — Cursor-native subagent format: frontmatter exposes exactly the four Cursor-native fields (`name`, `description`, `model`, `readonly`) and nothing else.
 - Plugin agents MUST NOT spawn other agents and cannot perform writes when `readonly: true`.
 - Generated artifacts target Cursor-native locations only: rules under `.cursor/rules/*.mdc`, skills under `.cursor/skills/` by default (`.agents/skills/` for portable workflows), subagents under `.cursor/agents/`, hooks per the project's Cursor hook configuration.
 - Generated rule files use `.mdc` format with frontmatter limited to `description`, `alwaysApply`, `globs`.
