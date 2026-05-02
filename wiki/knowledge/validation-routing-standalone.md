@@ -6,7 +6,7 @@
 
 ---
 
-> **Derived view** — Derived from `standalone-bundle` in [[normative-source-matrix]] (`docs/compliance/normative-source-matrix.md:283-290`). See [[compliance-routing]] for the full routing table.
+> **Derived view** — Derived from `standalone-bundle` in the normative source matrix (`docs/compliance/normative-source-matrix.md:283-290`). See [[compliance-routing]] for the full routing table.
 
 ---
 

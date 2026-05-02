@@ -6,7 +6,7 @@
 
 ---
 
-> **Derived view** — This page is a compact routing reference for validators. The authoritative definitions live in [[normative-source-matrix]] (`docs/compliance/normative-source-matrix.md`). If those definitions change, this page must be updated to match.
+> **Derived view** — This page is a compact routing reference for validators. The authoritative definitions live in the normative source matrix (`docs/compliance/normative-source-matrix.md`). If those definitions change, this page must be updated to match.
 
 Before loading any platform-specific conventions, identify your validation scope below and read the matching scope-specific page (`[[validation-routing-claude]]`, `[[validation-routing-cursor]]`, `[[validation-routing-standalone]]`). Each scope-specific page lists the primary entry points to read first; this prevents loading forbidden sources and reduces retrieval noise.
 

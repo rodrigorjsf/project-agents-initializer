@@ -6,7 +6,7 @@
 
 ---
 
-> **Derived view** — Derived from `claude-plugin-bundle` and `agent-customizer-bundle` in [[normative-source-matrix]] (`docs/compliance/normative-source-matrix.md:265-296`). See [[compliance-routing]] for the full routing table.
+> **Derived view** — Derived from `claude-plugin-bundle` and `agent-customizer-bundle` in the normative source matrix (`docs/compliance/normative-source-matrix.md:265-296`). See [[compliance-routing]] for the full routing table.
 
 ---
 

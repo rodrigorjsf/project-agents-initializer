@@ -6,7 +6,7 @@
 
 ---
 
-> **Derived view** — Derived from `cursor-plugin-bundle` in [[normative-source-matrix]] (`docs/compliance/normative-source-matrix.md:274-281`). See [[compliance-routing]] for the full routing table.
+> **Derived view** — Derived from `cursor-plugin-bundle` in the normative source matrix (`docs/compliance/normative-source-matrix.md:274-281`). See [[compliance-routing]] for the full routing table.
 
 ---
 
