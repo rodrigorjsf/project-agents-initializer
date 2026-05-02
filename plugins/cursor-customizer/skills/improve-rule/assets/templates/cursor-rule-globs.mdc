@@ -1,0 +1,31 @@
+<!-- TEMPLATE: cursor-rule-globs.mdc
+  Activation mode: Auto-attached
+  Placement: .cursor/rules/[rule-name].mdc
+  Naming: kebab-case, descriptive of the matched file scope
+  Target: 10-50 lines of pattern-relative instructions
+
+  This rule loads only when files matching its globs enter the agent's context.
+  Use this variant for conventions that apply ONLY to specific file patterns
+  (test files, generated code, migration scripts, sensitive-handler files,
+  monorepo workspace packages).
+
+  Frontmatter (only these three fields are valid):
+  - globs (string or array): REQUIRED — file patterns triggering auto-attachment
+  - alwaysApply (boolean): MUST be false for this variant
+  - description (optional): one-sentence summary of the rule
+-->
+---
+globs: ["[PATTERN]", "[PATTERN]"]
+alwaysApply: false
+description: "[ONE-SENTENCE SUMMARY OF WHAT MATCHED FILES NEED]"
+---
+
+<!-- Content guidelines for the globs variant:
+  - Write instructions relative to the matched files — assume the agent is editing them now
+  - Reference adjacent files with @path/to/file when canonical examples exist in the repo
+  - One concern per file: do not bundle unrelated conventions under the same glob
+  - If the rule must apply to several disjoint patterns, prefer one rule per pattern set
+-->
+
+- [Pattern-relative instruction the agent will need when editing matched files]
+- [Pattern-relative instruction the agent will need when editing matched files]
