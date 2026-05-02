@@ -66,6 +66,20 @@ The database is pre-built. Tools are available via MCP (`rag-knowledge-base` ser
 - Stage only files belonging to the same logical change; never `git add -A` across unrelated changes
 - If asked to "commit everything", break it into atomic commits by scope first, then commit each group
 
+## Agent skills
+
+### Issue tracker
+
+Issues live in GitHub Issues for `rodrigorjsf/agent-engineering-toolkit`, accessed via the `gh` CLI. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Five canonical roles — `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix` — using default label names. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context: `CONTEXT.md` and `docs/adr/` at the repo root (created lazily by `/grill-with-docs`). See `docs/agents/domain.md`.
+
 ## Applied Learning
 
 When something fails repeatedly, when User has to re-explain, or when a workaround is found for a platform/tool limitation, add a one-line bullet here. Keep each bullet under 15 words. No explanations. Only add things that will save time in future sessions.
