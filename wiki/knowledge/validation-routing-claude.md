@@ -1,8 +1,8 @@
 # Validation Routing — Claude Code Plugins
 
-**Summary**: Routing guide for validators checking Claude Code plugin artifacts (`agents-initializer`, `agent-customizer`). Lists primary sources, forbidden sources, convention entry points, and recommended search queries.
+**Summary**: Routing guide for validators checking Claude Code plugin artifacts (`agents-initializer`, `agent-customizer`). Lists primary sources, forbidden sources, convention entry points, and direct read paths.
 **Sources**: docs/compliance/normative-source-matrix.md
-**Last updated**: 2026-04-19
+**Last updated**: 2026-05-02
 
 ---
 
@@ -82,17 +82,13 @@ Start validation from these files:
 
 ---
 
-## Recommended Search Queries
+## Direct Read Paths
 
-```
-search_docs("claude code skill SKILL.md format frontmatter")
-search_docs("claude code agent definition model tools maxTurns")
-search_docs("claude code plugin structure manifest name")
-search_docs("claude code rules paths scoping CLAUDE.md hierarchy")
-search_code("plugins/agents-initializer SKILL.md")
-search_code("plugins/agent-customizer agents/*.md")
-search_all("plugin skill delegation named agents")
-```
+Read these in order when validating a Claude Code plugin artifact:
+
+1. Wiki concept pages (compact, curated): `[[claude-code-skills]]`, `[[claude-code-subagents]]`, `[[claude-code-plugins]]`, `[[claude-code-memory]]`, `[[claude-code-hooks]]`.
+2. Source documents (raw): `docs/claude-code/skills/`, `docs/claude-code/subagents/`, `docs/claude-code/plugins/`, `docs/claude-code/memory/`, `docs/claude-code/hooks/`.
+3. Concrete examples in this repo: `plugins/agents-initializer/skills/`, `plugins/agent-customizer/agents/`.
 
 ---
 

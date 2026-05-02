@@ -1,8 +1,8 @@
 # Validation Routing — Cursor IDE Plugin
 
-**Summary**: Routing guide for validators checking Cursor IDE plugin artifacts (`cursor-initializer`). Lists primary sources, forbidden sources, convention entry points, and recommended search queries.
+**Summary**: Routing guide for validators checking Cursor IDE plugin artifacts (`cursor-initializer`). Lists primary sources, forbidden sources, convention entry points, and direct read paths.
 **Sources**: docs/compliance/normative-source-matrix.md
-**Last updated**: 2026-04-19
+**Last updated**: 2026-05-02
 
 ---
 
@@ -84,17 +84,13 @@ Start validation from these files:
 
 ---
 
-## Recommended Search Queries
+## Direct Read Paths
 
-```
-search_docs("cursor rule mdc format globs activation modes")
-search_docs("cursor skill SKILL.md relative paths bundled files")
-search_docs("cursor subagent model inherit readonly")
-search_docs("cursor plugin manifest name bundling")
-search_code("plugins/cursor-initializer SKILL.md")
-search_code("plugins/cursor-initializer agents/*.md")
-search_all("cursor mdc frontmatter globs description alwaysApply")
-```
+Read these in order when validating a Cursor IDE plugin artifact:
+
+1. Wiki concept pages (compact, curated): `[[cursor-rules]]`, `[[cursor-skills]]`, `[[cursor-subagents]]`, `[[cursor-plugins]]`, `[[cursor-hooks]]`, `[[cursor-mcp]]`, `[[cursor-tools]]`.
+2. Source documents (raw): `docs/cursor/skills/`, `docs/cursor/rules/`, `docs/cursor/subagents/`, `docs/cursor/plugin/`, `docs/cursor/hooks/`, `docs/cursor/best-practices/`.
+3. Concrete examples in this repo: `plugins/cursor-initializer/skills/`, `plugins/cursor-initializer/agents/`.
 
 ---
 

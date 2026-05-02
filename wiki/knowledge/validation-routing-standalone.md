@@ -1,8 +1,8 @@
 # Validation Routing — Standalone Skills
 
-**Summary**: Routing guide for validators checking standalone skills (`skills/` — the `npx skills add` portable distribution). Lists primary sources, forbidden sources, convention entry points, and recommended search queries.
+**Summary**: Routing guide for validators checking standalone skills (`skills/` — the `npx skills add` portable distribution). Lists primary sources, forbidden sources, convention entry points, and direct read paths.
 **Sources**: docs/compliance/normative-source-matrix.md
-**Last updated**: 2026-04-19
+**Last updated**: 2026-05-02
 
 ---
 
@@ -95,15 +95,13 @@ Start validation from these files:
 
 ---
 
-## Recommended Search Queries
+## Direct Read Paths
 
-```
-search_docs("agent skills standard SKILL.md frontmatter specification")
-search_docs("standalone skill inline bash analysis commands")
-search_docs("skill authoring eval-driven description optimization")
-search_code("skills/ SKILL.md pattern")
-search_all("standalone skills no agent delegation inline")
-```
+Read these in order when validating a standalone skill artifact:
+
+1. Wiki concept pages (compact, curated): `[[agent-skills-standard]]`, `[[skill-authoring]]`, `[[progressive-disclosure]]`.
+2. Source documents (raw): `docs/shared/skills-standard/`, `docs/shared/skill-authoring-best-practices.md`, `docs/general-llm/a-guide-to-agents.md`.
+3. Concrete examples in this repo: `skills/*/SKILL.md`.
 
 ---
 
