@@ -1,0 +1,119 @@
+# Subagent Config Reference
+
+Cursor-native subagent frontmatter specification, model handling, and orchestration patterns.
+Source: docs/cursor/subagents/subagents-guide.md, docs/adr/0002-product-strict-research-foundation.md
+
+---
+
+## Contents
+
+- Allowed frontmatter fields (the four-key contract)
+- Model field (always `inherit`)
+- Readonly field (always `true`)
+- File locations and naming
+- Orchestration patterns
+- Constraints (what subagents cannot do)
+- Foreign-platform fields (forbidden)
+
+---
+
+## Allowed Frontmatter Fields
+
+The Cursor-native subagent frontmatter for this distribution uses **exactly four keys**. No other key may appear.
+
+| Field | Required | Allowed Value | Description |
+|-------|----------|---------------|-------------|
+| `name` | Yes | Lowercase letters and hyphens; ≤64 chars | Display name and identifier; must be unique across the project's subagent set. |
+| `description` | Yes | Non-empty string, ≤1024 chars | Action-oriented summary that includes a "Use when..." trigger. The agent reads this to decide delegation. |
+| `model` | Yes | `inherit` | Cursor-native: the subagent runs on the same model as the parent agent. The product-strict contract requires this value. |
+| `readonly` | Yes | `true` | Cursor-native: the subagent runs with restricted write permissions (no file edits, no state-changing shell commands). The product-strict contract requires this value for analysis and evaluator subagents. |
+
+*Source: docs/cursor/subagents/subagents-guide.md (configuration fields table); docs/adr/0002-product-strict-research-foundation.md*
+
+---
+
+## Model Field
+
+The Cursor `model` field accepts three documented values: `inherit`, `fast`, and a specific model ID.
+
+For this distribution, **the value MUST be `inherit`**. The `fast` value and any specific model ID are not used by generated artifacts. Two reasons:
+
+1. **Product-strict contract (ADR-0002).** Generated subagent definitions cannot embed product-branded model identifiers. `inherit` is the only Cursor-native value that satisfies this constraint.
+2. **Operational consistency.** Customizer-generated subagents should run on the same model as the parent agent so behavior is predictable across user environments and plan tiers.
+
+If a Cursor user explicitly opts into `fast` or a specific model ID for their own hand-edited subagent, the customizer does not block that — but the customizer never generates such a value.
+
+*Source: docs/cursor/subagents/subagents-guide.md (model configuration); docs/adr/0002-product-strict-research-foundation.md*
+
+---
+
+## Readonly Field
+
+The `readonly` field is a boolean. When `true`, the subagent runs with restricted write permissions: no file edits, no state-changing shell commands.
+
+For this distribution, **the value MUST be `true`** for every generated subagent. Customizer-generated subagents are analysis and evaluation roles by design; they report findings to the parent agent and do not modify project state directly.
+
+If a future workflow requires a subagent that writes files, the customizer prompts the user to confirm and document the rationale before generating such a subagent — but the default and recommended posture is `readonly: true`.
+
+*Source: docs/cursor/subagents/subagents-guide.md (configuration fields table)*
+
+---
+
+## File Locations and Naming
+
+Cursor honors several subagent locations. This customizer generates into the Cursor-native paths only.
+
+| Type | Generated Location | Scope |
+|------|--------------------|-------|
+| Project subagent | `.cursor/agents/{name}.md` | Current project |
+| Plugin-scoped subagent | `plugins/{plugin}/agents/{name}.md` | Plugin context |
+
+File naming: kebab-case `.md` filenames matching the subagent's `name` field (e.g., `security-reviewer.md` for `name: security-reviewer`).
+
+*Source: docs/cursor/subagents/subagents-guide.md (file locations)*
+
+---
+
+## Orchestration Patterns
+
+**Hub-and-spoke** — The parent agent delegates tasks to specialized subagents; subagents report results back. No inter-subagent communication is planned.
+
+**Sequential pipeline** — The parent invokes subagent A, takes its output, and uses it to brief subagent B. Sub-flow within the parent.
+
+**Parallel decomposition** — The parent launches multiple independent subagents simultaneously and aggregates their results.
+
+| Pattern | When to use |
+|---------|-------------|
+| Hub-and-spoke | Independent delegation; one parent, many specialists |
+| Sequential pipeline | Task B depends on Task A's structured output |
+| Parallel decomposition | Independent reads or evaluations that can run concurrently |
+
+*Source: docs/cursor/subagents/subagents-guide.md (using subagents — parallel execution; orchestrator pattern)*
+
+---
+
+## Constraints
+
+These constraints govern subagents authored by this customizer:
+
+- **Project subagents must not spawn other subagents.** Although Cursor's runtime supports nested launches, this project's convention restricts subagent invocation to the parent agent only. The generated system prompt must not instruct the subagent to delegate further.
+- **Subagents do not inherit the parent's conversation history.** Pass relevant context inside the delegation prompt.
+- **Subagents do not inherit parent skills.** If a subagent needs domain knowledge, encode it in the system prompt.
+- **The frontmatter key set is closed.** Only `name`, `description`, `model`, `readonly` are permitted. Any other key is rejected by validation.
+
+*Source: docs/cursor/subagents/subagents-guide.md (best practices, anti-patterns)*
+
+---
+
+## Foreign-Platform Fields (Forbidden)
+
+The following frontmatter fields belong to other agent platforms and MUST NOT appear in Cursor subagent definitions generated by this customizer:
+
+- A tool-allowlist key (the foreign-platform key spelled t-o-o-l-s) — Cursor uses `readonly` for write restriction.
+- A turn-cap key (the foreign-platform key combining "max" and "Turns") — Cursor does not honor a turn-cap in subagent frontmatter.
+- A path-scope key (the foreign-platform key, plural of "path") — that key is for path-scoped rule files, not subagents.
+- Any literal model alias (such as the small-fast, balanced, or large-reasoning aliases) or any specific model ID prefix — `model` MUST be `inherit`.
+
+These rejections are enforced by `subagent-validation-criteria.md` with explicit examples.
+
+*Source: docs/adr/0002-product-strict-research-foundation.md*
