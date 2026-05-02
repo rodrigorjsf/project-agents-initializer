@@ -20,7 +20,7 @@ a degraded state and the improve skill must identify all violations and propose 
 | Fixture | Violations Planted | Improve Skill |
 |---------|--------------------|---------------|
 | `bloated-skill.md` | 10 labeled violations | `improve-skill` |
-| `bloated-hook.json` | 8 labeled violations | `improve-hook` |
+| `bloated-hook.json` | 7 labeled violations | `improve-hook` |
 | `bloated-rule.md` | 8 labeled violations | `improve-rule` |
 | `bloated-subagent.md` | 8 labeled violations | `improve-subagent` |
 
@@ -38,23 +38,24 @@ a degraded state and the improve skill must identify all violations and propose 
 | 4 | Inline bash analysis blocks in plugin skill | YES | P8 (MAJOR) |
 | 5 | No self-validation phase | YES | P9 (MAJOR) |
 | 6 | References loaded all upfront (not per-phase) | YES | P9/P12 (MAJOR) |
-| 7 | Hardcoded absolute paths instead of `${CLAUDE_SKILL_DIR}` | YES | Convention |
+| 7 | Plugin skill uses hardcoded absolute paths instead of `${CLAUDE_SKILL_DIR}` | YES | Convention |
 | 8 | No evidence citations anywhere | YES | R3 (MINOR) |
 | 9 | No `references/` directory referenced | YES | P10 (CRITICAL) |
 | 10 | Vague phase instructions ("ensure quality") | YES | Convention |
 
-### bloated-hook.json (8 violations)
+### bloated-hook.json (7 violations)
 
 | # | Violation | Must Detect | Maps to Check |
 |---|-----------|------------|---------------|
-| 1 | Invalid JSON (trailing comma + `//` comments) | YES | Hook validity |
-| 2 | Unknown event name `PreToolExecute` | YES | Event validation |
-| 3 | Handler type `"webhook"` (must be `"command"`) | YES | Type validation |
-| 4 | Wildcard matcher `"*"` on blocking `PreToolUse` hook | YES | Matcher safety |
-| 5 | Hardcoded secret/token in configuration | YES | Security |
-| 6 | No `exit 2` path in validation script | YES | Error handling |
-| 7 | Wrong exit code behavior assumption | YES | Event semantics |
-| 8 | No evidence citation comments | NO | Attribution — JSON format has limited comment support; JSON-only hooks are exempt from this check per hook-validation-criteria.md |
+| 1 | Unknown event name `PreToolExecute` | YES | Event validation |
+| 2 | Handler type `"webhook"` (must be `"command"`) | YES | Type validation |
+| 3 | Wildcard matcher `"*"` on blocking `PreToolUse` hook | YES | Matcher safety |
+| 4 | Hardcoded secret/token in configuration | YES | Security |
+| 5 | No `exit 2` path in validation script | YES | Error handling |
+| 6 | Wrong exit code behavior assumption | YES | Event semantics |
+| 7 | No evidence citation comments | NO | Attribution — JSON format has limited comment support; JSON-only hooks are exempt from this check per hook-validation-criteria.md |
+
+> **Expected extra finding (unlabeled bonus)**: The fixture also contains a `SessionStart` hook with `matcher: "Edit"`. Since `SessionStart` filters on start reason (`startup`, `resume`, `clear`, `compact`) — not tool names — an `"Edit"` matcher is semantically invalid. The evaluator should flag this as an invalid matcher value. This is an expected correct detection, not a false positive; do not penalize the skill for detecting it.
 
 ### bloated-rule.md (8 violations)
 
@@ -102,7 +103,7 @@ a degraded state and the improve skill must identify all violations and propose 
 | Artifact | RED State | GREEN State |
 |----------|-----------|-------------|
 | bloated-skill.md | 10 violations, inline bash, missing validation | All violations detected; proposed fixes for each |
-| bloated-hook.json | Invalid JSON, wrong event, wildcard matcher | All issues flagged; corrected config proposed |
+| bloated-hook.json | Wrong event name, wildcard matcher, invalid handler type | All issues flagged; corrected config proposed |
 | bloated-rule.md | Overly broad glob, prose, multi-concern | All violations surfaced; focused rule proposed |
 | bloated-subagent.md | Missing model, write tools, agent spawning | All violations caught; read-only agent proposed |
 

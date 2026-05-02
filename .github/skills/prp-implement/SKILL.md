@@ -133,6 +133,10 @@ If the plan involves API/server changes, use the integration test commands from 
 ### 4.5 Edge Case Testing
 Run any edge case tests specified in the plan.
 
+### 4.6 Completion Gate
+Run the `prp-verification-before-completion` skill before proceeding to Phase 5. Do not archive the plan or generate a report until this gate passes.
+
+
 **CHECKPOINT**: Type-check passes, lint passes, tests pass, build succeeds, integration tests pass (if applicable).
 
 ---
@@ -227,5 +231,6 @@ To continue: run the `prp-plan` skill with the PRD path.
 - **LINT_PASS**: Lint exits 0 (warnings OK)
 - **TESTS_PASS**: All tests green
 - **BUILD_PASS**: Build succeeds
+- **VERIFICATION_COMPLETE**: `prp-verification-before-completion` skill invoked and passed
 - **REPORT_CREATED**: Implementation report exists
 - **PLAN_ARCHIVED**: Original plan moved to completed

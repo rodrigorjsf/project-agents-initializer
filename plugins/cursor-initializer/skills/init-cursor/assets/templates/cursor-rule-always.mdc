@@ -1,0 +1,30 @@
+<!-- TEMPLATE: cursor-rule-always.mdc
+  Activation mode: Always
+  Placement: .cursor/rules/[rule-name].mdc
+  Naming: kebab-case, descriptive of the rule's scope
+  Target: Short — critical-tooling bullets only. 5-30 lines of rule content.
+
+  Reminder: this rule loads on EVERY chat. Every line consumes attention budget
+  on every conversation. Use this variant ONLY for content the agent must see
+  on every task — non-default tooling commands, hard project-wide constraints.
+  When in doubt, prefer cursor-rule-globs.mdc or cursor-rule-description.mdc.
+
+  Frontmatter (only these three fields are valid):
+  - alwaysApply (boolean): MUST be true for this variant
+  - description (optional): one-sentence summary of the rule
+  - globs (omit): not used by always-apply rules
+-->
+---
+alwaysApply: true
+description: "[ONE-SENTENCE SUMMARY OF THIS ALWAYS-APPLY RULE]"
+---
+
+<!-- Content guidelines for the always-apply variant:
+  - Short critical-tooling bullets only — every line loads on every chat
+  - No directory listings, no codebase overviews, no standard conventions
+  - Each bullet must be specific and verifiable
+  - If the section grows beyond ~20 bullets, split it into a globs- or description-mode rule
+-->
+
+- [Critical tooling command or project-wide constraint]
+- [Critical tooling command or project-wide constraint]

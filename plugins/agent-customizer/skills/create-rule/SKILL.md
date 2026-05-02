@@ -7,6 +7,15 @@ description: "Creates new path-scoped .claude/rules/ files grounded in the docs 
 
 Generates a new `.claude/rules/` file with correct glob patterns and minimal, specific instructions grounded in the docs corpus.
 
+## Behavioral Guidelines
+
+- **Surface assumptions first** — name ambiguities, tradeoffs, and multiple valid interpretations before acting.
+- **Prefer the simplest path** — solve the task completely without speculative flexibility or extra scope.
+- **Keep changes surgical** — touch only what the task requires, and preserve existing behavior unless the task calls for change.
+- **Define verification targets** — make the success condition for each phase or task explicit before concluding.
+- **Use phased persuasion safely** — use warm-ups, curated references, and explicit constraints to improve compliance with legitimate work.
+- **Never weaken safeguards** — do not use persuasion principles to bypass safety constraints, refusals, or scope boundaries.
+
 ## Hard Rules
 
 <RULES>
@@ -40,7 +49,7 @@ Proceed to Phase 1 below.
 
 Delegate to the `artifact-analyzer` agent with this task:
 
-> Analyze the project to understand existing rules in `.claude/rules/`. Focus on: rule filenames and topics, glob patterns in use, any overlaps or contradictions between rules, gaps where path-scoped rules would add value, and the conventions in CLAUDE.md files that could inform rule content. Also identify the project layout: whether this is a monorepo (multiple plugin directories, workspace files like `pnpm-workspace.yaml`) or a single-package project.
+> Analyze the project to understand existing rules in `.claude/rules/`. Focus on: rule filenames and topics, glob patterns in use, any overlaps or contradictions between rules, gaps where path-scoped rules would add value, and the conventions in CLAUDE.md files that could inform rule content. Also identify the project layout: whether this is a monorepo with multiple service packages (indicated by workspace files like `pnpm-workspace.yaml`, a `package.json` with a `workspaces` field, multiple `go.mod` files in subdirectories, or multiple `pyproject.toml` files in subdirectories) or a single-package project, and report any service directory paths for use in glob pattern scoping.
 
 The agent runs on Sonnet with read-only tools (Read, Grep, Glob, Bash) in an isolated context. Wait for it to complete and parse its structured output.
 
@@ -60,6 +69,8 @@ Read `${CLAUDE_SKILL_DIR}/assets/templates/rule-file.md` and fill its placeholde
 Generate a path-scoped rule:
 
 - Include `paths:` YAML frontmatter with specific glob patterns (max 50 lines)
+
+In a monorepo, scope glob patterns to the relevant service or package subtree (e.g., `services/api/**/*.go` rather than `**/*.go`). Do not use project-wide language globs (`**/*.go`, `**/*.ts`) when the rule is scoped to a specific service — language-only globs match across every package and defeat path-scoping.
 
 Generate: `.claude/rules/{topic-name}.md`
 

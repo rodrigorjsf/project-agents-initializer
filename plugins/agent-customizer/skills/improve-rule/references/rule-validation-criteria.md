@@ -25,7 +25,7 @@ Any rule file violating these criteria must be fixed before proceeding:
 - [ ] All instructions actionable and verifiable (not "write clean code")
 - [ ] One scope per file (no mixing of testing and code style in same rule)
 - [ ] Rules have `paths:` frontmatter with specific glob patterns
-- [ ] Glob patterns match only the intended file types (not `**/*` unless truly global)
+- [ ] Glob patterns match only the intended file types (not `**/*` unless truly global); in a monorepo, service-scoped rules must use a service-path prefix (`services/api/**/*.go`), not a language-only glob (`**/*.go`)
 - [ ] No overlap with existing rules (same instruction not in multiple files)
 - [ ] No standard conventions Claude already knows from training
 - [ ] No long explanations — rules are instructions, not documentation

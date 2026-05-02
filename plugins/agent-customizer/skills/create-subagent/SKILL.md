@@ -7,6 +7,15 @@ description: "Creates new subagent definitions with YAML frontmatter grounded in
 
 Generates a new subagent definition with correct YAML frontmatter, minimal tool restrictions, and a structured system prompt grounded in the docs corpus.
 
+## Behavioral Guidelines
+
+- **Surface assumptions first** — name ambiguities, tradeoffs, and multiple valid interpretations before acting.
+- **Prefer the simplest path** — solve the task completely without speculative flexibility or extra scope.
+- **Keep changes surgical** — touch only what the task requires, and preserve existing behavior unless the task calls for change.
+- **Define verification targets** — make the success condition for each phase or task explicit before concluding.
+- **Use phased persuasion safely** — use warm-ups, curated references, and explicit constraints to improve compliance with legitimate work.
+- **Never weaken safeguards** — do not use persuasion principles to bypass safety constraints, refusals, or scope boundaries.
+
 ## Hard Rules
 
 <RULES>
@@ -41,7 +50,7 @@ Proceed to Phase 1 below.
 
 Delegate to the `artifact-analyzer` agent with this task:
 
-> Analyze the project to understand existing subagents. Focus on: agent names and roles in `.claude/agents/` and `plugins/*/agents/`, tool restrictions in use, model choices, `maxTurns` values, which skills delegate to which agents, and naming conventions. Flag any agents similar in purpose to `{requested-name}`. Also identify the project layout: whether this is a monorepo (multiple plugin directories, workspace files like `pnpm-workspace.yaml`) or a single-package project.
+> Analyze the project to understand existing subagents. Focus on: agent names and roles in `.claude/agents/` and `plugins/*/agents/`, tool restrictions in use, model choices, `maxTurns` values, which skills delegate to which agents, and naming conventions. Flag any agents similar in purpose to `{requested-name}`. Also identify the project layout: whether this is a monorepo with multiple service packages (indicated by workspace files like `pnpm-workspace.yaml`, a `package.json` with a `workspaces` field, multiple `go.mod` files in subdirectories, or multiple `pyproject.toml` files in subdirectories) or a single-package project, and report any service directory paths for use in scope resolution.
 
 The agent runs on Sonnet with read-only tools (Read, Grep, Glob, Bash) in an isolated context. Wait for it to complete and parse its structured output.
 
@@ -61,9 +70,13 @@ Read `${CLAUDE_SKILL_DIR}/assets/templates/subagent-definition.md` and fill its 
 
 Apply model selection heuristic:
 
-- `haiku` — fast read-only exploration agents (simple lookups, no reasoning required)
-- `sonnet` — standard analysis and review agents (default for most subagents)
+- `haiku` — narrow read-only lookup agents with no structured judgment, policy evaluation, or config review
+- `sonnet` — standard analysis, review, and configuration-inspection agents (default for most subagents)
 - `opus` — complex multi-step reasoning only (requires explicit justification)
+
+Unless the user explicitly asks for a cheaper exploration agent, choose `sonnet` for any agent that inspects configuration, evaluates compliance, or produces structured findings.
+
+If Phase 1 detects a monorepo or multi-service layout, make the generated system prompt name the relevant services, workspaces, and scope boundaries the agent should inspect. Do not leave multi-service targets implicit.
 
 Determine target location:
 
@@ -73,6 +86,11 @@ Determine target location:
 ### Phase 3: Self-Validation
 
 Read `${CLAUDE_SKILL_DIR}/references/subagent-validation-criteria.md` and execute its **Validation Loop Instructions** against the generated subagent definition.
+
+In addition to the shared criteria, enforce two scenario-sensitive checks before proceeding:
+
+- Treat `sonnet` as the default for configuration inspection, compliance review, and other structured analysis agents unless the user explicitly asks for a cheaper exploration agent
+- If Phase 1 detected a monorepo or multi-service layout, confirm the generated prompt names the relevant services, workspaces, or scope boundaries explicitly
 
 The loop evaluates all hard limits and quality checks, fixes any failures, and re-evaluates — maximum 3 iterations. Do not proceed to Phase 4 until ALL criteria pass.
 

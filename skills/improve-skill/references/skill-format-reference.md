@@ -71,12 +71,12 @@ Use these variables inside SKILL.md content:
 | `$ARGUMENTS` | All arguments passed when invoking the skill |
 | `$ARGUMENTS[N]` or `$N` | Specific argument by 0-based index |
 | `${CLAUDE_SESSION_ID}` | Current session ID (for logging, session-specific files) |
-| `${CLAUDE_SKILL_DIR}` | Directory containing SKILL.md (use for bundled scripts/files) |
+| `${CLAUDE_SKILL_DIR}` | Claude Code plugin variable — not available in standalone distribution; use relative `references/` paths instead |
 
-**Critical**: Always use `${CLAUDE_SKILL_DIR}` to reference bundled files, not hardcoded paths:
+**Critical**: Use relative `references/` paths to reference bundled files (portable across all AI tools); not hardcoded absolute paths:
 
 ```
-Read ${CLAUDE_SKILL_DIR}/references/guide.md for detailed context.
+Read the bundled guide material for detailed context.
 ```
 
 Dynamic context injection with `!` prefix runs shell commands before skill loads:

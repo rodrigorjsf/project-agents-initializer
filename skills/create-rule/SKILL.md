@@ -7,6 +7,15 @@ description: "Creates new path-scoped .claude/rules/ files grounded in the docs 
 
 Generates a new `.claude/rules/` file with correct glob patterns and minimal, specific instructions grounded in the docs corpus.
 
+## Behavioral Guidelines
+
+- **Surface assumptions first** — name ambiguities, tradeoffs, and multiple valid interpretations before acting.
+- **Prefer the simplest path** — solve the task completely without speculative flexibility or extra scope.
+- **Keep changes surgical** — touch only what the task requires, and preserve existing behavior unless the task calls for change.
+- **Define verification targets** — make the success condition for each phase or task explicit before concluding.
+- **Use phased persuasion safely** — use warm-ups, curated references, and explicit constraints to improve compliance with legitimate work.
+- **Never weaken safeguards** — do not use persuasion principles to bypass safety constraints, refusals, or scope boundaries.
+
 ## Hard Rules
 
 <RULES>
@@ -38,7 +47,7 @@ Proceed to Phase 1 below.
 
 ### Phase 1: Codebase Analysis
 
-Read `${CLAUDE_SKILL_DIR}/references/artifact-analyzer.md` and follow its analysis instructions to analyze the project at the current working directory.
+Read `references/artifact-analyzer.md` and follow its analysis instructions to analyze the project at the current working directory.
 
 Focus on: all `.claude/rules/` files and their path scopes; detect overlapping globs, naming conventions, and any conventions already documented in `CLAUDE.md` that would be redundant in a new rule.
 
@@ -46,10 +55,10 @@ Focus on: all `.claude/rules/` files and their path scopes; detect overlapping g
 
 Before generating, read these reference documents:
 
-- `${CLAUDE_SKILL_DIR}/references/rule-authoring-guide.md` — when to use rules, path-scoping, glob syntax, and anti-patterns
-- `${CLAUDE_SKILL_DIR}/references/prompt-engineering-strategies.md` — rule-specific prompting (zero-shot, no examples in rules)
+- `references/rule-authoring-guide.md` — when to use rules, path-scoping, glob syntax, and anti-patterns
+- `references/prompt-engineering-strategies.md` — rule-specific prompting (zero-shot, no examples in rules)
 
-Read `${CLAUDE_SKILL_DIR}/assets/templates/rule-file.md` and fill its placeholders using:
+Read `assets/templates/rule-file.md` and fill its placeholders using:
 
 - User requirements for the new rule (topic, target paths, instructions)
 - Phase 1 analysis output (existing rules, gaps, potential contradictions)
@@ -63,7 +72,7 @@ Generate: `.claude/rules/{topic-name}.md`
 
 ### Phase 3: Self-Validation
 
-Read `${CLAUDE_SKILL_DIR}/references/rule-validation-criteria.md` and execute its **Validation Loop Instructions** against the generated rule.
+Read `references/rule-validation-criteria.md` and execute its **Validation Loop Instructions** against the generated rule.
 
 The loop evaluates all hard limits and quality checks, fixes any failures, and re-evaluates — maximum 3 iterations. Additionally, cross-check against ALL existing rule files in `.claude/rules/` for contradictions and overlapping glob patterns. Do not proceed to Phase 4 until ALL criteria pass.
 

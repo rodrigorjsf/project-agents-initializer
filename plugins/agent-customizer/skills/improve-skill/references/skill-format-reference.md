@@ -45,7 +45,7 @@ Source: skills/research-claude-code-skills-format.md, skills/extend-claude-with-
 | `agent` | Subagent type when `context: fork` (e.g., `Explore`, `Plan`, `general-purpose`) |
 | `hooks` | Hooks scoped to this skill's lifecycle (see hooks documentation) |
 
-*Source: skills/research-claude-code-skills-format.md lines 90-125; skills/extend-claude-with-skills.md lines 183-198*
+*Source: skills/research-claude-code-skills-format.md lines 90-130; skills/extend-claude-with-skills.md lines 183-198*
 
 ---
 
@@ -75,7 +75,7 @@ Use these variables inside SKILL.md content:
 **Critical**: Always use `${CLAUDE_SKILL_DIR}` to reference bundled files, not hardcoded paths:
 
 ```
-Read ${CLAUDE_SKILL_DIR}/references/guide.md for detailed context.
+Read the bundled guide material for detailed context.
 ```
 
 Dynamic context injection with `!` prefix runs shell commands before skill loads:

@@ -5,3 +5,7 @@
 next-steps.md
 
 .claude/PRPs/reviews/
+
+# Session-local runtime artifacts
+.claude/worktrees/
+.claude/scheduled_tasks.lock

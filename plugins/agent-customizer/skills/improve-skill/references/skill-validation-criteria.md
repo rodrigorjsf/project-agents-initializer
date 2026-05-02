@@ -1,7 +1,7 @@
 # Skill Validation Criteria
 
 Quality checklist for generated and improved SKILL.md files.
-Source: skills/skill-authoring-best-practices.md, skills/extend-claude-with-skills.md
+Source: skills/skill-authoring-best-practices.md, skills/extend-claude-with-skills.md, `.github/instructions/karpathy-guidelines.instructions.md`, `docs/general-llm/persuasion-principles.md`
 
 ---
 
@@ -34,6 +34,8 @@ Any skill violating these criteria must be fixed before proceeding:
 - [ ] Reference files cited explicitly so Claude knows what to load and when
 - [ ] `disable-model-invocation: true` set for side-effect workflows (commit, deploy, send)
 - [ ] Prompt engineering strategy applied: skill follows relevant strategy from prompt-engineering-strategies.md (role prompting for skills, progressive disclosure for phases)
+- [ ] Behavioral guidelines applied: the skill surfaces assumptions before acting, prefers the simplest adequate path, keeps changes surgical, and defines explicit validation targets
+- [ ] Persuasion cues, if present, stay inside the ethical constraint: they improve compliance with legitimate work only and never weaken safeguards, refusals, or scope boundaries
 - [ ] Phase instructions are specific and actionable — no vague directives like "ensure quality" or "review for completeness"
 - [ ] Plugin skill body contains no inline bash analysis commands — analysis must be delegated to registered agents (applies to skills in `plugins/*/skills/`)
 - [ ] Standalone skill body includes explicit bash commands for each analysis step (applies to skills in `skills/`)

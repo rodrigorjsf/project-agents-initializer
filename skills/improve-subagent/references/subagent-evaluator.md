@@ -1,8 +1,7 @@
 # Subagent Evaluation Instructions
-
 Structured process for evaluating subagent definitions against evidence-based quality criteria.
-Used by IMPROVE-SUBAGENT skill for current state analysis. Source: agents/subagent-evaluator.md
-
+Used by IMPROVE-SUBAGENT skill for current state analysis.
+Source: agents/subagent-evaluator.md
 ---
 
 ## Contents

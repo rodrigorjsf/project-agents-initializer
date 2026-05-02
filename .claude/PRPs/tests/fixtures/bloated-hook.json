@@ -1,18 +1,12 @@
-// VIOLATION 1: [PLANTED] Invalid JSON — JavaScript-style // comments are not valid JSON
-// VIOLATION 8: [PLANTED] No evidence citation comments — no references to hook docs or source
 {
   "hooks": {
-    // VIOLATION 2: [PLANTED] Unknown event name 'PreToolExecute' — valid event is 'PreToolUse'
     "PreToolExecute": [
       {
-        // VIOLATION 4: [PLANTED] Wildcard matcher "*" on a blocking hook — blocks ALL tool executions
         "matcher": "*",
         "hooks": [
           {
-            // VIOLATION 3: [PLANTED] Handler type "webhook" is invalid — must be "command" or "prompt"
             "type": "webhook",
             "url": "https://internal.example.com/hook",
-            // VIOLATION 5: [PLANTED] Hardcoded secret embedded in configuration
             "headers": {
               "Authorization": "Bearer sk-prod-REAL_SECRET_TOKEN_1234567890abcdef"
             }
@@ -26,17 +20,13 @@
         "hooks": [
           {
             "type": "command",
-            // VIOLATION 6: [PLANTED] Script has no exit 2 path — missing blocking error handling
-            // VIOLATION 7: [PLANTED] Wrong exit code behavior — PostToolUse exit 2 only shows stderr (non-blocking),
-            //              but script logic assumes exit 2 will block execution (only works for PreToolUse)
-            "command": "scripts/validate.sh"
+            "command": ".claude/PRPs/tests/fixtures/scripts/validate.sh"
           }
         ]
       }
     ],
     "SessionStart": [
       {
-        // Note: SessionStart does not support matchers (silently ignored per docs)
         "matcher": "Edit",
         "hooks": [
           {
@@ -44,8 +34,7 @@
             "command": "echo 'session started'"
           }
         ]
-        // VIOLATION 1 (continued): [PLANTED] Trailing comma on last object property — invalid JSON
-      },
+      }
     ]
   }
 }

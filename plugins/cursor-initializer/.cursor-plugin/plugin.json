@@ -1,7 +1,7 @@
 {
   "name": "cursor-initializer",
-  "version": "1.0.0",
-  "description": "Evidence-based AGENTS.md and Cursor rules initializer and optimizer. Generates minimal, scoped configuration files following progressive disclosure principles — based on the ETH Zurich 'Evaluating AGENTS.md' study and Cursor's context engineering best practices.",
+  "version": "1.0.1",
+  "description": "Evidence-based rules-first initializer and optimizer for Cursor projects. Generates minimal .cursor/rules/*.mdc hierarchies with the right activation mode per rule; non-destructively migrates legacy AGENTS.md when present.",
   "author": {
     "name": "rodrigorjsf"
   },

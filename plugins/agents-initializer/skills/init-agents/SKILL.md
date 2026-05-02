@@ -11,6 +11,15 @@ Generate an evidence-based AGENTS.md file hierarchy for this project. Instead of
 
 Research shows that auto-generated comprehensive AGENTS.md files **reduce** agent task success by ~3% while **increasing cost by 20%+** (Evaluating AGENTS.md, ETH Zurich, 2026). Developer-written **minimal** files improve success by ~4%. This skill generates files that mimic what an experienced developer would write: only non-obvious tooling and conventions.
 
+## Behavioral Guidelines
+
+- **Surface assumptions first** — name ambiguities, tradeoffs, and multiple valid interpretations before acting.
+- **Prefer the simplest path** — solve the task completely without speculative flexibility or extra scope.
+- **Keep changes surgical** — touch only what the task requires, and preserve existing behavior unless the task calls for change.
+- **Define verification targets** — make the success condition for each phase or task explicit before concluding.
+- **Use phased persuasion safely** — use warm-ups, curated references, and explicit constraints to improve compliance with legitimate work.
+- **Never weaken safeguards** — do not use persuasion principles to bypass safety constraints, refusals, or scope boundaries.
+
 ## Hard Rules
 
 <RULES>
@@ -46,14 +55,16 @@ Delegate to the `codebase-analyzer` agent with this task:
 > Analyze the project at the current working directory. Return ONLY non-standard, non-obvious information that would cause an agent to make mistakes if it didn't know them. Be ruthlessly minimal.
 
 The agent runs on Sonnet with read-only tools (Read, Grep, Glob, Bash) in an isolated context. Wait for it to complete and parse its structured output.
+Require the parsed output to surface non-default config overrides, repo-wide critical constraints, and any cross-scope prerequisites needed for the root file.
 
 ### Phase 2: Scope Detection
 
 Delegate to the `scope-detector` agent with this task:
 
-> Detect scopes in the project at the current working directory. Only flag scopes with genuinely different tooling or conventions. A simple single-package project should have ZERO additional scopes.
+> Detect scopes in the project at the current working directory. Only flag scopes with genuinely different tooling or conventions. A simple single-package project should have ZERO additional scopes. Check shared/library packages for unique constraints even if they are not user-facing, and treat repo-internal tooling directories as root/domain-doc candidates unless they truly need their own config file.
 
 Wait for it to complete and parse its structured output.
+Require the parsed output to state explicitly when a simple single-package project needs zero additional scopes.
 
 ### Phase 3: Generate Files
 
@@ -82,10 +93,12 @@ If the codebase-analyzer identified non-standard domain patterns, read `${CLAUDE
 Read `${CLAUDE_SKILL_DIR}/references/validation-criteria.md` and execute its **Validation Loop Instructions** against every generated file.
 
 The loop evaluates all hard limits and quality checks, fixes any failures, and re-evaluates — maximum 3 iterations. Do not proceed to Phase 5 until ALL criteria pass for ALL files.
+For init flows, treat output-size targets as required validation gates: the root file MUST finish within 15-40 lines and each scoped file MUST finish within 10-30 lines. If a monorepo root exceeds target, move scope-specific detail down or trim non-essential context and rerun the validation loop.
 
 ### Phase 5: Present and Write
 
 1. Show the user ALL generated files with their content before writing
 2. Explain briefly why each file exists and what evidence supports its content
-3. Ask for confirmation before writing files
-4. Write all files to the project
+3. Include a concise validation summary: iteration count, final root line count, scoped file count, and any fixes made during self-validation
+4. Ask for confirmation before writing files
+5. Write all files to the project

@@ -1,6 +1,6 @@
 # Orientations
 
-Only search information from the files in `docs` if you're unable to retrieve consistent information from the following tools:
+Search `docs/` files only as a last resort — prefer RAG and `wiki/knowledge/` first (see root CLAUDE.md § Knowledge Lookup).
 
 - `search_docs`
 - `search_code`

@@ -7,6 +7,15 @@ description: "Evaluates and optimizes existing hook configurations against evide
 
 Evaluate existing hook configurations against evidence-based quality criteria and apply improvements to fix invalid events, tighten matchers, and eliminate security issues.
 
+## Behavioral Guidelines
+
+- **Surface assumptions first** — name ambiguities, tradeoffs, and multiple valid interpretations before acting.
+- **Prefer the simplest path** — solve the task completely without speculative flexibility or extra scope.
+- **Keep changes surgical** — touch only what the task requires, and preserve existing behavior unless the task calls for change.
+- **Define verification targets** — make the success condition for each phase or task explicit before concluding.
+- **Use phased persuasion safely** — use warm-ups, curated references, and explicit constraints to improve compliance with legitimate work.
+- **Never weaken safeguards** — do not use persuasion principles to bypass safety constraints, refusals, or scope boundaries.
+
 ## Hard Rules
 
 <RULES>
@@ -39,14 +48,14 @@ Proceed to Phase 1 below.
 
 ### Phase 1: Evaluate
 
-Read `${CLAUDE_SKILL_DIR}/references/hook-evaluator.md` and follow its evaluation instructions to evaluate the hook configuration at `{target-path}`. Check JSON validity, event names against the 22-event list, handler types, matcher specificity, exit code behavior, command script existence, and security (no hardcoded secrets). Return structured results with severity classifications (AUTO-FAIL/HIGH/MEDIUM/LOW).
+Read `references/hook-evaluator.md` and follow its evaluation instructions to evaluate the hook configuration at `{target-path}`. Check JSON validity, event names against the 22-event list, handler types, matcher specificity, exit code behavior, command script existence, and security (no hardcoded secrets). Return structured results with severity classifications (AUTO-FAIL/HIGH/MEDIUM/LOW).
 
 - If the user provides a specific event/matcher to improve, scope evaluation to that hook.
 - If no specific hook provided, evaluate ALL hooks in the project.
 
 ### Phase 2: Codebase Context
 
-Read `${CLAUDE_SKILL_DIR}/references/artifact-analyzer.md` and follow its analysis instructions.
+Read `references/artifact-analyzer.md` and follow its analysis instructions.
 
 Focus on: all hook definitions and scripts, event coverage gaps, matcher patterns already in use.
 
@@ -54,10 +63,10 @@ Focus on: all hook definitions and scripts, event coverage gaps, matcher pattern
 
 Read these reference documents:
 
-- `${CLAUDE_SKILL_DIR}/references/hook-authoring-guide.md` — when to use hooks, 4 handler types, exit codes, security
-- `${CLAUDE_SKILL_DIR}/references/hook-evaluation-criteria.md` — bloat/staleness indicators, quality rubric
-- `${CLAUDE_SKILL_DIR}/references/hook-events-reference.md` — all 22 events, matchers, JSON schema
-- `${CLAUDE_SKILL_DIR}/references/prompt-engineering-strategies.md` — hook-specific prompting
+- `references/hook-authoring-guide.md` — when to use hooks, 4 handler types, exit codes, security
+- `references/hook-evaluation-criteria.md` — bloat/staleness indicators, quality rubric
+- `references/hook-events-reference.md` — all 22 events, matchers, JSON schema
+- `references/prompt-engineering-strategies.md` — hook-specific prompting
 
 Based on both evaluation and analysis results, create improvement plan with categories:
 
@@ -69,7 +78,7 @@ Based on both evaluation and analysis results, create improvement plan with cate
 
 ### Phase 4: Self-Validation
 
-Read `${CLAUDE_SKILL_DIR}/references/hook-validation-criteria.md` and execute its **Validation Loop Instructions** against the improved hook configurations.
+Read `references/hook-validation-criteria.md` and execute its **Validation Loop Instructions** against the improved hook configurations.
 
 For improve operations, also evaluate the **"If This Is an IMPROVE Operation"** section. Maximum 3 iterations. Do not proceed to Phase 5 until ALL criteria pass.
 

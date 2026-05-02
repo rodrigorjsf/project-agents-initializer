@@ -7,6 +7,15 @@ description: "Evaluates and optimizes existing SKILL.md files against evidence-b
 
 Evaluate an existing SKILL.md file against evidence-based quality criteria and apply improvements to optimize token usage, reduce bloat, and align with proven patterns.
 
+## Behavioral Guidelines
+
+- **Surface assumptions first** — name ambiguities, tradeoffs, and multiple valid interpretations before acting.
+- **Prefer the simplest path** — solve the task completely without speculative flexibility or extra scope.
+- **Keep changes surgical** — touch only what the task requires, and preserve existing behavior unless the task calls for change.
+- **Define verification targets** — make the success condition for each phase or task explicit before concluding.
+- **Use phased persuasion safely** — use warm-ups, curated references, and explicit constraints to improve compliance with legitimate work.
+- **Never weaken safeguards** — do not use persuasion principles to bypass safety constraints, refusals, or scope boundaries.
+
 ## Hard Rules
 
 <RULES>
@@ -16,6 +25,7 @@ Evaluate an existing SKILL.md file against evidence-based quality criteria and a
 - **NEVER** flatten progressive disclosure into inline content
 - **NEVER** exceed 500 lines in SKILL.md or 200 lines in reference files after improvements
 - **PRESERVE** all genuinely useful skill phases and instructions — only remove waste
+- **PRESERVE** or strengthen the ethical constraint: persuasion cues support legitimate work only, never safety bypass
 </RULES>
 
 ## Process
@@ -39,11 +49,11 @@ Proceed to Phase 1 below.
 
 ### Phase 1: Evaluate
 
-Read `${CLAUDE_SKILL_DIR}/references/skill-evaluator.md` and follow its evaluation instructions to evaluate the skill at `{target-path}`. Check hard limits (body ≤500 lines, references ≤200 lines, frontmatter valid), structural quality (progressive disclosure, phase structure, reference loading), and token efficiency. Return structured evaluation results with severity classifications (AUTO-FAIL/HIGH/MEDIUM/LOW).
+Read `references/skill-evaluator.md` and follow its evaluation instructions to evaluate the skill at `{target-path}`. Check hard limits (body ≤500 lines, references ≤200 lines, frontmatter valid), structural quality (progressive disclosure, phase structure, reference loading), and token efficiency. Return structured evaluation results with severity classifications (AUTO-FAIL/HIGH/MEDIUM/LOW).
 
 ### Phase 2: Codebase Context
 
-Read `${CLAUDE_SKILL_DIR}/references/artifact-analyzer.md` and follow its analysis instructions.
+Read `references/artifact-analyzer.md` and follow its analysis instructions.
 
 Focus on: which agents the skill delegates to and whether those agents still exist, naming conventions for similar skills, any other skills that overlap in purpose, and the plugin structure.
 
@@ -51,21 +61,24 @@ Focus on: which agents the skill delegates to and whether those agents still exi
 
 Read these reference documents:
 
-- `${CLAUDE_SKILL_DIR}/references/skill-authoring-guide.md` — core principles, structure, progressive disclosure, anti-patterns
-- `${CLAUDE_SKILL_DIR}/references/skill-evaluation-criteria.md` — bloat/staleness indicators, quality rubric
-- `${CLAUDE_SKILL_DIR}/references/prompt-engineering-strategies.md` — skill-specific prompting strategies
+- `references/skill-authoring-guide.md` — core principles, structure, progressive disclosure, anti-patterns
+- `references/skill-evaluation-criteria.md` — bloat/staleness indicators, quality rubric
+- `references/behavioral-guidelines.md` — Karpathy-aligned behavior and safe persuasion patterns for skills
+- `references/prompt-engineering-strategies.md` — skill-specific prompting strategies
 
 Based on both evaluation and analysis results, create improvement plan with categories:
 
 1. **Removals** — bloat (inlined content, over-specified instructions), stale (broken agent refs, removed tools), duplicates
 2. **Refactoring** — progressive disclosure optimization, phase consolidation, reference path corrections
-3. **Additions** — missing sections (Hard Rules, preflight check, self-validation, output format)
+3. **Additions** — missing sections (Hard Rules, preflight check, self-validation, output format). Only suggest Hard Rules or Preflight if the skill has user-facing interactions or side effects — do NOT suggest them for informational/analysis-only skills that read and report.
+
+If all three categories yield zero items after analysis, conclude: "No improvements needed — artifact is already convention-compliant." and proceed directly to Phase 5 with an empty improvement summary.
 
 **Standalone constraint**: This is the standalone distribution — suggest only skills and path-scoped rules as improvement targets. Do not suggest creating hooks or subagents (these require Claude Code plugin infrastructure). When evaluation criteria mention hooks or subagents as improvement mechanisms, substitute with the closest available mechanism (a rule for path-scoped enforcement, a skill for workflow guidance).
 
 ### Phase 4: Self-Validation
 
-Read `${CLAUDE_SKILL_DIR}/references/skill-validation-criteria.md` and execute its **Validation Loop Instructions** against the improved skill.
+Read `references/skill-validation-criteria.md` and execute its **Validation Loop Instructions** against the improved skill.
 
 For improve operations, also evaluate the **"If This Is an IMPROVE Operation"** section. Maximum 3 iterations. Do not proceed to Phase 5 until ALL criteria pass.
 

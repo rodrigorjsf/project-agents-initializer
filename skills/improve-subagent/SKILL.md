@@ -7,6 +7,15 @@ description: "Evaluates and optimizes existing subagent definitions against evid
 
 Evaluate an existing subagent definition against evidence-based quality criteria and apply improvements to tighten tool restrictions, fix model selection, and strengthen system prompts.
 
+## Behavioral Guidelines
+
+- **Surface assumptions first** — name ambiguities, tradeoffs, and multiple valid interpretations before acting.
+- **Prefer the simplest path** — solve the task completely without speculative flexibility or extra scope.
+- **Keep changes surgical** — touch only what the task requires, and preserve existing behavior unless the task calls for change.
+- **Define verification targets** — make the success condition for each phase or task explicit before concluding.
+- **Use phased persuasion safely** — use warm-ups, curated references, and explicit constraints to improve compliance with legitimate work.
+- **Never weaken safeguards** — do not use persuasion principles to bypass safety constraints, refusals, or scope boundaries.
+
 ## Hard Rules
 
 <RULES>
@@ -39,14 +48,14 @@ Proceed to Phase 1 below.
 
 ### Phase 1: Evaluate
 
-Read `${CLAUDE_SKILL_DIR}/references/subagent-evaluator.md` and follow its evaluation instructions to evaluate the subagent definition at `{target-path}`. Check YAML frontmatter validity, required fields (name, description, model, maxTurns), name format (lowercase+hyphens), model appropriateness for task, tool restriction (minimum-necessary principle), system prompt structure (role, process, output format, self-verification), and description specificity for routing. Return structured results with severity classifications (AUTO-FAIL/HIGH/MEDIUM/LOW).
+Read `references/subagent-evaluator.md` and follow its evaluation instructions to evaluate the subagent definition at `{target-path}`. Check YAML frontmatter validity, required fields (name, description, model, maxTurns), name format (lowercase+hyphens), model appropriateness for task, tool restriction (minimum-necessary principle), system prompt structure (role, process, output format, self-verification), and description specificity for routing. Return structured results with severity classifications (AUTO-FAIL/HIGH/MEDIUM/LOW).
 
 - If the user provides a specific agent file → scope to that file.
 - If no specific file → evaluate ALL agents in `.claude/agents/` and `plugins/*/agents/`.
 
 ### Phase 2: Codebase Context
 
-Read `${CLAUDE_SKILL_DIR}/references/artifact-analyzer.md` and follow its analysis instructions.
+Read `references/artifact-analyzer.md` and follow its analysis instructions.
 
 Focus on: all agents and their roles, which skills delegate to which agents, tool restrictions, model choices, agents with similar purposes, naming conventions.
 
@@ -54,10 +63,10 @@ Focus on: all agents and their roles, which skills delegate to which agents, too
 
 Read these reference documents:
 
-- `${CLAUDE_SKILL_DIR}/references/subagent-authoring-guide.md` — when to use subagents, system prompt structure, model selection, tool restriction, anti-patterns
-- `${CLAUDE_SKILL_DIR}/references/subagent-evaluation-criteria.md` — bloat/staleness indicators, quality rubric
-- `${CLAUDE_SKILL_DIR}/references/subagent-config-reference.md` — YAML frontmatter fields, model IDs, orchestration patterns, plugin restrictions
-- `${CLAUDE_SKILL_DIR}/references/prompt-engineering-strategies.md` — subagent-specific prompting
+- `references/subagent-authoring-guide.md` — when to use subagents, system prompt structure, model selection, tool restriction, anti-patterns
+- `references/subagent-evaluation-criteria.md` — bloat/staleness indicators, quality rubric
+- `references/subagent-config-reference.md` — YAML frontmatter fields, model IDs, orchestration patterns, plugin restrictions
+- `references/prompt-engineering-strategies.md` — subagent-specific prompting
 
 Based on both evaluation and analysis results, create improvement plan with categories:
 
@@ -69,7 +78,7 @@ Based on both evaluation and analysis results, create improvement plan with cate
 
 ### Phase 4: Self-Validation
 
-Read `${CLAUDE_SKILL_DIR}/references/subagent-validation-criteria.md` and execute its **Validation Loop Instructions** against the improved subagent definition.
+Read `references/subagent-validation-criteria.md` and execute its **Validation Loop Instructions** against the improved subagent definition.
 
 For improve operations, also evaluate the **"If This Is an IMPROVE Operation"** section. Maximum 3 iterations. Do not proceed to Phase 5 until ALL criteria pass.
 

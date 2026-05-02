@@ -20,9 +20,9 @@ You are a cross-distribution consistency auditor for the agents-initializer proj
 
 ### 1. Shared Reference Files
 
-These files are intentionally shared across skills. All intended copies must be byte-for-byte identical.
+These files are intentionally shared across skills. All intended copies within each listed parity family must be byte-for-byte identical.
 
-**Present in ALL 8 skills (4 plugin + 4 standalone):**
+**SCG-01 / SCG-03 / SCG-04 non-cursor family (agents-initializer + standalone; 8 copies):**
 
 ```bash
 md5sum plugins/agents-initializer/skills/*/references/context-optimization.md \
@@ -38,7 +38,7 @@ md5sum plugins/agents-initializer/skills/*/references/progressive-disclosure-gui
        skills/*/references/progressive-disclosure-guide.md
 ```
 
-**Present in improve skills only (4 copies: 2 plugin + 2 standalone):**
+**SCG-05 / SCG-06 non-cursor family (improve plugin + standalone; 4 copies):**
 
 ```bash
 md5sum plugins/agents-initializer/skills/improve-agents/references/automation-migration-guide.md \
@@ -61,7 +61,7 @@ md5sum plugins/agents-initializer/skills/improve-claude/references/claude-rules-
        skills/init-claude/references/claude-rules-system.md
 ```
 
-**Present in cursor skills only (2 copies: plugin init + improve):**
+**SCG-01 / SCG-02 / SCG-03 / SCG-04 cursor family (2 copies):**
 
 ```bash
 md5sum plugins/cursor-initializer/skills/*/references/context-optimization.md
@@ -101,38 +101,74 @@ md5sum skills/improve-agents/references/file-evaluator.md \
 
 ### 2. Shared Template Files
 
-Templates are shared across plugin and standalone distributions for the same skill type.
+Templates are checked by intended parity family. Cursor or lifecycle-specific variants are split out when the registry allows different content.
 
 ```bash
-# agents-md templates: plugin vs standalone
+# root/scoped AGENTS template families: agents-initializer + standalone
 md5sum plugins/agents-initializer/skills/init-agents/assets/templates/root-agents-md.md \
-       skills/init-agents/assets/templates/root-agents-md.md
-
-md5sum plugins/agents-initializer/skills/improve-agents/assets/templates/root-agents-md.md \
+       plugins/agents-initializer/skills/improve-agents/assets/templates/root-agents-md.md \
+       skills/init-agents/assets/templates/root-agents-md.md \
        skills/improve-agents/assets/templates/root-agents-md.md
 
 md5sum plugins/agents-initializer/skills/init-agents/assets/templates/scoped-agents-md.md \
-       skills/init-agents/assets/templates/scoped-agents-md.md
+       plugins/agents-initializer/skills/improve-agents/assets/templates/scoped-agents-md.md \
+       skills/init-agents/assets/templates/scoped-agents-md.md \
+       skills/improve-agents/assets/templates/scoped-agents-md.md
 
-# claude-md templates: plugin vs standalone
+# claude-md families: plugin + standalone
 md5sum plugins/agents-initializer/skills/init-claude/assets/templates/root-claude-md.md \
-       skills/init-claude/assets/templates/root-claude-md.md
-
-md5sum plugins/agents-initializer/skills/improve-claude/assets/templates/root-claude-md.md \
+       plugins/agents-initializer/skills/improve-claude/assets/templates/root-claude-md.md \
+       skills/init-claude/assets/templates/root-claude-md.md \
        skills/improve-claude/assets/templates/root-claude-md.md
+
+md5sum plugins/agents-initializer/skills/init-claude/assets/templates/scoped-claude-md.md \
+       plugins/agents-initializer/skills/improve-claude/assets/templates/scoped-claude-md.md \
+       skills/init-claude/assets/templates/scoped-claude-md.md \
+       skills/improve-claude/assets/templates/scoped-claude-md.md
 
 # domain-doc: all 8 skills
 md5sum plugins/agents-initializer/skills/*/assets/templates/domain-doc.md \
        skills/*/assets/templates/domain-doc.md
 
 # cursor templates: init vs improve
-md5sum plugins/cursor-initializer/skills/*/assets/templates/root-agents-md.md
-
-md5sum plugins/cursor-initializer/skills/*/assets/templates/scoped-agents-md.md
-
+# Note: the three activation-mode .mdc variant templates are within-cursor parity
+# families and are checked by the cursor-initializer-quality-gate meta-skill, not here.
+# This block only covers the cursor template that is also relevant for cross-skill consistency.
 md5sum plugins/cursor-initializer/skills/*/assets/templates/domain-doc.md
 
-md5sum plugins/cursor-initializer/skills/*/assets/templates/cursor-rule.mdc
+# claude-rule families
+md5sum plugins/agents-initializer/skills/init-claude/assets/templates/claude-rule.md \
+       skills/init-claude/assets/templates/claude-rule.md
+
+md5sum plugins/agents-initializer/skills/improve-agents/assets/templates/claude-rule.md \
+       plugins/agents-initializer/skills/improve-claude/assets/templates/claude-rule.md \
+       skills/improve-agents/assets/templates/claude-rule.md \
+       skills/improve-claude/assets/templates/claude-rule.md
+
+# hook-config families
+md5sum plugins/agents-initializer/skills/improve-agents/assets/templates/hook-config.md \
+       plugins/agents-initializer/skills/improve-claude/assets/templates/hook-config.md
+
+md5sum plugins/agent-customizer/skills/create-hook/assets/templates/hook-config.md \
+       plugins/agent-customizer/skills/improve-hook/assets/templates/hook-config.md \
+       skills/create-hook/assets/templates/hook-config.md \
+       skills/improve-hook/assets/templates/hook-config.md
+
+# skill template family (non-cursor improve)
+md5sum plugins/agents-initializer/skills/improve-agents/assets/templates/skill.md \
+       plugins/agents-initializer/skills/improve-claude/assets/templates/skill.md \
+       skills/improve-agents/assets/templates/skill.md \
+       skills/improve-claude/assets/templates/skill.md
+
+# standalone families mirrored by shared quality-gate
+md5sum skills/create-skill/assets/templates/skill-md.md \
+       skills/improve-skill/assets/templates/skill-md.md
+
+md5sum skills/create-subagent/assets/templates/subagent-definition.md \
+       skills/improve-subagent/assets/templates/subagent-definition.md
+
+md5sum skills/create-skill/references/behavioral-guidelines.md \
+       skills/improve-skill/references/behavioral-guidelines.md
 ```
 
 ---
@@ -172,15 +208,22 @@ Return exactly this structure:
 | codebase-analyzer.md (4 copies) | 4 | [MATCH/MISMATCH] | |
 | file-evaluator.md (2 copies) | 2 | [MATCH/MISMATCH] | |
 | root-agents-md.md templates | 4 | [MATCH/MISMATCH] | |
+| scoped-agents-md.md templates | 4 | [MATCH/MISMATCH] | |
 | root-claude-md.md templates | 4 | [MATCH/MISMATCH] | |
+| scoped-claude-md.md templates | 4 | [MATCH/MISMATCH] | |
 | domain-doc.md templates | 8 | [MATCH/MISMATCH] | |
-| cursor root-agents-md.md templates | 2 | [MATCH/MISMATCH] | |
-| cursor scoped-agents-md.md templates | 2 | [MATCH/MISMATCH] | |
 | cursor domain-doc.md templates | 2 | [MATCH/MISMATCH] | |
-| cursor-rule.mdc templates | 2 | [MATCH/MISMATCH] | |
+| init claude-rule.md templates | 2 | [MATCH/MISMATCH] | |
+| improve claude-rule.md templates | 4 | [MATCH/MISMATCH] | |
+| agents-init hook-config.md templates | 2 | [MATCH/MISMATCH] | |
+| create/improve hook-config.md templates | 4 | [MATCH/MISMATCH] | |
+| non-cursor skill.md templates | 4 | [MATCH/MISMATCH] | |
+| standalone skill-md.md templates | 2 | [MATCH/MISMATCH] | |
+| standalone subagent-definition.md templates | 2 | [MATCH/MISMATCH] | |
+| standalone behavioral-guidelines.md | 2 | [MATCH/MISMATCH] | |
 
 ### Divergences Found
-[If none: "✅ No divergences — all shared files are identical across distributions."]
+[If none: "✅ No divergences — all shared files are identical within their intended copy families."]
 
 For each divergence:
 **P[NNN]** | Severity: [CRITICAL/MAJOR/MINOR]

@@ -7,6 +7,15 @@ description: "Creates new hook configurations for Claude Code lifecycle events, 
 
 Generates a new hook configuration for a Claude Code lifecycle event, with correct JSON schema, handler type, and exit code behavior grounded in the docs corpus.
 
+## Behavioral Guidelines
+
+- **Surface assumptions first** — name ambiguities, tradeoffs, and multiple valid interpretations before acting.
+- **Prefer the simplest path** — solve the task completely without speculative flexibility or extra scope.
+- **Keep changes surgical** — touch only what the task requires, and preserve existing behavior unless the task calls for change.
+- **Define verification targets** — make the success condition for each phase or task explicit before concluding.
+- **Use phased persuasion safely** — use warm-ups, curated references, and explicit constraints to improve compliance with legitimate work.
+- **Never weaken safeguards** — do not use persuasion principles to bypass safety constraints, refusals, or scope boundaries.
+
 ## Hard Rules
 
 <RULES>
@@ -40,7 +49,7 @@ Proceed to Phase 1 below.
 
 ### Phase 1: Codebase Analysis
 
-Read `${CLAUDE_SKILL_DIR}/references/artifact-analyzer.md` and follow its analysis instructions to analyze the project at the current working directory.
+Read `references/artifact-analyzer.md` and follow its analysis instructions to analyze the project at the current working directory.
 
 Focus on: existing hook configurations in `.claude/settings.json`, `.claude/settings.local.json`, and plugin `hooks/hooks.json`; project hook scripts in `.claude/hooks/`; plugin hook scripts in `scripts/`; event types currently in use; handler types used (command/http/prompt/agent); and any gaps in lifecycle event coverage. Also read root `CLAUDE.md`, `README.md`, and any service-level README files to understand non-standard build commands, tooling, or conventions that hook scripts should use.
 
@@ -48,11 +57,11 @@ Focus on: existing hook configurations in `.claude/settings.json`, `.claude/sett
 
 Before generating, read these reference documents:
 
-- `${CLAUDE_SKILL_DIR}/references/hook-authoring-guide.md` — when to use hooks, 4 handler types, exit code semantics, blocking vs non-blocking behavior
-- `${CLAUDE_SKILL_DIR}/references/hook-events-reference.md` — all 22 valid events, matcher fields per event, full JSON schema
-- `${CLAUDE_SKILL_DIR}/references/prompt-engineering-strategies.md` — hook-specific prompting (zero-shot only for hooks)
+- `references/hook-authoring-guide.md` — when to use hooks, 4 handler types, exit code semantics, blocking vs non-blocking behavior
+- `references/hook-events-reference.md` — all 22 valid events, matcher fields per event, full JSON schema
+- `references/prompt-engineering-strategies.md` — hook-specific prompting (zero-shot only for hooks)
 
-Read `${CLAUDE_SKILL_DIR}/assets/templates/hook-config.md` and fill its placeholders using:
+Read `assets/templates/hook-config.md` and fill its placeholders using:
 
 - User requirements for the new hook (event, purpose, handler type)
 - Phase 1 analysis output (existing hooks, coverage gaps)
@@ -77,7 +86,7 @@ Generate the complete hook configuration:
 
 ### Phase 3: Self-Validation
 
-Read `${CLAUDE_SKILL_DIR}/references/hook-validation-criteria.md` and execute its **Validation Loop Instructions** against the generated hook configuration.
+Read `references/hook-validation-criteria.md` and execute its **Validation Loop Instructions** against the generated hook configuration.
 
 The loop evaluates all hard limits and quality checks, fixes any failures, and re-evaluates — maximum 3 iterations. Do not proceed to Phase 4 until ALL criteria pass.
 

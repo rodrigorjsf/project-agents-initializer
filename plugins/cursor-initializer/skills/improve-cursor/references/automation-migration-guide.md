@@ -1,6 +1,6 @@
 # Automation Migration Guide
 
-Decision criteria for migrating instructions from AGENTS.md to on-demand mechanisms.
+Decision criteria for migrating instructions (including legacy AGENTS.md content the migration sub-flow processes) into on-demand `.cursor/rules/*.mdc` mechanisms.
 Source: context-aware-improve-optimization.prd.md, analysis-automate-workflow-with-hooks.md, analysis-skill-authoring-best-practices.md, analysis-how-claude-remembers-a-project.md
 
 ---
@@ -21,7 +21,7 @@ Source: context-aware-improve-optimization.prd.md, analysis-automate-workflow-wi
 
 When evaluating an instruction block for migration, follow this decision path:
 
-1. **Is it always needed for every task and under 5 lines?** → Keep in AGENTS.md root
+1. **Is it always needed for every task and under 5 lines?** → `.cursor/rules/*.mdc` with `alwaysApply: true`
 2. **Can the agent infer it from code?** → DELETE — do not document
 3. **Is it a deterministic rule (no judgment needed)?** → Hook (`.cursor/hooks.json` entry)
 4. **Does enforcement require LLM judgment?** → Hook (`prompt` type)
@@ -40,7 +40,7 @@ Classify each instruction block by content type, then recommend the correspondin
 
 | Content Type | Best Mechanism | Evidence Source |
 |---|---|---|
-| Always-applicable universal rules (<5 lines) | AGENTS.md root or rule without `globs:` | research-context-engineering-comprehensive.md |
+| Always-applicable universal rules (<5 lines) | `.cursor/rules/*.mdc` with `alwaysApply: true` | research-context-engineering-comprehensive.md |
 | Path-specific conventions (5-50 lines) | `.cursor/rules/` with `globs:` frontmatter | analysis-how-claude-remembers-a-project.md |
 | Domain knowledge or workflows (50-500 lines) | Skill (auto-invocable) | agentskills-specification.md |
 | Heavy workflows with side effects | Skill (`disable-model-invocation: true`) | agentskills-specification.md |
@@ -84,7 +84,6 @@ Compare all available on-demand mechanisms when recommending a migration:
 | Hook (`.cursor/hooks.json` — `prompt` type) | Zero | LLM-judged | Decisions requiring judgment, complex verification |
 | Path-scoped rule (`.cursor/rules/` with `globs:`) | Zero until file match | Advisory, scoped to matched files | File-pattern-specific conventions |
 | Subagent (Task tool) | Isolated context | Delegated execution | Parallel analysis, heavy processing |
-| Auto memory | First 200 lines at startup | Advisory — system-managed | Cross-session learnings, preferences |
 
 Hook events: `preToolUse`, `postToolUse`, `postToolUseFailure`, `stop`, `sessionStart`, `beforeShellExecution`, and others — see `.cursor/hooks.json` schema for the full list. Block by returning `{"decision": "block"}` from a `prompt`-type hook.
 
@@ -102,9 +101,8 @@ When suggesting migrations, recommend only mechanisms available in the target di
 |---|---|---|---|
 | Skills | Suggest | Suggest | Both distributions support skills fully |
 | Path-scoped rules | Suggest | Suggest (as separate files) | Both support rules; standalone uses file conventions |
-| Hooks | Suggest | Do not suggest | Hooks require Claude Code; standalone tools lack hook support |
-| Subagents | Suggest | Do not suggest | Subagent delegation requires Claude Code plugin architecture |
-| Auto memory | Mention only | Mention only | System-managed; not a direct migration target |
+| Hooks | Suggest | Do not suggest | Cursor plugin supports hooks; standalone distributions do not provide hook infrastructure |
+| Subagents | Suggest | Do not suggest | Cursor plugin supports subagents; standalone distributions use inline analysis instead of agent delegation |
 
 Check the distribution type before generating improvement suggestions. Filter mechanism recommendations to include only supported mechanisms for the detected distribution.
 

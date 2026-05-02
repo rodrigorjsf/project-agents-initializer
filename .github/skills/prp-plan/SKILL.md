@@ -66,7 +66,7 @@ Load the full exploration protocol with agent prompts:
 ${CLAUDE_SKILL_DIR}/references/exploration-protocol.md
 ```
 
-Launch `prp-core:codebase-explorer` and `prp-core:codebase-analyst` in parallel (see protocol for prompts and output format).
+Launch subagents in parallel using `subagent_type="codebase-explorer"` and `subagent_type="codebase-analyst"` (see protocol for prompts and output format).
 
 **IMMEDIATELY after merging results** — compose a **Discovery Brief** (authoritative reference for all subsequent phases):
 
@@ -91,7 +91,7 @@ Target: ≤ 50 lines. This brief replaces raw agent output for all subsequent ph
 
 **ONLY AFTER Phase 2 is complete.**
 
-Use `prp-core:web-researcher` agent (see exploration protocol for prompt and output format). Match documentation versions to project config.
+Use `web-researcher` agent (see exploration protocol for prompt and output format). Match documentation versions to project config.
 
 **IMMEDIATELY after results** — compose a **Research Brief** (authoritative reference for subsequent phases):
 
@@ -133,7 +133,7 @@ Target: ≤ 30 lines.
 
 ## Phase 5: ARCHITECT — Strategic Design
 
-For complex features, use `prp-core:codebase-analyst` to trace architecture at integration points (see exploration protocol for prompt and output format).
+For complex features, use `codebase-analyst` to trace architecture at integration points (see exploration protocol for prompt and output format).
 
 Analyze: architecture fit, execution order, failure modes, performance, security, maintainability.
 
@@ -160,7 +160,7 @@ Target: ≤ 30 lines.
 
 **Skip this phase if complexity is LOW.**
 
-Launch `prp-core:plan-critic` with all phase briefs:
+Launch `plan-critic` with all phase briefs:
 
 ```
 Review these consolidated findings for a plan about: [feature description]
@@ -181,6 +181,8 @@ Validate completeness, coherence, and identify blind spots.
 ```
 
 Process feedback: incorporate valid findings into the relevant briefs, briefly justify any disagreements.
+
+Make sure to execute `prp-verification-before-completion` skill for every claim you make in the briefs and critic feedback. No evidence = no claim.
 
 ---
 

@@ -26,6 +26,14 @@
      Remove if no cross-scope ordering dependencies exist. -->
 - Prerequisite: `[command]` must run before `[scope]`
 
+## Critical Constraints
+
+<!-- CONDITIONAL: Include ONLY if codebase analysis found 1-3 repo-wide non-obvious constraints,
+     architectural boundaries, or domain terms that would cause agent mistakes if omitted.
+     This section is especially useful for sparse single-scope projects: prefer short behavioral constraints
+     over filler so the root file can still carry enough signal without boilerplate. -->
+- `[constraint or non-obvious pattern]`
+
 ## Context
 
 <!-- CONDITIONAL: Include ONLY if scopes with genuinely different tooling were detected.

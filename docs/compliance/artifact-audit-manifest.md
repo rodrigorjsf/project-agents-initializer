@@ -240,6 +240,7 @@ Type taxonomy and validator code legend used in all inventory tables.
 | `skills/create-rule/assets/templates/rule-file.md` | template | `i:tf` | — | no |
 | `skills/create-skill/SKILL.md` | skill | `r:ps`, `i:sf`, `ac:P` | — | no |
 | `skills/create-skill/references/prompt-engineering-strategies.md` | reference | `r:rf`, `i:rf`, `ac:R`, `ac:X` | SCG-11 | yes |
+| `skills/create-skill/references/behavioral-guidelines.md` | reference | `r:rf`, `i:rf`, `ac:R`, `ac:X` | SCG-25 | yes |
 | `skills/create-skill/references/skill-authoring-guide.md` | reference | `r:rf`, `i:rf`, `ac:R`, `ac:X` | SCG-16 | yes |
 | `skills/create-skill/references/skill-format-reference.md` | reference | `r:rf`, `i:rf`, `ac:R`, `ac:X` | SCG-20 | yes |
 | `skills/create-skill/references/skill-validation-criteria.md` | reference | `r:rf`, `i:rf`, `ac:R`, `ac:X` | SCG-12 | yes |
@@ -265,6 +266,7 @@ Type taxonomy and validator code legend used in all inventory tables.
 | `skills/improve-rule/assets/templates/rule-file.md` | template | `i:tf` | — | no |
 | `skills/improve-skill/SKILL.md` | skill | `r:ps`, `i:sf`, `ac:P` | — | no |
 | `skills/improve-skill/references/prompt-engineering-strategies.md` | reference | `r:rf`, `i:rf`, `ac:R`, `ac:X` | SCG-11 | yes |
+| `skills/improve-skill/references/behavioral-guidelines.md` | reference | `r:rf`, `i:rf`, `ac:R`, `ac:X` | SCG-25 | yes |
 | `skills/improve-skill/references/skill-authoring-guide.md` | reference | `r:rf`, `i:rf`, `ac:R`, `ac:X` | SCG-16 | yes |
 | `skills/improve-skill/references/skill-evaluation-criteria.md` | reference | `r:rf`, `i:rf`, `ac:R` | — | no |
 | `skills/improve-skill/references/skill-format-reference.md` | reference | `r:rf`, `i:rf`, `ac:R`, `ac:X` | SCG-20 | yes |
@@ -345,6 +347,7 @@ Type taxonomy and validator code legend used in all inventory tables.
 | `create-skill/SKILL.md` | skill | `r:ss`, `i:sf`, `q:S` | — | no |
 | `create-skill/references/artifact-analyzer.md` | reference | `r:rf`, `i:rf`, `q:R` | — | no |
 | `create-skill/references/prompt-engineering-strategies.md` | reference | `r:rf`, `i:rf`, `q:R` | — | no |
+| `create-skill/references/behavioral-guidelines.md` | reference | `r:rf`, `i:rf`, `q:R` | SCG-25 | yes |
 | `create-skill/references/skill-authoring-guide.md` | reference | `r:rf`, `i:rf`, `q:R` | — | no |
 | `create-skill/references/skill-format-reference.md` | reference | `r:rf`, `i:rf`, `q:R` | — | no |
 | `create-skill/references/skill-validation-criteria.md` | reference | `r:rf`, `i:rf`, `q:R` | — | no |
@@ -405,6 +408,7 @@ Type taxonomy and validator code legend used in all inventory tables.
 | `improve-skill/SKILL.md` | skill | `r:ss`, `i:sf`, `q:S` | — | no |
 | `improve-skill/references/artifact-analyzer.md` | reference | `r:rf`, `i:rf`, `q:R` | — | no |
 | `improve-skill/references/prompt-engineering-strategies.md` | reference | `r:rf`, `i:rf`, `q:R` | — | no |
+| `improve-skill/references/behavioral-guidelines.md` | reference | `r:rf`, `i:rf`, `q:R` | SCG-25 | yes |
 | `improve-skill/references/skill-authoring-guide.md` | reference | `r:rf`, `i:rf`, `q:R` | — | no |
 | `improve-skill/references/skill-evaluation-criteria.md` | reference | `r:rf`, `i:rf`, `q:R` | — | no |
 | `improve-skill/references/skill-evaluator.md` | reference | `r:rf`, `i:rf`, `q:R` | — | no |
@@ -557,18 +561,18 @@ Type taxonomy and validator code legend used in all inventory tables.
 
 ## 10. Shared Copy Group Registry
 
-Groups are stable identifiers referenced in inventory Ph.7 columns. Member paths are the filesystem truth — Task 2 cross-validates all member paths exist.
+Groups are stable identifiers referenced in inventory Ph.7 columns. Member paths are the filesystem truth — Task 2 cross-validates all member paths exist. Some Phase 7 groups contain multiple parity families under one stable ID when platform or lifecycle adaptations are intentional; in those cases, the Parity Enforcer column names the family split instead of requiring one hash across every listed member.
 
 ### SCG Groups (Reference Shared Copies)
 
 | Group ID | Shared File | Member Paths | Copies | Parity Enforcer |
 |----------|-------------|--------------|--------|-----------------|
-| SCG-01 | `context-optimization.md` | agents-init/improve-agents, agents-init/improve-claude, agents-init/init-agents, agents-init/init-claude, cursor-init/improve-cursor, cursor-init/init-cursor, standalone/improve-agents, standalone/improve-claude, standalone/init-agents, standalone/init-claude | 10 | quality-gate parity-checker (X1) |
-| SCG-02 | `validation-criteria.md` (initializer) | same 10 skill directories as SCG-01 | 10 | quality-gate parity-checker (X2) |
-| SCG-03 | `what-not-to-include.md` | same 10 skill directories as SCG-01 | 10 | quality-gate parity-checker (X1) |
-| SCG-04 | `progressive-disclosure-guide.md` | same 10 skill directories as SCG-01 | 10 | quality-gate parity-checker (X1) |
-| SCG-05 | `automation-migration-guide.md` | agents-init/improve-agents, agents-init/improve-claude, cursor-init/improve-cursor, standalone/improve-agents, standalone/improve-claude | 5 | quality-gate parity-checker (X1) |
-| SCG-06 | `evaluation-criteria.md` | agents-init/improve-agents, agents-init/improve-claude, cursor-init/improve-cursor, standalone/improve-agents, standalone/improve-claude | 5 | quality-gate parity-checker (X1) |
+| SCG-01 | `context-optimization.md` | Family A: agents-init ×4 + standalone ×4; Family B: cursor-init ×2 | 8 + 2 | quality-gate parity-checker (X1 split families) |
+| SCG-02 | `validation-criteria.md` (initializer) | Family A: agents-init ×4 + standalone ×4; Family B: cursor-init ×2 | 8 + 2 | quality-gate parity-checker (X2 split families) |
+| SCG-03 | `what-not-to-include.md` | Family A: agents-init ×4 + standalone ×4; Family B: cursor-init ×2 | 8 + 2 | quality-gate parity-checker (X1 split families) |
+| SCG-04 | `progressive-disclosure-guide.md` | Family A: agents-init ×4 + standalone ×4; Family B: cursor-init ×2 | 8 + 2 | quality-gate parity-checker (X1 split families) |
+| SCG-05 | `automation-migration-guide.md` | Family A: agents-init ×2 + standalone ×2; Family B: cursor-init improve-cursor singleton | 4 + 1 | quality-gate parity-checker (X1 family A) + manual validator (singleton) |
+| SCG-06 | `evaluation-criteria.md` | Family A: agents-init ×2 + standalone ×2; Family B: cursor-init improve-cursor singleton | 4 + 1 | quality-gate parity-checker (X1 family A) + manual validator (singleton) |
 | SCG-07 | `claude-rules-system.md` | agents-init/improve-claude, agents-init/init-claude, standalone/improve-claude, standalone/init-claude | 4 | quality-gate parity-checker (X1) |
 | SCG-08 | `codebase-analyzer.md` (standalone refs) | standalone/improve-agents, standalone/improve-claude, standalone/init-agents, standalone/init-claude | 4 | quality-gate parity-checker (X1) |
 | SCG-09 | `file-evaluator.md` (standalone refs) | standalone/improve-agents, standalone/improve-claude | 2 | quality-gate parity-checker (X1) |
@@ -592,21 +596,22 @@ Groups are stable identifiers referenced in inventory Ph.7 columns. Member paths
 | SCG-22 | X12 | `subagent-config-reference.md` | create-subagent ↔ improve-subagent | 2 | agent-customizer-qg parity-checker |
 | SCG-23 | X13 | `skill-md.md` (template) | create-skill ↔ improve-skill | 2 | agent-customizer-qg parity-checker |
 | SCG-24 | X14 | `subagent-definition.md` (template) | create-subagent ↔ improve-subagent | 2 | agent-customizer-qg parity-checker |
+| SCG-25 | X15 | `behavioral-guidelines.md` | create-skill ↔ improve-skill (plugin + standalone) | 4 | agent-customizer-qg parity-checker (plugin 2) + quality-gate parity-checker (standalone 2) |
 
 ### TCG Groups (Template Shared Copies)
 
 | Group ID | Shared Template | Member Distributions | Copies | Parity Enforcer |
 |----------|-----------------|----------------------|--------|-----------------|
 | TCG-01 | `domain-doc.md` | agents-init ×4, cursor-init ×2, standalone ×4 | 10 | quality-gate parity-checker (T2) |
-| TCG-02 | `root-agents-md.md` | agents-init ×2, cursor-init ×2, standalone ×2 | 6 | quality-gate parity-checker (T2) |
-| TCG-03 | `scoped-agents-md.md` | agents-init ×2, cursor-init ×2, standalone ×2 | 6 | quality-gate parity-checker (T2) |
+| TCG-02 | `root-agents-md.md` | Family A: agents-init ×2 + standalone ×2; Family B: cursor-init ×2 | 4 + 2 | quality-gate parity-checker (T2 split families) |
+| TCG-03 | `scoped-agents-md.md` | Family A: agents-init ×2 + standalone ×2; Family B: cursor-init ×2 | 4 + 2 | quality-gate parity-checker (T2 split families) |
 | TCG-04 | `root-claude-md.md` | agents-init ×2, standalone ×2 | 4 | quality-gate parity-checker (T2) |
-| TCG-05 | `scoped-claude-md.md` | agents-init ×2, standalone ×2 | 4 | quality-gate parity-checker (T2) |
-| TCG-06 | `claude-rule.md` | agents-init ×3, standalone ×3 | 6 | quality-gate parity-checker (T2) |
-| TCG-07 | `hook-config.md` | agents-init ×2, agent-custom ×2, cursor-init ×1, standalone ×2 | 7 | quality-gate parity-checker (T2) |
-| TCG-08 | `skill.md` | agents-init ×2, cursor-init ×1, standalone ×2 | 5 | quality-gate parity-checker (T2) |
-| TCG-09 | `skill-md.md` | agent-custom ×2 (SCG-23), standalone ×2 | 4 | quality-gate (T2) + agent-custom-qg (X13) |
-| TCG-10 | `subagent-definition.md` | agent-custom ×2 (SCG-24), standalone ×2 | 4 | quality-gate (T2) + agent-custom-qg (X14) |
+| TCG-05 | `scoped-claude-md.md` | agents-init ×2 + standalone ×2 | 4 | quality-gate parity-checker (T2) |
+| TCG-06 | `claude-rule.md` | Family A: init-claude plugin + standalone; Family B: improve-agents + improve-claude across plugin + standalone | 2 + 4 | quality-gate parity-checker (T2 split families) |
+| TCG-07 | `hook-config.md` | Family A: agents-init improve pair; Family B: agent-custom create/improve + standalone create/improve hook pair; Family C: cursor-init improve singleton | 2 + 4 + 1 | quality-gate parity-checker (T2 split families) + manual validator (singleton) |
+| TCG-08 | `skill.md` | Family A: agents-init improve pair + standalone improve pair; Family B: cursor-init improve singleton | 4 + 1 | quality-gate parity-checker (T2 family A) + manual validator (singleton) |
+| TCG-09 | `skill-md.md` | Family A: agent-custom create/improve pair (SCG-23); Family B: standalone create/improve pair | 2 + 2 | quality-gate parity-checker (T2 family B) + agent-custom-qg (X13 family A) |
+| TCG-10 | `subagent-definition.md` | Family A: agent-custom create/improve pair (SCG-24); Family B: standalone create/improve pair | 2 + 2 | quality-gate parity-checker (T2 family B) + agent-custom-qg (X14 family A) |
 
 ---
 
@@ -628,10 +633,10 @@ Enforcement status per (scope × artifact type). Cells show active rule/instruct
 | agent-customizer | template | — | `i:tf` | `ac:X` (X13–X14) | — | no |
 | agent-customizer | drift-manifest | — | — | `ac:D` | — | no |
 | agent-customizer | plugin-manifest | — | `i:pc` | — | — | **yes** (no gate) |
-| cursor-initializer | skill | `r:cp` | `i:sf` | — | — | **yes** (no quality gate) |
-| cursor-initializer | agent | `r:ca` | `i:ad` | — | — | **yes** (no quality gate) |
-| cursor-initializer | reference | `r:rf` | `i:rf` | — | — | **yes** (no parity gate) |
-| cursor-initializer | template | — | `i:tf` | — | — | **yes** (no quality gate) |
+| cursor-initializer | skill | `r:cp` | `i:sf` | `ci:P` (P1–P10) | — | no |
+| cursor-initializer | agent | `r:ca` | `i:ad` | `ci:A` (A1–A5) | — | no |
+| cursor-initializer | reference | `r:rf` | `i:rf` | `ci:R` (R1–R5), `ci:X` (X1–X2) | — | no |
+| cursor-initializer | template | — | `i:tf` | `ci:T` (T1–T4), `ci:X` | — | no |
 | standalone | skill | `r:ss` | `i:sf` | `q:S` (S1–S11) | — | no |
 | standalone | reference | `r:rf` | `i:rf` | `q:R` (R1–R5), `q:X` (X1–X2) | — | no |
 | standalone | template | — | `i:tf` | `q:T` (T1–T2), `q:X` | — | no |
@@ -647,13 +652,13 @@ Enforcement status per (scope × artifact type). Cells show active rule/instruct
 
 | Scope | Quality Gate | Static (Phase 1) | Parity (Phase 2) | Drift (Phase 3) | Scenarios (Phase 4) | Coverage Gap |
 |-------|-------------|-----------------|-----------------|-----------------|---------------------|--------------|
-| agents-initializer | `.claude/skills/quality-gate/` | ✅ P1–P12, A1–A6, R1–R5 | ✅ X1–X2, T1–T2 | ❌ none | ✅ G1–G4 | No drift detection |
+| agents-initializer | `.claude/skills/quality-gate/` | ✅ P1–P12, A1–A6, R1–R5 | ✅ X1–X2, T1–T2 | ✅ (Phase 3, via manifest) | ✅ G1–G4 | No cursor-initializer drift |
 | agent-customizer | `.claude/skills/agent-customizer-quality-gate/` | ✅ P1–P12, A1–A6, R1–R5 | ✅ X1–X14, T1–T3 | ✅ D1–D3 | ✅ G1–G4 | Full coverage |
-| cursor-initializer | **No quality gate** | ❌ | ❌ | ❌ | ❌ | **All coverage manual** |
-| standalone | `.claude/skills/quality-gate/` (shared) | ✅ S1–S11, R1–R5 | ✅ X1–X2, T1–T2 | ❌ none | ✅ G1–G4 | No drift detection |
+| cursor-initializer | `.claude/skills/cursor-initializer-quality-gate/` | ✅ P1–P10, A1–A5, R1–R5 | ✅ X1–X2, T1–T4 | ❌ none | ✅ G1–G4 | No drift detection |
+| standalone | `.claude/skills/quality-gate/` (shared) | ✅ S1–S11, R1–R5 | ✅ X1–X2, T1–T2 | ✅ (Phase 3, via manifest) | ✅ G1–G4 | No cursor-initializer drift |
 | repository-global | **No quality gate** | ❌ | ❌ | ❌ | ❌ | **All coverage manual** |
 
-> **Remediation**: cursor-initializer and repository-global quality gate gaps are documented here and **deferred to Phase 9** (regression prevention). Drift detection for agents-initializer and standalone is also deferred to Phase 9.
+> **Note**: cursor-initializer quality gate shipped in Phase 9 (`.claude/skills/cursor-initializer-quality-gate/`); first full run executed in Phase 10. Drift detection for agents-initializer and standalone is implemented via `plugins/agents-initializer/docs-drift-manifest.md` and `skills/docs-drift-manifest.md` respectively (quality-gate Phase 3). Cursor-initializer has no drift manifest; cursor drift detection not yet implemented. Repository-global coverage remains manual-only.
 
 ---
 
@@ -664,7 +669,7 @@ Enforcement status per (scope × artifact type). Cells show active rule/instruct
 | 3 | Cross-cutting | — | — | Normative source matrix cross-validation; validator protocol definition |
 | 4 | agents-initializer + agent-customizer | 111 | Both quality gates available | Claude Code scope audit; ~51 agents-init + ~60 agent-customizer |
 | 5 | standalone | 114 | quality-gate (partial) | Standalone scope audit |
-| 6 | cursor-initializer | 31 | **None** (manual only) | Cursor scope audit; no automated quality gate |
+| 6 | cursor-initializer | 31 | `.claude/skills/cursor-initializer-quality-gate/` | Cursor scope audit; automated gate shipped Phase 9, first full run Phase 10 |
 | 7 | Cross-cutting (Ph.7?=yes) | ~180 | Parity checkers | Parity review for all SCG/TCG groups; drift remediation for agent-customizer |
 | 8 | RAG/Wiki infrastructure | — | None | RAG hardening; out of scope for distribution artifact audit |
 | 9 | All | 354 | New/extended gates | Regression prevention; cursor-initializer and repository-global gap remediation |

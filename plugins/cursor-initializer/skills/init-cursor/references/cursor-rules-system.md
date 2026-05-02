@@ -1,10 +1,10 @@
 # Cursor Rules System
 
-Reference for generating and evaluating `.cursor/rules/` files. Source: [cursor.com/docs/context/rules](https://cursor.com/docs/context/rules).
+Reference for generating and evaluating `.cursor/rules/` files. Source: Cursor official documentation ([cursor.com/docs/context/rules](https://cursor.com/docs/context/rules)).
 
 ## File Format
 
-Cursor rules are markdown files in `.cursor/rules/` with optional `.mdc` extension for frontmatter support. Both `.md` and `.mdc` extensions are supported.
+Cursor rules are markdown files in `.cursor/rules/` with optional `.mdc` extension for frontmatter support. Both `.md` and `.mdc` extensions are supported; this distribution generates `.mdc`.
 
 ### Frontmatter Fields (ONLY these three are valid)
 
@@ -41,14 +41,12 @@ Rules behave differently based on which frontmatter fields are set:
 - Instructions for edge cases that rarely apply
 - Content that duplicates what's in your codebase
 
-### When to Use Rules vs AGENTS.md
+### Activation-Mode Selection
 
-| Use `.cursor/rules/` when... | Use `AGENTS.md` when... |
-|-------------------------------|-------------------------|
-| You need metadata-controlled activation (globs, description) | You want simple, portable, readable instructions |
-| You want auto-attachment based on file patterns | The project also needs AGENTS.md for other tools |
-| You need different activation modes for different content | All instructions should always load |
-| You want to organize rules in folders | You prefer a single-file approach |
+| Use `alwaysApply: true` when... | Use `globs:` when... | Use `description:` when... |
+|-------------------------------|----------------------|----------------------------|
+| Content is critical for every task | Convention applies only to specific file patterns | Content is a cross-cutting / domain topic the agent should pull in by name |
+| Content is short — one or two screenfuls of bullets | Convention is pattern-relative | Content is reference material attached on demand |
 
 ### File Example
 

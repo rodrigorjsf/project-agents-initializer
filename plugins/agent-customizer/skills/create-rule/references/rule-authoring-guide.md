@@ -29,7 +29,7 @@ Rules are instruction files loaded on-demand when Claude reads files matching th
 
 **Rules load into context** when matching files are read, so keep them focused and concise.
 
-*Source: memory/how-claude-remembers-a-project.md lines 123-129*
+*Source: memory/how-claude-remembers-a-project.md lines 123-145; .github/instructions/rules.instructions.md*
 
 ---
 

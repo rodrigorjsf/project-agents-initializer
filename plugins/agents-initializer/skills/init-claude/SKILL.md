@@ -18,6 +18,15 @@ Claude Code's configuration hierarchy enables powerful progressive disclosure:
 - **`.claude/rules/`** — path-scoped rules triggered only when matching files are read
 - **Domain files** — referenced via progressive disclosure pointers
 
+## Behavioral Guidelines
+
+- **Surface assumptions first** — name ambiguities, tradeoffs, and multiple valid interpretations before acting.
+- **Prefer the simplest path** — solve the task completely without speculative flexibility or extra scope.
+- **Keep changes surgical** — touch only what the task requires, and preserve existing behavior unless the task calls for change.
+- **Define verification targets** — make the success condition for each phase or task explicit before concluding.
+- **Use phased persuasion safely** — use warm-ups, curated references, and explicit constraints to improve compliance with legitimate work.
+- **Never weaken safeguards** — do not use persuasion principles to bypass safety constraints, refusals, or scope boundaries.
+
 ## Hard Rules
 
 <RULES>
@@ -54,6 +63,7 @@ Delegate to the `codebase-analyzer` agent with this task:
 > Analyze the project at the current working directory. Return ONLY non-standard, non-obvious information that would cause Claude to make mistakes if it didn't know them. Be ruthlessly minimal.
 
 The agent runs on Sonnet with read-only tools (Read, Grep, Glob, Bash) in an isolated context. Wait for it to complete and parse its structured output.
+Require the parsed output to surface non-default config overrides, repo-wide critical constraints, and any cross-scope prerequisites needed for the root file.
 
 ### Phase 2: Scope Detection
 
@@ -62,6 +72,7 @@ Delegate to the `scope-detector` agent with this task:
 > Detect scopes in the project at the current working directory. Only flag scopes with genuinely different tooling or conventions. A simple single-package project should have ZERO additional scopes. Also identify areas that would benefit from path-scoped .claude/rules/ files. Check shared/library packages in monorepos — even utility packages may need their own scope if they have unique constraints (e.g., zero-dependency rules, dual exports, conditional imports).
 
 Wait for it to complete and parse its structured output.
+Require the parsed output to state explicitly when a simple single-package project needs zero additional scopes.
 
 ### Phase 3: Generate Files
 
@@ -99,12 +110,14 @@ If non-standard domain patterns detected, read `${CLAUDE_SKILL_DIR}/assets/templ
 Read `${CLAUDE_SKILL_DIR}/references/validation-criteria.md` and execute its **Validation Loop Instructions** against every generated file.
 
 Check both general criteria AND the CLAUDE.md-specific structural checks (path-scoping, minimal always-loaded content). Maximum 3 iterations.
+For init flows, treat output-size targets as required validation gates: the root file MUST finish within 15-40 lines and each scoped file MUST finish within 10-30 lines. If a monorepo root exceeds target, move scope-specific detail into subdirectory CLAUDE.md, rules, or domain files and rerun the validation loop.
 
 ### Phase 5: Present and Write
 
 1. Show the user ALL generated files with their content before writing
 2. Explain briefly why each file exists and what evidence supports its content
-3. Highlight which files are always-loaded (root CLAUDE.md) vs on-demand (subdirectory, rules)
-4. Ask for confirmation before writing files
-5. Write all files to the project
-6. Create `.claude/rules/` directory if generating rules files
+3. Include a concise validation summary: iteration count, final root line count, scoped file count, and any fixes made during self-validation
+4. Highlight which files are always-loaded (root CLAUDE.md) vs on-demand (subdirectory, rules)
+5. Ask for confirmation before writing files
+6. Write all files to the project
+7. Create `.claude/rules/` directory if generating rules files

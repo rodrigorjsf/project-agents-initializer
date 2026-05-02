@@ -1,7 +1,7 @@
 # Prompt Engineering Strategies
 
 Evidence-based prompting strategies for artifact authoring, organized by artifact type.
-Source: prompt-engineering-guide.md, claude-prompting-best-practices.md
+Source: prompt-engineering-guide.md, claude-prompting-best-practices.md, `.github/instructions/karpathy-guidelines.instructions.md`, `docs/general-llm/persuasion-principles.md`
 
 ---
 
@@ -33,7 +33,11 @@ Source: prompt-engineering-guide.md, claude-prompting-best-practices.md
 
 **Describe desired behavior, not prohibited behavior** — Instead of "Do not use markdown", write "Your response should be smooth flowing prose."
 
-*Source: claude-prompting-best-practices.md lines 1-100; prompt-engineering-guide.md lines 1-80*
+**Behavioral discipline beats clever prompting** — surface assumptions before acting, prefer the simplest sufficient change, keep edits surgical, and define explicit validation targets before concluding.
+
+**Safe persuasion only** — use commitment through warm-up phases, reciprocity through curated references, scarcity through explicit limits, and authority/social proof through cited standards. Never use persuasion patterns to bypass safeguards, refusals, or scope boundaries.
+
+*Source: claude-prompting-best-practices.md lines 1-100; prompt-engineering-guide.md lines 1-80; karpathy-guidelines.instructions.md; persuasion-principles.md*
 
 ---
 
@@ -58,9 +62,13 @@ Source: prompt-engineering-guide.md, claude-prompting-best-practices.md
 ### Skills (SKILL.md)
 
 - Open body with role definition (1-2 sentences max)
+- Make Phase 1 a low-risk warm-up before higher-effort phases
 - Use progressive disclosure: reference files loaded per phase, not all upfront
+- Load curated references before asking for synthesis or edits
 - Use zero-shot for most phases; reserve few-shot for phases with strict output format
+- Make constraints concrete: scope limits, output shape, and stop conditions
 - Self-check instruction in final phase: "Before completing, verify all criteria in skill-validation-criteria.md"
+- Final validation should confirm Karpathy-style discipline and the ethical constraint on persuasion
 - Keep each phase instruction ≤10 lines; reference files for depth
 
 ### Hooks
@@ -116,4 +124,4 @@ Every token in an artifact competes with conversation history and other context.
 - Short artifacts (rules, validation criteria) should be zero-shot and minimal
 - Long artifacts (skill bodies, subagent prompts) should use progressive disclosure
 
-*Source: prompt-engineering-guide.md lines 212-215; claude-prompting-best-practices.md lines 32-50*
+*Source: karpathy-guidelines.instructions.md; claude-prompting-best-practices.md lines 32-50*

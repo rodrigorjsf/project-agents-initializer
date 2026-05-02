@@ -7,7 +7,8 @@ Multi-plugin marketplace for evidence-based agent artifact engineering.
 Multiple plugin distributions and one standalone distribution — each follows its own platform conventions:
 
 - `plugins/agents-initializer/skills/` — Claude Code plugin; delegates analysis to subagents
-- `plugins/cursor-initializer/skills/` — Cursor IDE plugin; delegates analysis to subagents (Cursor-native format)
+- `plugins/cursor-initializer/skills/` — Cursor IDE plugin; rules-first `.cursor/rules/*.mdc` initializer; delegates analysis to subagents (Cursor-native format)
+- `plugins/cursor-customizer/skills/` — Cursor IDE plugin; single-artifact CRUD (rules, hooks, skills, subagents); delegates analysis to subagents (Cursor-native format)
 - `plugins/agent-customizer/skills/` — Claude Code plugin; artifact creation/improvement
 - `skills/` — npx skills add; standalone inline analysis, no agent delegation
 
@@ -28,23 +29,18 @@ Each skill directory contains:
 
 See `plugins/agents-initializer/CLAUDE.md` for plugin-specific conventions.
 See `plugins/cursor-initializer/CLAUDE.md` for cursor-initializer plugin conventions.
+See `plugins/cursor-customizer/CLAUDE.md` for cursor-customizer plugin conventions.
 See `plugins/agent-customizer/CLAUDE.md` for agent-customizer plugin conventions.
 
-## RAG Knowledge Base
+## Knowledge Lookup
 
-This project has a semantic search system. Use it **before** reading files with `view`/`grep`.
+Search project knowledge in this order — stop when the answer is sufficient:
 
-- `search_docs` — find documentation, guides, research, design decisions
-- `search_code` — find implementation examples, skill patterns, hook scripts
-- `search_all` — search both when unsure which collection to use
-- `get_doc_context` — get all chunks from a specific file
+1. **RAG** (`search_docs`, `search_code`, `search_all`, `get_doc_context`) — semantic search, always try first
+2. **Wiki** (`wiki/knowledge/`) — curated concept pages with cross-references; use when RAG returns poor or incomplete results
+3. **`docs/`** — full source documents; use only when wiki lacks relevant detail for the task
 
-The database is pre-built. Tools are available via MCP (`rag-knowledge-base` server).
-
-## Documentation
-
-- All user documentation should be rich and written using the `/docs:write-concisely` skill.
-- All documentation updates must be made using the `/docs:update-docs` skill.
+The RAG database is pre-built. Tools are available via MCP (`rag-knowledge-base` server).
 
 ## RAG Knowledge Base
 
@@ -69,6 +65,20 @@ The database is pre-built. Tools are available via MCP (`rag-knowledge-base` ser
 - Commit message format: `{type}({scope}): {description}` — use `feat`, `fix`, `docs`, `chore`, `refactor`
 - Stage only files belonging to the same logical change; never `git add -A` across unrelated changes
 - If asked to "commit everything", break it into atomic commits by scope first, then commit each group
+
+## Agent skills
+
+### Issue tracker
+
+Issues live in GitHub Issues for `rodrigorjsf/agent-engineering-toolkit`, accessed via the `gh` CLI. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Five canonical roles — `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix` — using default label names. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context: `CONTEXT.md` and `docs/adr/` at the repo root (created lazily by `/grill-with-docs`). See `docs/agents/domain.md`.
 
 ## Applied Learning
 

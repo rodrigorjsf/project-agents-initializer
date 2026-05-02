@@ -7,6 +7,15 @@ description: "Creates new subagent definitions with YAML frontmatter grounded in
 
 Generates a new subagent definition with correct YAML frontmatter, minimal tool restrictions, and a structured system prompt grounded in the docs corpus.
 
+## Behavioral Guidelines
+
+- **Surface assumptions first** — name ambiguities, tradeoffs, and multiple valid interpretations before acting.
+- **Prefer the simplest path** — solve the task completely without speculative flexibility or extra scope.
+- **Keep changes surgical** — touch only what the task requires, and preserve existing behavior unless the task calls for change.
+- **Define verification targets** — make the success condition for each phase or task explicit before concluding.
+- **Use phased persuasion safely** — use warm-ups, curated references, and explicit constraints to improve compliance with legitimate work.
+- **Never weaken safeguards** — do not use persuasion principles to bypass safety constraints, refusals, or scope boundaries.
+
 ## Hard Rules
 
 <RULES>
@@ -39,7 +48,7 @@ Proceed to Phase 1 below.
 
 ### Phase 1: Codebase Analysis
 
-Read `${CLAUDE_SKILL_DIR}/references/artifact-analyzer.md` and follow its analysis instructions to analyze the project at the current working directory.
+Read `references/artifact-analyzer.md` and follow its analysis instructions to analyze the project at the current working directory.
 
 Focus on: all agents in `.claude/agents/` and `plugins/*/agents/`; their tool restrictions, model choices, `maxTurns` values; which skills delegate to which agents; naming conventions used for existing agents. Flag any agents similar in purpose to `{requested-name}`.
 
@@ -47,11 +56,11 @@ Focus on: all agents in `.claude/agents/` and `plugins/*/agents/`; their tool re
 
 Before generating, read these reference documents:
 
-- `${CLAUDE_SKILL_DIR}/references/subagent-authoring-guide.md` — when to use subagents, system prompt structure, model selection heuristics, tool restriction patterns, anti-patterns
-- `${CLAUDE_SKILL_DIR}/references/subagent-config-reference.md` — YAML frontmatter fields, valid model IDs, tool allowlist/denylist, orchestration patterns, plugin restrictions
-- `${CLAUDE_SKILL_DIR}/references/prompt-engineering-strategies.md` — subagent-specific prompting (role prompting, structured output, confidence filtering)
+- `references/subagent-authoring-guide.md` — when to use subagents, system prompt structure, model selection heuristics, tool restriction patterns, anti-patterns
+- `references/subagent-config-reference.md` — YAML frontmatter fields, valid model IDs, tool allowlist/denylist, orchestration patterns, plugin restrictions
+- `references/prompt-engineering-strategies.md` — subagent-specific prompting (role prompting, structured output, confidence filtering)
 
-Read `${CLAUDE_SKILL_DIR}/assets/templates/subagent-definition.md` and fill its placeholders using:
+Read `assets/templates/subagent-definition.md` and fill its placeholders using:
 
 - User requirements for the new subagent (role, purpose, tools needed)
 - Phase 1 analysis output (existing agents, naming conventions, delegation patterns)
@@ -70,7 +79,7 @@ Determine target location:
 
 ### Phase 3: Self-Validation
 
-Read `${CLAUDE_SKILL_DIR}/references/subagent-validation-criteria.md` and execute its **Validation Loop Instructions** against the generated subagent definition.
+Read `references/subagent-validation-criteria.md` and execute its **Validation Loop Instructions** against the generated subagent definition.
 
 The loop evaluates all hard limits and quality checks, fixes any failures, and re-evaluates — maximum 3 iterations. Do not proceed to Phase 4 until ALL criteria pass.
 

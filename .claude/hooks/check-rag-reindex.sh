@@ -41,6 +41,9 @@ case "$FILE_PATH" in
   .claude/hooks/*.sh)
     MATCHES=true
     ;;
+  wiki/knowledge/*.md|wiki/knowledge/**/*.md)
+    MATCHES=true
+    ;;
   plugins/**/*.py|plugins/**/*.sh)
     MATCHES=true
     ;;
@@ -69,12 +72,12 @@ fi
   trap 'rm -f "$LOCK_FILE"' EXIT
   touch "$LOCK_FILE"
 
-  uv run --project rag python -m rag index --config rag.config.yaml > .rag/reindex.log 2>&1
+  uv run --project rag python -m rag --config rag.config.yaml index > .rag/reindex.log 2>&1
 
   # If dirty flag was set during our run, reindex again
   if [[ -f "$DIRTY_FLAG" ]]; then
     rm -f "$DIRTY_FLAG"
-    uv run --project rag python -m rag index --config rag.config.yaml >> .rag/reindex.log 2>&1
+    uv run --project rag python -m rag --config rag.config.yaml index >> .rag/reindex.log 2>&1
   fi
 ) &
 

@@ -17,6 +17,9 @@ collections:
       - path: "docs/"
         patterns: ["*.md"]
         recursive: true
+      - path: "wiki/knowledge/"
+        patterns: ["*.md"]
+        recursive: false
     chunking:
       strategy: "markdown_header"
       max_tokens: 512

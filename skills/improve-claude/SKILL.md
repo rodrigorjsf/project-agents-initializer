@@ -18,6 +18,15 @@ Key metrics from research:
 - Target: **under 200 lines** per file (Anthropic recommendation)
 - Instruction budget: **~150-200 instructions** max before adherence drops
 
+## Behavioral Guidelines
+
+- **Surface assumptions first** — name ambiguities, tradeoffs, and multiple valid interpretations before acting.
+- **Prefer the simplest path** — solve the task completely without speculative flexibility or extra scope.
+- **Keep changes surgical** — touch only what the task requires, and preserve existing behavior unless the task calls for change.
+- **Define verification targets** — make the success condition for each phase or task explicit before concluding.
+- **Use phased persuasion safely** — use warm-ups, curated references, and explicit constraints to improve compliance with legitimate work.
+- **Never weaken safeguards** — do not use persuasion principles to bypass safety constraints, refusals, or scope boundaries.
+
 ## Hard Rules
 
 <RULES>
@@ -37,9 +46,9 @@ Key metrics from research:
 
 ### Phase 1: Current State Analysis
 
-Read `${CLAUDE_SKILL_DIR}/references/evaluation-criteria.md` for the scoring rubric and bloat/staleness indicators.
+Read `references/evaluation-criteria.md` for the scoring rubric and bloat/staleness indicators.
 
-Read `${CLAUDE_SKILL_DIR}/references/file-evaluator.md` and follow its evaluation instructions to evaluate all CLAUDE.md files and .claude/rules/ files in the project at the current working directory.
+Read `references/file-evaluator.md` and follow its evaluation instructions to evaluate all CLAUDE.md files and .claude/rules/ files in the project at the current working directory.
 
 Check for:
 
@@ -56,7 +65,7 @@ Build a structured assessment with specific line numbers and content for each is
 
 ### Phase 2: Codebase Comparison
 
-Read `${CLAUDE_SKILL_DIR}/references/codebase-analyzer.md` and follow its codebase analysis instructions. Focus on:
+Read `references/codebase-analyzer.md` and follow its codebase analysis instructions. Focus on:
 
 1. Verifying that tooling commands documented in CLAUDE.md files still work
 2. Identifying scopes that have distinct tooling but lack their own CLAUDE.md — including library/shared packages in monorepos that have unique constraints (zero-dependency rules, dual exports, conditional imports, server-only markers)
@@ -69,11 +78,11 @@ Return ONLY actionable findings.
 
 Read these reference documents:
 
-- `${CLAUDE_SKILL_DIR}/references/progressive-disclosure-guide.md` — hierarchy decisions and loading tiers
-- `${CLAUDE_SKILL_DIR}/references/what-not-to-include.md` — content exclusion criteria
-- `${CLAUDE_SKILL_DIR}/references/context-optimization.md` — token budget guidelines
-- `${CLAUDE_SKILL_DIR}/references/claude-rules-system.md` — .claude/rules/ conventions and path-scoping
-- `${CLAUDE_SKILL_DIR}/references/automation-migration-guide.md` — automation migration decision criteria (skill vs. hook vs. rule vs. subagent)
+- `references/progressive-disclosure-guide.md` — hierarchy decisions and loading tiers
+- `references/what-not-to-include.md` — content exclusion criteria
+- `references/context-optimization.md` — token budget guidelines
+- `references/claude-rules-system.md` — .claude/rules/ conventions and path-scoping
+- `references/automation-migration-guide.md` — automation migration decision criteria (skill vs. hook vs. rule vs. subagent)
 
 Based on both analyses, create improvement plan:
 
@@ -95,9 +104,11 @@ Based on both analyses, create improvement plan:
 7. **Migrate automation candidates** — for each instruction flagged in Phase 1 as `HOOK_CANDIDATE`, `RULE_CANDIDATE`, or `SKILL_CANDIDATE`:
    - Classify using the decision flowchart in automation-migration-guide.md
    - Select target mechanism: path-scoped `.claude/rules/` (file-pattern convention) or skill (domain knowledge/infrequent workflow)
+   - For concise file-pattern-specific formatting guidance in a high-quality file, prefer a path-scoped `.claude/rules/` file over broader restructuring
    - Reclassify `HOOK_CANDIDATE` items: if the behavior is path-specific and under 50 lines → `RULE_CANDIDATE`; if it is a workflow or domain block → `SKILL_CANDIDATE`
    - Estimate token savings using the token impact estimation table in automation-migration-guide.md
    - This is the standalone distribution — suggest only skills and path-scoped rules. Do not suggest hooks or subagents (these require Claude Code). When automation-migration-guide.md references hooks or subagents, substitute with the closest available mechanism.
+   - In calibrated mode (overall quality score ≥ 7 with no hard-limit violations), keep migration and extraction suggestions proportional to the confirmed issues. Do not create new files or migrations unless they resolve a failing criterion, and preserve non-issue sections in place.
 
 #### Redundancy Elimination (delete what agents already know)
 
@@ -119,17 +130,18 @@ For each deletion, document: the specific content being removed, WHY the agent d
 
 When generating new or restructured files, use these templates:
 
-- Root CLAUDE.md: Read `${CLAUDE_SKILL_DIR}/assets/templates/root-claude-md.md`
-- Scoped CLAUDE.md: Read `${CLAUDE_SKILL_DIR}/assets/templates/scoped-claude-md.md`
-- .claude/rules/ files: Read `${CLAUDE_SKILL_DIR}/assets/templates/claude-rule.md`
-- Domain docs: Read `${CLAUDE_SKILL_DIR}/assets/templates/domain-doc.md`
-- Skills (from automation migration): Read `${CLAUDE_SKILL_DIR}/assets/templates/skill.md`
+- Root CLAUDE.md: Read `assets/templates/root-claude-md.md`
+- Scoped CLAUDE.md: Read `assets/templates/scoped-claude-md.md`
+- .claude/rules/ files: Read `assets/templates/claude-rule.md`
+- Domain docs: Read `assets/templates/domain-doc.md`
+- Skills (from automation migration): Read `assets/templates/skill.md`
 
 ### Phase 4: Self-Validation
 
-Read `${CLAUDE_SKILL_DIR}/references/validation-criteria.md` and execute its **Validation Loop Instructions** against every improved or newly created file.
+Read `references/validation-criteria.md` and execute its **Validation Loop Instructions** against every improved or newly created file.
 
 For improve operations, also evaluate the **"If This Is an IMPROVE Operation"** section. For CLAUDE.md files, also check **CLAUDE.md-specific** structural checks (path-scoping, minimal always-loaded content). Maximum 3 iterations.
+In calibrated high-quality cases (overall quality score ≥ 7 and no hard limits), treat unrelated structural churn as a validation failure: if a change rewrites a non-issue section, adds extra files, or increases file count without fixing a documented criterion, revert and choose the smaller fix.
 
 ### Phase 5: Present and Apply
 
@@ -139,8 +151,9 @@ For improve operations, also evaluate the **"If This Is an IMPROVE Operation"** 
    - **Automation Migrations**: X items (rules: X, skills: X)
    - **Redundancy Eliminations**: X items
    - **Additions**: X items
+2. Include a concise validation summary: iteration count, final root line count, file-count delta, and what each validation iteration fixed
 
-2. For each suggestion, present a structured card in priority order (Removals → Refactoring → Automation Migrations → Redundancy Eliminations → Additions):
+3. For each suggestion, present a structured card in priority order (Removals → Refactoring → Automation Migrations → Redundancy Eliminations → Additions):
 
    **WHAT**: The specific content and its current location (file:lines)
    **WHY**: Evidence-based justification with source reference (e.g., "Agents can infer directory structure from tools — source: analysis-evaluating-agents-paper.md lines 36-41")
@@ -154,13 +167,13 @@ For improve operations, also evaluate the **"If This Is an IMPROVE Operation"** 
    Wait for the user to select an option for each suggestion before proceeding to the next.
    If the user selects "Keep as-is", preserve the content in its exact current location — no modification.
 
-3. After all suggestions are reviewed, show aggregate token impact analysis:
+4. After all suggestions are reviewed, show aggregate token impact analysis:
    - **Always-loaded tokens**: before → after
    - **On-demand tokens**: before → after
    - **Removed tokens**: total waste eliminated
    - **Deferred suggestions**: X items kept as-is (user chose to preserve)
 
-4. Apply ONLY the approved changes (options A or B selections):
+5. Apply ONLY the approved changes (options A or B selections):
    - Execute each approved change in dependency order
    - Verify after each change:
      - All files under 200 lines
@@ -168,7 +181,7 @@ For improve operations, also evaluate the **"If This Is an IMPROVE Operation"** 
      - Progressive disclosure tree is consistent
      - Path-scoped rules have valid glob patterns
 
-5. Report final metrics:
+6. Report final metrics:
    - Total lines before → after
    - Always-loaded lines before → after
    - Files before → after

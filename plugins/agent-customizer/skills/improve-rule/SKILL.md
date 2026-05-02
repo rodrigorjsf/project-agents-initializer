@@ -7,6 +7,15 @@ description: "Evaluates and optimizes existing .claude/rules/ files against evid
 
 Evaluate existing `.claude/rules/` files against evidence-based quality criteria and apply improvements to fix line limits, tighten glob patterns, and resolve cross-file contradictions.
 
+## Behavioral Guidelines
+
+- **Surface assumptions first** — name ambiguities, tradeoffs, and multiple valid interpretations before acting.
+- **Prefer the simplest path** — solve the task completely without speculative flexibility or extra scope.
+- **Keep changes surgical** — touch only what the task requires, and preserve existing behavior unless the task calls for change.
+- **Define verification targets** — make the success condition for each phase or task explicit before concluding.
+- **Use phased persuasion safely** — use warm-ups, curated references, and explicit constraints to improve compliance with legitimate work.
+- **Never weaken safeguards** — do not use persuasion principles to bypass safety constraints, refusals, or scope boundaries.
+
 ## Hard Rules
 
 <RULES>
@@ -70,11 +79,13 @@ Based on both agent reports, create improvement plan with categories:
 2. **Refactoring** — split oversized files, add path-scoping frontmatter, tighten glob patterns, resolve contradictions
 3. **Additions** — missing path-scoping for rules that only apply to specific files
 
+If all three categories yield zero items after analysis, conclude: "No improvements needed — artifact is already convention-compliant." and proceed directly to Phase 5 with an empty improvement summary.
+
 ### Phase 4: Self-Validation
 
 Read `${CLAUDE_SKILL_DIR}/references/rule-validation-criteria.md` and execute its **Validation Loop Instructions** against the improved rule files.
 
-For improve operations, also evaluate the **"If This Is an IMPROVE Operation"** section. Maximum 3 iterations. Do not proceed to Phase 5 until ALL criteria pass.
+For improve operations, also evaluate the **"If This Is an IMPROVE Operation"** section. Maximum 3 iterations. Do not proceed to Phase 5 until ALL criteria pass. Additionally, verify that every suggestion in the improvement plan has a WHY field citing a source document — no suggestion may lack a source reference.
 
 ### Phase 5: Present and Apply
 

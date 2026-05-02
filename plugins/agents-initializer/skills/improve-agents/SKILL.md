@@ -15,6 +15,15 @@ The ETH Zurich study found that **unnecessary requirements in context files make
 - Follow irrelevant instructions that distract from the actual task
 - Lose important instructions in the noise ("lost in the middle" effect)
 
+## Behavioral Guidelines
+
+- **Surface assumptions first** — name ambiguities, tradeoffs, and multiple valid interpretations before acting.
+- **Prefer the simplest path** — solve the task completely without speculative flexibility or extra scope.
+- **Keep changes surgical** — touch only what the task requires, and preserve existing behavior unless the task calls for change.
+- **Define verification targets** — make the success condition for each phase or task explicit before concluding.
+- **Use phased persuasion safely** — use warm-ups, curated references, and explicit constraints to improve compliance with legitimate work.
+- **Never weaken safeguards** — do not use persuasion principles to bypass safety constraints, refusals, or scope boundaries.
+
 ## Hard Rules
 
 <RULES>
@@ -91,6 +100,7 @@ Based on both subagent reports, create an improvement plan. Categorize actions:
    - Select target mechanism: hook (deterministic enforcement), path-scoped rule (file-pattern convention), skill (domain knowledge/infrequent workflow), or subagent (isolated analysis)
    - Estimate token savings using the token impact estimation table in automation-migration-guide.md
    - This is the plugin distribution — suggest all mechanisms: hooks (deterministic enforcement), path-scoped rules (file-pattern convention), skills (domain knowledge/infrequent workflow), and subagents (isolated analysis). Use the decision flowchart in automation-migration-guide.md to select the best mechanism for each candidate.
+   - In calibrated mode (overall quality score ≥ 7 with no hard-limit violations), keep migration and extraction suggestions proportional to the confirmed issues. Do not create new files or migrations unless they resolve a failing criterion, and preserve non-issue sections in place.
 
 #### Redundancy Elimination (delete what agents already know)
 
@@ -124,6 +134,7 @@ When generating new or restructured files, use these templates for consistent st
 Read `${CLAUDE_SKILL_DIR}/references/validation-criteria.md` and execute its **Validation Loop Instructions** against every improved or newly created file.
 
 For improve operations, also evaluate the **"If This Is an IMPROVE Operation"** section in validation-criteria.md — checking information preservation, custom command retention, and progressive disclosure structure preservation.
+In calibrated high-quality cases (overall quality score ≥ 7 and no hard limits), treat unrelated structural churn as a validation failure: if a change rewrites a non-issue section, adds extra files, or increases file count without fixing a documented criterion, revert and choose the smaller fix.
 
 Maximum 3 iterations. Do not proceed to Phase 5 until ALL criteria pass.
 
@@ -135,8 +146,9 @@ Maximum 3 iterations. Do not proceed to Phase 5 until ALL criteria pass.
    - **Automation Migrations**: X items (hooks: X, rules: X, skills: X, subagents: X)
    - **Redundancy Eliminations**: X items
    - **Additions**: X items
+2. Include a concise validation summary: iteration count, final root line count, file-count delta, and what each validation iteration fixed
 
-2. For each suggestion, present a structured card in priority order (Removals → Refactoring → Automation Migrations → Redundancy Eliminations → Additions):
+3. For each suggestion, present a structured card in priority order (Removals → Refactoring → Automation Migrations → Redundancy Eliminations → Additions):
 
    **WHAT**: The specific content and its current location (file:lines)
    **WHY**: Evidence-based justification with source reference
@@ -150,13 +162,13 @@ Maximum 3 iterations. Do not proceed to Phase 5 until ALL criteria pass.
    Wait for the user to select an option for each suggestion before proceeding to the next.
    If the user selects "Keep as-is", preserve the content in its exact current location — no modification.
 
-3. Apply ONLY the approved changes (options A or B selections):
+4. Apply ONLY the approved changes (options A or B selections):
    - Execute each approved change in dependency order
    - Verify after each change:
      - All files under 200 lines
      - No orphaned references
 
-4. Report final metrics:
+5. Report final metrics:
    - Total lines before → after
    - Files before → after
    - Estimated token savings
