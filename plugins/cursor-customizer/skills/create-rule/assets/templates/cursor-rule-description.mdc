@@ -1,0 +1,32 @@
+<!-- TEMPLATE: cursor-rule-description.mdc
+  Activation mode: Agent-requested
+  Placement: .cursor/rules/[rule-name].mdc
+  Naming: kebab-case, descriptive of the topic the agent will be looking for
+  Target: 10-150 lines of reference content
+
+  The agent decides to attach this rule based on the description sentence.
+  Use this variant for cross-cutting / domain content the agent should pull
+  in by topic — authentication, observability, accessibility, API design.
+  The body is reference material the agent attaches when relevant; it is
+  NOT loaded on every chat.
+
+  Frontmatter (only these three fields are valid):
+  - description (string): REQUIRED — a focused topic-attractor sentence
+  - alwaysApply (boolean): MUST be false for this variant
+  - globs (omit): not used by agent-requested rules
+-->
+---
+description: "[FOCUSED TOPIC-ATTRACTOR SENTENCE — what task or concern triggers this rule]"
+alwaysApply: false
+---
+
+<!-- Content guidelines for the description variant:
+  - The description sentence is the attractor — write it from the agent's point of view:
+    "Use this when working on [topic / concern / surface]."
+  - The body is reference content the agent reads after deciding the rule is relevant
+  - Reference canonical files with @path/to/file rather than copying their content
+  - One topic per file; split when the rule covers more than one concern
+-->
+
+- [Reference instruction relevant to the topic in the description]
+- [Reference instruction relevant to the topic in the description]
