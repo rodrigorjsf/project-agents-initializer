@@ -47,11 +47,11 @@ _(populated by the hooks-support slice)_
 
 ### create-skill
 
-_(populated by the skills-support slice)_
+_See § Slice E below._
 
 ### improve-skill
 
-_(populated by the skills-support slice)_
+_See § Slice E below._
 
 ### create-subagent
 
@@ -63,10 +63,39 @@ _(populated by the subagents-support slice)_
 
 ---
 
-## Source Doc Index
+## Slice E: skills
 
-_(populated as reference files land; lists each source document and the count of reference files distilling it)_
+This slice populates the `create-skill` and `improve-skill` reference inventories. Two references are copied **verbatim** from the `agent-customizer` skill-authoring pair (matching that pair's intentional cross-skill scoping); the rest are derived from local Cursor documentation.
+
+### create-skill
+
+| Reference File | Source Type | Source |
+|----------------|-------------|--------|
+| `references/skill-authoring-guide.md` | Derived (≤200 lines, with attribution) | `docs/cursor/skills/agent-skills-guide.md` |
+| `references/skill-format-reference.md` | Derived | `docs/cursor/skills/agent-skills-guide.md` |
+| `references/skill-validation-criteria.md` | Derived | `docs/cursor/skills/agent-skills-guide.md` |
+| `references/behavioral-guidelines.md` | Verbatim copy | `plugins/agent-customizer/skills/create-skill/references/behavioral-guidelines.md` |
+| `references/prompt-engineering-strategies.md` | Verbatim copy | `plugins/agent-customizer/skills/create-skill/references/prompt-engineering-strategies.md` |
+
+### improve-skill
+
+| Reference File | Source Type | Source |
+|----------------|-------------|--------|
+| `references/skill-authoring-guide.md` | Derived (≤200 lines, with attribution) | `docs/cursor/skills/agent-skills-guide.md` |
+| `references/skill-format-reference.md` | Derived | `docs/cursor/skills/agent-skills-guide.md` |
+| `references/skill-validation-criteria.md` | Derived | `docs/cursor/skills/agent-skills-guide.md` |
+| `references/skill-evaluation-criteria.md` | Derived | `docs/cursor/skills/agent-skills-guide.md` |
+| `references/behavioral-guidelines.md` | Verbatim copy | `plugins/agent-customizer/skills/create-skill/references/behavioral-guidelines.md` |
+| `references/prompt-engineering-strategies.md` | Verbatim copy | `plugins/agent-customizer/skills/create-skill/references/prompt-engineering-strategies.md` |
+
+The two verbatim files are copied (not symlinked) into both `create-skill/references/` and `improve-skill/references/`. When the canonical copy under `agent-customizer` changes, every copy listed above must be re-validated for byte equivalence.
+
+---
+
+## Source Doc Index
 
 | Source Doc | Referenced By (count) |
 |------------|----------------------|
-| _(empty until artifact-type slices add entries)_ | — |
+| `docs/cursor/skills/agent-skills-guide.md` | 7 |
+| `plugins/agent-customizer/skills/create-skill/references/behavioral-guidelines.md` | 2 |
+| `plugins/agent-customizer/skills/create-skill/references/prompt-engineering-strategies.md` | 2 |
