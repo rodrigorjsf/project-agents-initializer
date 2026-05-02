@@ -70,7 +70,7 @@ Read `assets/templates/hook-config.md` and fill its placeholders using:
 
 For blocking hooks (e.g., `preToolUse`, `beforeShellExecution`, `beforeReadFile`, `subagentStart`, `beforeSubmitPrompt`, `beforeMCPExecution`), translate the user intent into a concrete matcher when the event supports one:
 
-- `preToolUse` blocking write tools → matcher like `Write|Edit|Create`
+- `preToolUse` blocking write or delete tools → matcher like `Write|Delete`
 - `beforeShellExecution` blocking network commands → matcher like `curl|wget|nc`
 - `subagentStart` gating specific subagent types → matcher like `explore|shell`
 

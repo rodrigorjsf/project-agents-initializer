@@ -66,7 +66,7 @@ A hook configuration violating any hard limit is flagged **INVALID** regardless 
 | Question | Good | Bad |
 |----------|------|-----|
 | Event type matches intent? | Block-capable event for blocking intent; observation-only event for non-blocking intent | Using a non-blocking event to try to block actions |
-| Matcher is specific? | `Edit|Write` for file hooks, `curl|wget|nc` for network shell hooks | Omitted matcher on a blocking hook when the event supports filtering |
+| Matcher is specific? | `Write|Delete` for file-write/delete hooks, `curl|wget|nc` for network shell hooks | Omitted matcher on a blocking hook when the event supports filtering |
 | Error handling defined? | Exit `2` with clear stderr on failure; `failClosed: true` on security-critical blocking hooks | Silent failure — no error path, no stderr, no `failClosed` setting on a security-critical hook |
 | Security posture appropriate? | Hook validates before allowing; secrets in env vars; stdin variables quoted | Hook only logs, never blocks; secrets hardcoded; unquoted variable expansion |
 | Hook type appropriate for task? | `command` for deterministic, `prompt` for natural-language judgment | `prompt` for a simple regex check |
@@ -101,7 +101,7 @@ A hook configuration violating any hard limit is flagged **INVALID** regardless 
 | Event | Matcher | Type | Status |
 |-------|---------|------|--------|
 | `preToolUse` | (omitted) | command | Overly broad matcher |
-| `afterFileEdit` | `Edit|Write` | command | OK |
+| `afterFileEdit` | `Write` | command | OK |
 
 ### Issues
 
