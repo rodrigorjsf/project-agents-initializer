@@ -1,14 +1,14 @@
 # Compliance Routing
 
-**Summary**: Decision table mapping every validator scope to its named source bundle, primary directories, forbidden sources, and recommended search queries — derived from the normative-source-matrix.
+**Summary**: Decision table mapping every validator scope to its named source bundle, primary directories, forbidden sources, and entry points — derived from the normative-source-matrix.
 **Sources**: docs/compliance/normative-source-matrix.md
-**Last updated**: 2026-04-19
+**Last updated**: 2026-05-02
 
 ---
 
-> **Derived view** — This page is a compact routing reference for validators. The authoritative definitions live in [[normative-source-matrix]] (`docs/compliance/normative-source-matrix.md`). If those definitions change, this page must be updated to match.
+> **Derived view** — This page is a compact routing reference for validators. The authoritative definitions live in the normative source matrix (`docs/compliance/normative-source-matrix.md`). If those definitions change, this page must be updated to match.
 
-Before loading any platform-specific conventions, run `search_docs("compliance routing [scope]")` to retrieve the routing entry for your validation context. This prevents loading forbidden sources and reduces retrieval noise.
+Before loading any platform-specific conventions, identify your validation scope below and read the matching scope-specific page (`[[validation-routing-claude]]`, `[[validation-routing-cursor]]`, `[[validation-routing-standalone]]`). Each scope-specific page lists the primary entry points to read first; this prevents loading forbidden sources and reduces retrieval noise.
 
 ---
 
@@ -24,36 +24,37 @@ Before loading any platform-specific conventions, run `search_docs("compliance r
 
 ---
 
-## Recommended Search Queries per Scope
+## Primary Entry Points per Scope
 
 ### Claude Code plugin scope
-```
-search_docs("claude code skill SKILL.md format")
-search_docs("claude code agent definition frontmatter")
-search_docs("claude code plugin structure manifest")
-search_code("plugins/agents-initializer SKILL.md pattern")
-```
+
+Read first:
+- `wiki/knowledge/claude-code-skills.md` — SKILL.md format, frontmatter
+- `wiki/knowledge/claude-code-subagents.md` — agent definitions
+- `wiki/knowledge/claude-code-plugins.md` — plugin structure and manifest
+- `plugins/agents-initializer/skills/` — concrete SKILL.md examples in this repo
 
 ### Cursor IDE plugin scope
-```
-search_docs("cursor rule mdc format activation modes")
-search_docs("cursor skill SKILL.md invocation")
-search_docs("cursor plugin manifest bundling")
-search_code("plugins/cursor-initializer SKILL.md pattern")
-```
+
+Read first:
+- `wiki/knowledge/cursor-rules.md` — `.mdc` format and activation modes
+- `wiki/knowledge/cursor-skills.md` — Cursor skill invocation
+- `wiki/knowledge/cursor-plugins.md` — manifest and bundling
+- `plugins/cursor-initializer/skills/` — concrete SKILL.md examples in this repo
 
 ### Standalone skills scope
-```
-search_docs("agent skills standard specification")
-search_docs("standalone skill inline bash analysis")
-search_code("skills/ SKILL.md pattern")
-```
+
+Read first:
+- `wiki/knowledge/agent-skills-standard.md` — open specification
+- `wiki/knowledge/skill-authoring.md` — authoring best practices
+- `skills/` — concrete SKILL.md examples in this repo
 
 ### Repository governance scope
-```
-search_docs("design guidelines evidence research")
-search_docs("CLAUDE.md hierarchy progressive disclosure")
-```
+
+Read first:
+- `wiki/knowledge/evaluating-agents-paper.md` — ETH Zurich minimal-config evidence
+- `wiki/knowledge/claude-code-memory.md` — CLAUDE.md hierarchy and progressive disclosure
+- `DESIGN-GUIDELINES.md` at the repo root
 
 ---
 

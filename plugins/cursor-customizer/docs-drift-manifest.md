@@ -132,7 +132,7 @@ The two verbatim files are copied (not symlinked) into both `create-skill/refere
 
 ---
 
-## Source Doc Index
+## Slice E: skills
 
 | Source Doc | Referenced By (count) |
 |------------|----------------------|

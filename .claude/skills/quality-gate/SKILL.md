@@ -13,7 +13,7 @@ Perform a complete quality gate of the agents-initializer project. This meta-ski
 
 **Convention sources:** `.claude/rules/`, `plugins/agents-initializer/CLAUDE.md`, `DESIGN-GUIDELINES.md`
 
-**Routing guidance:** For platform-scoped validation, run `search_docs("compliance routing [platform]")` before loading convention files to retrieve the scope-specific source bundle and forbidden-source list. See `[[compliance-routing]]` in the wiki.
+**Routing guidance:** For platform-scoped validation, read `wiki/knowledge/compliance-routing.md` and the matching scope page (`wiki/knowledge/validation-routing-claude.md` for this skill) before loading convention files. They list the scope-specific source bundle, forbidden sources, and direct read paths.
 
 **Test scenarios:** `.claude/PRPs/tests/scenarios/` (4 scenarios, init + improve)
 

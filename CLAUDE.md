@@ -1,6 +1,7 @@
 # agent-engineering-toolkit
 
 Multi-plugin marketplace for evidence-based agent artifact engineering.
+ALWAYS keep `caveman` skill enabled in ultra mode
 
 ## Structure
 
@@ -34,24 +35,13 @@ See `plugins/agent-customizer/CLAUDE.md` for agent-customizer plugin conventions
 
 ## Knowledge Lookup
 
-Search project knowledge in this order — stop when the answer is sufficient:
+This repo follows a wiki-first lookup contract (see ADR-0004 and `.claude/rules/wiki-routing.md`):
 
-1. **RAG** (`search_docs`, `search_code`, `search_all`, `get_doc_context`) — semantic search, always try first
-2. **Wiki** (`wiki/knowledge/`) — curated concept pages with cross-references; use when RAG returns poor or incomplete results
-3. **`docs/`** — full source documents; use only when wiki lacks relevant detail for the task
+1. **Wiki index** — read `wiki/knowledge/index.md` first to find candidate pages.
+2. **Wiki page** — read the specific `wiki/knowledge/<slug>.md` and follow `[[wiki-link]]` cross-references.
+3. **Source documents** — fall through to `docs/` only when the wiki lacks coverage. Treat `docs/` as immutable raw input.
 
-The RAG database is pre-built. Tools are available via MCP (`rag-knowledge-base` server).
-
-## RAG Knowledge Base
-
-This project has a semantic search system. Use it **before** reading files with `view`/`grep`.
-
-- `search_docs` — find documentation, guides, research, design decisions
-- `search_code` — find implementation examples, skill patterns, hook scripts
-- `search_all` — search both when unsure which collection to use
-- `get_doc_context` — get all chunks from a specific file
-
-The database is pre-built. Tools are available via MCP (`rag-knowledge-base` server).
+Page format and citation rules live in `wiki/CLAUDE.md`. Ingest and lint workflows live in their own skills (`/wiki-ingest`, `/wiki-lint`). When the wiki lacks coverage, prefer ingesting the relevant `docs/` source via `/wiki-ingest` over instructing agents to re-read raw documents repeatedly.
 
 ## Documentation
 
@@ -65,6 +55,16 @@ The database is pre-built. Tools are available via MCP (`rag-knowledge-base` ser
 - Commit message format: `{type}({scope}): {description}` — use `feat`, `fix`, `docs`, `chore`, `refactor`
 - Stage only files belonging to the same logical change; never `git add -A` across unrelated changes
 - If asked to "commit everything", break it into atomic commits by scope first, then commit each group
+
+## Implementation Completion Protocol
+
+After any substantive implementation in this repository, before declaring the work done:
+
+1. Make the deliverable durable first (write the file, save, commit if appropriate).
+2. Call `advisor()` for a second-opinion review of the change.
+3. Run `/compound-engineering:ce-code-review` on the diff and resolve any P0/P1 findings before stopping.
+
+The CI workflow `.github/workflows/claude-code-review.yml` is the final gate on PRs into `main`; this local protocol is the earlier shift-left check during implementation. Skip only for: typo fixes, comment-only edits, and pure documentation changes already reviewed elsewhere. Does not apply when the user explicitly says the work is exploratory or in-progress.
 
 ## Agent skills
 
@@ -86,3 +86,7 @@ When something fails repeatedly, when User has to re-explain, or when a workarou
 
 - Agents fail silently on wrong paths. Always verify hardcoded paths.
 - Before creating a new project artifact, check if an existing one can be extended or merged.
+
+# RTK (Rust Token Killer) - Token-Optimized Commands
+
+@RTK.md

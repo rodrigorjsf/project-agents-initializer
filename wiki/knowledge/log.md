@@ -2,6 +2,16 @@
 
 ---
 
+## 2026-05-02 — RAG → Wiki migration (ADR-0004)
+
+**Pages updated (4):** `compliance-routing.md`, `validation-routing-claude.md`, `validation-routing-cursor.md`, `validation-routing-standalone.md`.
+
+**Change:** Removed `search_docs(...)` invocations and "Recommended Search Queries" sections. Replaced with "Direct Read Paths" pointing at wiki pages first, then `docs/` fallback, then concrete in-repo examples — aligned with the new wiki-first lookup contract in `.claude/rules/wiki-routing.md`.
+
+**Why:** Per ADR-0004, the RAG MCP server (`rag-knowledge-base`) is deleted; agents now navigate the wiki by `[[link]]`/slug rather than semantic search.
+
+---
+
 ## 2026-05-01 — Batch ingest: new docs directories
 
 **Source directories scanned:**

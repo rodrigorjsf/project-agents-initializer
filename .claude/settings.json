@@ -23,17 +23,11 @@
             "command": ".claude/hooks/check-docs-sync.sh"
           }
         ]
-      },
-      {
-        "matcher": "Edit|Create",
-        "hooks": [
-          {
-            "type": "command",
-            "command": ".claude/hooks/check-rag-reindex.sh"
-          }
-        ]
       }
     ]
   },
-  "enabledPlugins": {}
+  "enabledPlugins": {
+    "compound-engineering@compound-engineering-plugin": true,
+    "agents-initializer@agent-engineering-toolkit": true
+  }
 }

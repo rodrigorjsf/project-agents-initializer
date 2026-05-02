@@ -64,6 +64,9 @@ Vendor-neutral research that informs this plugin's design:
 - **[Cursor Rules](https://github.com/rodrigorjsf/agent-engineering-toolkit/tree/development/docs/cursor/rules/)** — defines `.mdc` format, activation modes, and scoping conventions.
 - **[Cursor Subagents](https://github.com/rodrigorjsf/agent-engineering-toolkit/tree/development/docs/cursor/subagents/)** — documents Cursor's native subagent format and `readonly` behavior.
 
+- **[Cursor Rules](https://github.com/rodrigorjsf/agent-engineering-toolkit/tree/development/docs/cursor/rules/)** — defines `.mdc` format, activation modes, and scoping conventions.
+- **[Cursor Subagents](https://github.com/rodrigorjsf/agent-engineering-toolkit/tree/development/docs/cursor/subagents/)** — documents Cursor's native subagent format and `readonly` behavior.
+
 ## Architecture
 
 ### Cursor-Native Subagents

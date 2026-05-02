@@ -50,6 +50,24 @@ _Avoid_: rules-only (rules-first leaves room for legacy migration; rules-only wo
 **Subagent**:
 A YAML-fronted agent definition spawned for delegated, isolated work. Claude Code uses `tools:`/`maxTurns:`; Cursor uses `readonly:`/`model: inherit`.
 
+### Knowledge base vocabulary
+
+**Wiki**:
+The agent-maintained knowledge base under `wiki/knowledge/` — markdown pages compiled by an LLM from source documents in `docs/`, with an `index.md` table of contents and `log.md` operation log. Inspired by Karpathy's "LLM Knowledge Bases" pattern (see ADR-0004).
+_Avoid_: RAG, vector store, knowledge graph
+
+**Wiki page**:
+A single `.md` file in `wiki/knowledge/` with frontmatter (Summary, Sources, Last updated) and `[[wiki-link]]` cross-references. One page per concept or per source-document summary.
+_Avoid_: doc, article, note (these names are reserved for source documents in `docs/`)
+
+**Source document**:
+An immutable raw input under `docs/` (papers, vendor documentation, posts) ingested into the wiki. Never modified by agents — plays the role of Karpathy's `raw/` layer.
+_Avoid_: raw, original (we keep the existing `docs/` name; renaming would break too many cross-references)
+
+**Wiki-first lookup**:
+The mandated knowledge-search order: `wiki/knowledge/index.md` → specific wiki page (via `[[link]]` or filename) → `docs/` source documents only as last resort. Replaces the prior RAG-first order (deleted in ADR-0004).
+_Avoid_: wiki-only (the `docs/` fallback still exists for uncovered topics)
+
 **Product-strict (Cursor distribution stance)**:
 Branding rule for Cursor distribution artifacts: zero textual references to Claude Code, `.claude/`, `CLAUDE.md`, `tools:` whitelists, `maxTurns:`, `paths:` frontmatter, or any other Claude Code-specific construct. Vendor-neutral research (ETH study, "Lost in the Middle", "Effective Context Engineering") may be cited as "Industry Research" without product branding.
 _Avoid_: claude-free, vendor-pure (these miss the product-vs-research distinction)
@@ -59,6 +77,8 @@ _Avoid_: claude-free, vendor-pure (these miss the product-vs-research distinctio
 - A **Distribution** owns at most one **Initializer** and at most one **Customizer**.
 - An **Initializer** generates platform-wide files; a **Customizer** generates individual **Artifacts** of the four supported types.
 - The **Claude Code distribution** and the **Cursor distribution** are siblings — same conceptual roles, different platform formats and conventions.
+- A **Source document** in `docs/` is summarized into one **Wiki page** in `wiki/knowledge/`; one Source document may also seed multiple concept Wiki pages with `[[wiki-link]]` cross-references.
+- The **Wiki** is the canonical knowledge surface for agents; **Source documents** are searched only when the wiki lacks coverage.
 
 ## Example dialogue
 
@@ -68,3 +88,4 @@ _Avoid_: claude-free, vendor-pure (these miss the product-vs-research distinctio
 ## Flagged ambiguities
 
 - "Cursor CLI" was used by the user to mean the full Cursor distribution surface (IDE + CLI share the `.cursor/rules/` system). Resolved: in this repo, **Cursor distribution** covers both surfaces — they consume the same artifact files.
+- "knowledge base" was historically used to mean the RAG vector store registered as the `rag-knowledge-base` MCP server. Resolved as of ADR-0004: **Wiki** is the canonical knowledge base; the RAG layer is deleted.

@@ -1,24 +1,76 @@
 name: Claude Code Review
 
+# ──────────────────────────────────────────────────────────────────────────────
+# Why this workflow exists
+# ──────────────────────────────────────────────────────────────────────────────
+# Runs the compound-engineering `ce-code-review` skill against a PR, in
+# report-only (read-only) mode, with the model pinned to Sonnet so that costs
+# stay predictable regardless of the account-default tier. The skill itself is
+# diff-aware: it spawns a small set of always-on reviewer personas plus only
+# the conditional reviewers (security, performance, migrations, language-
+# specific, etc.) that actually match the diff. So "review only what changed"
+# is enforced inside the skill — this workflow's job is to invoke it cheaply
+# and at the right moments.
+#
+# Token-cost levers, in priority order:
+#   1. Trigger gating  → workflow rarely fires (see `on:` block below)
+#   2. Model pinning   → Sonnet for orchestrator + reviewers, Haiku for the
+#                        skill's internal trivial-PR pre-check
+#   3. base:<sha> arg  → skill skips its own diff-base resolution
+#   4. mode:report-only → no autofix re-review rounds, no commits
+#   5. --max-turns hard cap as a circuit breaker
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Trigger strategy
+# ──────────────────────────────────────────────────────────────────────────────
+# - `types: [opened]` → run ONCE when the PR is first created. Subsequent
+#   commits (the `synchronize` event) and close/reopen cycles intentionally do
+#   NOT re-trigger this workflow. If a re-review is needed after a major
+#   change, request it manually (e.g. `gh workflow run` or the Actions UI),
+#   or invoke `/compound-engineering:ce-code-review` locally.
+# - `branches: [main]` → only PRs targeting the `main` branch. Feature-to-
+#   feature PRs are not reviewed by this workflow.
+# - `paths-ignore` → skip the workflow entirely for PRs that only change
+#   auto-generated files (lockfiles), license, or top-level changelog. We
+#   deliberately do NOT ignore `**/*.md` because in this repo the `.md` files
+#   under `skills/`, `plugins/`, and `references/` ARE the product.
 on:
   pull_request:
-    types: [opened, synchronize, ready_for_review, reopened]
-    # Optional: Only run on specific file changes
-    # paths:
-    #   - "src/**/*.ts"
-    #   - "src/**/*.tsx"
-    #   - "src/**/*.js"
-    #   - "src/**/*.jsx"
+    types: [opened]
+    branches: [main]
+    paths-ignore:
+      - 'LICENSE*'
+      - '**/CHANGELOG.md'
+      - '**/*.lock'
+      - '**/*-lock.*'
+      - '**/yarn.lock'
+      - '**/Gemfile.lock'
+      - '**/poetry.lock'
+      - '**/Cargo.lock'
+      - '**/go.sum'
+
+# Safety net: if for any reason two runs are queued for the same PR (e.g. an
+# `opened` event retried by GitHub), cancel the older one so we never pay for
+# two parallel reviews of the same diff.
+concurrency:
+  group: claude-code-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
 
 jobs:
   claude-review:
-    # Optional: Filter by PR author
-    # if: |
-    #   github.event.pull_request.user.login == 'external-contributor' ||
-    #   github.event.pull_request.user.login == 'new-developer' ||
-    #   github.event.pull_request.author_association == 'FIRST_TIME_CONTRIBUTOR'
+    # Draft PRs are skipped. Since this workflow does not subscribe to the
+    # `ready_for_review` event, a PR opened as a draft will never trigger a
+    # review automatically — re-run manually after marking it ready, or add
+    # `ready_for_review` to `types:` above if you want that transition to
+    # auto-trigger one review.
+    if: github.event.pull_request.draft == false
 
     runs-on: ubuntu-latest
+
+    # Permissions are intentionally read-only. With `pull-requests: read` the
+    # action emits its review output to the workflow run summary (Actions tab)
+    # rather than posting PR review comments. To switch to inline PR comments,
+    # change `pull-requests` to `write` — no other change required.
     permissions:
       contents: read
       pull-requests: read
@@ -26,19 +78,60 @@ jobs:
       id-token: write
 
     steps:
+      # Shallow checkout is sufficient: we pass the PR base SHA explicitly to
+      # the skill via `base:<sha>`, so the skill does not need full history to
+      # compute the diff range.
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
 
-      - name: Run Claude Code Review
+      # ────────────────────────────────────────────────────────────────────
+      # Run ce-code-review
+      # ────────────────────────────────────────────────────────────────────
+      # Plugins:
+      #   - `compound-engineering@compound-engineering-plugin` provides the
+      #     `/compound-engineering:ce-code-review` skill. The marketplace is
+      #     registered via `plugin_marketplaces` on the same step.
+      #
+      # claude_args:
+      #   - `--model claude-sonnet-4-6` pins the SESSION model to Sonnet.
+      #     Inside the skill:
+      #       • the orchestrator runs on Sonnet (instead of the account
+      #         default, which on this account is Opus and ~3-4× the cost);
+      #       • `ce-correctness-reviewer`, `ce-security-reviewer`, and
+      #         `ce-adversarial-reviewer` inherit the session model and so
+      #         also run on Sonnet (capped, not upgraded);
+      #       • all other reviewer personas are already explicitly downshifted
+      #         to Sonnet by the skill, so no extra knob is needed;
+      #       • the skill's internal "trivial-PR" pre-check uses Haiku
+      #         automatically — that's where Haiku enters the picture.
+      #   - `--max-turns 10` is a HARD CEILING, intended as a circuit breaker
+      #     against runaway sessions. If real runs legitimately need more
+      #     turns, raise this cap rather than working around it.
+      #
+      # prompt:
+      #   - `mode:report-only` keeps the run strictly read-only: no autofix
+      #     rounds, no commits, no PR mutations.
+      #   - `base:<sha>` is the PR base SHA, fed straight from the GitHub
+      #     event. This lets the skill skip its diff-base detection step.
+      #   - The PR target (`<repo>/pull/<num>`) tells the skill which PR's
+      #     metadata to load.
+      #   - The "Second-opinion gate" paragraph is the advisor mechanism
+      #     (Option A from the plan): a prompt-level instruction asking the
+      #     orchestrator to run one extra synthesis pass when confidence is
+      #     low or the diff touches a sensitive domain. It stays inside the
+      #     same session, so it costs nothing when not triggered.
+      - name: Run ce-code-review
         id: claude-review
         uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          plugin_marketplaces: 'https://github.com/anthropics/claude-code.git'
-          plugins: 'code-review@claude-code-plugins'
-          prompt: '/code-review:code-review ${{ github.repository }}/pull/${{ github.event.pull_request.number }}'
-          # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
-          # or https://code.claude.com/docs/en/cli-reference for available options
+          plugin_marketplaces: 'https://github.com/EveryInc/compound-engineering-plugin.git'
+          plugins: 'compound-engineering@compound-engineering-plugin'
+          claude_args: '--model claude-sonnet-4-6 --max-turns 10'
+          prompt: |
+            /compound-engineering:ce-code-review mode:report-only base:${{ github.event.pull_request.base.sha }} ${{ github.repository }}/pull/${{ github.event.pull_request.number }}
 
+            Second-opinion gate: if synthesis confidence is low, reviewer findings conflict, or the diff touches auth, payments, public APIs, or data migrations, run one additional synthesis pass before publishing the final review. Otherwise publish directly.
+          # Reference: https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
