@@ -1,8 +1,6 @@
 # Orientations
 
-Search `docs/` files only as a last resort — prefer RAG and `wiki/knowledge/` first (see root CLAUDE.md § Knowledge Lookup).
+`docs/` is the immutable raw layer (papers, vendor docs, posts). Search this directory **only as a last resort** — the curated `wiki/knowledge/` is the canonical knowledge surface (see root `CLAUDE.md` § Knowledge Lookup and `.claude/rules/wiki-routing.md`).
 
-- `search_docs`
-- `search_code`
-- `search_all`
-- `get_doc_context`
+- Never edit files in `docs/` to "fix" them; they are sources, not guidance.
+- When a `docs/` source is read often and the wiki lacks a corresponding page, run `/wiki:ingest <path>` to compile a wiki entry instead of repeatedly re-reading the raw file.

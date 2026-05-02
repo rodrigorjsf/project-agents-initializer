@@ -35,24 +35,13 @@ See `plugins/agent-customizer/CLAUDE.md` for agent-customizer plugin conventions
 
 ## Knowledge Lookup
 
-Search project knowledge in this order — stop when the answer is sufficient:
+This repo follows a wiki-first lookup contract (see ADR-0004 and `.claude/rules/wiki-routing.md`):
 
-1. **RAG** (`search_docs`, `search_code`, `search_all`, `get_doc_context`) — semantic search, always try first
-2. **Wiki** (`wiki/knowledge/`) — curated concept pages with cross-references; use when RAG returns poor or incomplete results
-3. **`docs/`** — full source documents; use only when wiki lacks relevant detail for the task
+1. **Wiki index** — read `wiki/knowledge/index.md` first to find candidate pages.
+2. **Wiki page** — read the specific `wiki/knowledge/<slug>.md` and follow `[[wiki-link]]` cross-references.
+3. **Source documents** — fall through to `docs/` only when the wiki lacks coverage. Treat `docs/` as immutable raw input.
 
-The RAG database is pre-built. Tools are available via MCP (`rag-knowledge-base` server).
-
-## RAG Knowledge Base
-
-This project has a semantic search system. Use it **before** reading files with `view`/`grep`.
-
-- `search_docs` — find documentation, guides, research, design decisions
-- `search_code` — find implementation examples, skill patterns, hook scripts
-- `search_all` — search both when unsure which collection to use
-- `get_doc_context` — get all chunks from a specific file
-
-The database is pre-built. Tools are available via MCP (`rag-knowledge-base` server).
+Page format, citation rules, and ingest/lint workflows live in `wiki/CLAUDE.md`. When the wiki lacks coverage, prefer ingesting the relevant `docs/` source via `/wiki:ingest` over instructing agents to re-read raw documents repeatedly.
 
 ## Documentation
 

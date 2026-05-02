@@ -1,8 +1,8 @@
 # LLM Wiki
 
-A personal knowledge base maintained by Claude Code.
-Based on Andrej Karpathy's LLM Wiki pattern.
-Must be used when searching for curated knowledge or when `rag-knowledge-base` return missing/imcomplete information.
+The canonical knowledge base for this repo, maintained by Claude Code.
+Based on Andrej Karpathy's "LLM Knowledge Bases" pattern (see ADR-0004).
+Wiki-first lookup is the contract for every agent in this repo (see `.claude/rules/wiki-routing.md`).
 
 ## Purpose
 
