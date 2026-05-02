@@ -1,3 +1,8 @@
+---
+paths:
+  - "**/*.md"
+---
+
 # Wiki-First Knowledge Lookup
 
 Search project knowledge in this order — stop when the answer is sufficient:
