@@ -19,8 +19,8 @@ Source: Andrej Karpathy, "LLM Knowledge Bases" (X / Twitter post, 2026). Pattern
 - `docs/` plays the role of `raw/`. We do **not** rename — too many cross-references in rules, skills, and CI — but the immutability invariant carries over.
 - `wiki/knowledge/` is the compiled wiki. `index.md` and `log.md` are agent-maintained.
 - A new `.claude/rules/wiki-routing.md` enforces the lookup order: `wiki/knowledge/index.md` → specific page → `docs/` fallback.
-- A new `wiki:ingest` skill mechanizes Karpathy's "data ingest" loop when a new file is added under `docs/`.
-- A new `wiki:lint` skill mechanizes the "health check" loop (orphans, contradictions, missing backlinks, stale claims).
+- A new `wiki-ingest` skill (slash command `/wiki-ingest`) mechanizes Karpathy's "data ingest" loop when a new file is added under `docs/`.
+- A new `wiki-lint` skill (slash command `/wiki-lint`) mechanizes the "health check" loop (orphans, contradictions, missing backlinks, stale claims).
 - Obsidian (`wiki/.obsidian/`) is the human IDE; the LLM is the writer.
 
 ## Deferred (future work)

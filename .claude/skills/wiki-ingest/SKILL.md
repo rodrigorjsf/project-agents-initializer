@@ -1,6 +1,6 @@
 ---
 name: wiki-ingest
-description: Compile a `docs/` source document into the `wiki/knowledge/` knowledge base — Karpathy-style ingest. Use when a new file is added under `docs/` and the user wants it summarized, cross-linked, and indexed in the wiki. Trigger phrases include "ingest this doc", "compile into the wiki", "add to the wiki", "summarize and cross-link", or `/wiki:ingest <path>`. Skip for casual questions about a doc — only invoke when the user wants a durable wiki entry.
+description: Compile a `docs/` source document into the `wiki/knowledge/` knowledge base — Karpathy-style ingest. Use when a new file is added under `docs/` and the user wants it summarized, cross-linked, and indexed in the wiki. Trigger phrases include "ingest this doc", "compile into the wiki", "add to the wiki", "summarize and cross-link", or `/wiki-ingest <path>`. Skip for casual questions about a doc — only invoke when the user wants a durable wiki entry.
 ---
 
 # Wiki Ingest
@@ -67,7 +67,7 @@ A single source typically touches 5-15 wiki pages. That is normal.
 
 ### 5. Add cross-references both directions
 
-For every `[[wiki-link]]` you place into a page, ensure the linked target also references back from its `## Related pages` section if the relationship is bidirectional. Asymmetric links create orphans that `/wiki:lint` will flag.
+For every `[[wiki-link]]` you place into a page, ensure the linked target also references back from its `## Related pages` section if the relationship is bidirectional. Asymmetric links create orphans that `/wiki-lint` will flag.
 
 ### 6. Update `wiki/knowledge/index.md`
 
@@ -102,4 +102,4 @@ Tell the user:
 - ADR-0004 — methodology and the future search-CLI / synthetic-data extensions reserved for later
 - `.claude/rules/wiki-routing.md` — the global lookup contract this skill maintains
 - `wiki/CLAUDE.md` — page format, citation rules, and lint criteria
-- `/wiki:lint` (skill `wiki-lint`) — health check after ingest if many pages were touched
+- `/wiki-lint` (skill `wiki-lint`) — health check after ingest if many pages were touched

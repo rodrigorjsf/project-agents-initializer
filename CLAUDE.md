@@ -41,7 +41,7 @@ This repo follows a wiki-first lookup contract (see ADR-0004 and `.claude/rules/
 2. **Wiki page** — read the specific `wiki/knowledge/<slug>.md` and follow `[[wiki-link]]` cross-references.
 3. **Source documents** — fall through to `docs/` only when the wiki lacks coverage. Treat `docs/` as immutable raw input.
 
-Page format, citation rules, and ingest/lint workflows live in `wiki/CLAUDE.md`. When the wiki lacks coverage, prefer ingesting the relevant `docs/` source via `/wiki:ingest` over instructing agents to re-read raw documents repeatedly.
+Page format, citation rules, and ingest/lint workflows live in `wiki/CLAUDE.md`. When the wiki lacks coverage, prefer ingesting the relevant `docs/` source via `/wiki-ingest` over instructing agents to re-read raw documents repeatedly.
 
 ## Documentation
 

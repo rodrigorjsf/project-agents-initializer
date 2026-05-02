@@ -1,6 +1,6 @@
 ---
 name: wiki-lint
-description: Run health checks over `wiki/knowledge/` — Karpathy-style wiki linting. Use when the user wants to audit, lint, or sweep the wiki for contradictions, orphan pages, missing concept pages, broken `[[wiki-link]]`s, format violations, or stale claims. Trigger phrases include "lint the wiki", "audit the wiki", "wiki health check", "check the wiki for issues", `/wiki:lint`. Do not invoke for routine page edits — only for explicit audit requests or after large ingestion runs.
+description: Run health checks over `wiki/knowledge/` — Karpathy-style wiki linting. Use when the user wants to audit, lint, or sweep the wiki for contradictions, orphan pages, missing concept pages, broken `[[wiki-link]]`s, format violations, or stale claims. Trigger phrases include "lint the wiki", "audit the wiki", "wiki health check", "check the wiki for issues", `/wiki-lint`. Do not invoke for routine page edits — only for explicit audit requests or after large ingestion runs.
 ---
 
 # Wiki Lint
@@ -65,7 +65,7 @@ Report: contradiction set (P1).
 ### 6. Concept-gap detection
 
 - Scan page bodies for **bold or repeatedly-mentioned terms** that are not themselves wiki pages and are not generic English.
-- These are candidates for new concept pages — list them with their first occurrence so the user (or `/wiki:ingest`) can act.
+- These are candidates for new concept pages — list them with their first occurrence so the user (or `/wiki-ingest`) can act.
 
 Report: missing concept candidates (P2 — opportunity, not error).
 
@@ -98,7 +98,7 @@ Produce a numbered list grouped by severity (P0 → P1 → P2). For each finding
 
 ### 4. Offer remediation, do not auto-fix
 
-After the report, ask the user which findings to act on. The user may delegate `/wiki:ingest` for ingestion-driven fixes, or ask for direct edits per finding. **Never modify wiki pages in this skill without explicit per-finding consent.**
+After the report, ask the user which findings to act on. The user may delegate `/wiki-ingest` for ingestion-driven fixes, or ask for direct edits per finding. **Never modify wiki pages in this skill without explicit per-finding consent.**
 
 ### 5. Append a lint entry to `wiki/knowledge/log.md`
 
@@ -115,4 +115,4 @@ Append a dated entry summarizing what was checked, finding counts per severity, 
 - ADR-0004 — methodology, including the future search-CLI and synthetic-data extensions reserved for later
 - `.claude/rules/wiki-routing.md` — the lookup contract this skill protects
 - `wiki/CLAUDE.md` — page format and citation rules (authority for checks 1 and 4)
-- `/wiki:ingest` (skill `wiki-ingest`) — the ingest counterpart; lint findings often suggest ingest work
+- `/wiki-ingest` (skill `wiki-ingest`) — the ingest counterpart; lint findings often suggest ingest work
