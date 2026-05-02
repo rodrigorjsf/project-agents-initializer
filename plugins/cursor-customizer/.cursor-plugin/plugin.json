@@ -1,0 +1,10 @@
+{
+  "name": "cursor-customizer",
+  "version": "0.1.0",
+  "description": "Rules-first, product-strict customizer for the Cursor distribution: creates and improves individual Cursor artifacts (rules, hooks, skills, subagents) inside an already-initialized project. Sibling of cursor-initializer.",
+  "author": {
+    "name": "rodrigorjsf"
+  },
+  "repository": "https://github.com/rodrigorjsf/agent-engineering-toolkit",
+  "license": "MIT"
+}
