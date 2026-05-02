@@ -131,13 +131,10 @@ md5sum plugins/agents-initializer/skills/*/assets/templates/domain-doc.md \
        skills/*/assets/templates/domain-doc.md
 
 # cursor templates: init vs improve
-md5sum plugins/cursor-initializer/skills/*/assets/templates/root-agents-md.md
-
-md5sum plugins/cursor-initializer/skills/*/assets/templates/scoped-agents-md.md
-
+# Note: the three activation-mode .mdc variant templates are within-cursor parity
+# families and are checked by the cursor-initializer-quality-gate meta-skill, not here.
+# This block only covers the cursor template that is also relevant for cross-skill consistency.
 md5sum plugins/cursor-initializer/skills/*/assets/templates/domain-doc.md
-
-md5sum plugins/cursor-initializer/skills/*/assets/templates/cursor-rule.mdc
 
 # claude-rule families
 md5sum plugins/agents-initializer/skills/init-claude/assets/templates/claude-rule.md \
@@ -215,10 +212,7 @@ Return exactly this structure:
 | root-claude-md.md templates | 4 | [MATCH/MISMATCH] | |
 | scoped-claude-md.md templates | 4 | [MATCH/MISMATCH] | |
 | domain-doc.md templates | 8 | [MATCH/MISMATCH] | |
-| cursor root-agents-md.md templates | 2 | [MATCH/MISMATCH] | |
-| cursor scoped-agents-md.md templates | 2 | [MATCH/MISMATCH] | |
 | cursor domain-doc.md templates | 2 | [MATCH/MISMATCH] | |
-| cursor-rule.mdc templates | 2 | [MATCH/MISMATCH] | |
 | init claude-rule.md templates | 2 | [MATCH/MISMATCH] | |
 | improve claude-rule.md templates | 4 | [MATCH/MISMATCH] | |
 | agents-init hook-config.md templates | 2 | [MATCH/MISMATCH] | |

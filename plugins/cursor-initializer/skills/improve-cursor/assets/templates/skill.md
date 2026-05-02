@@ -19,11 +19,9 @@ description: [One sentence: what this skill does — the agent uses this to deci
      Default (field absent) = auto-invocable (~100 token passive cost per startup).
      Manual-only skills have zero passive cost — user invokes via slash command. -->
 
-<!-- CONDITIONAL: Add `allowed-tools` to frontmatter ONLY when the skill requires
-     specific tools restricted to its scope.
-     Add to frontmatter:
-       allowed-tools: [Read, Glob, Grep]
--->
+<!-- The Cursor Agent Skills frontmatter is intentionally minimal.
+     Do NOT add tool-restriction or turn-limit fields — those are
+     specific to other agent platforms and have no meaning here. -->
 
 # [Skill Title]
 

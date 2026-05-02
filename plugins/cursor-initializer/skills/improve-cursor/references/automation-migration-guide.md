@@ -1,6 +1,6 @@
 # Automation Migration Guide
 
-Decision criteria for migrating instructions from AGENTS.md to on-demand mechanisms.
+Decision criteria for migrating instructions (including legacy AGENTS.md content the migration sub-flow processes) into on-demand `.cursor/rules/*.mdc` mechanisms.
 Source: context-aware-improve-optimization.prd.md, analysis-automate-workflow-with-hooks.md, analysis-skill-authoring-best-practices.md, analysis-how-claude-remembers-a-project.md
 
 ---
@@ -21,7 +21,7 @@ Source: context-aware-improve-optimization.prd.md, analysis-automate-workflow-wi
 
 When evaluating an instruction block for migration, follow this decision path:
 
-1. **Is it always needed for every task and under 5 lines?** → Keep in AGENTS.md root
+1. **Is it always needed for every task and under 5 lines?** → `.cursor/rules/*.mdc` with `alwaysApply: true`
 2. **Can the agent infer it from code?** → DELETE — do not document
 3. **Is it a deterministic rule (no judgment needed)?** → Hook (`.cursor/hooks.json` entry)
 4. **Does enforcement require LLM judgment?** → Hook (`prompt` type)
@@ -40,7 +40,7 @@ Classify each instruction block by content type, then recommend the correspondin
 
 | Content Type | Best Mechanism | Evidence Source |
 |---|---|---|
-| Always-applicable universal rules (<5 lines) | AGENTS.md root or rule without `globs:` | research-context-engineering-comprehensive.md |
+| Always-applicable universal rules (<5 lines) | `.cursor/rules/*.mdc` with `alwaysApply: true` | research-context-engineering-comprehensive.md |
 | Path-specific conventions (5-50 lines) | `.cursor/rules/` with `globs:` frontmatter | analysis-how-claude-remembers-a-project.md |
 | Domain knowledge or workflows (50-500 lines) | Skill (auto-invocable) | agentskills-specification.md |
 | Heavy workflows with side effects | Skill (`disable-model-invocation: true`) | agentskills-specification.md |

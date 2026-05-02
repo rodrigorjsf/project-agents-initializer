@@ -1,74 +1,66 @@
 # Validation Criteria
 
-Quality checklist for generated and improved AGENTS.md / `.cursor/rules/` files.
-Source: plugins/agents-initializer/skills/improve-agents/SKILL.md:108-122, improve-cursor/SKILL.md, file-evaluator.md:23-59
+Quality checklist for generated `.cursor/rules/*.mdc` files.
+Source: Industry Research (research-context-engineering-comprehensive.md), file-evaluator.md
 
 ---
 
 ## Hard Limits (Auto-fail if violated)
 
-Any file violating these criteria must be fixed before proceeding:
+Any rule file violating these criteria must be fixed before proceeding:
 
 | Criterion | Threshold | Source |
 |-----------|-----------|--------|
-| File length | ≤ 200 lines | Anthropic Docs: 200-line target for configuration files in this toolkit |
-| Root file length (recommended) | 15-40 lines | Derived from "absolute minimum" guidance |
-| Scope file length (recommended) | 10-30 lines | One topic per file guideline |
-| Instruction count | ≤ 150-200 | HumanLayer: "~150-200 instructions with reasonable consistency" |
-| Contradictions between files | 0 | Anthropic: conflicting instructions make the model choose inconsistently |
-| Language-specific rules in root | 0 | Domain rules belong in separate files |
-| Stale file path references | 0 | "File paths change constantly... actively poisons context" |
+| Rule file length | ≤ 200 lines | Industry Research: 200-line target for configuration files in this toolkit |
+| Instruction count | ≤ 150-200 | Industry Research: "~150-200 instructions with reasonable consistency" |
+| Contradictions between rules | 0 | Industry Research: conflicting instructions make the model choose inconsistently |
+| Stale file path references | 0 | Industry Research: "File paths change constantly... actively poisons context" |
+| Invalid `.mdc` frontmatter fields | 0 | Only `description`, `alwaysApply`, `globs` are valid |
 
 ---
 
 ## Quality Checks (All must pass)
 
 - [ ] Every instruction is actionable (not vague like "write clean code")
-- [ ] Package manager specified if non-standard (pnpm, bun, yarn; omit if npm)
-- [ ] Build/test commands included if non-standard
+- [ ] Package manager mentioned only if non-standard (pnpm, bun, yarn; omit if npm)
+- [ ] Build / test commands included only if non-standard
 - [ ] Non-default config overrides included when analysis found them
-- [ ] Progressive disclosure applied: domain docs referenced, not inlined
-- [ ] No information that tools can enforce (linting, formatting rules → use hooks instead)
-- [ ] No duplication of content across files in the hierarchy
-- [ ] No directory/file structure listings
+- [ ] Progressive disclosure applied: cross-cutting domain content lives in `description:`-mode rules, not inlined into always-apply rules
+- [ ] No information that tools can enforce (linting, formatting → use hooks instead)
+- [ ] No duplication of content across rules
+- [ ] No directory or file structure listings
 - [ ] No standard language conventions the model already knows
 - [ ] No long explanations or tutorials (link to external docs instead)
-- [ ] Critical instructions appear at start or end of file (not buried in middle)
-- [ ] One scope per file (TypeScript rules in one file, testing rules in another)
+- [ ] Critical instructions appear at start or end of each rule (not buried in middle)
+- [ ] One concern per rule
 
 ---
 
-## If This Is an IMPROVE Operation — Also Check
+## `.mdc`-Specific Checks
 
-**Information Preservation:**
-
-- [ ] Critical project information preserved (domain concepts, security notes, compliance requirements)
-- [ ] Custom commands/scripts referenced in the original file are retained
-- [ ] Existing progressive disclosure structure not flattened back into root
-- [ ] Non-obvious architectural decisions carried forward (not deleted as "bloat")
-
-**Structural:**
-
-- [ ] Files not merged that should stay separate (each scope gets its own file)
-- [ ] Scope widened rather than narrowed where the original had too little coverage
+- [ ] Frontmatter contains ONLY `description`, `alwaysApply`, and `globs` — no other fields
+- [ ] `globs:`-mode rules use `globs:` and set `alwaysApply: false`
+- [ ] `description:`-mode rules use `description:`, omit `globs:`, and set `alwaysApply: false`
+- [ ] `alwaysApply: true` rules are reserved for content the agent must see on every conversation
+- [ ] Activation mode of each rule matches the content's nature (pattern-relative → globs; topic-attractor → description; critical tooling → alwaysApply)
 
 ---
 
-## Structural Checks
+## Empty-Set Outcome
 
-- [ ] Root file: one-liner + package manager (if non-standard) + build commands (if non-standard) + pointers
-- [ ] Domain content lives in separate files, not inline
-- [ ] Progressive disclosure pointers point to files that actually exist
-- [ ] **Cursor rules**: `.cursor/rules/*.mdc` files use `globs:` for path-scoped activation (not `alwaysApply: true`) when they apply to specific file patterns
-- [ ] **Cursor rules**: `alwaysApply: true` used only for conventions relevant to every task — not as default
-- [ ] **AGENTS.md-specific**: Subdirectory AGENTS.md files used for monorepo package scoping; path-scoped rules go in `.cursor/rules/*.mdc` with `globs:`
-- [ ] **Init simple projects**: Generate zero `.cursor/rules/*.mdc` files unless analysis found a necessary non-obvious file-pattern convention
+For trivial single-package projects with no non-obvious tooling, `rule-domain-detector` returns an empty `Suggested Rules` list. In that case:
+
+- [ ] Generate ZERO `.cursor/rules/*.mdc` files
+- [ ] Do not create the `.cursor/rules/` directory
+- [ ] Report the empty-set result to the user with a one-line note that the project's tooling is fully covered by the agent's defaults
+
+This is the **canonical passing outcome** for trivial projects — not a failure.
 
 ---
 
 ## Validation Loop Instructions
 
-Execute this loop for each generated or improved file:
+Execute this loop for each generated rule file:
 
 1. Evaluate the file against ALL criteria above
 2. If ANY criterion fails: identify the specific failure, fix the file, restart evaluation

@@ -45,18 +45,22 @@ ls plugins/cursor-initializer/skills/improve-cursor/references/
 
 ### 2. Shared Template Files (init-cursor ↔ improve-cursor)
 
-```bash
-md5sum plugins/cursor-initializer/skills/init-cursor/assets/templates/root-agents-md.md \
-       plugins/cursor-initializer/skills/improve-cursor/assets/templates/root-agents-md.md
+The Cursor distribution ships three activation-mode-specific rule templates. Each must be byte-identical between init-cursor and improve-cursor. The `domain-doc.md` template is also intentionally shared.
 
-md5sum plugins/cursor-initializer/skills/init-cursor/assets/templates/scoped-agents-md.md \
-       plugins/cursor-initializer/skills/improve-cursor/assets/templates/scoped-agents-md.md
+`hook-config.md` and `skill.md` are improve-cursor-only outputs of the automation-migration sub-flow — they have no init-cursor counterpart and are NOT in any parity family.
+
+```bash
+md5sum plugins/cursor-initializer/skills/init-cursor/assets/templates/cursor-rule-always.mdc \
+       plugins/cursor-initializer/skills/improve-cursor/assets/templates/cursor-rule-always.mdc
+
+md5sum plugins/cursor-initializer/skills/init-cursor/assets/templates/cursor-rule-globs.mdc \
+       plugins/cursor-initializer/skills/improve-cursor/assets/templates/cursor-rule-globs.mdc
+
+md5sum plugins/cursor-initializer/skills/init-cursor/assets/templates/cursor-rule-description.mdc \
+       plugins/cursor-initializer/skills/improve-cursor/assets/templates/cursor-rule-description.mdc
 
 md5sum plugins/cursor-initializer/skills/init-cursor/assets/templates/domain-doc.md \
        plugins/cursor-initializer/skills/improve-cursor/assets/templates/domain-doc.md
-
-md5sum plugins/cursor-initializer/skills/init-cursor/assets/templates/cursor-rule.mdc \
-       plugins/cursor-initializer/skills/improve-cursor/assets/templates/cursor-rule.mdc
 ```
 
 ---
@@ -82,13 +86,12 @@ Return exactly this structure:
 | File Group | Copies | Status | Notes |
 |------------|--------|--------|-------|
 | context-optimization.md (init/improve) | 2 | [MATCH/MISMATCH] | |
-| validation-criteria.md (init/improve) | 2 | [MATCH/MISMATCH] | |
 | what-not-to-include.md (init/improve) | 2 | [MATCH/MISMATCH] | |
 | progressive-disclosure-guide.md (init/improve) | 2 | [MATCH/MISMATCH] | |
-| root-agents-md.md templates (init/improve) | 2 | [MATCH/MISMATCH] | |
-| scoped-agents-md.md templates (init/improve) | 2 | [MATCH/MISMATCH] | |
+| cursor-rule-always.mdc templates (init/improve) | 2 | [MATCH/MISMATCH] | |
+| cursor-rule-globs.mdc templates (init/improve) | 2 | [MATCH/MISMATCH] | |
+| cursor-rule-description.mdc templates (init/improve) | 2 | [MATCH/MISMATCH] | |
 | domain-doc.md templates (init/improve) | 2 | [MATCH/MISMATCH] | |
-| cursor-rule.mdc templates (init/improve) | 2 | [MATCH/MISMATCH] | |
 
 ### Divergences Found
 [If none: "✅ No divergences — all shared files are identical within their intended copy families."]
