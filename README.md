@@ -1,6 +1,6 @@
 # Agent Engineering Toolkit
 
-A multi-plugin marketplace providing evidence-based agent artifact engineering. Instead of auto-generating one bloated configuration file, this toolkit creates **minimal, scoped files** following progressive disclosure principles — proven by research to outperform comprehensive auto-generated configurations. Ships as three distributions: a Claude Code plugin (`agents-initializer`), a Cursor IDE plugin (`cursor-initializer`), and a standalone distribution compatible with any AI coding tool.
+A multi-plugin marketplace providing evidence-based agent artifact engineering. Instead of auto-generating one bloated configuration file, this toolkit creates **minimal, scoped files** following progressive disclosure principles — proven by research to outperform comprehensive auto-generated configurations. Ships as Claude Code and Cursor distributions — each an Initializer/Customizer pair — plus a standalone distribution compatible with any AI coding tool.
 
 ## Cost and Model Guidance
 
@@ -21,8 +21,9 @@ the generated files are in place. Treat the first execution as a one-time invest
 | Distribution | Platform | Install Path | Full Documentation |
 |---|---|---|---|
 | `agents-initializer` | Claude Code | Native plugin system | [plugins/agents-initializer/README.md](plugins/agents-initializer/README.md) |
-| `cursor-initializer` | Cursor IDE | Native plugin system | [plugins/cursor-initializer/README.md](plugins/cursor-initializer/README.md) |
 | `agent-customizer` | Claude Code | Native plugin system | [plugins/agent-customizer/README.md](plugins/agent-customizer/README.md) |
+| `cursor-initializer` | Cursor IDE | Native plugin system | [plugins/cursor-initializer/README.md](plugins/cursor-initializer/README.md) |
+| `cursor-customizer` | Cursor IDE | Native plugin system | [plugins/cursor-customizer/README.md](plugins/cursor-customizer/README.md) |
 | Standalone | Any AI tool | `npx skills add` / manual | [skills/README.md](skills/README.md) |
 
 ## Research Foundation
@@ -74,6 +75,16 @@ ln -s ~/src/agent-engineering-toolkit ~/.cursor/plugins/local/agent-engineering-
 
 → See [plugins/cursor-initializer/README.md](plugins/cursor-initializer/README.md) for full setup instructions.
 
+### Cursor IDE — cursor-customizer
+
+```bash
+git clone https://github.com/rodrigorjsf/agent-engineering-toolkit.git ~/src/agent-engineering-toolkit
+mkdir -p ~/.cursor/plugins/local
+ln -s ~/src/agent-engineering-toolkit ~/.cursor/plugins/local/agent-engineering-toolkit
+```
+
+→ See [plugins/cursor-customizer/README.md](plugins/cursor-customizer/README.md) for full setup instructions.
+
 ### npx skills add — Standalone
 
 ```bash
@@ -96,11 +107,17 @@ agent-engineering-toolkit/
 │   │   ├── README.md                # Full plugin documentation
 │   │   ├── skills/                  # 4 skills: init-agents, init-claude, improve-agents, improve-claude
 │   │   └── agents/                  # 3 subagents: codebase-analyzer, scope-detector, file-evaluator
-│   ├── cursor-initializer/          # Cursor IDE plugin — .cursor/rules/*.mdc + AGENTS.md init/improve
+│   ├── cursor-initializer/          # Cursor IDE plugin — rules-first .cursor/rules/*.mdc init/improve (legacy AGENTS.md migration only)
 │   │   ├── .cursor-plugin/plugin.json
 │   │   ├── README.md                # Full plugin documentation
 │   │   ├── skills/                  # 2 skills: init-cursor, improve-cursor
 │   │   └── agents/                  # 3 subagents (Cursor-native format)
+│   ├── cursor-customizer/           # Cursor IDE plugin — single-artifact CRUD (rules, hooks, skills, subagents)
+│   │   ├── .cursor-plugin/plugin.json
+│   │   ├── README.md                # Full plugin documentation
+│   │   ├── docs-drift-manifest.md   # Registry: reference files → source docs
+│   │   ├── agents/                  # artifact-analyzer + per-type evaluators (Cursor-native format)
+│   │   └── skills/                  # 8 skills: create-{type} and improve-{type}
 │   └── agent-customizer/            # Claude Code plugin — artifact creation and improvement
 │       ├── .claude-plugin/plugin.json
 │       ├── README.md                # Full plugin documentation
