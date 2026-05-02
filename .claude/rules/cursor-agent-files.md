@@ -1,8 +1,9 @@
 ---
 paths:
   - "plugins/cursor-initializer/agents/*.md"
+  - "plugins/cursor-customizer/agents/*.md"
 ---
-# Cursor Agent File Conventions
+# Cursor-distribution Agent File Conventions
 
 - YAML frontmatter required: `name`, `description`, `model`, `readonly`
 - `model: inherit` — Cursor agents inherit model from parent context

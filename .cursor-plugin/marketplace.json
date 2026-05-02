@@ -5,7 +5,7 @@
     "email": "rodrigo_rjsf@hotmail.com"
   },
   "metadata": {
-    "description": "Multi-plugin marketplace for evidence-based Cursor artifact engineering. Provides plugins for configuration initialization (AGENTS.md, .cursor/rules/) based on academic research and Cursor best practices.",
+    "description": "Multi-plugin marketplace for evidence-based Cursor artifact engineering. Ships the rules-first Cursor distribution as an Initializer/Customizer pair: cursor-initializer bootstraps minimal, scoped .cursor/rules/*.mdc hierarchies; cursor-customizer creates and improves individual Cursor artifacts (rules, hooks, skills, subagents) inside an already-initialized project.",
     "version": "1.0.0",
     "pluginRoot": "plugins"
   },
@@ -13,7 +13,12 @@
     {
       "name": "cursor-initializer",
       "source": "cursor-initializer",
-      "description": "Generate and optimize minimal, scoped AGENTS.md and .cursor/rules/*.mdc configuration files based on academic research and Cursor best practices. Uses subagent-driven analysis for context-efficient file generation."
+      "description": "Evidence-based rules-first initializer and optimizer for Cursor projects. Generates minimal .cursor/rules/*.mdc hierarchies with the right activation mode per rule; non-destructively migrates legacy AGENTS.md when present."
+    },
+    {
+      "name": "cursor-customizer",
+      "source": "cursor-customizer",
+      "description": "Rules-first, product-strict customizer for the Cursor distribution: creates and improves individual Cursor artifacts (rules, hooks, skills, subagents) inside an already-initialized project. Sibling of cursor-initializer."
     }
   ]
 }
