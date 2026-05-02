@@ -27,15 +27,26 @@ The check runs as part of the plugin's quality gate and may also be invoked manu
 
 ## Reference File Registry
 
-> Empty until artifact-type slices populate it. Each slice (rules / hooks / skills / subagents support) adds one section per skill it ships, listing every reference file in that skill's `references/` directory alongside its source documents.
+> Each slice (rules / hooks / skills / subagents support) adds one section per skill it ships, listing every reference file in that skill's `references/` directory alongside its source documents.
+
+## Slice C: rules
 
 ### create-rule
 
-_(populated by the rules-support slice)_
+| Reference File | Source Document(s) | Derivation |
+|----------------|-------------------|------------|
+| `references/rule-authoring-guide.md` | `docs/cursor/rules/rules.md` | Derived: distilled guidance on activation modes, frontmatter contract, glob syntax, and anti-patterns. ≤200 lines. Source attribution at top. |
+| `references/rule-validation-criteria.md` | `docs/cursor/rules/rules.md`; Industry Research (`research-context-engineering-comprehensive.md`) | Derived: hard limits, quality checks, `.mdc`-specific checks, validation-loop instructions. |
+| `references/prompt-engineering-strategies.md` | `plugins/agent-customizer/skills/create-rule/references/prompt-engineering-strategies.md` | Verbatim copy. Vendor-neutral content; per the per-skill-copy convention this file is duplicated, not symlinked. |
 
 ### improve-rule
 
-_(populated by the rules-support slice)_
+| Reference File | Source Document(s) | Derivation |
+|----------------|-------------------|------------|
+| `references/rule-authoring-guide.md` | `docs/cursor/rules/rules.md` | Verbatim copy of `create-rule/references/rule-authoring-guide.md` (per the per-skill-copy convention). |
+| `references/rule-validation-criteria.md` | `docs/cursor/rules/rules.md`; Industry Research (`research-context-engineering-comprehensive.md`) | Verbatim copy of `create-rule/references/rule-validation-criteria.md`. |
+| `references/rule-evaluation-criteria.md` | `docs/cursor/rules/rules.md`; Industry Research (`research-context-engineering-comprehensive.md`) | Derived: bloat / staleness / activation-mode appropriateness rubric and quality scoring. Improve-only reference. |
+| `references/prompt-engineering-strategies.md` | `plugins/agent-customizer/skills/create-rule/references/prompt-engineering-strategies.md` | Verbatim copy. Vendor-neutral content; per the per-skill-copy convention this file is duplicated, not symlinked. |
 
 ### create-hook
 
@@ -69,4 +80,6 @@ _(populated as reference files land; lists each source document and the count of
 
 | Source Doc | Referenced By (count) |
 |------------|----------------------|
-| _(empty until artifact-type slices add entries)_ | — |
+| `docs/cursor/rules/rules.md` | 5 (create-rule: authoring-guide, validation-criteria; improve-rule: authoring-guide, validation-criteria, evaluation-criteria) |
+| Industry Research: `research-context-engineering-comprehensive.md` | 3 (create-rule: validation-criteria; improve-rule: validation-criteria, evaluation-criteria) |
+| `plugins/agent-customizer/skills/create-rule/references/prompt-engineering-strategies.md` | 2 (create-rule, improve-rule — verbatim copy) |
