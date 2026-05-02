@@ -14,7 +14,8 @@ Mechanizes the health-check loop from ADR-0004 (Karpathy "LLM Knowledge Bases" m
 
 ## Invariants
 
-- **No auto-fix on wiki pages.** Lint reports findings but does not modify pages in `wiki/knowledge/*.md` without explicit per-finding consent. Appending a dated audit entry to `wiki/knowledge/log.md` is the only write this skill performs (step 5).
+- **No auto-fix on wiki pages.** This skill never modifies files in `wiki/knowledge/*.md` without explicit per-finding consent.
+- **Audit log is the only sanctioned write.** Step 5 appends a single dated entry to `wiki/knowledge/log.md` unconditionally — that is the *only* file this skill writes without confirmation.
 - **Findings are evidence-cited.** Every finding lists the file path and line range that triggers it, plus a suggested fix.
 - **Severity is meaningful.** P0 = breaks lookup (e.g., missing `index.md` entry, dangling `[[link]]`). P1 = degrades quality (orphan, missing backlink, format drift). P2 = stylistic.
 
