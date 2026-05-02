@@ -6,7 +6,7 @@
   },
   "metadata": {
     "description": "Multi-plugin marketplace for evidence-based Cursor artifact engineering. Ships the rules-first Cursor distribution as an Initializer/Customizer pair: cursor-initializer bootstraps minimal, scoped .cursor/rules/*.mdc hierarchies; cursor-customizer creates and improves individual Cursor artifacts (rules, hooks, skills, subagents) inside an already-initialized project.",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "pluginRoot": "plugins"
   },
   "plugins": [
