@@ -2,6 +2,49 @@
 
 ---
 
+## 2026-05-01 — Batch ingest: new docs directories
+
+**Source directories scanned:**
+
+- `docs/agent-protocols/` (6 files)
+- `docs/agentic-engineering/` (5 files)
+- `docs/context-engineering/` (9 files)
+- `docs/harness-engineering/` (3 files)
+- `docs/human-layer-project/` (1 file)
+- `docs/long-context-research/` (1 file synthesized from 4 variants)
+- `docs/spec-driven-development/` (1 file synthesized)
+- `docs/structured-outputs/` (4 files)
+- `docs/tool-calling/` (4 files)
+- `docs/claude/` (2 files)
+
+**Excluded:** `docs/agents/` (project-internal operational docs), `claude-cookbook-anthropic.md` (API reference, no conceptual content), `docs/claude/prompting-best-practices.md` (absorbed into existing prompt-engineering.md)
+
+**Pages created (8):**
+
+| Page | Sources | Key content |
+|------|---------|-------------|
+| `agent-protocols.md` | 5 files | MCP + A2A ecosystem, M×N problem, ACP merger, ANP, decision framework |
+| `human-agent-collaboration.md` | 1 file | Fluid collaboration, dynamic roles, intertwinement/fluidity metrics |
+| `harness-engineering.md` | 5 files | Harness as OS, 52.8→66.5% evidence, five pillars, long-running agent patterns |
+| `rpi-workflow.md` | 3 files | Research→Plan→Implement→Review, leverage model, FIC, phase artifacts |
+| `long-context-lost-in-middle.md` | 1 file | U-shaped positional bias, empirical benchmark data |
+| `spec-driven-development.md` | 1 file | SDD methodology, three adoption levels, tooling landscape |
+| `structured-outputs.md` | 5 files | JSON schema enforcement, strict tool use, tool_search, programmatic tool calling |
+| `human-layer.md` | 1 file | HumanLayer/CodeLayer architecture, approval loops, daemon orchestration |
+
+**Pages updated (4):**
+
+| Page | What was added |
+|------|----------------|
+| `context-engineering.md` | Dumb zone (40% threshold), dead context, memory scopes/types, 1M token caveats |
+| `progressive-disclosure.md` | Phase-based loading, index-first pattern, context trigger system |
+| `agent-best-practices.md` | Harness > model choice evidence, MCP server gotchas |
+| `subagents.md` | Context firewall pattern, FIC-based compaction role |
+
+**Index updated:** Added sections "Agentic Engineering" (4 pages) and "API & Tooling" (1 page); expanded "Agent Architecture" (+2 pages); expanded "Research" (+1 page). Count: 30 → 38.
+
+---
+
 ## 2026-04-19 — Phase 8: RAG & wiki hardening
 
 **Source**: `docs/compliance/normative-source-matrix.md` (bundle definitions at lines 261-306)

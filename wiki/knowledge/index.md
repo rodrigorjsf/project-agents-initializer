@@ -1,6 +1,6 @@
 # Wiki Index
 
-Total pages: **30**
+Total pages: **38**
 
 ---
 
@@ -19,9 +19,11 @@ Total pages: **30**
 | ----------------------------- | ---------------------------------------------------------------------- |
 | [[evaluating-agents-paper]]   | ETH Zurich 2026 study: minimal configs outperform comprehensive ones   |
 | [[agent-workflows]]           | Fundamental loop, five core patterns, orchestration strategies         |
-| [[subagents]]                 | Cross-platform subagent comparison (Claude Code vs Cursor)             |
+| [[subagents]]                 | Cross-platform subagent comparison, context firewall pattern           |
 | [[agent-configuration-files]] | AGENTS.md, CLAUDE.md, .cursorrules patterns and hierarchy              |
 | [[agent-best-practices]]      | Cross-platform guide: harness model, context management, anti-patterns |
+| [[agent-protocols]]           | MCP + A2A as complementary standards, protocol comparison, decision framework |
+| [[human-agent-collaboration]] | Fluid collaboration: dynamic role-flexible coordination, fluidity metrics |
 
 ## Claude Code Platform
 
@@ -45,6 +47,15 @@ Total pages: **30**
 | [[cursor-mcp]]       | Three transports, OAuth, MCP Apps, tool approval          |
 | [[cursor-tools]]     | Browser, search, terminal sandbox, worktrees              |
 
+## Agentic Engineering
+
+| Page                      | Summary                                                          |
+| ------------------------- | ---------------------------------------------------------------- |
+| [[harness-engineering]]   | Harness as agent OS: five pillars, MCP gotchas, long-running agents, 52.8→66.5% evidence |
+| [[rpi-workflow]]          | Research→Plan→Implement→Review, leverage model, FIC, fresh context per phase |
+| [[spec-driven-development]] | Move ambiguity to spec review, three adoption levels, when to use vs RPI |
+| [[human-layer]]           | HumanLayer/CodeLayer architecture, daemon orchestration, approval loop patterns |
+
 ## Agent Skills Standard
 
 | Page                      | Summary                                                          |
@@ -52,13 +63,20 @@ Total pages: **30**
 | [[agent-skills-standard]] | Open specification, frontmatter, progressive disclosure loading  |
 | [[skill-authoring]]       | Eval-driven iteration, description optimization, script bundling |
 
+## API & Tooling
+
+| Page                   | Summary                                                          |
+| ---------------------- | ---------------------------------------------------------------- |
+| [[structured-outputs]] | JSON schema enforcement, strict tool use, tool_search for JIT discovery, 80%+ token savings |
+
 ## Research
 
-| Page                          | Summary                                                         |
-| ----------------------------- | --------------------------------------------------------------- |
-| [[persuasion-in-ai]]          | Seven persuasion principles with quantitative effect sizes      |
-| [[multilingual-performance]]  | Tokenization disparities, English-thinking, Portuguese analysis |
-| [[whitespace-and-formatting]] | Formatting costs (1 token), structural quality improvements     |
+| Page                              | Summary                                                         |
+| --------------------------------- | --------------------------------------------------------------- |
+| [[persuasion-in-ai]]              | Seven persuasion principles with quantitative effect sizes      |
+| [[multilingual-performance]]      | Tokenization disparities, English-thinking, Portuguese analysis |
+| [[whitespace-and-formatting]]     | Formatting costs (1 token), structural quality improvements     |
+| [[long-context-lost-in-middle]]   | U-shaped positional bias: performance peaks at start/end, degrades in middle |
 
 ## Compliance & Validation
 

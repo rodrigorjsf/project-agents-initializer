@@ -1,8 +1,8 @@
 # Subagents
 
 **Summary**: Specialized assistants running in isolated context windows with custom system prompts and restricted tool sets — the primary mechanism for keeping main agent context clean while enabling complex parallel work across both Claude Code and Cursor platforms.
-**Sources**: creating-custom-subagents.md, subagents-guide.md, research-subagent-best-practices.md, analysis-creating-custom-subagents.md, analysis-research-subagent-best-practices.md
-**Last updated**: 2026-04-18
+**Sources**: creating-custom-subagents.md, subagents-guide.md, research-subagent-best-practices.md, analysis-creating-custom-subagents.md, analysis-research-subagent-best-practices.md, research-plan-implement-rpi.md, skill-issue-harness-engineering-for-coding-agents.md
+**Last updated**: 2026-05-01
 
 ---
 
@@ -94,6 +94,19 @@ Ten common mistakes when building and deploying subagents:
 9. **Not restricting tool access** → Security risk and unfocused behavior; every agent should have the minimum tools it needs
 10. **Not checking into version control** → Team members can't benefit; `.claude/agents/` should be committed
 
+## Subagents as Context Firewalls
+
+The primary value of subagents is **context isolation**, not task delegation. Each subagent starts with a fresh context window containing only its system prompt and task input — no accumulated parent history, no unrelated exploration results, no poisoned trajectory from earlier errors.
+
+This makes subagents the primary mechanism for staying in the [[context-engineering#the-dumb-zone|smart zone]]. When a task would push the main context above ~40%, route it to a subagent instead. The subagent completes in its own fresh window and returns only a summary to the parent (typically 1,000–2,000 tokens vs. tens of thousands of exploration tokens).
+
+Two concrete applications (source: skill-issue-harness-engineering-for-coding-agents.md, research-plan-implement-rpi.md):
+
+1. **Research isolation** — The research phase of [[rpi-workflow]] runs in a dedicated subagent. It can explore broadly, accumulate documentation, and exhaust its window. The parent receives only the synthesized RESEARCH.md artifact.
+2. **Compaction enforcement** — When a task segment finishes, a compaction subagent summarizes that segment before the next segment begins. This implements Frequent Intentional Compaction (FIC) without losing the parent's high-level context.
+
+The mistake is treating subagents as role-based workers ("the researcher", "the planner") when their real value is as **context windows you can throw away**. See [[harness-engineering]] for how this integrates with the full harness model.
+
 ## Related pages
 
 - [[claude-code-subagents]]
@@ -101,3 +114,6 @@ Ten common mistakes when building and deploying subagents:
 - [[agent-workflows]]
 - [[progressive-disclosure]]
 - [[claude-code-plugins]]
+- [[harness-engineering]]
+- [[rpi-workflow]]
+- [[context-engineering]]

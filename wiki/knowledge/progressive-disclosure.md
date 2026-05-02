@@ -1,8 +1,8 @@
 # Progressive Disclosure
 
 **Summary**: An information architecture principle applied to LLM context management — load only what's needed for the current task, organized in tiers from always-loaded to on-demand to invoked, dramatically reducing token waste and improving agent focus.
-**Sources**: a-guide-to-agents.md, Evaluating-AGENTS-paper.md, research-agent-workflows-and-patterns.md, research-context-engineering-comprehensive.md
-**Last updated**: 2026-04-18
+**Sources**: a-guide-to-agents.md, Evaluating-AGENTS-paper.md, research-agent-workflows-and-patterns.md, research-context-engineering-comprehensive.md, progressive-disclosure-ai-agents.md
+**Last updated**: 2026-05-01
 
 ---
 
@@ -62,6 +62,27 @@ The [[evaluating-agents-paper]] (ETH Zurich, 2026) measured:
 - Developer-provided context: **+4% average** success rate vs. no context
 - Context files encourage broader exploration but don't improve direction-finding
 
+## Phase-Based Loading
+
+Rather than pre-loading all context for a task, phase-based loading exposes content dynamically as the task progresses through phases. This aligns context with the current phase of work rather than the entire anticipated task.
+
+Four implementation patterns (source: progressive-disclosure-ai-agents.md):
+
+1. **Index-first loading** — Load a lightweight table of contents first; fetch full sections only when a query matches. Prevents loading 50,000 tokens of documentation when only a 500-token section is relevant.
+2. **Scout pattern** — A lightweight read-only subagent previews the task space and returns a summary; the main agent loads detail only for relevant areas.
+3. **Phase-based loading** — Research phase loads broad context; implementation phase loads only the spec and relevant code; review phase loads test results. Each phase starts with a fresh, minimal context.
+4. **Skill files without embedded references** — SKILL.md files contain only phase definitions and pointers; reference files are loaded on-demand by phase instruction, not bundled into the skill.
+
+### Context Trigger System
+
+A trigger system conditionalizes context loading:
+
+1. **Condition detection** — Agent identifies which task phase or content type is active (e.g., "processing payment logic")
+2. **Fetch** — Agent retrieves the matching reference file (e.g., `rules/payments.md`)
+3. **Scoping** — Fetched content is marked as phase-local and removed after the phase completes
+
+This allows a 50,000-token knowledge base to present as a ~2,000-token effective load per interaction.
+
 ## Related pages
 
 - [[context-engineering]]
@@ -70,3 +91,5 @@ The [[evaluating-agents-paper]] (ETH Zurich, 2026) measured:
 - [[agent-configuration-files]]
 - [[claude-code-memory]]
 - [[cursor-rules]]
+- [[harness-engineering]]
+- [[rpi-workflow]]
