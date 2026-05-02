@@ -7,7 +7,8 @@ Multi-plugin marketplace for evidence-based agent artifact engineering.
 Multiple plugin distributions and one standalone distribution — each follows its own platform conventions:
 
 - `plugins/agents-initializer/skills/` — Claude Code plugin; delegates analysis to subagents
-- `plugins/cursor-initializer/skills/` — Cursor IDE plugin; delegates analysis to subagents (Cursor-native format)
+- `plugins/cursor-initializer/skills/` — Cursor IDE plugin; rules-first `.cursor/rules/*.mdc` initializer; delegates analysis to subagents (Cursor-native format)
+- `plugins/cursor-customizer/skills/` — Cursor IDE plugin; single-artifact CRUD (rules, hooks, skills, subagents); delegates analysis to subagents (Cursor-native format)
 - `plugins/agent-customizer/skills/` — Claude Code plugin; artifact creation/improvement
 - `skills/` — npx skills add; standalone inline analysis, no agent delegation
 
@@ -28,6 +29,7 @@ Each skill directory contains:
 
 See `plugins/agents-initializer/CLAUDE.md` for plugin-specific conventions.
 See `plugins/cursor-initializer/CLAUDE.md` for cursor-initializer plugin conventions.
+See `plugins/cursor-customizer/CLAUDE.md` for cursor-customizer plugin conventions.
 See `plugins/agent-customizer/CLAUDE.md` for agent-customizer plugin conventions.
 
 ## Knowledge Lookup
