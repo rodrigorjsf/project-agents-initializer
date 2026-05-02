@@ -107,6 +107,33 @@ The two verbatim files are copied (not symlinked) into both `create-skill/refere
 
 | Source Doc | Referenced By (count) |
 |------------|----------------------|
+| `docs/cursor/rules/rules.md` | 5 (create-rule: authoring-guide, validation-criteria; improve-rule: authoring-guide, validation-criteria, evaluation-criteria) |
+| Industry Research: `research-context-engineering-comprehensive.md` | 3 (create-rule: validation-criteria; improve-rule: validation-criteria, evaluation-criteria) |
+| `plugins/agent-customizer/skills/create-rule/references/prompt-engineering-strategies.md` | 2 (create-rule, improve-rule — verbatim copy) |
 | `docs/cursor/skills/agent-skills-guide.md` | 7 |
 | `plugins/agent-customizer/skills/create-skill/references/behavioral-guidelines.md` | 2 |
 | `plugins/agent-customizer/skills/create-skill/references/prompt-engineering-strategies.md` | 2 |
+
+---
+
+## Slice D: hooks
+
+Mappings added by the hooks-support slice. Both `create-hook` and `improve-hook` ship the same two derived references and one verbatim copy.
+
+### Derived references (distilled from a Cursor source doc)
+
+| Reference file | Source doc | Notes |
+|----------------|------------|-------|
+| `create-hook/references/hook-authoring-guide.md` | `docs/cursor/hooks/hooks-guide.md` | ≤200 lines; covers when-to-use, config structure, two handler types, exit codes + `failClosed`, matchers, locations, security |
+| `improve-hook/references/hook-authoring-guide.md` | `docs/cursor/hooks/hooks-guide.md` | Identical to the `create-hook` copy (intra-plugin shared) |
+| `create-hook/references/hook-events-reference.md` | `docs/cursor/hooks/hooks-guide.md` | Authoritative Cursor-native event vocabulary the orchestration consults during validation |
+| `improve-hook/references/hook-events-reference.md` | `docs/cursor/hooks/hooks-guide.md` | Identical to the `create-hook` copy (intra-plugin shared) |
+
+### Verbatim copy (from the agent-customizer plugin)
+
+| Reference file | Source | Notes |
+|----------------|--------|-------|
+| `create-hook/references/prompt-engineering-strategies.md` | `plugins/agent-customizer/skills/create-hook/references/prompt-engineering-strategies.md` | Copied verbatim; vendor-neutral prompt-engineering guidance |
+| `improve-hook/references/prompt-engineering-strategies.md` | `plugins/agent-customizer/skills/improve-hook/references/prompt-engineering-strategies.md` | Copied verbatim; vendor-neutral prompt-engineering guidance |
+
+
