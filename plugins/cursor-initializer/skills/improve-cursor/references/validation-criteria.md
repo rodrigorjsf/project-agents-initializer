@@ -63,7 +63,7 @@ Any rule file violating these criteria must be fixed before proceeding:
 
 **Quality calibration:** A rule scoring ≥ 7/10 that is already within the 200-line budget must NOT be restructured purely to reduce line count — quality and information preservation take precedence over line minimization.
 
-**Quality calibration:** A file scoring ≥ 7/10 that is already within the 200-line budget must NOT be restructured purely to reduce line count — quality and information preservation take precedence over line minimization.
+**Quality calibration:** A rule scoring ≥ 7/10 that is already within the 200-line budget must NOT be restructured purely to reduce line count — quality and information preservation take precedence over line minimization.
 
 ---
 
