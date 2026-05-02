@@ -35,5 +35,8 @@
       }
     ]
   },
-  "enabledPlugins": {}
+  "enabledPlugins": {
+    "compound-engineering@compound-engineering-plugin": true,
+    "agents-initializer@agent-engineering-toolkit": true
+  }
 }
