@@ -1,6 +1,7 @@
 # agent-engineering-toolkit
 
 Multi-plugin marketplace for evidence-based agent artifact engineering.
+ALWAYS keep `caveman` skill enabled in ultra mode
 
 ## Structure
 
@@ -65,6 +66,16 @@ The database is pre-built. Tools are available via MCP (`rag-knowledge-base` ser
 - Commit message format: `{type}({scope}): {description}` — use `feat`, `fix`, `docs`, `chore`, `refactor`
 - Stage only files belonging to the same logical change; never `git add -A` across unrelated changes
 - If asked to "commit everything", break it into atomic commits by scope first, then commit each group
+
+## Implementation Completion Protocol
+
+After any substantive implementation in this repository, before declaring the work done:
+
+1. Make the deliverable durable first (write the file, save, commit if appropriate).
+2. Call `advisor()` for a second-opinion review of the change.
+3. Run `/compound-engineering:ce-code-review` on the diff and resolve any P0/P1 findings before stopping.
+
+The CI workflow `.github/workflows/claude-code-review.yml` is the final gate on PRs into `main`; this local protocol is the earlier shift-left check during implementation. Skip only for: typo fixes, comment-only edits, and pure documentation changes already reviewed elsewhere. Does not apply when the user explicitly says the work is exploratory or in-progress.
 
 ## Agent skills
 
