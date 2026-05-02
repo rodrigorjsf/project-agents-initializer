@@ -9,15 +9,6 @@
             "command": ".claude/hooks/check-docs-sync.sh"
           }
         ]
-      },
-      {
-        "matcher": "Edit|Create",
-        "hooks": [
-          {
-            "type": "command",
-            "command": ".claude/hooks/check-rag-reindex.sh"
-          }
-        ]
       }
     ]
   }
