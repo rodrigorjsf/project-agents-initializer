@@ -70,3 +70,25 @@ _(populated as reference files land; lists each source document and the count of
 | Source Doc | Referenced By (count) |
 |------------|----------------------|
 | _(empty until artifact-type slices add entries)_ | — |
+
+---
+
+## Slice D: hooks
+
+Mappings added by the hooks-support slice. Both `create-hook` and `improve-hook` ship the same two derived references and one verbatim copy.
+
+### Derived references (distilled from a Cursor source doc)
+
+| Reference file | Source doc | Notes |
+|----------------|------------|-------|
+| `create-hook/references/hook-authoring-guide.md` | `docs/cursor/hooks/hooks-guide.md` | ≤200 lines; covers when-to-use, config structure, two handler types, exit codes + `failClosed`, matchers, locations, security |
+| `improve-hook/references/hook-authoring-guide.md` | `docs/cursor/hooks/hooks-guide.md` | Identical to the `create-hook` copy (intra-plugin shared) |
+| `create-hook/references/hook-events-reference.md` | `docs/cursor/hooks/hooks-guide.md` | Authoritative Cursor-native event vocabulary the orchestration consults during validation |
+| `improve-hook/references/hook-events-reference.md` | `docs/cursor/hooks/hooks-guide.md` | Identical to the `create-hook` copy (intra-plugin shared) |
+
+### Verbatim copy (from the agent-customizer plugin)
+
+| Reference file | Source | Notes |
+|----------------|--------|-------|
+| `create-hook/references/prompt-engineering-strategies.md` | `plugins/agent-customizer/skills/create-hook/references/prompt-engineering-strategies.md` | Copied verbatim; vendor-neutral prompt-engineering guidance |
+| `improve-hook/references/prompt-engineering-strategies.md` | `plugins/agent-customizer/skills/improve-hook/references/prompt-engineering-strategies.md` | Copied verbatim; vendor-neutral prompt-engineering guidance |
