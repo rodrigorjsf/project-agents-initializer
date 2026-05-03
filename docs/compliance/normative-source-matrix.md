@@ -47,6 +47,7 @@ When multiple sources could apply to an artifact, use this precedence order:
 | `agents-initializer` | Claude Code plugin | `plugins/agents-initializer/` | Claude Code | `.claude-plugin` |
 | `agent-customizer` | Claude Code plugin | `plugins/agent-customizer/` | Claude Code | `.claude-plugin` |
 | `cursor-initializer` | Cursor IDE plugin | `plugins/cursor-initializer/` | Cursor | `.cursor-plugin` |
+| `cursor-customizer` | Cursor IDE plugin | `plugins/cursor-customizer/` | Cursor | `.cursor-plugin` |
 | `standalone` | Portable skills | `skills/` | Any AI tool | None |
 | `repository-global` | Governance artifacts | Root, `.claude/rules/`, `.github/instructions/`, `docs/` | All | N/A |
 
@@ -142,13 +143,13 @@ When multiple sources could apply to an artifact, use this precedence order:
 
 | Artifact Type | File Pattern | Present In |
 |---------------|-------------|------------|
-| `skill` | `*/SKILL.md` | All 5 scopes |
-| `agent` | `agents/*.md` | agents-initializer, cursor-initializer, agent-customizer |
-| `reference` | `references/*.md` | All 4 distribution scopes |
-| `template` | `assets/templates/*.md`, `*.mdc` | All 4 distribution scopes |
-| `plugin-manifest` | `plugin.json`, `marketplace.json` | agents-initializer, cursor-initializer, agent-customizer |
-| `config-file` | `CLAUDE.md`, `AGENTS.md` | All 5 scopes |
-| `readme` | `README.md` | All 5 scopes |
+| `skill` | `*/SKILL.md` | All 6 scopes |
+| `agent` | `agents/*.md` | agents-initializer, cursor-initializer, cursor-customizer, agent-customizer |
+| `reference` | `references/*.md` | All 5 distribution scopes |
+| `template` | `assets/templates/*.md`, `*.mdc` | All 5 distribution scopes |
+| `plugin-manifest` | `plugin.json`, `marketplace.json` | agents-initializer, cursor-initializer, cursor-customizer, agent-customizer |
+| `config-file` | `CLAUDE.md`, `AGENTS.md` | All 6 scopes |
+| `readme` | `README.md` | All 6 scopes |
 | `rule` | `.claude/rules/*.md` | repository-global |
 | `instruction` | `.github/instructions/*.md` | repository-global |
 | `docs` | `docs/**/*.md` | repository-global |
@@ -182,6 +183,18 @@ When multiple sources could apply to an artifact, use this precedence order:
 | `readme` | `CLAUDE-PLUGINS` | `PROJECT-DESIGN-GUIDELINES` | `rule:readme-files`, `instr:readme-files` | Cursor-only content |
 
 ### cursor-initializer (Cursor Plugin)
+
+| Artifact | Primary Sources | Secondary Sources | Project Rules | Forbidden Sources |
+|----------|----------------|-------------------|---------------|-------------------|
+| `skill` | `CURSOR-SKILLS`, `CURSOR-PLUGIN` | `SHARED-SKILLS-STD`, `SHARED-AUTHORING`, `PROJECT-DESIGN-GUIDELINES` | `rule:cursor-plugin-skills`, `instr:skill-files` | `CLAUDE-*`, `${CLAUDE_SKILL_DIR}`, inline bash patterns |
+| `agent` | `CURSOR-SUBAGENTS` | `GENERAL-SUBAGENTS`, `PROJECT-DESIGN-GUIDELINES` | `rule:cursor-agent-files`, `instr:agent-definitions` | `CLAUDE-SUBAGENTS`, `tools:`/`maxTurns:` fields |
+| `reference` | `CURSOR-RULES`, `CURSOR-SKILLS` | `SHARED-AUTHORING`, `PROJECT-DESIGN-GUIDELINES` | `rule:reference-files`, `instr:reference-files` | `CLAUDE-MEMORY` (`paths:` guidance) |
+| `template` | `CURSOR-RULES`, `CURSOR-SKILLS` | `PROJECT-DESIGN-GUIDELINES` | `instr:template-files` | `paths:` frontmatter, Claude hook templates |
+| `plugin-manifest` | `CURSOR-PLUGIN` | — | `instr:plugin-config` | `CLAUDE-PLUGINS` manifest fields |
+| `config-file` | `CURSOR-RULES`, `CURSOR-PRACTICES` | `PROJECT-DESIGN-GUIDELINES`, `GENERAL-AGENTS-GUIDE` | `instr:plugin-config` | `CLAUDE-MEMORY`, `.claude/rules/` patterns |
+| `readme` | `CURSOR-PLUGIN` | `PROJECT-DESIGN-GUIDELINES` | `rule:readme-files`, `instr:readme-files` | Claude-only skills, standalone-only content |
+
+### cursor-customizer (Cursor Plugin)
 
 | Artifact | Primary Sources | Secondary Sources | Project Rules | Forbidden Sources |
 |----------|----------------|-------------------|---------------|-------------------|
@@ -273,7 +286,7 @@ For `agents-initializer` and `agent-customizer` scopes:
 
 ### `cursor-plugin-bundle`
 
-For `cursor-initializer` scope:
+For `cursor-initializer` and `cursor-customizer` scopes:
 - **Primary**: `CURSOR-SKILLS`, `CURSOR-PLUGIN`, `CURSOR-SUBAGENTS`, `CURSOR-RULES`, `CURSOR-HOOKS`, `CURSOR-PRACTICES`
 - **Secondary**: `SHARED-SKILLS-STD`, `SHARED-AUTHORING`, `PROJECT-DESIGN-GUIDELINES`
 - **Project**: `rule:cursor-plugin-skills`, `rule:cursor-agent-files`, `rule:reference-files`, `rule:readme-files`, `instr:skill-files`, `instr:agent-definitions`, `instr:reference-files`, `instr:template-files`, `instr:plugin-config`, `instr:readme-files`
