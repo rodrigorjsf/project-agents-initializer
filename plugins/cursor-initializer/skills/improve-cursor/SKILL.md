@@ -201,10 +201,6 @@ For the migration sub-flow output, also check the migration-sub-flow schema crit
 
 In calibrated high-quality cases, treat unrelated structural churn as a validation failure: if a change rewrites a non-issue section, adds extra files or rules, or increases file count without fixing a documented criterion, revert and choose the smaller fix.
 
-For the migration sub-flow output, also check the migration-sub-flow schema criteria documented in `references/validation-criteria.md`.
-
-In calibrated high-quality cases, treat unrelated structural churn as a validation failure: if a change rewrites a non-issue section, adds extra files or rules, or increases file count without fixing a documented criterion, revert and choose the smaller fix.
-
 Maximum 3 iterations.
 
 ### Phase 5: Present and Apply
