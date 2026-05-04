@@ -50,7 +50,7 @@ Proceed to Phase 1 below.
 
 Read `references/artifact-analyzer.md` and follow its analysis instructions to analyze the project at the current working directory.
 
-Focus on: existing skill directory structure, naming patterns, which skills delegate to agents, plugin conventions in CLAUDE.md files, and any skill that is similar to `{requested-name}` in purpose.
+Focus on: existing skill directory structure, naming patterns, and any skill that is similar to `{requested-name}` in purpose.
 
 ### Phase 2: Generate Skill
 
