@@ -13,12 +13,13 @@
 - [5. Artifact Inventory — agents-initializer](#5-artifact-inventory--agents-initializer)
 - [6. Artifact Inventory — agent-customizer](#6-artifact-inventory--agent-customizer)
 - [7. Artifact Inventory — cursor-initializer](#7-artifact-inventory--cursor-initializer)
-- [8. Artifact Inventory — standalone](#8-artifact-inventory--standalone)
-- [9. Artifact Inventory — repository-global](#9-artifact-inventory--repository-global)
-- [10. Shared Copy Group Registry](#10-shared-copy-group-registry)
-- [11. Validator Coverage Matrix](#11-validator-coverage-matrix)
-- [12. Quality Gate Coverage Map](#12-quality-gate-coverage-map)
-- [13. Audit Phase Assignments](#13-audit-phase-assignments)
+- [8. Artifact Inventory — cursor-customizer](#8-artifact-inventory--cursor-customizer)
+- [9. Artifact Inventory — standalone](#9-artifact-inventory--standalone)
+- [10. Artifact Inventory — repository-global](#10-artifact-inventory--repository-global)
+- [11. Shared Copy Group Registry](#11-shared-copy-group-registry)
+- [12. Validator Coverage Matrix](#12-validator-coverage-matrix)
+- [13. Quality Gate Coverage Map](#13-quality-gate-coverage-map)
+- [14. Audit Phase Assignments](#14-audit-phase-assignments)
 
 ---
 
@@ -31,8 +32,8 @@ This manifest enumerates every in-scope repository artifact individually, linkin
 **How to use this document:**
 
 - **Phase 4–6 auditors**: open the inventory section for your scope; work through each row using the Bundle and Validators columns to locate the applicable sources and enforcement rules.
-- **Phase 7 (parity/drift)**: use the Shared Copy Group Registry (Section 10) to identify which files must be byte-identical and which quality gate enforces parity.
-- **Phase 9 (regression prevention)**: use the Quality Gate Coverage Map (Section 12) to identify scopes lacking automated enforcement.
+- **Phase 7 (parity/drift)**: use the Shared Copy Group Registry (Section 11) to identify which files must be byte-identical and which quality gate enforces parity.
+- **Phase 9 (regression prevention)**: use the Quality Gate Coverage Map (Section 13) to identify scopes lacking automated enforcement.
 
 ---
 
@@ -47,6 +48,7 @@ Defines the reproducible filesystem scan rules for verifying manifest completene
 | `plugins/agents-initializer/` | agents-initializer |
 | `plugins/agent-customizer/` | agent-customizer |
 | `plugins/cursor-initializer/` | cursor-initializer |
+| `plugins/cursor-customizer/` | cursor-customizer |
 | `skills/` | standalone |
 | `.claude/rules/` | repository-global |
 | `.claude/hooks/` | repository-global |
@@ -72,7 +74,7 @@ Defines the reproducible filesystem scan rules for verifying manifest completene
 | `next-steps.md` | Personal session tracking — excluded source |
 | `.github/skills/` | Internal PRP workflow infrastructure — not auditable artifacts |
 | `.github/hooks/` | GitHub Actions (not Claude hooks) |
-| `node_modules/`, `.git/`, `.rag/`, `.specs/`, `rag/` | Build / infra / search infrastructure |
+| `node_modules/`, `.git/`, `.specs/` | Build / infra / excluded source |
 
 ---
 
@@ -83,11 +85,12 @@ Defines the reproducible filesystem scan rules for verifying manifest completene
 | agents-initializer | 4 | 3 | 22 | 19 | 1 | 2 | — | 51 |
 | agent-customizer | 8 | 6 | 34 | 8 | 1 | 3 | — | 60 |
 | cursor-initializer | 2 | 3 | 12 | 10 | 1 | 3 | — | 31 |
+| cursor-customizer | 8 | 6 | 36 | 12 | 1 | 3 | — | 66 |
 | standalone | 12 | — | 76 | 25 | — | 1 | — | 114 |
 | repository-global | 4 | 6 | 13 | — | 2 | 15 | 59 | 99 |
-| **TOTAL** | **30** | **18** | **157** | **62** | **5** | **24** | **59** | **355** |
+| **TOTAL** | **38** | **24** | **193** | **74** | **6** | **27** | **59** | **421** |
 
-> repository-global "Refs" = 4 quality-gate + dev-skill reference files; "Config/README" = rules (9) + instructions (9) + hooks (2) + root files (3) = 23, plus 2 marketplace manifests = 25... see Section 9 for per-artifact classification.
+> repository-global "Refs" = 4 quality-gate + dev-skill reference files; "Config/README" = rules (9) + instructions (9) + hooks (2) + root files (3) = 23, plus 2 marketplace manifests = 25... see Section 10 for per-artifact classification.
 
 ---
 
@@ -116,7 +119,7 @@ Type taxonomy and validator code legend used in all inventory tables.
 | `quality-gate-reference` | `.claude/skills/*/references/*.md` | repository-global | `.claude/skills/quality-gate/references/quality-gate-criteria.md` |
 | `dev-skill` | `.claude/skills/receiving-code-review/SKILL.md`, `.claude/skills/update-review-instructions/SKILL.md` | repository-global | `.claude/skills/receiving-code-review/SKILL.md` |
 | `dev-skill-reference` | `.claude/skills/update-review-instructions/references/*.md` | repository-global | `.claude/skills/update-review-instructions/references/scope-registry.md` |
-| `drift-manifest` | `docs-drift-manifest.md` | agent-customizer | `plugins/agent-customizer/docs-drift-manifest.md` |
+| `drift-manifest` | `docs-drift-manifest.md` | agent-customizer, cursor-customizer | `plugins/agent-customizer/docs-drift-manifest.md` |
 
 ### Validator Code Legend
 
@@ -339,7 +342,84 @@ Type taxonomy and validator code legend used in all inventory tables.
 
 ---
 
-## 8. Artifact Inventory — standalone
+## 8. Artifact Inventory — cursor-customizer
+
+> **Base**: `plugins/cursor-customizer/` | **Bundle**: `cursor-plugin-bundle` | **Primary Phase**: 6
+
+| Path (relative to base) | Type | Validators | Copy Group | Ph.7? |
+|-------------------------|------|------------|------------|-------|
+| `.cursor-plugin/plugin.json` | plugin-manifest | `i:pc` | — | no |
+| `CONVENTIONS.md` | config-file | `i:pc` | — | no |
+| `README.md` | readme | `r:rm`, `i:rm` | — | no |
+| `docs-drift-manifest.md` | drift-manifest | — | — | no |
+| `agents/artifact-analyzer.md` | agent | `r:ca`, `i:ad` | — | no |
+| `agents/docs-drift-checker.md` | agent | `r:ca`, `i:ad` | — | no |
+| `agents/hook-evaluator.md` | agent | `r:ca`, `i:ad` | — | no |
+| `agents/rule-evaluator.md` | agent | `r:ca`, `i:ad` | — | no |
+| `agents/skill-evaluator.md` | agent | `r:ca`, `i:ad` | — | no |
+| `agents/subagent-evaluator.md` | agent | `r:ca`, `i:ad` | — | no |
+| `skills/create-hook/SKILL.md` | skill | `r:cp`, `i:sf` | — | no |
+| `skills/create-hook/references/hook-authoring-guide.md` | reference | `r:rf`, `i:rf` | — | no |
+| `skills/create-hook/references/hook-events-reference.md` | reference | `r:rf`, `i:rf` | — | no |
+| `skills/create-hook/references/hook-validation-criteria.md` | reference | `r:rf`, `i:rf` | — | no |
+| `skills/create-hook/references/prompt-engineering-strategies.md` | reference | `r:rf`, `i:rf` | — | no |
+| `skills/create-hook/assets/templates/hook-config.md` | template | `i:tf` | — | no |
+| `skills/create-rule/SKILL.md` | skill | `r:cp`, `i:sf` | — | no |
+| `skills/create-rule/references/prompt-engineering-strategies.md` | reference | `r:rf`, `i:rf` | — | no |
+| `skills/create-rule/references/rule-authoring-guide.md` | reference | `r:rf`, `i:rf` | — | no |
+| `skills/create-rule/references/rule-validation-criteria.md` | reference | `r:rf`, `i:rf` | — | no |
+| `skills/create-rule/assets/templates/cursor-rule-always.mdc` | template | `i:tf` | — | no |
+| `skills/create-rule/assets/templates/cursor-rule-description.mdc` | template | `i:tf` | — | no |
+| `skills/create-rule/assets/templates/cursor-rule-globs.mdc` | template | `i:tf` | — | no |
+| `skills/create-skill/SKILL.md` | skill | `r:cp`, `i:sf` | — | no |
+| `skills/create-skill/references/behavioral-guidelines.md` | reference | `r:rf`, `i:rf` | — | no |
+| `skills/create-skill/references/prompt-engineering-strategies.md` | reference | `r:rf`, `i:rf` | — | no |
+| `skills/create-skill/references/skill-authoring-guide.md` | reference | `r:rf`, `i:rf` | — | no |
+| `skills/create-skill/references/skill-format-reference.md` | reference | `r:rf`, `i:rf` | — | no |
+| `skills/create-skill/references/skill-validation-criteria.md` | reference | `r:rf`, `i:rf` | — | no |
+| `skills/create-skill/assets/templates/skill-md.md` | template | `i:tf` | — | no |
+| `skills/create-subagent/SKILL.md` | skill | `r:cp`, `i:sf` | — | no |
+| `skills/create-subagent/references/prompt-engineering-strategies.md` | reference | `r:rf`, `i:rf` | — | no |
+| `skills/create-subagent/references/subagent-authoring-guide.md` | reference | `r:rf`, `i:rf` | — | no |
+| `skills/create-subagent/references/subagent-config-reference.md` | reference | `r:rf`, `i:rf` | — | no |
+| `skills/create-subagent/references/subagent-validation-criteria.md` | reference | `r:rf`, `i:rf` | — | no |
+| `skills/create-subagent/assets/templates/subagent-definition.md` | template | `i:tf` | — | no |
+| `skills/improve-hook/SKILL.md` | skill | `r:cp`, `i:sf` | — | no |
+| `skills/improve-hook/references/hook-authoring-guide.md` | reference | `r:rf`, `i:rf` | — | no |
+| `skills/improve-hook/references/hook-evaluation-criteria.md` | reference | `r:rf`, `i:rf` | — | no |
+| `skills/improve-hook/references/hook-events-reference.md` | reference | `r:rf`, `i:rf` | — | no |
+| `skills/improve-hook/references/hook-validation-criteria.md` | reference | `r:rf`, `i:rf` | — | no |
+| `skills/improve-hook/references/prompt-engineering-strategies.md` | reference | `r:rf`, `i:rf` | — | no |
+| `skills/improve-hook/assets/templates/hook-config.md` | template | `i:tf` | — | no |
+| `skills/improve-rule/SKILL.md` | skill | `r:cp`, `i:sf` | — | no |
+| `skills/improve-rule/references/prompt-engineering-strategies.md` | reference | `r:rf`, `i:rf` | — | no |
+| `skills/improve-rule/references/rule-authoring-guide.md` | reference | `r:rf`, `i:rf` | — | no |
+| `skills/improve-rule/references/rule-evaluation-criteria.md` | reference | `r:rf`, `i:rf` | — | no |
+| `skills/improve-rule/references/rule-validation-criteria.md` | reference | `r:rf`, `i:rf` | — | no |
+| `skills/improve-rule/assets/templates/cursor-rule-always.mdc` | template | `i:tf` | — | no |
+| `skills/improve-rule/assets/templates/cursor-rule-description.mdc` | template | `i:tf` | — | no |
+| `skills/improve-rule/assets/templates/cursor-rule-globs.mdc` | template | `i:tf` | — | no |
+| `skills/improve-skill/SKILL.md` | skill | `r:cp`, `i:sf` | — | no |
+| `skills/improve-skill/references/behavioral-guidelines.md` | reference | `r:rf`, `i:rf` | — | no |
+| `skills/improve-skill/references/prompt-engineering-strategies.md` | reference | `r:rf`, `i:rf` | — | no |
+| `skills/improve-skill/references/skill-authoring-guide.md` | reference | `r:rf`, `i:rf` | — | no |
+| `skills/improve-skill/references/skill-evaluation-criteria.md` | reference | `r:rf`, `i:rf` | — | no |
+| `skills/improve-skill/references/skill-format-reference.md` | reference | `r:rf`, `i:rf` | — | no |
+| `skills/improve-skill/references/skill-validation-criteria.md` | reference | `r:rf`, `i:rf` | — | no |
+| `skills/improve-skill/assets/templates/skill-md.md` | template | `i:tf` | — | no |
+| `skills/improve-subagent/SKILL.md` | skill | `r:cp`, `i:sf` | — | no |
+| `skills/improve-subagent/references/prompt-engineering-strategies.md` | reference | `r:rf`, `i:rf` | — | no |
+| `skills/improve-subagent/references/subagent-authoring-guide.md` | reference | `r:rf`, `i:rf` | — | no |
+| `skills/improve-subagent/references/subagent-config-reference.md` | reference | `r:rf`, `i:rf` | — | no |
+| `skills/improve-subagent/references/subagent-evaluation-criteria.md` | reference | `r:rf`, `i:rf` | — | no |
+| `skills/improve-subagent/references/subagent-validation-criteria.md` | reference | `r:rf`, `i:rf` | — | no |
+| `skills/improve-subagent/assets/templates/subagent-definition.md` | template | `i:tf` | — | no |
+
+> **Note**: `.mdc` templates are Cursor-only — no Claude/standalone counterpart expected. `docs-drift-manifest.md` validator is managed by `cursor-customizer-quality-gate` Phase 3 (drift detection); no separate rule or instruction validator is assigned.
+
+---
+
+## 9. Artifact Inventory — standalone
 
 > **Base**: `skills/` | **Bundle**: `standalone-bundle` | **Primary Phase**: 5
 
@@ -464,7 +544,7 @@ Type taxonomy and validator code legend used in all inventory tables.
 
 ---
 
-## 9. Artifact Inventory — repository-global
+## 10. Artifact Inventory — repository-global
 
 > **Bundle**: `governance-bundle` | **Primary Phase**: varies — see Ph.column
 
@@ -474,8 +554,6 @@ Type taxonomy and validator code legend used in all inventory tables.
 | `.claude/rules/cursor-agent-files.md` | rule | `i:rl` | — | 6 | no |
 | `.claude/rules/cursor-plugin-skills.md` | rule | `i:rl` | — | 6 | no |
 | `.claude/rules/plugin-skills.md` | rule | `i:rl` | — | 4 | no |
-| `.claude/rules/rag-mcp-server.md` | rule | `i:rl` | — | 9 | no |
-| `.claude/rules/rag-storage-and-search.md` | rule | `i:rl` | — | 9 | no |
 | `.claude/rules/readme-files.md` | rule | `i:rl` | — | 4,5,6 | no |
 | `.claude/rules/reference-files.md` | rule | `i:rl` | — | 4,5,6 | no |
 | `.claude/rules/standalone-skills.md` | rule | `i:rl` | — | 5 | no |
@@ -489,7 +567,6 @@ Type taxonomy and validator code legend used in all inventory tables.
 | `.github/instructions/skill-files.instructions.md` | instruction | — | — | 4,5,6 | no |
 | `.github/instructions/template-files.instructions.md` | instruction | — | — | 4,5,6 | no |
 | `.claude/hooks/check-docs-sync.sh` | hook | — | — | 9 | no |
-| `.claude/hooks/check-rag-reindex.sh` | hook | — | — | 9 | no |
 | `.claude/skills/quality-gate/SKILL.md` | quality-gate-skill | — | — | 9 | no |
 | `.claude/skills/quality-gate/README.md` | quality-gate-skill | — | — | 9 | no |
 | `.claude/skills/quality-gate/agents/artifact-inspector.md` | quality-gate-agent | — | — | 9 | no |
@@ -574,7 +651,7 @@ Type taxonomy and validator code legend used in all inventory tables.
 
 ---
 
-## 10. Shared Copy Group Registry
+## 11. Shared Copy Group Registry
 
 Groups are stable identifiers referenced in inventory Ph.7 columns. Member paths are the filesystem truth — Task 2 cross-validates all member paths exist. Some Phase 7 groups contain multiple parity families under one stable ID when platform or lifecycle adaptations are intentional; in those cases, the Parity Enforcer column names the family split instead of requiring one hash across every listed member.
 
@@ -630,7 +707,7 @@ Groups are stable identifiers referenced in inventory Ph.7 columns. Member paths
 
 ---
 
-## 11. Validator Coverage Matrix
+## 12. Validator Coverage Matrix
 
 Enforcement status per (scope × artifact type). Cells show active rule/instruction/gate checks. **Gap** = no automated enforcement.
 
@@ -659,6 +736,13 @@ Enforcement status per (scope × artifact type). Cells show active rule/instruct
 | cursor-initializer | agent | `r:ca` | `i:ad` | `ci:A` (A1–A5) | — | no |
 | cursor-initializer | reference | `r:rf` | `i:rf` | `ci:R` (R1–R5), `ci:X` (X1–X2) | — | no |
 | cursor-initializer | template | — | `i:tf` | `ci:T` (T1–T4), `ci:X` | — | no |
+| cursor-customizer | skill | `r:cp` | `i:sf` | `cc:P` (P1–P12) | `cc:D` (D1–D4) | no |
+| cursor-customizer | agent | `r:ca` | `i:ad` | `cc:A` (A1–A8) | `cc:D` (D1–D4) | no |
+| cursor-customizer | reference | `r:rf` | `i:rf` | `cc:R` (R1–R5), `cc:X` (X1–X19) | `cc:D` (D1–D4) | no |
+| cursor-customizer | template | — | `i:tf` | `cc:T` (T1–T7), `cc:X` | — | no |
+| cursor-customizer | drift-manifest | — | — | `cc:D` (D1–D4) | — | no |
+| cursor-customizer | plugin-manifest | — | `i:pc` | — | — | **yes** (no gate) |
+| cursor-customizer | config-file/readme | `r:rm` | `i:pc`, `i:rm` | — | — | **yes** (no gate) |
 | standalone | skill | `r:ss` | `i:sf` | `q:S` (S1–S11) | — | no |
 | standalone | reference | `r:rf` | `i:rf` | `q:R` (R1–R5), `q:X` (X1–X2) | — | no |
 | standalone | template | — | `i:tf` | `q:T` (T1–T2), `q:X` | — | no |
@@ -670,7 +754,7 @@ Enforcement status per (scope × artifact type). Cells show active rule/instruct
 
 ---
 
-## 12. Quality Gate Coverage Map
+## 13. Quality Gate Coverage Map
 
 | Scope | Quality Gate | Static (Phase 1) | Parity (Phase 2) | Drift (Phase 3) | Scenarios (Phase 4) | Coverage Gap |
 |-------|-------------|-----------------|-----------------|-----------------|---------------------|--------------|
@@ -678,6 +762,7 @@ Enforcement status per (scope × artifact type). Cells show active rule/instruct
 | agent-customizer | `.claude/skills/agent-customizer-quality-gate/` | ✅ P1–P12, A1–A6, R1–R5, M1–M3 | ✅ X1–X14, T1–T3 | ✅ D1–D3 | ✅ G1–G4 | Full coverage |
 | cursor-customizer | `.claude/skills/cursor-customizer-quality-gate/` | ✅ P1–P12, A1–A8, R1–R5, T1–T7, M1–M3, DM1–DM3, S1 | ✅ X1–X19 | ✅ D1–D4 | ✅ G1–G4 | Full coverage |
 | cursor-initializer | `.claude/skills/cursor-initializer-quality-gate/` | ✅ P1–P10, A1–A5, R1–R5 | ✅ X1–X2, T1–T4 | ❌ none | ✅ G1–G4 | No drift detection |
+| cursor-customizer | `.claude/skills/cursor-customizer-quality-gate/` | ✅ P1–P12, A1–A8, R1–R5 | ✅ T1–T7, X1–X19 | ✅ D1–D4 | ✅ G1–G4 | Full coverage |
 | standalone | `.claude/skills/quality-gate/` (shared) | ✅ S1–S11, R1–R5 | ✅ X1–X2, T1–T2 | ✅ (Phase 3, via manifest) | ✅ G1–G4 | No cursor-initializer drift |
 | repository-global | **No quality gate** | ❌ | ❌ | ❌ | ❌ | **All coverage manual** |
 
@@ -685,14 +770,14 @@ Enforcement status per (scope × artifact type). Cells show active rule/instruct
 
 ---
 
-## 13. Audit Phase Assignments
+## 14. Audit Phase Assignments
 
 | PRD Phase | Scope | Artifact Count | Quality Gate | Notes |
 |-----------|-------|---------------|--------------|-------|
 | 3 | Cross-cutting | — | — | Normative source matrix cross-validation; validator protocol definition |
 | 4 | agents-initializer + agent-customizer | 111 | Both quality gates available | Claude Code scope audit; ~51 agents-init + ~60 agent-customizer |
 | 5 | standalone | 114 | quality-gate (partial) | Standalone scope audit |
-| 6 | cursor-initializer | 31 | `.claude/skills/cursor-initializer-quality-gate/` | Cursor scope audit; automated gate shipped Phase 9, first full run Phase 10 |
-| 7 | Cross-cutting (Ph.7?=yes) | ~180 | Parity checkers | Parity review for all SCG/TCG groups; drift remediation for agent-customizer |
+| 6 | cursor-initializer + cursor-customizer | 97 | cursor-initializer-qg + cursor-customizer-qg | Cursor scope audit; ~31 cursor-init + ~66 cursor-customizer |
+| 7 | Cross-cutting (Ph.7?=yes) | ~180 | Parity checkers | Parity review for all SCG/TCG groups; drift remediation for agent-customizer and cursor-customizer |
 | 8 | RAG/Wiki infrastructure | — | None | RAG hardening; out of scope for distribution artifact audit |
-| 9 | All | 354 | New/extended gates | Regression prevention; cursor-initializer and repository-global gap remediation |
+| 9 | All | 420 | New/extended gates | Regression prevention; cursor-initializer and repository-global gap remediation |
