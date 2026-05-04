@@ -64,7 +64,7 @@ Before generating, read these reference documents:
 Read `assets/templates/skill-md.md` and fill its placeholders using:
 
 - User requirements for the new skill
-- Phase 1 analysis output (naming conventions, existing patterns, plugin context)
+- Phase 1 analysis output (naming conventions, existing patterns)
 - Evidence from the reference files above
 
 Generate the complete skill directory structure:
